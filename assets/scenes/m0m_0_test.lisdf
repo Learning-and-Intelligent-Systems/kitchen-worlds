@@ -33,7 +33,7 @@
 	      <size>0.015 0.015 0.35</size>
 	    </box>
 	  </geometry>
-	</collision>	
+	</collision>
       </link>
       <link name="table_leg_3">
 	<pose>0.285 -0.585 0.35 0 0 0</pose>
@@ -43,7 +43,7 @@
 	      <size>0.015 0.015 0.35</size>
 	    </box>
 	  </geometry>
-	</collision>	
+	</collision>
       </link>
       <link name="table_leg_4">
 	<pose>0.285 0.585 0.35 0 0 0</pose>
@@ -53,7 +53,7 @@
 	      <size>0.015 0.015 0.35</size>
 	    </box>
 	  </geometry>
-	</collision>	
+	</collision>
       </link>
     </model>
 
@@ -73,7 +73,7 @@
     </model>
 
     <model name="pillar#3_1">
-      <static>true</static>      
+      <static>true</static>
       <pose>0.0 0.20000000298023224 0.7549999952316284 0 0 0</pose>
       <link name="pillar#3">
 	<collision name="pillar#3_collision">
@@ -84,7 +84,7 @@
 	  </geometry>
 	</collision>
       </link>
-      
+
     </model>
 
     <model name="banana#12_1">
@@ -94,7 +94,7 @@
 	<collision name="banana_collision">
 	  <geometry>
 	    <mesh>
-	      <uri>011_banana/textured.obj</uri>
+	      <uri>../models/011_banana/textured.obj</uri>
 	      <scale>1.0 1.0 1.0</scale>
 	    </mesh>
 	  </geometry>
@@ -103,19 +103,19 @@
     </model>
 
     <model name="sugar_box#13_1">
-      <static>false</static>      
+      <static>false</static>
       <pose>0.11750369518995285 -0.1199718788266182 0.8201214075088501 0 0 0</pose>
       <link name="sugar_box">
 	<collision name="sugar_box_collision">
 	  <geometry>
 	    <mesh>
-	      <uri>004_sugar_box/textured.obj</uri>
+	      <uri>../models/004_sugar_box/textured.obj</uri>
 	      <scale>1.0 1.0 1.0</scale>
 	    </mesh>
 	  </geometry>
 	</collision>
       </link>
     </model>
-    
+
   </world>
 </sdf>

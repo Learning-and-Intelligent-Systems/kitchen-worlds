@@ -14,6 +14,8 @@ git submodule init
 
 ## Examples
 
+The kitchen scenes in the format of  `.lisdf` are in path `models/asset/`.
+
 To test parsing of LISDF files, run
 
 ```shell
@@ -28,11 +30,22 @@ python pybullet_test.py
 
 ## TODO
 
-- [ ] upload test scene files in the format of `.lisdf` -> need lisdf team to resolve a few issues with parsing
+- [ ] upload test scene files in the format of `.lisdf` -> need lisdf team to support a few more tags, including 
+
+  ``````xml
+  <world><actor>...</actor></world>
+  <model><uri>...</uri></model>
+  <state>...</state>
+  ``````
+
 - [ ] upload problem files in the format of `problem.pddl`
+
 - [ ] add `requirements.txt`
+
 - [ ] upload implicit domain files in the format of `domain.pddl`
+
 - [ ] add instructions to solve the example problems with TAMP planner [PDDLStream](https://github.com/caelan/pddlstream/tree/main)
+
 - [ ] add instructions on generating kitchen scenes with scripts in [cognitive-architectures](https://github.mit.edu/ztyang/cognitive-architectures/tree/master/bullet)
 
 ## Acknowledgements

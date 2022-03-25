@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <!-- tmp sdf file generated from LISDF -->
 <sdf version="1.9">
-  <world name="tmp_world">
+  <world name="kitchen_world_0">
 
     <!-- <actor name="pr2">
       <uri>models/drake/pr2_description/urdf/pr2_simplified.urdf</uri>
@@ -71,6 +71,14 @@
       <scale>0.8815298531369636</scale>
       <pose>0.6 8.0 0.727 0.0 -0.0 3.142</pose>
     </model> -->
+
+    <state world_name="kitchen_world_0">
+      <model name="pr2">
+        <joint name="">
+          <angle></angle>
+        </joint>
+      </model>
+    </state>
 
   </world>
 </sdf>

@@ -144,7 +144,7 @@
       	<collision name="banana_collision">
       	  <geometry>
       	    <mesh>
-      	      <uri>models/011_banana/textured.obj</uri>
+      	      <uri>../models/011_banana/textured.obj</uri>
       	      <scale>1.0 1.0 1.0</scale>
       	    </mesh>
       	  </geometry>
@@ -159,7 +159,7 @@
       	<collision name="sugar_box_collision">
       	  <geometry>
       	    <mesh>
-      	      <uri>models/004_sugar_box/textured.obj</uri>
+      	      <uri>../models/004_sugar_box/textured.obj</uri>
       	      <scale>1.0 1.0 1.0</scale>
       	    </mesh>
       	  </geometry>
