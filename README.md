@@ -1,6 +1,6 @@
 # kitchen-worlds
 
-![example kitchen scene](media/move_egg.png)
+![kitchen_basics.lisdf in PyBullet](media/kitchen_basics.png)
 
 A collection of kitchen scenes in LISDF format (an extension to SDF that includes URDF), kitchen object models, and TAMP problems. A product of LIS TAMP I/O Hackathon 03/25/2022.
 
@@ -14,7 +14,7 @@ git submodule init
 
 ## Examples
 
-The kitchen scenes in the format of  `.lisdf` are in path `models/asset/`.
+The kitchen scenes are in path `asset/scenes/`.
 
 To test parsing of LISDF files, run
 
@@ -22,11 +22,19 @@ To test parsing of LISDF files, run
 python parser_test.py
 ```
 
-To test loading LISDF worlds into PyBullet, run
+To test loading LISDF worlds into PyBullet, run (expecting failure)
 
 ```shell
 python pybullet_test.py
 ```
+
+## LISDF Spec
+
+Current kitchen scenes in the format of  `.lisdf` are in path `asset/scenes/`, e.g. `kitchen_counter.lisdf` as simulated below. The LISDF format has a few additions compared to [SDF](http://sdformat.org/spec?ver=1.9&elem=sdf):
+
+* add actor and models with `<uri>URDF_file</uri>` 
+
+![kitchen_counter.lisdf in PyBullet](media/kitchen_counter.png)
 
 ## TODO
 
