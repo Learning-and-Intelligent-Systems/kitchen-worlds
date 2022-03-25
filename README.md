@@ -6,7 +6,7 @@ A collection of kitchen scenes in LISDF format (an extension to SDF that include
 
 ## Setup
 
-Initiate lisdf submodule:
+Grab the lisdf package, developed by William Shen, Nishanth Kumar, Aidan Curtis, and Jiayuan Mao
 
 ```shell
 git submodule init 
@@ -39,6 +39,5 @@ python pybullet_test.py
 
 In order to be lightweight, some functions in this repo is copied from the work of other LIS members instead of added as part of their original submodules:
 
-* the [lisdf](https://github.com/Learning-and-Intelligent-Systems/lisdf) package is developed by William Shen, Nishanth Kumar, Aidan Curtis, and Jiayuan Mao
 * the [pybullet_tools](https://github.com/caelan/pybullet-planning/tree/master/pybullet_tools) package is a subset of tools developed by Caelan Garret
 * most object models are downloaded from [PartNet Mobility dataset](https://sapien.ucsd.edu/browse) (Mo, Kaichun, et al. "Partnet: A large-scale benchmark for fine-grained and hierarchical part-level 3d object understanding." *Proceedings of the IEEE/CVF conference on computer vision and pattern recognition*. 2019.)
