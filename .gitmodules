@@ -1,0 +1,3 @@
+[submodule "lisdf"]
+	path = lisdf
+	url = https://github.com/Learning-and-Intelligent-Systems/lisdf

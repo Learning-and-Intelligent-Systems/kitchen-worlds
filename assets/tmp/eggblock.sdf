@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<!-- tmp sdf file generated from LISDF -->
+<sdf version="1.9">
+  <world name="tmp_world">
+
+<model name="eggblock">
+  <static>False</static>
+  <pose>0.550000011920929 8.140000343322754 0.8349999785423279 0.0 -0.0 0.746999979019165</pose>
+  <link name="box">
+    <pose>0.0 0.0 0.0 0.0 -0.0 0.0</pose>
+    <inertial>
+      <mass>0</mass>
+      <pose>0.0 0.0 0.0 0.0 -0.0 0.0</pose>
+      <inertia>
+        <ixx>0</ixx>
+        <ixy>0</ixy>
+        <ixz>0</ixz>
+        <iyy>0</iyy>
+        <iyz>0</iyz>
+        <izz>0</izz>
+      </inertia>
+    </inertial>
+    <collision>
+      <geometry>
+        <box>
+          <size>0.07000000029802322 0.07000000029802322 0.10000000149011612</size>
+        </box>
+      </geometry>
+    </collision>
+      
+  </link>
+  
+</model>
+
+
+
+  </world>
+</sdf>

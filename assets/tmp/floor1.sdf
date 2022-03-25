@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<!-- tmp sdf file generated from LISDF -->
+<sdf version="1.9">
+  <world name="tmp_world">
+
+<model name="floor1">
+  <static>False</static>
+  <pose>2.299999952316284 4.699999809265137 -0.0020000000949949026 0.0 -0.0 0.0</pose>
+  <link name="box">
+    <pose>0.0 0.0 0.0 0.0 -0.0 0.0</pose>
+    <inertial>
+      <mass>0</mass>
+      <pose>0.0 0.0 0.0 0.0 -0.0 0.0</pose>
+      <inertia>
+        <ixx>0</ixx>
+        <ixy>0</ixy>
+        <ixz>0</ixz>
+        <iyy>0</iyy>
+        <iyz>0</iyz>
+        <izz>0</izz>
+      </inertia>
+    </inertial>
+    <collision>
+      <geometry>
+        <box>
+          <size>4.699999809265137 9.399999618530273 0.0010000000474974513</size>
+        </box>
+      </geometry>
+    </collision>
+      
+  </link>
+  
+</model>
+
+
+
+  </world>
+</sdf>
