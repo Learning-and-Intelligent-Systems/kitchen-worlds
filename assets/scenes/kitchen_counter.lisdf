@@ -3,15 +3,15 @@
 <sdf version="1.9">
   <world name="kitchen_counter">
 
-    <actor name="pr2">    
+    <model name="pr2">    
       <uri>../models/drake/pr2_description/urdf/pr2_simplified.urdf</uri>
       <pose>1.79 6.0 0.051 0.0 -0.0 3.142</pose>
-    </actor>            
+    </model>            
 
 
     <model name="eggblock">
-      <static>True</static>
-      <pose>0.55 8.176 0.835 0.0 -0.0 0.747</pose>
+      <static>false</static>
+      <pose>0.55 8.133 0.835 0.0 -0.0 0.747</pose>
       <link name="box">
         <collision name="box_collision">
           <geometry>
@@ -24,7 +24,7 @@
     </model>
 
     <model name="floor1">
-      <static>False</static>
+      <static>true</static>
       <pose>2.3 4.7 -0.002 0.0 -0.0 0.0</pose>
       <link name="box">
         <collision name="box_collision">
@@ -39,42 +39,42 @@
 
     <model name="counter#1">
       <uri>../models/counter/urdf/kitchen_part_right_gen_convex.urdf</uri>
-      <static>False</static>
+      <static>true</static>
       <scale>1.0096553359875846</scale>
       <pose>0.5 7.6 1.394 0.0 -0.0 0.0</pose>
     </model>
 
     <model name="braiserbody#1">
       <uri>../models/braiserbody/100693/mobility.urdf</uri>
-      <static>False</static>
+      <static>true</static>
       <scale>0.259</scale>
-      <pose>0.55 8.176 0.818 0.0 -0.0 2.973</pose>
+      <pose>0.55 8.133 0.818 0.0 -0.0 2.833</pose>
     </model>
 
     <model name="microwave#1">
       <uri>../models/microwave/7128/mobility.urdf</uri>
-      <static>False</static>
+      <static>true</static>
       <scale>0.48999999999999994</scale>
       <pose>0.4 6.4 1.019 0.0 -0.0 3.142</pose>
     </model>
 
     <model name="braiserlid#1">
       <uri>../models/braiserlid/100693/mobility.urdf</uri>
-      <static>False</static>
+      <static>true</static>
       <scale>0.259</scale>
-      <pose>0.7 9.097 0.813 0.0 -0.0 0.794</pose>
+      <pose>0.7 8.475 0.813 0.0 -0.0 2.249</pose>
     </model>
 
     <model name="oven#1">
       <uri>../models/Oven/01909/mobility.urdf</uri>
-      <static>False</static>
+      <static>true</static>
       <scale>0.8815298531369636</scale>
       <pose>0.6 8.0 0.727 0.0 -0.0 3.142</pose>
     </model>
 
 
     <state world_name="kitchen_counter">
-      <actor name="pr2">
+      <model name="pr2">
         <joint name="l_shoulder_pan_joint"><angle>0.677</angle></joint>
         <joint name="l_shoulder_lift_joint"><angle>-0.343</angle></joint>
         <joint name="l_upper_arm_roll_joint"><angle>1.2</angle></joint>
@@ -89,7 +89,7 @@
         <joint name="r_forearm_roll_joint"><angle>-10000.0</angle></joint>
         <joint name="r_wrist_flex_joint"><angle>-0.1</angle></joint>
         <joint name="r_wrist_roll_joint"><angle>-10000.0</angle></joint>
-      </actor>
+      </model>
       <model name="counter#1">
         <joint name="hitman_drawer_top_joint"><angle>0.0</angle></joint>
         <joint name="indigo_drawer_top_joint"><angle>0.0</angle></joint>
