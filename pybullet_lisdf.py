@@ -3,7 +3,11 @@ import sys
 from os.path import join, abspath, dirname, isdir, isfile
 sys.path.append('lisdf')
 from lisdf.parsing.sdf_j import load_sdf
-from lisdf.components.model_urdf import URDFModel
+from lisdf.components.model import URDFInclude
+
+from pybullet_tools.utils import load_pybullet, connect, wait_if_gui, HideOutput, \
+    disconnect, set_pose, Point, Euler, Pose, set_joint_position, joint_from_name, \
+    quat_from_euler
 
 def make_sdf_world(sdf_model):
     """ temporary fix for LISDF format """
@@ -15,7 +19,7 @@ def make_sdf_world(sdf_model):
     #         sdf_model_fixed += line + '\n'
     #     last_line = line
     # sdf_model = sdf_model_fixed
-    print(sdf_model)
+    # print(sdf_model)
 
     return f"""<?xml version="1.0" ?>
 <!-- tmp sdf file generated from LISDF -->
@@ -27,10 +31,8 @@ def make_sdf_world(sdf_model):
   </world>
 </sdf>"""
 
-def load_lisdf_pybullet(sdf_path):
-    from pybullet_tools.utils import load_pybullet, connect, wait_if_gui, \
-        disconnect, HideOutput
-
+def load_lisdf_pybullet(lisdf_path):
+    scenes_path = dirname(os.path.abspath(lisdf_path))
     tmp_path = join('assets', 'tmp')
 
     connect(use_gui=True, shadows=False, width=1980, height=1238)
@@ -40,22 +42,34 @@ def load_lisdf_pybullet(sdf_path):
     # load_pybullet(sdf_path)  ## failed
     # load_pybullet(join(tmp_path, 'table#1_1.sdf'))
 
-    world = load_sdf(sdf_path).worlds[0]
+    world = load_sdf(lisdf_path).worlds[0]
+    model_states = world.states[0].model_states
+    model_states = {s.name: s for s in model_states}
     for model in world.models:
-        print(model.name)
-        if isinstance(model, URDFModel):
-            uri = model.uri
+        print(f'\n\n---------- {model.name}')
+        scale = 1
+        if isinstance(model, URDFInclude):
+            uri = join(scenes_path, model.uri)
+            scale = model.scale_1d
         else:
             uri = join(tmp_path, f'{model.name}.sdf')
             with open(uri, 'w') as f:
                 f.write(make_sdf_world(model.to_sdf()))
 
-        # with HideOutput():
+        with HideOutput():
+            body = load_pybullet(uri, scale=scale)
+            if isinstance(body, tuple): body = body[0]
 
-        body = load_pybullet(uri)
+        ## set pose of body using PyBullet tools' data structure
+        pose = (model.pose.pos, quat_from_euler(model.pose.rpy))
+        set_pose(body, pose)
+        if model.name in model_states:
+            for js in model_states[model.name].joint_states:
+                position = js.axis_states[0].value
+                set_joint_position(body, joint_from_name(body, js.name), position)
 
-        # if tmp_path in uri:
-        #     os.remove(tmp_path)
+        if not isinstance(model, URDFInclude):
+            os.remove(uri)
 
         wait_if_gui('load next model?')
 
@@ -65,6 +79,6 @@ def load_lisdf_pybullet(sdf_path):
 
 if __name__ == "__main__":
 
-    for sdf_test in ['kitchen_counter_test']: ## 'm0m_joint_test'
-        sdf_path = join('assets', 'scenes', f'{sdf_test}.lisdf')
-        world = load_lisdf_pybullet(sdf_path)
+    for lisdf_test in ['m0m_joint_test']: ## 'kitchen_counter_test'
+        lisdf_path = join('assets', 'scenes', f'{lisdf_test}.lisdf')
+        world = load_lisdf_pybullet(lisdf_path)

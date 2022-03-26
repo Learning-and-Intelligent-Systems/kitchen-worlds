@@ -6,7 +6,7 @@ A collection of kitchen scenes in LISDF format (an extension to SDF that include
 
 ## Setup
 
-Grab the lisdf package, developed by William Shen, Nishanth Kumar, Aidan Curtis, and Jiayuan Mao
+Grab the [lisdf](https://github.com/Learning-and-Intelligent-Systems/lisdf) package, developed by William Shen, Nishanth Kumar, Aidan Curtis, and Jiayuan Mao
 
 ```shell
 git submodule init
