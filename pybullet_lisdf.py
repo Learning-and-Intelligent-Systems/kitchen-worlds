@@ -6,8 +6,8 @@ from lisdf.parsing.sdf_j import load_sdf
 from lisdf.components.model import URDFInclude
 
 from pybullet_tools.utils import load_pybullet, connect, wait_if_gui, HideOutput, \
-    disconnect, set_pose, Point, Euler, Pose, set_joint_position, joint_from_name, \
-    quat_from_euler, set_camera_pose
+    disconnect, set_pose, set_joint_position, joint_from_name, quat_from_euler, \
+    set_camera_pose, get_camera
 
 ## will be replaced later will <world><gui><camera> tag
 HACK_CAMERA_POSES = { ## scene_name : (camera_point, target_point)
@@ -53,6 +53,9 @@ def load_lisdf_pybullet(lisdf_path):
     if world.name in HACK_CAMERA_POSES:
         cp, tp = HACK_CAMERA_POSES[world.name]
         set_camera_pose(camera_point=cp, target_point=tp)
+
+        ## for retriving camera info from pybullet
+        _, _, _, _, _, _, _, _, yaw, pitch, dist, target = get_camera()
 
     ## may be changes in joint positions
     model_states = {}
