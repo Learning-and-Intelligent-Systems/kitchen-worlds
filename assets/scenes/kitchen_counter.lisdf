@@ -3,15 +3,23 @@
 <sdf version="1.9">
   <world name="kitchen_counter">
 
-    <include name="pr2">
+    <gui>
+      <camera name="default_camera" definition_type="lookat">
+        <xyz>1.463 8.024 1.454</xyz>
+        <point_to>0.463 8.024 0.454</point_to>
+      </camera>
+    </gui>
+
+
+    <include name="pr2">    
       <uri>../models/drake/pr2_description/urdf/pr2_simplified.urdf</uri>
       <pose>1.79 6.0 0.051 0.0 -0.0 3.142</pose>
-    </include>
+    </include>            
 
 
     <model name="eggblock">
       <static>false</static>
-      <pose>0.55 8.212 0.835 0.0 -0.0 0.747</pose>
+      <pose>0.55 8.185 0.835 0.0 -0.0 0.747</pose>
       <link name="box">
         <collision name="box_collision">
           <geometry>
@@ -48,7 +56,7 @@
       <uri>../models/braiserbody/100693/mobility.urdf</uri>
       <static>true</static>
       <scale>0.259</scale>
-      <pose>0.55 8.212 0.818 0.0 -0.0 1.138</pose>
+      <pose>0.55 8.185 0.818 0.0 -0.0 1.421</pose>
     </include>
 
     <include name="microwave#1">
@@ -62,7 +70,7 @@
       <uri>../models/braiserlid/100693/mobility.urdf</uri>
       <static>true</static>
       <scale>0.259</scale>
-      <pose>0.7 9.046 0.813 0.0 -0.0 2.509</pose>
+      <pose>0.7 9.056 0.813 0.0 -0.0 0.715</pose>
     </include>
 
     <include name="oven#1">
