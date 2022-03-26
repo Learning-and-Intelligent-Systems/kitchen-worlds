@@ -3,15 +3,15 @@
 <sdf version="1.9">
   <world name="kitchen_basics">
 
-    <model name="pr2">    
+    <include name="pr2">
       <uri>../models/drake/pr2_description/urdf/pr2_simplified.urdf</uri>
       <pose>2.5 6.0 0.051 0.0 -0.0 3.142</pose>
-    </model>            
+    </include>
 
 
     <model name="eggblock">
       <static>false</static>
-      <pose>0.7 4.9 0.845 0.0 -0.0 0.813</pose>
+      <pose>0.7 4.9 0.845 0.0 -0.0 2.234</pose>
       <link name="box">
         <collision name="box_collision">
           <geometry>
@@ -37,75 +37,75 @@
       </link>
     </model>
 
-    <model name="counter#1">
+    <include name="counter#1">
       <uri>../models/counter/urdf/kitchen_part_right_gen_convex.urdf</uri>
       <static>true</static>
       <scale>1.0096553359875846</scale>
       <pose>0.5 7.6 1.394 0.0 -0.0 0.0</pose>
-    </model>
+    </include>
 
-    <model name="braiserbody#1">
+    <include name="braiserbody#1">
       <uri>../models/braiserbody/100693/mobility.urdf</uri>
       <static>true</static>
       <scale>0.259</scale>
-      <pose>0.55 8.185 0.818 0.0 -0.0 1.781</pose>
-    </model>
+      <pose>0.55 8.157 0.818 0.0 -0.0 0.332</pose>
+    </include>
 
-    <model name="microwave#1">
+    <include name="microwave#1">
       <uri>../models/microwave/7128/mobility.urdf</uri>
       <static>true</static>
       <scale>0.48999999999999994</scale>
       <pose>0.4 6.4 1.019 0.0 -0.0 3.142</pose>
-    </model>
+    </include>
 
-    <model name="braiserlid#1">
+    <include name="braiserlid#1">
       <uri>../models/braiserlid/100693/mobility.urdf</uri>
       <static>false</static>
       <scale>0.259</scale>
-      <pose>0.55 8.185 0.821 0.0 -0.0 1.781</pose>
-    </model>
+      <pose>0.55 8.157 0.821 0.0 -0.0 0.332</pose>
+    </include>
 
-    <model name="oven#1">
+    <include name="oven#1">
       <uri>../models/Oven/01909/mobility.urdf</uri>
       <static>true</static>
       <scale>0.8815298531369636</scale>
       <pose>0.6 8.0 0.727 0.0 -0.0 3.142</pose>
-    </model>
+    </include>
 
-    <model name="dishwasher#1">
+    <include name="dishwasher#1">
       <uri>../models/DishWasher/2085/mobility.urdf</uri>
       <static>true</static>
       <scale>0.6992448779636837</scale>
       <pose>0.7 6.4 0.366 0.0 -0.0 3.142</pose>
-    </model>
+    </include>
 
-    <model name="basin#1">
+    <include name="basin#1">
       <uri>../models/Basin/102379/mobility.urdf</uri>
       <static>true</static>
       <scale>0.5535737943700895</scale>
       <pose>0.5 5.6 0.363 0.0 -0.0 3.142</pose>
-    </model>
+    </include>
 
-    <model name="faucet#1">
+    <include name="faucet#1">
       <uri>../models/faucet/149/mobility.urdf</uri>
       <static>true</static>
       <scale>0.21</scale>
       <pose>0.3 5.6 0.967 0.0 -0.0 3.142</pose>
-    </model>
+    </include>
 
-    <model name="fridge#1">
+    <include name="fridge#1">
       <uri>../models/Fridge/10144/mobility.urdf</uri>
       <static>true</static>
       <scale>1.110876559215739</scale>
       <pose>0.5 4.9 1.055 0.0 -0.0 3.142</pose>
-    </model>
+    </include>
 
-    <model name="milkbottle#1">
+    <include name="milkbottle#1">
       <uri>../models/milkbottle/4043/mobility.urdf</uri>
       <static>true</static>
       <scale>0.13999999999999999</scale>
-      <pose>0.7 4.9 1.503 0.0 -0.0 2.762</pose>
-    </model>
+      <pose>0.7 4.9 1.503 0.0 -0.0 3.067</pose>
+    </include>
 
 
     <state world_name="kitchen_basics">

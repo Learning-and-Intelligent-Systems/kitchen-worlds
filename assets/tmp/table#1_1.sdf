@@ -5,12 +5,12 @@
 
 <model name="table#1_1">
   <static>True</static>
-  <pose>0.0 0.0 0.0 0.0 -0.0 0.0</pose>
+  <pose>0.0, 0.0, 0.0, 0.0, -0.0, 0.0</pose>
   <link name="table_top">
-    <pose>0.0 0.0 0.7149999737739563 0.0 -0.0 0.0</pose>
+    <pose>0.0, 0.0, 0.7149999737739563, 0.0, -0.0, 0.0</pose>
     <inertial>
       <mass>0</mass>
-      <pose>0.0 0.0 0.0 0.0 -0.0 0.0</pose>
+      <pose>0.0, 0.0, 0.0, 0.0, -0.0, 0.0</pose>
       <inertia>
         <ixx>0</ixx>
         <ixy>0</ixy>
@@ -22,19 +22,20 @@
     </inertial>
     <collision>
       <geometry>
-        <box>
-          <size>0.30000001192092896 0.6000000238418579 0.014999999664723873</size>
-        </box>
-      </geometry>
-    </collision>
       
+      <box>
+        <size>0.30000001192092896 0.6000000238418579 0.014999999664723873</size>
+      </box>
+    </geometry>
+    </collision>
+    
   </link>
   
   <link name="table_leg_1">
-    <pose>-0.2849999964237213 -0.5849999785423279 0.3499999940395355 0.0 -0.0 0.0</pose>
+    <pose>-0.2849999964237213, -0.5849999785423279, 0.3499999940395355, 0.0, -0.0, 0.0</pose>
     <inertial>
       <mass>0</mass>
-      <pose>0.0 0.0 0.0 0.0 -0.0 0.0</pose>
+      <pose>0.0, 0.0, 0.0, 0.0, -0.0, 0.0</pose>
       <inertia>
         <ixx>0</ixx>
         <ixy>0</ixy>
@@ -46,19 +47,20 @@
     </inertial>
     <collision>
       <geometry>
-        <box>
-          <size>0.014999999664723873 0.014999999664723873 0.3499999940395355</size>
-        </box>
-      </geometry>
-    </collision>
       
+      <box>
+        <size>0.014999999664723873 0.014999999664723873 0.3499999940395355</size>
+      </box>
+    </geometry>
+    </collision>
+    
   </link>
   
   <link name="table_leg_2">
-    <pose>-0.2849999964237213 0.5849999785423279 0.3499999940395355 0.0 -0.0 0.0</pose>
+    <pose>-0.2849999964237213, 0.5849999785423279, 0.3499999940395355, 0.0, -0.0, 0.0</pose>
     <inertial>
       <mass>0</mass>
-      <pose>0.0 0.0 0.0 0.0 -0.0 0.0</pose>
+      <pose>0.0, 0.0, 0.0, 0.0, -0.0, 0.0</pose>
       <inertia>
         <ixx>0</ixx>
         <ixy>0</ixy>
@@ -70,19 +72,20 @@
     </inertial>
     <collision>
       <geometry>
-        <box>
-          <size>0.014999999664723873 0.014999999664723873 0.3499999940395355</size>
-        </box>
-      </geometry>
-    </collision>
       
+      <box>
+        <size>0.014999999664723873 0.014999999664723873 0.3499999940395355</size>
+      </box>
+    </geometry>
+    </collision>
+    
   </link>
   
   <link name="table_leg_3">
-    <pose>0.2849999964237213 -0.5849999785423279 0.3499999940395355 0.0 -0.0 0.0</pose>
+    <pose>0.2849999964237213, -0.5849999785423279, 0.3499999940395355, 0.0, -0.0, 0.0</pose>
     <inertial>
       <mass>0</mass>
-      <pose>0.0 0.0 0.0 0.0 -0.0 0.0</pose>
+      <pose>0.0, 0.0, 0.0, 0.0, -0.0, 0.0</pose>
       <inertia>
         <ixx>0</ixx>
         <ixy>0</ixy>
@@ -94,19 +97,20 @@
     </inertial>
     <collision>
       <geometry>
-        <box>
-          <size>0.014999999664723873 0.014999999664723873 0.3499999940395355</size>
-        </box>
-      </geometry>
-    </collision>
       
+      <box>
+        <size>0.014999999664723873 0.014999999664723873 0.3499999940395355</size>
+      </box>
+    </geometry>
+    </collision>
+    
   </link>
   
   <link name="table_leg_4">
-    <pose>0.2849999964237213 0.5849999785423279 0.3499999940395355 0.0 -0.0 0.0</pose>
+    <pose>0.2849999964237213, 0.5849999785423279, 0.3499999940395355, 0.0, -0.0, 0.0</pose>
     <inertial>
       <mass>0</mass>
-      <pose>0.0 0.0 0.0 0.0 -0.0 0.0</pose>
+      <pose>0.0, 0.0, 0.0, 0.0, -0.0, 0.0</pose>
       <inertia>
         <ixx>0</ixx>
         <ixy>0</ixy>
@@ -118,16 +122,21 @@
     </inertial>
     <collision>
       <geometry>
-        <box>
-          <size>0.014999999664723873 0.014999999664723873 0.3499999940395355</size>
-        </box>
-      </geometry>
-    </collision>
       
+      <box>
+        <size>0.014999999664723873 0.014999999664723873 0.3499999940395355</size>
+      </box>
+    </geometry>
+    </collision>
+    
   </link>
-  
+  <joint name="table_leg_link_1" type="hinge">
+    <parent>table_top</parent>
+    <child>table_leg_1</child>
+    <pose>0.0, 0.5, 0.0, 0.0, -0.0, 0.0</pose>
+    <axis>0.0 0.0 1.0</axis>
+  </joint>
 </model>
-
 
 
   </world>

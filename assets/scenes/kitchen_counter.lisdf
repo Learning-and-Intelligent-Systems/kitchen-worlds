@@ -3,15 +3,15 @@
 <sdf version="1.9">
   <world name="kitchen_counter">
 
-    <model name="pr2">    
+    <include name="pr2">
       <uri>../models/drake/pr2_description/urdf/pr2_simplified.urdf</uri>
       <pose>1.79 6.0 0.051 0.0 -0.0 3.142</pose>
-    </model>            
+    </include>
 
 
     <model name="eggblock">
       <static>false</static>
-      <pose>0.55 8.133 0.835 0.0 -0.0 0.747</pose>
+      <pose>0.55 8.212 0.835 0.0 -0.0 0.747</pose>
       <link name="box">
         <collision name="box_collision">
           <geometry>
@@ -37,40 +37,40 @@
       </link>
     </model>
 
-    <model name="counter#1">
+    <include name="counter#1">
       <uri>../models/counter/urdf/kitchen_part_right_gen_convex.urdf</uri>
       <static>true</static>
       <scale>1.0096553359875846</scale>
       <pose>0.5 7.6 1.394 0.0 -0.0 0.0</pose>
-    </model>
+    </include>
 
-    <model name="braiserbody#1">
+    <include name="braiserbody#1">
       <uri>../models/braiserbody/100693/mobility.urdf</uri>
       <static>true</static>
       <scale>0.259</scale>
-      <pose>0.55 8.133 0.818 0.0 -0.0 2.833</pose>
-    </model>
+      <pose>0.55 8.212 0.818 0.0 -0.0 1.138</pose>
+    </include>
 
-    <model name="microwave#1">
+    <include name="microwave#1">
       <uri>../models/microwave/7128/mobility.urdf</uri>
       <static>true</static>
       <scale>0.48999999999999994</scale>
       <pose>0.4 6.4 1.019 0.0 -0.0 3.142</pose>
-    </model>
+    </include>
 
-    <model name="braiserlid#1">
+    <include name="braiserlid#1">
       <uri>../models/braiserlid/100693/mobility.urdf</uri>
       <static>true</static>
       <scale>0.259</scale>
-      <pose>0.7 8.475 0.813 0.0 -0.0 2.249</pose>
-    </model>
+      <pose>0.7 9.046 0.813 0.0 -0.0 2.509</pose>
+    </include>
 
-    <model name="oven#1">
+    <include name="oven#1">
       <uri>../models/Oven/01909/mobility.urdf</uri>
       <static>true</static>
       <scale>0.8815298531369636</scale>
       <pose>0.6 8.0 0.727 0.0 -0.0 3.142</pose>
-    </model>
+    </include>
 
 
     <state world_name="kitchen_counter">
