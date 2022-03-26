@@ -48,7 +48,7 @@ def load_lisdf_pybullet(lisdf_path):
         model_states = world.states[0].model_states
         model_states = {s.name: s for s in model_states}
     for model in world.models:
-        print(f'\n\n---------- {model.name}')
+        print(f'---------- {model.name}')
         scale = 1
         if isinstance(model, URDFInclude):
             uri = join(scenes_path, model.uri)
@@ -58,8 +58,7 @@ def load_lisdf_pybullet(lisdf_path):
             with open(uri, 'w') as f:
                 f.write(make_sdf_world(model.to_sdf()))
 
-        # with HideOutput():
-        if True:
+        with HideOutput():
             body = load_pybullet(uri, scale=scale)
             if isinstance(body, tuple): body = body[0]
 
@@ -74,14 +73,14 @@ def load_lisdf_pybullet(lisdf_path):
         if not isinstance(model, URDFInclude):
             os.remove(uri)
 
-        wait_if_gui('load next model?')
+        # wait_if_gui('load next model?')
 
-    wait_if_gui('exit pybullet?')
+    wait_if_gui('load next test scene?')
     disconnect()
 
 
 if __name__ == "__main__":
 
-    for lisdf_test in ['kitchen_counter_test']: ## 'm0m_joint_test'
+    for lisdf_test in ['kitchen_basics', 'kitchen_counter']: ## 'm0m_joint_test'
         lisdf_path = join('assets', 'scenes', f'{lisdf_test}.lisdf')
         world = load_lisdf_pybullet(lisdf_path)
