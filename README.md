@@ -34,7 +34,7 @@ python pybullet_lisdf.py
 
 ## LISDF Spec
 
-Current kitchen scenes in the format of  `.lisdf` are in path `asset/scenes/`, e.g. `kitchen_counter.lisdf` as simulated below. The LISDF format has a few additions compared to [SDF](http://sdformat.org/spec?ver=1.9&elem=sdf):
+Current kitchen scenes in the format of  `.lisdf` are in path `asset/scenes/`, e.g. `kitchen_counter.lisdf` as simulated below. The LISDF format has a few additional tags inside `<world></world>` compared to [SDF](http://sdformat.org/spec?ver=1.9&elem=sdf):
 
 * add object and robot models with 
   ```xml
@@ -45,7 +45,24 @@ Current kitchen scenes in the format of  `.lisdf` are in path `asset/scenes/`, e
       <scale> an integer to scale model .obj with original ratio</scale>
   </include>
   ```
+* describe camera pose in a way that's easy to export from PyBullet
 
+  ```xml
+  <gui>
+    <camera name="default_camera" definition_type="lookat">
+      <xyz>3 6 3</xyz>
+      <point_to>0 6 1</point_to>
+    </camera>
+  </gui>
+  ```
+  apart from what SDF originally supports 
+  ```xml
+  <gui>
+    <camera name="default_camera" definition_type="pose">
+      <pose>3 6 3 0 -2.15 0</pose>
+    </camera>
+  </gui>
+  ```
 ![kitchen_counter.lisdf in PyBullet](media/kitchen_counter.png)
 
 ## TODO
@@ -56,7 +73,7 @@ Current kitchen scenes in the format of  `.lisdf` are in path `asset/scenes/`, e
   <include><uri>...</uri></include>
   <state>...</state>
   ``````
-- [ ] upload test scene files with `<world><gui><camera><pose>`
+- [x] upload test scene files with `<world><gui><camera><pose>`
 
 - [ ] update problem files in the format of `problem.pddl`
 
