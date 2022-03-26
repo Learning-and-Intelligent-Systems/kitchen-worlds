@@ -5,7 +5,7 @@ from lisdf.parsing.sdf_j import load_sdf
 
 if __name__ == "__main__":
 
-    for lisdf_test in ['m0m_0_test', 'm0m_joint_test']:  ## 'counter'
+    for lisdf_test in ['m0m_0_test', 'm0m_joint_test', 'kitchen_counter_test']:  ## 'counter'
         print(f"... paring {lisdf_test}.lisdf")
         lisdf_path = join('assets', 'scenes', f'{lisdf_test}.lisdf')
         lissdf_results = load_sdf(lisdf_path)

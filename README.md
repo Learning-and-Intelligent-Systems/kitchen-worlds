@@ -9,7 +9,7 @@ A collection of kitchen scenes in LISDF format (an extension to SDF that include
 Grab the lisdf package, developed by William Shen, Nishanth Kumar, Aidan Curtis, and Jiayuan Mao
 
 ```shell
-git submodule init 
+git submodule init
 ```
 
 ## Examples
@@ -32,13 +32,13 @@ python pybullet_test.py
 
 Current kitchen scenes in the format of  `.lisdf` are in path `asset/scenes/`, e.g. `kitchen_counter.lisdf` as simulated below. The LISDF format has a few additions compared to [SDF](http://sdformat.org/spec?ver=1.9&elem=sdf):
 
-* add actor and models with `<uri>URDF_file</uri>` 
+* add actor and models with `<uri>URDF_file</uri>`
 
 ![kitchen_counter.lisdf in PyBullet](media/kitchen_counter.png)
 
 ## TODO
 
-- [ ] upload test scene files in the format of `.lisdf` -> need lisdf team to support a few more tags, including 
+- [ ] upload test scene files in the format of `.lisdf` -> need lisdf team to support a few more tags, including
 
   ``````xml
   <world><actor>...</actor></world>
