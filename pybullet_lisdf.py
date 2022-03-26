@@ -7,7 +7,13 @@ from lisdf.components.model import URDFInclude
 
 from pybullet_tools.utils import load_pybullet, connect, wait_if_gui, HideOutput, \
     disconnect, set_pose, Point, Euler, Pose, set_joint_position, joint_from_name, \
-    quat_from_euler
+    quat_from_euler, set_camera_pose
+
+## will be replaced later will <world><gui><camera> tag
+HACK_CAMERA_POSES = { ## scene_name : (camera_point, target_point)
+    'kitchen_counter': ([3, 8, 3], [0, 8, 1]),
+    'kitchen_basics': ([3, 6, 3], [0, 6, 1])
+}
 
 def make_sdf_world(sdf_model):
     """ temporary fix for LISDF format """
@@ -43,10 +49,17 @@ def load_lisdf_pybullet(lisdf_path):
     # load_pybullet(join(tmp_path, 'table#1_1.sdf'))
 
     world = load_sdf(lisdf_path).worlds[0]
+
+    if world.name in HACK_CAMERA_POSES:
+        cp, tp = HACK_CAMERA_POSES[world.name]
+        set_camera_pose(camera_point=cp, target_point=tp)
+
+    ## may be changes in joint positions
     model_states = {}
     if len(world.states) > 0:
         model_states = world.states[0].model_states
         model_states = {s.name: s for s in model_states}
+
     for model in world.models:
         print(f'---------- {model.name}')
         scale = 1
