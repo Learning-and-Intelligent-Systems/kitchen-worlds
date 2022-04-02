@@ -1,2 +1,5 @@
 .DS_Stor
 .idea/
+assets/tmp/*
+*.lisdf~
+*.pyc
