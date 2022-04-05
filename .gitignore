@@ -1,3 +1,6 @@
 .DS_Stor
 __pycache__/
 .idea/
+assets/tmp/*
+*.lisdf~
+*.pyc

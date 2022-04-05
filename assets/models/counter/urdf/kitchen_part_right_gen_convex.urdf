@@ -1121,7 +1121,7 @@
       <material name="Grey"/>
     </visual>
     <visual>
-      <origin rpy="0  0  0" xyz="-0.0015,  0.3475,  0."/>
+      <origin rpy="0  0  0" xyz="-0.0015  0.3475  0."/>
       <geometry>
         <box size="0.511  0.005  0.086"/>
       </geometry>
@@ -1135,9 +1135,9 @@
       <material name="Grey"/>
     </visual>
     <visual>
-      <origin rpy="0  0  0" xyz="-0.0015,  0.0005, -0.0425"/>
+      <origin rpy="0  0  0" xyz="-0.0015  0.0005 -0.0425"/>
       <geometry>
-        <box size="0.511,  0.699,  0.001"/>
+        <box size="0.511  0.699  0.001"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -1155,7 +1155,7 @@
       </geometry>
     </collision>
     <collision>
-      <origin rpy="0  0  0" xyz="-0.0015,  0.3475,  0."/>
+      <origin rpy="0  0  0" xyz="-0.0015  0.3475  0."/>
       <geometry>
         <box size="0.511  0.005  0.086"/>
       </geometry>
@@ -1167,9 +1167,9 @@
       </geometry>
     </collision>
     <collision>
-      <origin rpy="0  0  0" xyz="-0.0015,  0.0005, -0.0425"/>
+      <origin rpy="0  0  0" xyz="-0.0015  0.0005 -0.0425"/>
       <geometry>
-        <box size="0.511,  0.699,  0.001"/>
+        <box size="0.511  0.699  0.001"/>
       </geometry>
     </collision>
     <collision>
@@ -1213,7 +1213,7 @@
       <material name="Grey"/>
     </visual>
     <visual>
-      <origin rpy="0  0  0" xyz="-0.0015,  0.3475,  0."/>
+      <origin rpy="0  0  0" xyz="-0.0015  0.3475  0."/>
       <geometry>
         <box size="0.511  0.005  0.086"/>
       </geometry>
@@ -1227,9 +1227,9 @@
       <material name="Grey"/>
     </visual>
     <visual>
-      <origin rpy="0  0  0" xyz="-0.0015,  0.0005, -0.0425"/>
+      <origin rpy="0  0  0" xyz="-0.0015  0.0005 -0.0425"/>
       <geometry>
-        <box size="0.511,  0.699,  0.001"/>
+        <box size="0.511  0.699  0.001"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -1247,7 +1247,7 @@
       </geometry>
     </collision>
     <collision>
-      <origin rpy="0  0  0" xyz="-0.0015,  0.3475,  0."/>
+      <origin rpy="0  0  0" xyz="-0.0015  0.3475  0."/>
       <geometry>
         <box size="0.511  0.005  0.086"/>
       </geometry>
@@ -1259,9 +1259,9 @@
       </geometry>
     </collision>
     <collision>
-      <origin rpy="0  0  0" xyz="-0.0015,  0.0005, -0.0425"/>
+      <origin rpy="0  0  0" xyz="-0.0015  0.0005 -0.0425"/>
       <geometry>
-        <box size="0.511,  0.699,  0.001"/>
+        <box size="0.511  0.699  0.001"/>
       </geometry>
     </collision>
     <collision>
