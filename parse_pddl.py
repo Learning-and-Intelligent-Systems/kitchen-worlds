@@ -1,14 +1,3 @@
-#! /usr/bin/env python3
-# -*- coding: utf-8 -*-
-# File   : test_pddl.py
-# Author : Jiayuan Mao
-# Email  : maojiayuan@gmail.com
-# Date   : 04/05/2022
-#
-# Distributed under terms of the MIT license.
-
-import jacinle
-import os.path as osp
 import lisdf.components as C
 from lisdf.parsing import load_all
 
