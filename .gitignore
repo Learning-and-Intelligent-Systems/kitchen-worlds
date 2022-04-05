@@ -1,2 +1,3 @@
 .DS_Stor
+__pycache__/
 .idea/
