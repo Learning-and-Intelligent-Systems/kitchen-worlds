@@ -65,6 +65,86 @@
 		<limit lower="0.0" upper="2.967"/>
 	</joint>
 
+
+	<joint name="fridge_collision_left" type="fixed">
+		<origin xyz="0 0 0"/>
+		<child link="fridge_collision_left_link"/>
+		<parent link="fridge_body"/>
+	</joint>
+	<link name="fridge_collision_left_link">
+		<visual>
+			<origin xyz="0 0 0"/>
+			<geometry>
+				<mesh filename="textured_objs/fridge_body_left.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0"/>
+			<geometry>
+				<mesh filename="textured_objs/fridge_body_left.obj"/>
+			</geometry>
+		</collision>
+	</link>
+
+	<joint name="fridge_collision_right" type="fixed">
+		<origin xyz="0 0 0"/>
+		<child link="fridge_collision_right_link"/>
+		<parent link="fridge_body"/>
+	</joint>
+	<link name="fridge_collision_right_link">
+		<visual>
+			<origin xyz="0 0 0"/>
+			<geometry>
+				<mesh filename="textured_objs/fridge_body_right.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0"/>
+			<geometry>
+				<mesh filename="textured_objs/fridge_body_right.obj"/>
+			</geometry>
+		</collision>
+	</link>
+
+	<joint name="fridge_collision_top" type="fixed">
+		<origin xyz="0 0 0"/>
+		<child link="fridge_collision_top_link"/>
+		<parent link="fridge_body"/>
+	</joint>
+	<link name="fridge_collision_top_link">
+		<visual>
+			<origin xyz="0 0 0"/>
+			<geometry>
+				<mesh filename="textured_objs/fridge_body_top.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0"/>
+			<geometry>
+				<mesh filename="textured_objs/fridge_body_top.obj"/>
+			</geometry>
+		</collision>
+	</link>
+
+	<joint name="fridge_collision_bottom" type="fixed">
+		<origin xyz="0 0 0"/>
+		<child link="fridge_collision_bottom_link"/>
+		<parent link="fridge_body"/>
+	</joint>
+	<link name="fridge_collision_bottom_link">
+		<visual>
+			<origin xyz="0 0 0"/>
+			<geometry>
+				<mesh filename="textured_objs/fridge_body_bottom.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0"/>
+			<geometry>
+				<mesh filename="textured_objs/fridge_body_bottom.obj"/>
+			</geometry>
+		</collision>
+	</link>
 	<link name="fridge_body">
 		<visual name="frame-10">
 			<origin xyz="0 0 0"/>
@@ -116,33 +196,8 @@
 				<mesh filename="textured_objs/original-119.obj"/>
 			</geometry>
 		</collision-->
-		<collision>
-			<origin xyz="0 0 0"/>
-			<geometry>
-				<mesh filename="textured_objs/fridge_body_top.obj"/>
-			</geometry>
-		</collision>
-		<collision>
-			<origin xyz="0 0 0"/>
-			<geometry>
-				<mesh filename="textured_objs/fridge_body_left.obj"/>
-			</geometry>
-		</collision>
-		<collision>
-			<origin xyz="0 0 0"/>
-			<geometry>
-				<mesh filename="textured_objs/fridge_body_right.obj"/>
-			</geometry>
-		</collision>
-		<collision>
-			<origin xyz="0 0 0"/>
-			<geometry>
-				<mesh filename="textured_objs/fridge_body_bottom.obj"/>
-			</geometry>
-		</collision>
-		<!-- replace with convex sub-parts -->
 
-		<collision>
+		<!-- <collision>
 			<origin xyz="0 0 0"/>
 			<geometry>
 				<mesh filename="textured_objs/original-58.obj"/>
@@ -177,7 +232,7 @@
 			<geometry>
 				<mesh filename="textured_objs/original-183.obj"/>
 			</geometry>
-		</collision>
+		</collision> -->
 	</link>
 
 

@@ -98,6 +98,6 @@ def load_lisdf_pybullet(lisdf_path):
 
 if __name__ == "__main__":
 
-    for lisdf_test in ['kitchen_basics', 'kitchen_counter']: ## 'm0m_joint_test'
+    for lisdf_test in ['kitchen_lunch']: ## 'm0m_joint_test', 'kitchen_basics', 'kitchen_counter'
         lisdf_path = join('assets', 'scenes', f'{lisdf_test}.lisdf')
         world = load_lisdf_pybullet(lisdf_path)

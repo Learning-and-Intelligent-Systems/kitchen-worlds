@@ -226,7 +226,7 @@
     </collision> -->
   </link>
 
-  <joint name="back_left_knob_transform" type="fixed">
+  <!-- <joint name="back_left_knob_transform" type="fixed">
     <parent link="control_panel"/>
     <child link="back_left_knob"/>
     <origin rpy="0 0 0" xyz="0 -0.25 0.0127"/>
@@ -298,7 +298,7 @@
         <cylinder radius="0.025" length="0.025" />
       </geometry>
     </collision>
-  </link>
+  </link> -->
 
   <!--
       Width of a single corpus:  13.5inch + 1.5inch = 15inch = 38.1cm
