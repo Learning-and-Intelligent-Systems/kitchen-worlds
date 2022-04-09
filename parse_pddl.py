@@ -1,3 +1,7 @@
+import os
+import sys
+from os.path import join, abspath, dirname, isdir, isfile
+sys.path.append('lisdf')
 import lisdf.components as C
 from lisdf.parsing import load_all
 

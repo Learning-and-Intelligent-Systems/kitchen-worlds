@@ -12,6 +12,7 @@ Grab the [lisdf](https://github.com/Learning-and-Intelligent-Systems/lisdf) pack
 cd kitchen-worlds
 git submodule init
 cd lisdf
+git checkout jiayuan
 git pull
 pip install -r requirements.txt
 ```
@@ -75,9 +76,9 @@ Current kitchen scenes in the format of  `.lisdf` are in path `asset/scenes/`, e
   ``````
 - [x] upload test scene files with `<world><gui><camera><pose>`
 
-- [ ] update problem files in the format of `problem.pddl`
+- [x] update problem files in the format of `problem.pddl`
 
-- [ ] upload implicit domain files in the format of `domain.pddl`
+- [x] upload implicit domain files in the format of `domain.pddl`
 
 - [ ] add instructions to solve the example problems with TAMP planner [PDDLStream](https://github.com/caelan/pddlstream/tree/main)
 
@@ -88,4 +89,8 @@ Current kitchen scenes in the format of  `.lisdf` are in path `asset/scenes/`, e
 In order to be lightweight, some functions in this repo is copied from the work of other LIS members instead of added as part of their original submodules:
 
 * the [pybullet_tools](https://github.com/caelan/pybullet-planning/tree/master/pybullet_tools) package is a subset of tools developed by Caelan Garret
-* most object models are downloaded from [PartNet Mobility dataset](https://sapien.ucsd.edu/browse) (Mo, Kaichun, et al. "Partnet: A large-scale benchmark for fine-grained and hierarchical part-level 3d object understanding." *Proceedings of the IEEE/CVF conference on computer vision and pattern recognition*. 2019.)
+
+All the object models and urdf files are downloaded for free from the following sources:
+
+* most articulated object models are downloaded from [PartNet Mobility dataset](https://sapien.ucsd.edu/browse) (Mo, Kaichun, et al. "Partnet: A large-scale benchmark for fine-grained and hierarchical part-level 3d object understanding." *Proceedings of the IEEE/CVF conference on computer vision and pattern recognition*. 2019.)
+* most kitchen object models are downloaded from [Free3D](https://free3d.com/3d-models/food).
