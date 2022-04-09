@@ -1,4 +1,4 @@
-.DS_Stor
+.DS_Store
 __pycache__/
 .idea/
 assets/tmp/*
