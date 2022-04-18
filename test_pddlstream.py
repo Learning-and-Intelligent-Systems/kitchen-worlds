@@ -294,6 +294,33 @@ def main(exp_dir=__file__, partial=False, defer=False, verbose=True):
     disconnect()
     # TODO: need to wrap circular joints
 
+def pddl_to_init(exp_dir):
+    sys.path.append('lisdf')
+    import lisdf.components as C
+    from lisdf.parsing import load_all
+
+    lisdf, domain, problem = load_all(
+        join(exp_dir, 'scene.lisdf'),
+        join(exp_dir, 'domain.pddl'),
+        join(exp_dir, 'problem.pddl'),
+    )
+
+    for t in domain.types.values():
+        print(t)
+
+    init = []
+    for v in problem.init:
+        print(v.predicate.to_pddl())
+        args = [v.predicate.name]
+        for arg in v.arguments:
+            if isinstance(arg, C.PDDLObject):
+                print(" ", arg.name, arg.sdf_object)
+            else:
+                print(" ", arg.to_pddl())
+        init.append(args)
+    print()
+
 if __name__ == '__main__':
-    exp_dir = join('experiments', 'pr2')
-    main(exp_dir=exp_dir)
+    exp_dir = join('experiments', 'blocks_kitchen')
+    pddl_to_init(exp_dir)
+    # main(exp_dir=exp_dir)
