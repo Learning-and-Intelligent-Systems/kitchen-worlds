@@ -66,6 +66,31 @@ Current kitchen scenes in the format of  `.lisdf` are in path `asset/scenes/`, e
   ```
 ![kitchen_counter.lisdf in PyBullet](media/kitchen_counter.png)
 
+## Test LISDF + PDDL + Streams with PDDLStream
+
+### Set up PDDLStream
+
+```commandline
+# git submodule add https://github.com/caelan/pddlstream.git
+cd pddlstream
+git submodule update --init --recursive  ## may take a few minutes
+./downward/build.py ## may take a few minutes
+
+cd examples/pybullet/utils
+git pull origin master
+cd motion
+git pull origin master
+```
+
+### Troubleshooting
+
+```  
+File "/Users/z/Documents/simulators/PyBullet/kitchen-worlds/pddlstream/examples/pybullet/utils/pybullet_tools/utils.py", line 3572, in get_closest_points
+    return [CollisionInfo(*info) for info in results]
+TypeError: 'NoneType' object is not iterable
+```
+
+
 ## TODO
 
 - [x] add `requirements.txt`
