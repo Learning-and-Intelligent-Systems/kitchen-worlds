@@ -5,7 +5,9 @@ sys.path.append('lisdf')
 from lisdf.parsing.sdf_j import load_sdf
 from lisdf.components.model import URDFInclude
 
-from pybullet_utils.utils import load_pybullet, connect, wait_if_gui, HideOutput, \
+sys.path.append(join('pybullet-planning'))
+
+from pybullet_tools.utils import load_pybullet, connect, wait_if_gui, HideOutput, \
     disconnect, set_pose, set_joint_position, joint_from_name, quat_from_euler, \
     set_camera_pose, set_camera_pose2
 
@@ -47,7 +49,7 @@ class World():
     def robot(self):
         return self.name_to_body['pr2']
 
-def load_lisdf_pybullet(lisdf_path):
+def load_lisdf_pybullet(lisdf_path, verbose=False):
     scenes_path = dirname(os.path.abspath(lisdf_path))
     tmp_path = join('assets', 'tmp')
 
@@ -76,7 +78,7 @@ def load_lisdf_pybullet(lisdf_path):
         model_states = {s.name: s for s in model_states}
 
     for model in world.models:
-        print(f'---------- {model.name}')
+        if verbose: print(f'---------- {model.name}')
         scale = 1
         if isinstance(model, URDFInclude):
             uri = join(scenes_path, model.uri)
@@ -110,6 +112,6 @@ if __name__ == "__main__":
 
     for lisdf_test in ['kitchen_lunch']: ## 'm0m_joint_test', 'kitchen_basics', 'kitchen_counter'
         lisdf_path = join('assets', 'scenes', f'{lisdf_test}.lisdf')
-        world = load_lisdf_pybullet(lisdf_path)
+        world = load_lisdf_pybullet(lisdf_path, verbose=True)
         wait_if_gui('load next test scene?')
         disconnect()

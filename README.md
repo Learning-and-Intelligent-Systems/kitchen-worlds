@@ -17,9 +17,11 @@ pip install -r requirements.txt
 
 cd pybullet-planning
 git pull --recurse-submodules
+(cd pybullet_tools/ikfast/pr2; python setup.py)
+
+git submodule add --name motion https://github.com/caelan/motion-planners.git motion/
 cd motion
 git pull origin master
-(cd pybullet_tools/ikfast/pr2; python setup.py)
 ```
 
 ## Examples

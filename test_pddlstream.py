@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
-from os.path import join
+import os
+from os.path import join, isfile
 import sys
 sys.path.append('pddlstream')
 sys.path.append(join('pybullet-planning'))
 
-from pybullet_tools.pr2_primitives import get_base_custom_limits, control_commands, apply_commands, State
-from pybullet_tools.pr2_utils import get_arm_joints, ARM_NAMES, get_group_joints, get_group_conf
-from pybullet_tools.utils import connect, get_pose, is_placement, point_from_pose, \
+from pybullet_tools.pr2_primitives import get_base_custom_limits, control_commands, apply_commands, State, Pose, Conf
+from pybullet_tools.pr2_utils import get_arm_joints, ARM_NAMES, get_group_joints, get_group_conf, create_gripper
+from pybullet_tools.utils import connect, get_pose, is_placement, point_from_pose, remove_body, \
     disconnect, get_joint_positions, enable_gravity, save_state, restore_state, HideOutput, quat_from_euler, \
     get_distance, LockRenderer, get_min_limit, get_max_limit, has_gui, WorldSaver, wait_if_gui, add_line, SEPARATOR
 
@@ -16,21 +17,23 @@ from pddlstream.language.constants import Equal, AND, print_solution, PDDLProble
 from pddlstream.utils import read, INF, get_file_path, find_unique, Profiler, str_from_object
 from pddlstream.algorithms.meta import solve, create_parser
 
-## new versions used by Yang
-from pybullet_tools.pr2_primitives import Pose, Conf
-from experiments.pr2_agent import get_stream_info, get_stream_map, post_process
+from pybullet_tools.bullet_utils import summarize_facts, print_goal
+from pybullet_tools.pr2_streams import WConf
+from pybullet_tools.logging import TXT_FILE
 
+from test_cases.pr2_agent import get_stream_info, get_stream_map, post_process
 from lisdf_loader import load_lisdf_pybullet
 
 def pddlstream_from_dir(problem, exp_dir, collisions=True, teleport=False):
 
     world = problem.world
 
-    domain_pddl = read(join(exp_dir, 'domain.pddl')) ## get_file_path(__file__, 'domain.pddl')
+    domain_pddl = read(join(exp_dir, 'domain_full.pddl'))
     stream_pddl = read(join(exp_dir, 'stream.pddl'))
     constant_map = {}
 
     init, goal = pddl_to_init_goal(exp_dir, world)
+    goal = [AND] + goal
     problem.add_init(init)
 
     base_limits = ((-5, -5), (5, 5))
@@ -42,9 +45,51 @@ def pddlstream_from_dir(problem, exp_dir, collisions=True, teleport=False):
 class Problem():
     def __init__(self, world):
         self.world = world
+        self.robot = world.robot
+        self.fixed, self.movable, self.floors = self.init_from_world(world)
+        self.grasp_types = ['top']
+        self.gripper = None
+
+    def init_from_world(self, world):
+        fixed = []
+        movable = []
+        floors = []
+        for model in world.lisdf.models:
+            if model.name != 'pr2':
+                body = world.name_to_body[model.name]
+                if model.static: fixed.append(body)
+                else: movable.append(body)
+            if hasattr(model, 'links'):
+                for link in model.links:
+                    if link.name == 'box':
+                        for collision in link.collisions:
+                            if collision.shape.size[-1] < 0.05:
+                                floors.append(model)
+        return fixed, movable, floors
+
+    @property
+    def obstacles(self):
+        return [n for n in self.fixed if n not in self.floors]
 
     def add_init(self, init):
         pass
+
+    def get_gripper(self, arm='left', visual=True):
+        # upper = get_max_limit(problem.robot, get_gripper_joints(problem.robot, 'left')[0])
+        # set_configuration(gripper, [0]*4)
+        # dump_body(gripper)
+        if self.gripper is None:
+            self.gripper = create_gripper(self.robot, arm=arm, visual=visual)
+        return self.gripper
+
+    def remove_gripper(self):
+        if self.gripper is not None:
+            remove_body(self.gripper)
+            self.gripper = None
+
+def init_experiment(exp_dir):
+    if isfile(TXT_FILE):
+        os.remove(TXT_FILE)
 
 #######################################################
 
@@ -65,10 +110,11 @@ def main(exp_dir, partial=False, defer=False, verbose=True):
 
     stream_info = get_stream_info(partial, defer)
     _, _, _, stream_map, init, goal = pddlstream_problem
-    print('Init:', init)
-    print('Goal:', goal)
-    print('Streams:', str_from_object(set(stream_map)))
+    summarize_facts(init)
+    print_goal(goal)
+    # print('Streams:', str_from_object(set(stream_map)))
     print(SEPARATOR)
+    init_experiment(exp_dir)
 
     with Profiler():
         with LockRenderer(lock=not args.enable):
@@ -118,7 +164,7 @@ def pddl_to_init_goal(exp_dir, world):
                 elem = arg.name
             else:
                 typ = ''.join([i for i in arg.name if not i.isdigit()])
-                index = ''.join([i for i in arg.name if i.isdigit()])
+                index = int(''.join([i for i in arg.name if i.isdigit()]))
                 value = list(arg.value.value)
                 if typ == 'q':
                     elem = Conf(robot, get_group_joints(robot, 'base'), value, index=index)
@@ -132,11 +178,21 @@ def pddl_to_init_goal(exp_dir, world):
             args.append(elem)
         return args
 
+    goal = [prop_to_list(v) for v in problem.conjunctive_goal]
     init = [prop_to_list(v) for v in problem.init]
-    problem = [prop_to_list(v) for v in problem.conjunctive_goal]
 
-    return init, problem
+    poses = {i[1]: i[2] for i in init if i[0] == 'AtPose'}
+    positions = {i[1]: i[2] for i in init if i[0] == 'AtPosition'}
+    wconf = WConf(poses, positions)
+    init += [('WConf', wconf), ('InWConf', wconf)]
+
+    init += [
+        Equal(('PickCost',), 1),
+        Equal(('PlaceCost',), 1),
+    ]
+
+    return init, goal
 
 if __name__ == '__main__':
-    exp_dir = join('experiments', 'blocks_kitchen')
+    exp_dir = join('test_cases', 'blocks_kitchen')
     main(exp_dir=exp_dir)
