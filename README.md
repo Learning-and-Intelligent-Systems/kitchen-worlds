@@ -12,9 +12,14 @@ Grab the [lisdf](https://github.com/Learning-and-Intelligent-Systems/lisdf) pack
 cd kitchen-worlds
 git submodule init
 cd lisdf
-git checkout jiayuan
 git pull
 pip install -r requirements.txt
+
+cd pybullet-planning
+git pull --recurse-submodules
+cd motion
+git pull origin master
+(cd pybullet_tools/ikfast/pr2; python setup.py)
 ```
 
 ## Examples

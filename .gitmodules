@@ -4,3 +4,6 @@
 [submodule "pddlstream"]
 	path = pddlstream
 	url = https://github.com/caelan/pddlstream.git
+[submodule "pybullet-planning"]
+	path = pybullet-planning
+	url = git@github.com:zt-yang/pybullet-planning.git

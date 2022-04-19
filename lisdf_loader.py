@@ -37,6 +37,16 @@ def make_sdf_world(sdf_model):
   </world>
 </sdf>"""
 
+class World():
+    def __init__(self, lisdf):
+        self.lisdf = lisdf
+        self.body_to_name = {}
+        self.name_to_body = {}
+
+    @property
+    def robot(self):
+        return self.name_to_body['pr2']
+
 def load_lisdf_pybullet(lisdf_path):
     scenes_path = dirname(os.path.abspath(lisdf_path))
     tmp_path = join('assets', 'tmp')
@@ -49,6 +59,7 @@ def load_lisdf_pybullet(lisdf_path):
     # load_pybullet(join(tmp_path, 'table#1_1.sdf'))
 
     world = load_sdf(lisdf_path).worlds[0]
+    bullet_world = World(world)
 
     if world.name in HACK_CAMERA_POSES:
         cp, tp = HACK_CAMERA_POSES[world.name]
@@ -78,6 +89,8 @@ def load_lisdf_pybullet(lisdf_path):
         with HideOutput():
             body = load_pybullet(uri, scale=scale)
             if isinstance(body, tuple): body = body[0]
+            bullet_world.body_to_name[body] = model.name
+            bullet_world.name_to_body[model.name] = body
 
         ## set pose of body using PyBullet tools' data structure
         pose = (model.pose.pos, quat_from_euler(model.pose.rpy))
@@ -91,6 +104,7 @@ def load_lisdf_pybullet(lisdf_path):
             os.remove(uri)
 
         # wait_if_gui('load next model?')
+    return bullet_world
 
 if __name__ == "__main__":
 
