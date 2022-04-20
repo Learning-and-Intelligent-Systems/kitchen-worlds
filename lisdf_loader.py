@@ -5,9 +5,7 @@ sys.path.append('lisdf')
 from lisdf.parsing.sdf_j import load_sdf
 from lisdf.components.model import URDFInclude
 
-sys.path.append(join('pybullet-planning'))
-
-from pybullet_tools.utils import load_pybullet, connect, wait_if_gui, HideOutput, \
+from pybullet_planning.pybullet_tools.utils import load_pybullet, connect, wait_if_gui, HideOutput, \
     disconnect, set_pose, set_joint_position, joint_from_name, quat_from_euler, \
     set_camera_pose, set_camera_pose2
 

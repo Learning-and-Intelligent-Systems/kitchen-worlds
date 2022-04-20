@@ -5,7 +5,7 @@ import os
 from os.path import join, isfile
 import sys
 sys.path.append('pddlstream')
-sys.path.append(join('pybullet-planning'))
+sys.path.append(join('pybullet_planning'))
 
 from pybullet_tools.pr2_primitives import get_base_custom_limits, control_commands, apply_commands, State, Pose, Conf
 from pybullet_tools.pr2_utils import get_arm_joints, ARM_NAMES, get_group_joints, get_group_conf, create_gripper
@@ -186,10 +186,7 @@ def pddl_to_init_goal(exp_dir, world):
     wconf = WConf(poses, positions)
     init += [('WConf', wconf), ('InWConf', wconf)]
 
-    init += [
-        Equal(('PickCost',), 1),
-        Equal(('PlaceCost',), 1),
-    ]
+    init += [Equal(('PickCost',), 1), Equal(('PlaceCost',), 1)]
 
     return init, goal
 
