@@ -3,25 +3,28 @@ from itertools import product
 from collections import defaultdict
 import copy
 
-from bullet.actions import Action
+# from bullet.actions import Action
+
+from pddlstream.language.constants import Equal, AND
+
 from pybullet_tools.utils import get_max_velocities, WorldSaver, elapsed_time, get_pose, LockRenderer, \
     CameraImage, get_joint_positions, euler_from_quat, get_link_name, get_joint_position, \
     BodySaver, set_pose, INF, add_parameter, irange, wait_for_duration, get_bodies, remove_body, \
     read_parameter, pairwise_collision, str_from_object, get_joint_name, get_name, get_link_pose, \
     get_joints, multiply, invert, is_movable
-from examples.pybullet.utils.pybullet_tools.pr2_utils import get_arm_joints, ARM_NAMES, get_group_joints, \
+from pybullet_tools.pr2_streams import get_stable_gen, get_contain_gen, get_position_gen, \
+    Position, get_handle_grasp_gen, LinkPose, pr2_grasp, WConf
+from pybullet_tools.bullet_utils import set_zero_world, nice, open_joint, get_pose2d, summarize_joints, get_point_distance, \
+    is_placement, is_contained, add_body, close_joint, toggle_joint, ObjAttachment, check_joint_state, \
+    set_camera_target_body, xyzyaw_to_pose, nice
+from pybullet_tools.pr2_utils import get_arm_joints, ARM_NAMES, get_group_joints, \
     get_group_conf, get_top_grasps, get_side_grasps, create_gripper
-from examples.pybullet.utils.pybullet_tools.pr2_primitives import Pose, Conf, get_ik_ir_gen, get_motion_gen, \
+from pybullet_tools.pr2_primitives import Pose, Conf, get_ik_ir_gen, get_motion_gen, \
     get_grasp_gen, Attach, Detach, Clean, Cook, control_commands, link_from_name, \
     get_gripper_joints, GripperCommand, apply_commands, State
-from pddlstream.language.constants import Equal, AND
-# from pybullet_tools.retime import interpolate_path, sample_curve
-from bullet.utils import set_zero_world, nice, open_joint, get_pose2d, summarize_joints, get_point_distance, \
-    is_placement, is_contained, add_body, close_joint, toggle_joint, ObjAttachment, check_joint_state, \
-    set_camera_target_body, xyzyaw_to_pose
-from bullet.entities import Region, Environment, Robot, Surface, ArticulatedObjectPart, Door, Drawer, Knob
-from bullet.processes.pddlstream_agent.pr2_streams import get_stable_gen, get_contain_gen, get_position_gen, \
-    Position, get_handle_grasp_gen, LinkPose, pr2_grasp, WConf
+
+from .entities import Region, Environment, Robot, Surface, ArticulatedObjectPart, Door, Drawer, Knob
+from world_builder.utils import GRASPABLES
 
 class World(object):
     def __init__(self, args, time_step=1e-3, prevent_collisions=False,
@@ -201,8 +204,7 @@ class World(object):
         return printout
 
     def summarize_all_objects(self):
-        from bullet.utils import nice
-        from zzz.logging import myprint as print
+        from pybullet_utils.logging import myprint as print
 
         BODY_TO_OBJECT = self.BODY_TO_OBJECT
         ROBOT_TO_OBJECT = self.ROBOT_TO_OBJECT
@@ -538,7 +540,7 @@ class State(object):
     def apply_action(self, action): # Transition model
         if action is None:
             return self
-        assert isinstance(action, Action)
+        # assert isinstance(action, Action)
         return action.transition(self.copy())
     def camera_observation(self, include_rgb=False, include_depth=False, include_segment=False):
         if not (self.world.args.camera or include_rgb or include_depth or include_segment):
@@ -567,7 +569,6 @@ class State(object):
                            facts=facts, variables=variables, image=image)
 
     def get_facts(self, init_facts=[], conf_saver=None, obj_poses=None):
-        from bullet.worlds.kitchen_worlds import GRASPABLES
         robot = self.world.robot.body
         cat_to_bodies = self.world.cat_to_bodies
         cat_to_objects = self.world.cat_to_objects

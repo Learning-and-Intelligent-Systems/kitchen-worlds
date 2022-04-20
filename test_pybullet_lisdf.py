@@ -9,34 +9,6 @@ from pybullet_planning.pybullet_tools.utils import load_pybullet, connect, wait_
     disconnect, set_pose, set_joint_position, joint_from_name, quat_from_euler, \
     set_camera_pose, set_camera_pose2
 
-## will be replaced later will <world><gui><camera> tag
-HACK_CAMERA_POSES = { ## scene_name : (camera_point, target_point)
-    'kitchen_counter': ([3, 8, 3], [0, 8, 1]),
-    'kitchen_basics': ([3, 6, 3], [0, 6, 1])
-}
-
-def make_sdf_world(sdf_model):
-    """ temporary fix for LISDF format """
-    # sdf_model = sdf_model.replace(',', '')
-    # last_line = ''
-    # sdf_model_fixed = ''
-    # for line in sdf_model.split('\n'):
-    #     if not ('<geometry>' in last_line and '<pose>' in line) and not 'visual>' in line:
-    #         sdf_model_fixed += line + '\n'
-    #     last_line = line
-    # sdf_model = sdf_model_fixed
-    # print(sdf_model)
-
-    return f"""<?xml version="1.0" ?>
-<!-- tmp sdf file generated from LISDF -->
-<sdf version="1.9">
-  <world name="tmp_world">
-
-{sdf_model}
-
-  </world>
-</sdf>"""
-
 def load_lisdf_pybullet(lisdf_path):
     scenes_path = dirname(os.path.abspath(lisdf_path))
     tmp_path = join('assets', 'tmp')
@@ -92,9 +64,38 @@ def load_lisdf_pybullet(lisdf_path):
 
         # wait_if_gui('load next model?')
 
+
+## will be replaced later will <world><gui><camera> tag
+HACK_CAMERA_POSES = { ## scene_name : (camera_point, target_point)
+    'kitchen_counter': ([3, 8, 3], [0, 8, 1]),
+    'kitchen_basics': ([3, 6, 3], [0, 6, 1])
+}
+
+def make_sdf_world(sdf_model):
+    """ temporary fix for LISDF format """
+    # sdf_model = sdf_model.replace(',', '')
+    # last_line = ''
+    # sdf_model_fixed = ''
+    # for line in sdf_model.split('\n'):
+    #     if not ('<geometry>' in last_line and '<pose>' in line) and not 'visual>' in line:
+    #         sdf_model_fixed += line + '\n'
+    #     last_line = line
+    # sdf_model = sdf_model_fixed
+    # print(sdf_model)
+
+    return f"""<?xml version="1.0" ?>
+<!-- tmp sdf file generated from LISDF -->
+<sdf version="1.9">
+  <world name="tmp_world">
+
+{sdf_model}
+
+  </world>
+</sdf>"""
+
 if __name__ == "__main__":
 
-    for lisdf_test in ['kitchen_lunch']: ## 'm0m_joint_test', 'kitchen_basics', 'kitchen_counter'
+    for lisdf_test in ['test_scene', 'kitchen_lunch']: ## 'm0m_joint_test', 'kitchen_basics', 'kitchen_counter',
         lisdf_path = join('assets', 'scenes', f'{lisdf_test}.lisdf')
         world = load_lisdf_pybullet(lisdf_path)
         wait_if_gui('load next test scene?')

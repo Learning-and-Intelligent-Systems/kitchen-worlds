@@ -1,4 +1,5 @@
-from examples.pybullet.namo.stream import BASE_LINK
+from pybullet_tools.pr2_problems import create_pr2
+from pybullet_tools.pr2_primitives import get_base_custom_limits
 from pybullet_tools.pr2_utils import attach_viewcone, draw_viewcone, get_viewcone_base, set_group_conf, get_arm_joints
 from pybullet_tools.utils import get_joint_name, get_joint_position, get_link_name, get_link_pose, get_pose, set_pose, \
     joint_from_name, get_movable_joints, get_joint_positions, set_joint_position, set_joint_positions, link_from_name, \
@@ -7,9 +8,37 @@ from pybullet_tools.utils import get_joint_name, get_joint_position, get_link_na
     all_between, get_name, dump_link, dump_joint, dump_body, PoseSaver, get_color, GREEN, unit_pose, \
     add_text, AABB, Point, Euler, PI, add_line, YELLOW, BLACK, remove_handles, get_com_pose, Pose, invert, \
     stable_z, get_joint_descendants, get_link_children, get_joint_info, get_links, link_from_name, \
-    get_min_limit, get_max_limit, get_link_parent
+    get_min_limit, get_max_limit, get_link_parent, LockRenderer, HideOutput
+from pybullet_tools.bullet_utils import set_pr2_ready, BASE_LINK, BASE_RESOLUTIONS, BASE_VELOCITIES, BASE_JOINTS, \
+    BASE_LIMITS, CAMERA_FRAME, CAMERA_MATRIX, EYE_FRAME
 import numpy as np
 import pybullet as p
+
+def create_robot(world, base_q=(0,0,0), DUAL_ARM=False,
+                 resolutions=BASE_RESOLUTIONS, max_velocities=BASE_VELOCITIES):
+
+    with LockRenderer(lock=True):
+        with HideOutput(enable=True):
+            robot = create_pr2()
+            set_pr2_ready(robot, DUAL_ARM=DUAL_ARM)
+
+        with np.errstate(divide='ignore'):
+            weights = np.reciprocal(resolutions)
+        robot = Robot(robot, base_link=BASE_LINK, joints=BASE_JOINTS,
+                      custom_limits=get_base_custom_limits(robot, BASE_LIMITS),
+                      resolutions=resolutions, weights=weights)
+        world.add_robot(robot, max_velocities)
+        set_group_conf(robot, 'base', base_q)
+        # print('initial base conf', get_group_conf(robot, 'base'))
+        # set_camera_target_robot(robot, FRONT=True)
+
+        camera = Camera(robot, camera_frame=CAMERA_FRAME, camera_matrix=CAMERA_MATRIX, max_depth=2.5, draw_frame=EYE_FRAME)
+        robot.cameras.append(camera)
+
+        ## don't show depth and segmentation data yet
+        # if args.camera: robot.cameras[-1].get_image(segment=args.segment)
+
+    return robot
 
 class Index(object):
     # TODO: unify with some of the following?
