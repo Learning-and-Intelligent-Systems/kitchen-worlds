@@ -95,8 +95,8 @@
 
   (:action move_base
     :parameters (?q1 ?q2 ?t)
-    :precondition (and (BaseMotion ?q1 ?t ?q2) (CanMove)
-                       (AtBConf ?q1)
+    :precondition (and (BaseMotion ?q1 ?t ?q2)
+                       (AtBConf ?q1) (CanMove)
                        ;; (not (UnsafeBTraj ?t))
                        )
     :effect (and (AtBConf ?q2)
@@ -104,10 +104,18 @@
                  (increase (total-cost) (MoveCost ?t)))
   )
 
-  (:action pick--no-atbconf
+  ;(:action move_arm
+  ;  :parameters (?q1 ?q2 ?t)
+  ;  :precondition (and (ArmMotion ?a ?q1 ?t ?q2)
+  ;                     (AtAConf ?a ?q1))
+  ;  :effect (and (AtAConf ?a ?q2)
+  ;               (not (AtAConf ?a ?q1)))
+  ;)
+
+  (:action pick
     :parameters (?a ?o ?p ?g ?q ?t)
     :precondition (and (Kin ?a ?o ?p ?g ?q ?t) (not (Marker ?o))
-                       (AtPose ?o ?p) (HandEmpty ?a) ;; (AtBConf ?q)
+                       (AtPose ?o ?p) (HandEmpty ?a) (AtBConf ?q)
                        (not (UnsafeApproach ?o ?p ?g))
                        (not (UnsafeATraj ?t)))
     :effect (and (AtGrasp ?a ?o ?g) (CanMove)
@@ -115,10 +123,10 @@
                  (not (AtPose ?o ?p)) (not (HandEmpty ?a))
                  (increase (total-cost) (PickCost)))
   )
-  (:action place--no-atbconf
+  (:action place
     :parameters (?a ?o ?p ?g ?q ?t)
     :precondition (and (Kin ?a ?o ?p ?g ?q ?t)
-                       (AtGrasp ?a ?o ?g) ;; (AtBConf ?q)
+                       (AtGrasp ?a ?o ?g) (AtBConf ?q)
                        (not (UnsafePose ?o ?p))
                        (not (UnsafeApproach ?o ?p ?g))
                        (not (UnsafeATraj ?t)))

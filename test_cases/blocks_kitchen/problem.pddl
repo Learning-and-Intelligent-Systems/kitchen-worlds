@@ -103,7 +103,7 @@
   )
 
   (:goal (and 
-    (Cooked egg)
+    (cooked egg)
   ))
 )
         

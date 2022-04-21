@@ -13,13 +13,13 @@ from pybullet_planning.pybullet_tools.utils import connect, get_pose, is_placeme
     get_distance, LockRenderer, get_min_limit, get_max_limit, has_gui, WorldSaver, wait_if_gui, add_line, SEPARATOR
 from pybullet_planning.pybullet_tools.bullet_utils import summarize_facts, print_goal
 from pybullet_planning.pybullet_tools.pr2_streams import WConf
+from pybullet_planning.pybullet_tools.pr2_agent import get_stream_info, get_stream_map, post_process
 from pybullet_planning.pybullet_tools.logging import TXT_FILE
 
 from pddlstream.language.constants import Equal, AND, print_solution, PDDLProblem
 from pddlstream.utils import read, INF, get_file_path, find_unique, Profiler, str_from_object
 from pddlstream.algorithms.meta import solve, create_parser
 
-from test_cases.pr2_agent import get_stream_info, get_stream_map, post_process
 from lisdf_loader import load_lisdf_pybullet
 
 def pddlstream_from_dir(problem, exp_dir, collisions=True, teleport=False):

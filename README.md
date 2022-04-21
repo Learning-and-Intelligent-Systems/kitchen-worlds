@@ -1,7 +1,6 @@
 # kitchen-worlds
 
-A toolbox for generating scenes with articulated objects and solving Task-and-Motion-Planning (TAMP) problems defined in them.
-You may
+A library of long-horizon Task-and-Motion-Planning (TAMP) problems in kitchen and household scenes, as well as planners to solve them
 
 - visualize a scene in LISDF format (an extension to SDF that includes URDF)
 - solve a TAMP problem using PDDLStream defined with a scene.lisdf, problem.pddl, domain.pddl, stream.pddl
