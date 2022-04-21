@@ -1,8 +1,14 @@
 # kitchen-worlds
 
+A toolbox for generating scenes with articulated objects and solving Task-and-Motion-Planning (TAMP) problems defined in them.
+You may
+
+- visualize a scene in LISDF format (an extension to SDF that includes URDF)
+- solve a TAMP problem using PDDLStream defined with a scene.lisdf, problem.pddl, domain.pddl, stream.pddl
+- procedurally generate scenes with rigid and articulated objects
+
 ![kitchen_basics.lisdf in PyBullet](media/kitchen_basics.png)
 
-A collection of kitchen scenes in LISDF format (an extension to SDF that includes URDF), kitchen object models, and TAMP problems. A product of LIS TAMP I/O Hackathon 03/25/2022.
 
 ## Setup
 
@@ -10,18 +16,10 @@ Grab the [lisdf](https://github.com/Learning-and-Intelligent-Systems/lisdf) pack
 
 ```shell
 cd kitchen-worlds
-git submodule init
+git submodule update --init --recursive
+
 cd lisdf
-git pull
 pip install -r requirements.txt
-
-cd pybullet-planning
-git pull --recurse-submodules
-(cd pybullet_tools/ikfast/pr2; python setup.py)
-
-git submodule add --name motion https://github.com/caelan/motion-planners.git motion/
-cd motion
-git pull origin master
 ```
 
 ## Examples

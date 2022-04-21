@@ -5,37 +5,14 @@ sys.path.append('lisdf')
 from lisdf.parsing.sdf_j import load_sdf
 from lisdf.components.model import URDFInclude
 
+import warnings
+warnings.filterwarnings('ignore')
+
 from pybullet_planning.pybullet_tools.utils import load_pybullet, connect, wait_if_gui, HideOutput, \
     disconnect, set_pose, set_joint_position, joint_from_name, quat_from_euler, \
     set_camera_pose, set_camera_pose2
 
-## will be replaced later will <world><gui><camera> tag
-HACK_CAMERA_POSES = { ## scene_name : (camera_point, target_point)
-    'kitchen_counter': ([3, 8, 3], [0, 8, 1]),
-    'kitchen_basics': ([3, 6, 3], [0, 6, 1])
-}
-
-def make_sdf_world(sdf_model):
-    """ temporary fix for LISDF format """
-    # sdf_model = sdf_model.replace(',', '')
-    # last_line = ''
-    # sdf_model_fixed = ''
-    # for line in sdf_model.split('\n'):
-    #     if not ('<geometry>' in last_line and '<pose>' in line) and not 'visual>' in line:
-    #         sdf_model_fixed += line + '\n'
-    #     last_line = line
-    # sdf_model = sdf_model_fixed
-    # print(sdf_model)
-
-    return f"""<?xml version="1.0" ?>
-<!-- tmp sdf file generated from LISDF -->
-<sdf version="1.9">
-  <world name="tmp_world">
-
-{sdf_model}
-
-  </world>
-</sdf>"""
+ASSET_PATH = join(dirname(__file__), 'assets')
 
 class World():
     def __init__(self, lisdf):
@@ -47,9 +24,9 @@ class World():
     def robot(self):
         return self.name_to_body['pr2']
 
-def load_lisdf_pybullet(lisdf_path, verbose=False):
-    scenes_path = dirname(os.path.abspath(lisdf_path))
-    tmp_path = join('assets', 'tmp')
+def load_lisdf_pybullet(lisdf_path, verbose=True):
+    # scenes_path = dirname(os.path.abspath(lisdf_path))
+    tmp_path = join(ASSET_PATH, 'tmp')
 
     connect(use_gui=True, shadows=False, width=1980, height=1238)
 
@@ -76,10 +53,9 @@ def load_lisdf_pybullet(lisdf_path, verbose=False):
         model_states = {s.name: s for s in model_states}
 
     for model in world.models:
-        if verbose: print(f'---------- {model.name}')
         scale = 1
         if isinstance(model, URDFInclude):
-            uri = join(scenes_path, model.uri)
+            uri = join(ASSET_PATH, 'scenes', model.uri)
             scale = model.scale_1d
         else:
             uri = join(tmp_path, f'{model.name}.sdf')
@@ -87,6 +63,7 @@ def load_lisdf_pybullet(lisdf_path, verbose=False):
                 f.write(make_sdf_world(model.to_sdf()))
 
         with HideOutput():
+            if verbose: print(f'..... loading {model.name} from {uri}', end="\r")
             body = load_pybullet(uri, scale=scale)
             if isinstance(body, tuple): body = body[0]
             bullet_world.body_to_name[body] = model.name
@@ -106,10 +83,27 @@ def load_lisdf_pybullet(lisdf_path, verbose=False):
         # wait_if_gui('load next model?')
     return bullet_world
 
+## will be replaced later will <world><gui><camera> tag
+HACK_CAMERA_POSES = { ## scene_name : (camera_point, target_point)
+    'kitchen_counter': ([3, 8, 3], [0, 8, 1]),
+    'kitchen_basics': ([3, 6, 3], [0, 6, 1])
+}
+
+def make_sdf_world(sdf_model):
+    return f"""<?xml version="1.0" ?>
+<!-- tmp sdf file generated from LISDF -->
+<sdf version="1.9">
+  <world name="tmp_world">
+
+{sdf_model}
+
+  </world>
+</sdf>"""
+
 if __name__ == "__main__":
 
     for lisdf_test in ['kitchen_lunch']: ## 'm0m_joint_test', 'kitchen_basics', 'kitchen_counter'
-        lisdf_path = join('assets', 'scenes', f'{lisdf_test}.lisdf')
+        lisdf_path = join(ASSET_PATH, 'scenes', f'{lisdf_test}.lisdf')
         world = load_lisdf_pybullet(lisdf_path, verbose=True)
         wait_if_gui('load next test scene?')
         disconnect()

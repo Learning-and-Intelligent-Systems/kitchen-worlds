@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns:xl="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns="http://www.w3.org/2000/svg" viewBox="-120 91 680 348" width="680" height="348">
+  <defs>
+    <font-face font-family="Helvetica Neue" font-size="16" panose-1="2 0 5 3 0 0 0 2 0 4" units-per-em="1000" underline-position="-100" underline-thickness="50" slope="0" x-height="517" cap-height="714" ascent="951.9958" descent="-212.99744" font-weight="400">
+      <font-face-src>
+        <font-face-name name="HelveticaNeue"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <metadata> Produced by OmniGraffle 7.18.5\n2022-02-21 15:48:00 +0000</metadata>
+  <g id="Canvas_1" stroke-opacity="1" stroke="none" stroke-dasharray="none" fill-opacity="1" fill="none">
+    <title>Canvas 1</title>
+    <rect fill="white" x="-120" y="91" width="680" height="348"/>
+    <g id="Canvas_1_Layer_1">
+      <title>Layer 1</title>
+      <g id="Graphic_3">
+        <rect x="-87" y="117" width="646.49935" height="321" fill="white"/>
+        <rect x="-87" y="117" width="646.49935" height="321" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(-82 268.276)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" font-weight="400" fill="black" x="277.35366" y="15">living_room</tspan>
+        </text>
+      </g>
+      <g id="Graphic_6">
+        <rect x="311.78946" y="117" width="247.7099" height="73" fill="white"/>
+        <rect x="311.78946" y="117" width="247.7099" height="73" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(316.78946 144.276)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" font-weight="400" fill="black" x="84.47894" y="15">counter/0</tspan>
+        </text>
+      </g>
+      <g id="Graphic_30">
+        <rect x="433.2" y="137.2" width="63.85826" height="51.288344" fill="white"/>
+        <rect x="433.2" y="137.2" width="63.85826" height="51.288344" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(438.2 144.39618)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" font-weight="400" fill="black" x="5.4411286" y="15">Oven/</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" font-weight="400" fill="black" x="13.585129" y="33.448">180</tspan>
+        </text>
+      </g>
+      <g id="Graphic_25">
+        <rect x="-119" y="92" width="67" height="55" fill="white"/>
+        <rect x="-119" y="92" width="67" height="55" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(-114 110.276)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" font-weight="400" fill="black" x="16.644" y="15">pr2</tspan>
+        </text>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -736,7 +736,7 @@
 		</collision>
 	</link>
 	<joint name="joint_5" type="fixed">
-		<origin rpy="1.570796326794897 0 -1.570796326794897" xyz="0.22 0 -0.45"/>
+		<origin rpy="1.570796326794897 0 -1.570796326794897" xyz="0.22 0 -0.3"/>
 		<child link="link_5"/>
 		<parent link="base"/>
 	</joint>
