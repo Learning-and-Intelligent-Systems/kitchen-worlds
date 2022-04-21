@@ -2,7 +2,7 @@
 (define
   (problem None)
   (:domain domain)
-  
+
   (:objects 
     cabbage
 	counter
@@ -16,7 +16,7 @@
 	stove
 	table
   )
-    
+
   (:init 
 	;; discrete facts (e.g. types, affordances)
 	(canmove)
@@ -52,7 +52,7 @@
 
 	(controllable left)
 
-	(bconf q336=(0, 0, 0))
+	(bconf q760=(0, 0, 0))
 	(stackable egg fridge)
 	(stackable egg sink)
 	(stackable egg stove)
@@ -74,7 +74,7 @@
 	(stackable plate counter)
 	(stackable plate table)
 
-	(atbconf q336=(0, 0, 0))
+	(atbconf q760=(0, 0, 0))
 
 	(pose egg p0=(2, -0.18, 0.95, 0))
 	(pose cabbage p1=(2, 0, 0.95, 0))
@@ -91,19 +91,19 @@
 	(supported salter p2=(2, 0.18, 0.95, 0) fridge)
 	(supported plate p3=(2.18, 0, 0.95, 0) fridge)
 
-	(aconf left aq528=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223))
-	(aconf right aq432=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000))
+	(aconf left aq952=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223))
+	(aconf right aq856=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000))
 
-	(ataconf left aq528=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223))
-	(ataconf right aq432=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000))
+	(ataconf left aq952=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223))
+	(ataconf right aq856=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000))
 
-	(defaultconf left aq528=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223))
-	(defaultconf right aq432=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000))
+	(defaultconf left aq952=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223))
+	(defaultconf right aq856=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000))
 
   )
-    
+
   (:goal (and 
-    (on cabbage sink)
+    (Cooked egg)
   ))
 )
         
