@@ -1,6 +1,6 @@
 from config import ASSET_PATH, EXP_PATH
 from os.path import join, abspath
-from lisdf_loader import load_lisdf_pybullet
+from pybullet_planning.lisdf_tools.lisdf_loader import load_lisdf_pybullet
 from pybullet_planning.pybullet_tools.utils import wait_if_gui, disconnect
 
 lisdf_paths = []
