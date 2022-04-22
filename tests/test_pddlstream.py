@@ -11,7 +11,7 @@ from pybullet_planning.pybullet_tools.pr2_primitives import get_base_custom_limi
 from pybullet_planning.pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, wait_if_gui, \
     SEPARATOR, get_aabb
 from pybullet_planning.pybullet_tools.bullet_utils import summarize_facts, print_goal, nice
-from pybullet_planning.pybullet_tools.pr2_agent import get_stream_info, post_process ## , get_stream_map
+from pybullet_planning.pybullet_tools.pr2_agent import get_stream_info, post_process, move_cost_fn ## , get_stream_map
 from pybullet_planning.pybullet_tools.logging import TXT_FILE
 
 ## custom stream_map
@@ -26,7 +26,7 @@ from pybullet_planning.pybullet_tools.pr2_streams import get_stable_gen, get_con
     get_update_wconf_p_gen, get_ik_ir_wconf_gen, get_pose_in_space_test, get_turn_knob_handle_motion_gen
 from pybullet_planning.pybullet_tools.pr2_primitives import get_group_joints, Conf, get_base_custom_limits, Pose, Conf, \
     get_ik_ir_gen, get_motion_gen, get_cfree_approach_pose_test, get_cfree_pose_pose_test, get_cfree_traj_pose_test, \
-    move_cost_fn, get_grasp_gen, Attach, Detach, Clean, Cook, control_commands, \
+    get_grasp_gen, Attach, Detach, Clean, Cook, control_commands, \
     get_gripper_joints, GripperCommand, apply_commands, State
 from pddlstream.language.generator import from_gen_fn, from_list_fn, from_fn, fn_from_constant, empty_gen, from_test
 
@@ -48,7 +48,7 @@ def get_stream_map(p, c, l, t):
         'sample-pose-inside': from_gen_fn(get_contain_gen(p, collisions=c)),  ##
         'sample-grasp': from_list_fn(get_grasp_gen(p, collisions=True)),
         'inverse-kinematics': from_gen_fn(get_ik_ir_gen(p, collisions=c, teleport=t, custom_limits=l,
-                                                        learned=False, max_attempts=60, verbose=True)),
+                                                        learned=False, max_attempts=60, verbose=False)),
         'inverse-kinematics-wconf': from_gen_fn(get_ik_ir_wconf_gen(p, collisions=c, teleport=t, custom_limits=l,
                                                                     learned=False, max_attempts=60, verbose=False,
                                                                     visualize=False)),
