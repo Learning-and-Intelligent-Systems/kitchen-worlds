@@ -48,6 +48,7 @@
 
     <state world_name="test_pick">
       <model name="pr2">
+        <joint name="torso_lift_joint"><angle>0.2</angle></joint>
         <joint name="l_shoulder_pan_joint"><angle>0.677</angle></joint>
         <joint name="l_shoulder_lift_joint"><angle>-0.343</angle></joint>
         <joint name="l_upper_arm_roll_joint"><angle>1.2</angle></joint>

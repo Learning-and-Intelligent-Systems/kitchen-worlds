@@ -70,7 +70,7 @@
 	(knob faucet#1--joint_faucet_1)
 	(knob faucet#1--joint_faucet_0)
 
-	(bconf q160=(2.5, 6, 3.142))
+	(bconf q704=(2.5, 6, 3.142))
 	(door fridge#1--fridge_door)
 
 	(joint fridge#1--fridge_door)
@@ -81,18 +81,17 @@
 	(joint faucet#1--joint_faucet_1)
 	(joint faucet#1--joint_faucet_0)
 
-	(atbconf q160=(2.5, 6, 3.142))
+	(atbconf q704=(2.5, 6, 3.142))
 
 	(meatturkeyleg meatturkeyleg#1)
 	(veggiecabbage veggiecabbage#1)
 
-	(surface fridge#1--shelf_bottom)
+	(cleaningsurface basin#1--basin_bottom)
 	(surface braiserbody#1--braiser_bottom)
 	(surface counter#1--front_left_stove)
-	(surface counter#1--indigo_tmp)
 	(surface basin#1--basin_bottom)
-
-	(cleaningsurface basin#1--basin_bottom)
+	(surface counter#1--indigo_tmp)
+	(surface fridge#1--shelf_bottom)
 
 	(isjointto fridge#1--fridge_door fridge#1)
 	(isjointto oven#1--knob_joint_2 oven#1)
@@ -114,28 +113,29 @@
 	(isclosedposition oven#1--knob_joint_2 pstn1=0)
 	(isclosedposition faucet#1--joint_faucet_1 pstn2=0)
 	(isclosedposition faucet#1--joint_faucet_0 pstn3=0)
-	(pose veggiecabbage#1 p0=(0.7, 4.8, 0.838, 0.891))
-	(pose braiserlid#1 p1=(0.55, 8.183, 0.821, 2.762))
-	(pose meatturkeyleg#1 p2=(0.7, 8.9, 0.844, 2.753))
-	(stackable veggiecabbage#1 fridge#1--shelf_bottom)
+	(pose veggiecabbage#1 p5=(0.7, 4.8, 0.838, 0.397))
+	(pose braiserlid#1 p6=(0.55, 8.163, 0.821, 1.044))
+	(pose meatturkeyleg#1 p7=(0.7, 8.9, 0.844, 2.38))
+
+	(atpose veggiecabbage#1 p5=(0.7, 4.8, 0.838, 0.397))
+	(atpose braiserlid#1 p6=(0.55, 8.163, 0.821, 1.044))
+	(atpose meatturkeyleg#1 p7=(0.7, 8.9, 0.844, 2.38))
+
 	(stackable veggiecabbage#1 braiserbody#1--braiser_bottom)
 	(stackable veggiecabbage#1 counter#1--front_left_stove)
-	(stackable veggiecabbage#1 counter#1--indigo_tmp)
 	(stackable veggiecabbage#1 basin#1--basin_bottom)
-	(stackable braiserlid#1 fridge#1--shelf_bottom)
+	(stackable veggiecabbage#1 counter#1--indigo_tmp)
+	(stackable veggiecabbage#1 fridge#1--shelf_bottom)
 	(stackable braiserlid#1 braiserbody#1--braiser_bottom)
 	(stackable braiserlid#1 counter#1--front_left_stove)
-	(stackable braiserlid#1 counter#1--indigo_tmp)
 	(stackable braiserlid#1 basin#1--basin_bottom)
-	(stackable meatturkeyleg#1 fridge#1--shelf_bottom)
+	(stackable braiserlid#1 counter#1--indigo_tmp)
+	(stackable braiserlid#1 fridge#1--shelf_bottom)
 	(stackable meatturkeyleg#1 braiserbody#1--braiser_bottom)
 	(stackable meatturkeyleg#1 counter#1--front_left_stove)
-	(stackable meatturkeyleg#1 counter#1--indigo_tmp)
 	(stackable meatturkeyleg#1 basin#1--basin_bottom)
-
-	(atpose veggiecabbage#1 p0=(0.7, 4.8, 0.838, 0.891))
-	(atpose braiserlid#1 p1=(0.55, 8.183, 0.821, 2.762))
-	(atpose meatturkeyleg#1 p2=(0.7, 8.9, 0.844, 2.753))
+	(stackable meatturkeyleg#1 counter#1--indigo_tmp)
+	(stackable meatturkeyleg#1 fridge#1--shelf_bottom)
 
 	(linkpose fridge#1--fridge_door lp0=(0.767, 5.12, 1.031, 2.771))
 	(linkpose oven#1--knob_joint_2 lp1=(0.293, 8.187, 0.993, 1.571))
@@ -150,22 +150,23 @@
 	(atlinkpose faucet#1--joint_faucet_1 lp2=(0.3, 5.6, 0.985, 1.571))
 	(atlinkpose faucet#1--joint_faucet_0 lp3=(0.3, 5.6, 0.985, 1.571))
 
-	(aconf left aq352=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223))
-	(aconf right aq256=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000))
+	(aconf left aq896=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223))
+	(aconf right aq800=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000))
 
-	(ataconf left aq352=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223))
-	(ataconf right aq256=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000))
+	(ataconf left aq896=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223))
+	(ataconf right aq800=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000))
 
-	(defaultconf left aq352=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223))
-	(defaultconf right aq256=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000))
+	(defaultconf left aq896=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223))
+	(defaultconf right aq800=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000))
 
-	(supported meatturkeyleg#1 p2=(0.7, 8.9, 0.844, 2.753) counter#1--indigo_tmp)
+	(supported veggiecabbage#1 p5=(0.7, 4.8, 0.838, 0.397) fridge#1--shelf_bottom)
+	(supported meatturkeyleg#1 p7=(0.7, 8.9, 0.844, 2.38) counter#1--indigo_tmp)
 
   )
 
   (:goal (and
-    (On meatturkeyleg#1 braiserbody#1--braiser_bottom)
-	(On veggiecabbage#1 braiserbody#1--braiser_bottom)
+    (on meatturkeyleg#1 braiserbody#1--braiser_bottom)
+	(on veggiecabbage#1 braiserbody#1--braiser_bottom)
   ))
 )
         

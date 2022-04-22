@@ -3,7 +3,7 @@
   (problem None)
   (:domain domain)
 
-  (:objects 
+  (:objects
     cabbage
 	counter
 	egg
@@ -17,7 +17,7 @@
 	table
   )
 
-  (:init 
+  (:init
 	;; discrete facts (e.g. types, affordances)
 	(canmove)
 	(canpull)
@@ -52,7 +52,7 @@
 
 	(controllable left)
 
-	(bconf q760=(0, 0, 0))
+	(bconf q104=(0, 0, 0))
 	(stackable egg fridge)
 	(stackable egg sink)
 	(stackable egg stove)
@@ -74,35 +74,35 @@
 	(stackable plate counter)
 	(stackable plate table)
 
-	(atbconf q760=(0, 0, 0))
+	(atbconf q104=(0, 0, 0))
 
-	(pose egg p0=(2, -0.18, 0.95, 0))
-	(pose cabbage p1=(2, 0, 0.95, 0))
-	(pose salter p2=(2, 0.18, 0.95, 0))
-	(pose plate p3=(2.18, 0, 0.95, 0))
+	(pose egg p1=(2, -0.18, 0.95, 0))
+	(pose cabbage p2=(2, 0, 0.95, 0))
+	(pose salter p3=(2, 0.18, 0.95, 0))
+	(pose plate p4=(2.18, 0, 0.95, 0))
 
-	(atpose egg p0=(2, -0.18, 0.95, 0))
-	(atpose cabbage p1=(2, 0, 0.95, 0))
-	(atpose salter p2=(2, 0.18, 0.95, 0))
-	(atpose plate p3=(2.18, 0, 0.95, 0))
+	(atpose egg p1=(2, -0.18, 0.95, 0))
+	(atpose cabbage p2=(2, 0, 0.95, 0))
+	(atpose salter p3=(2, 0.18, 0.95, 0))
+	(atpose plate p4=(2.18, 0, 0.95, 0))
 
-	(supported egg p0=(2, -0.18, 0.95, 0) fridge)
-	(supported cabbage p1=(2, 0, 0.95, 0) fridge)
-	(supported salter p2=(2, 0.18, 0.95, 0) fridge)
-	(supported plate p3=(2.18, 0, 0.95, 0) fridge)
+	(supported egg p1=(2, -0.18, 0.95, 0) fridge)
+	(supported cabbage p2=(2, 0, 0.95, 0) fridge)
+	(supported salter p3=(2, 0.18, 0.95, 0) fridge)
+	(supported plate p4=(2.18, 0, 0.95, 0) fridge)
 
-	(aconf left aq952=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223))
-	(aconf right aq856=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000))
+	(aconf left aq296=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223))
+	(aconf right aq200=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000))
 
-	(ataconf left aq952=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223))
-	(ataconf right aq856=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000))
+	(ataconf left aq296=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223))
+	(ataconf right aq200=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000))
 
-	(defaultconf left aq952=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223))
-	(defaultconf right aq856=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000))
+	(defaultconf left aq296=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223))
+	(defaultconf right aq200=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000))
 
   )
 
-  (:goal (and 
+  (:goal (and
     (cooked egg)
   ))
 )

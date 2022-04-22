@@ -21,7 +21,7 @@
       <uri>../../assets/models/milkbottle/4043/mobility.urdf</uri>
       <static>true</static>
       <scale>0.13999999999999999</scale>
-      <pose>0.7 4.8 1.479 0.0 -0.0 2.652</pose>
+      <pose>0.7 4.8 1.479 0.0 -0.0 1.626</pose>
     </include>
 
     <model name="floor1">
@@ -49,7 +49,7 @@
       <uri>../../assets/models/braiserbody/100693/mobility.urdf</uri>
       <static>true</static>
       <scale>0.259</scale>
-      <pose>0.55 8.183 0.818 0.0 -0.0 2.762</pose>
+      <pose>0.55 8.163 0.818 0.0 -0.0 1.044</pose>
     </include>
 
     <include name="microwave#1">
@@ -63,14 +63,14 @@
       <uri>../../assets/models/braiserlid/100693/mobility.urdf</uri>
       <static>false</static>
       <scale>0.259</scale>
-      <pose>0.55 8.183 0.821 0.0 -0.0 2.762</pose>
+      <pose>0.55 8.163 0.821 0.0 -0.0 1.044</pose>
     </include>
 
     <include name="meatturkeyleg#1">
       <uri>../../assets/models/meatturkeyleg/00001/mobility.urdf</uri>
       <static>true</static>
       <scale>0.00049</scale>
-      <pose>0.7 8.9 0.844 0.0 -0.0 2.753</pose>
+      <pose>0.7 8.9 0.844 0.0 -0.0 2.38</pose>
     </include>
 
     <include name="oven#1">
@@ -112,12 +112,13 @@
       <uri>../../assets/models/veggiecabbage/00001/mobility.urdf</uri>
       <static>true</static>
       <scale>0.0034999999999999996</scale>
-      <pose>0.7 4.8 0.838 0.0 -0.0 0.891</pose>
+      <pose>0.7 4.8 0.838 0.0 -0.0 0.397</pose>
     </include>
 
 
     <state world_name="kitchen">
       <model name="pr2">
+        <joint name="torso_lift_joint"><angle>0.2</angle></joint>
         <joint name="l_shoulder_pan_joint"><angle>0.677</angle></joint>
         <joint name="l_shoulder_lift_joint"><angle>-0.343</angle></joint>
         <joint name="l_upper_arm_roll_joint"><angle>1.2</angle></joint>

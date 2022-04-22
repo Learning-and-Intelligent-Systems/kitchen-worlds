@@ -1,0 +1,6 @@
+----------------
+PART I: world objects |
+1      |  pr2    |  Pose: (0, 0, 0, 0)
+2      |  table    |  Pose: (4, 6, 0.45, 0)
+3      |  cabbage    |  Pose: (4, 6, 0.95, 0)
+----------------
