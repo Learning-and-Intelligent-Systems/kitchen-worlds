@@ -23,10 +23,14 @@ pip install -r requirements.txt
 
 ## Examples
 
-
+To run all tests before git push, do
 ```commandline
 cd tests
+sh run_tests.sh
+```
 
+To test basic lisdf functions
+```commandline
 ## Test LISDF parser
 python test_parse_lisdf.py
 
@@ -35,11 +39,16 @@ python test_pybullet_lisdf.py
 
 ##  Test parse problem.pddl
 python test_parse_pddl.py
+```
 
-## Test solve PDDLStream problem
-python test_pddlstream.py -test test_pick
+To solve some test problems wih PDDLStream, `-test` takes the name of subdirectory inside `test_cases` folder, e.g. `blocks_pick`, `blocks_kitchen`, `kitchen`:
 
-## Test build scene
+```commandline
+python test_pddlstream.py -test blocks_pick
+```
+
+To build some scenes
+```commandline
 python test_world_builder.py
 ```
 
