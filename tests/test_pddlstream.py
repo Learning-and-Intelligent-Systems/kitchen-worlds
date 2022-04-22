@@ -149,8 +149,9 @@ def init_experiment(exp_dir):
 ###################
 # ####################################
 
-def main(exp_dir, partial=False, defer=False, verbose=True):
+def main(exp_name, partial=False, defer=False, verbose=True):
     parser = create_parser()
+    parser.add_argument('-test', type=str, default=exp_name, help='Name of the test case')
     parser.add_argument('-cfree', action='store_true', help='Disables collisions during planning')
     parser.add_argument('-enable', action='store_true', help='Enables rendering during planning')
     parser.add_argument('-teleport', action='store_true', help='Teleports between configurations')
@@ -158,6 +159,7 @@ def main(exp_dir, partial=False, defer=False, verbose=True):
     args = parser.parse_args()
     print('Arguments:', args)
 
+    exp_dir = exp_dir = join(EXP_PATH, args.test)
     world = load_lisdf_pybullet(join(exp_dir, 'scene.lisdf'))
     world.summarize_all_objects()
     saver = WorldSaver()
@@ -202,6 +204,4 @@ def main(exp_dir, partial=False, defer=False, verbose=True):
     disconnect()
 
 if __name__ == '__main__':
-    exp_name = 'test_pick' ## 'blocks_kitchen'
-    exp_dir = join(EXP_PATH, exp_name)
-    main(exp_dir=exp_dir)
+    main(exp_name='test_pick')

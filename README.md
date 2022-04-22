@@ -23,18 +23,24 @@ pip install -r requirements.txt
 
 ## Examples
 
-The kitchen scenes are in path `asset/scenes/`.
 
-To test parsing of LISDF files, run
+```commandline
+cd tests
 
-```shell
-python parse_lisdf.py
-```
+## Test LISDF parser
+python test_parse_lisdf.py
 
-To test loading LISDF worlds into PyBullet, run
+## Test load LISDF to Pybullet
+python test_pybullet_lisdf.py
 
-```shell
-python pybullet_lisdf.py
+##  Test parse problem.pddl
+python test_parse_pddl.py
+
+## Test solve PDDLStream problem
+python test_pddlstream.py -test test_pick
+
+## Test build scene
+python test_world_builder.py
 ```
 
 ## LISDF Spec
