@@ -107,25 +107,6 @@ File "/Users/z/Documents/simulators/PyBullet/kitchen-worlds/pddlstream/examples/
 TypeError: 'NoneType' object is not iterable
 ```
 
-
-## TODO
-
-- [x] add `requirements.txt`
-- [x] upload test scene files in the format of `.lisdf` -> need lisdf team to support a few more tags, including
-  ``````xml
-  <include><uri>...</uri></include>
-  <state>...</state>
-  ``````
-- [x] upload test scene files with `<world><gui><camera><pose>`
-
-- [x] update problem files in the format of `problem.pddl`
-
-- [x] upload implicit domain files in the format of `domain.pddl`
-
-- [x] add instructions to solve the example problems with TAMP planner [PDDLStream](https://github.com/caelan/pddlstream/tree/main)
-
-- [x] add instructions on generating kitchen scenes with scripts in [cognitive-architectures](https://github.mit.edu/ztyang/cognitive-architectures/tree/master/bullet)
-
 ## Acknowledgements
 
 This repo works thanks for the tools provided by LIS lab members and alum:
@@ -138,3 +119,20 @@ All the object models and urdf files are downloaded for free from the following 
 
 * most articulated object models are downloaded from [PartNet Mobility dataset](https://sapien.ucsd.edu/browse) (Mo, Kaichun, et al. "Partnet: A large-scale benchmark for fine-grained and hierarchical part-level 3d object understanding." *Proceedings of the IEEE/CVF conference on computer vision and pattern recognition*. 2019.)
 * most kitchen object models are downloaded from [Free3D](https://free3d.com/3d-models/food).
+
+
+## TODO
+
+- [x] add `requirements.txt`
+- [x] upload test scene files in the format of `.lisdf` -> need lisdf team to support a few more tags, including
+  ``````xml
+  <include><uri>...</uri></include>
+  <state>...</state>
+  ``````
+- [x] upload test scene files with `<world><gui><camera><pose>`
+- [x] update problem files in the format of `problem.pddl`
+- [x] upload implicit domain files in the format of `domain.pddl`
+- [x] add instructions to solve the example problems with TAMP planner [PDDLStream](https://github.com/caelan/pddlstream/tree/main)
+- [x] add instructions on generating kitchen scenes with scripts in [cognitive-architectures](https://github.mit.edu/ztyang/cognitive-architectures/tree/master/bullet)
+
+- [ ]

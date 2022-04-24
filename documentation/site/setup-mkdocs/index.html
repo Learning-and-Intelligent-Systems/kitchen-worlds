@@ -1,111 +1,66 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  
-  
-  <link rel="shortcut icon" href="../css/favicon.ico">
-  
-  <title>Set up MkDocs - LEAPdocs</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
-
-  <link rel="stylesheet" href="../css/theme.css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
-  <link href="../css/extra.css" rel="stylesheet" />
-  
-  <script>
-    // Current page data
-    var mkdocs_page_name = "Set up MkDocs";
-    var mkdocs_page_input_path = "setup-mkdocs.md";
-    var mkdocs_page_url = null;
-  </script>
-  
-  <script src="../js/jquery-2.1.1.min.js" defer></script>
-  <script src="../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../css/favicon.ico" />
+    <title>Set up MkDocs - KitchenWorlds</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+        <link href="../css/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Set up MkDocs";
+        var mkdocs_page_input_path = "setup-mkdocs.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
     <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> LEAPdocs</a>
-        <div role="search">
+          <a href=".." class="icon icon-home"> KitchenWorlds
+        </a><div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
       <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-                <p class="caption"><span class="caption-text">Project</span></p>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="..">LEAP Architecture</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../project-minutes/">Minutes & Notes</a>
-                    </li>
-                </ul>
-                <p class="caption"><span class="caption-text">Domains</span></p>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../domain-grocery/">Grocery - action costs</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../domain-kitchen/">Kitchen - large universe</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../sim-igibson/">iGibson's BEHAVIOR</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../sim-alfred/">AI2THOR's Alfred</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../sim-habitat/">Habitat's Rearrangement</a>
-                    </li>
-                </ul>
-                <p class="caption"><span class="caption-text">Strategists</span></p>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../str-iobig/">PLOI-like IOBIG [ NEW ]</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../str-sdbig/">HPN-like SDBIG [ NEW ]</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../str-ipbig/">HPN-like IPBIG [ NEW ]</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../str-hpn/">HPN [ NEW ]</a>
-                    </li>
-                </ul>
-                <p class="caption"><span class="caption-text">Experiments</span></p>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../exp-goals/">Num of Goal Predicates</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../exp-objects/">Num of Objects</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../exp-egg-recipes/">All Egg Recipes</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../exp-two-dishes/">Two Dishes</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../exp-planner-options/">Satisfising v.s. Optimizing</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../exp-merged-domains/">Merged Domains</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../exp-strategists/">Combine Strategists [ NEW ]</a>
-                    </li>
-                </ul>
-                <p class="caption"><span class="caption-text">Notes</span></p>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../notes-fd/">FastDownward</a>
-                    </li>
-                </ul>
-                <p class="caption"><span class="caption-text">Set it up</span></p>
-                <ul class="current">
-                    <li class="toctree-l1"><a class="reference internal" href="../setup-repository/">Set up the Repository</a>
-                    </li>
-                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Set up MkDocs</a>
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Project</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="..">Kitchen Worlds</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Domains</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../domain-kitchen/">Kitchen</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Experiments</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="" href="../exp-baseline.md">PDDLStream Baseline</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Set it up</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../setup-repository/">Set up the Repository</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Set up MkDocs</a>
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#step-1-install-mkdocs">Step 1: Install MkDocs</a>
         <ul>
@@ -134,46 +89,33 @@
     <li class="toctree-l2"><a class="reference internal" href="#summary">Summary</a>
     </li>
     </ul>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../setup-notes/">Editor's Notes</a>
-                    </li>
-                </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../setup-notes/">Editor's Notes</a>
+                  </li>
+              </ul>
       </div>
     </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="..">LEAPdocs</a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">KitchenWorlds</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    
-      
-        
-          <li>Set it up &raquo;</li>
-        
-      
-    
-    <li>Set up MkDocs</li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Set it up &raquo;</li><li>Set up MkDocs</li>
     <li class="wy-breadcrumbs-aside">
-      
     </li>
   </ul>
-  
   <hr/>
 </div>
 
-          <div role="main">
-            <div class="section">
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
               
                 <h1 id="set-up-the-documentation">Set up the documentation<a class="headerlink" href="#set-up-the-documentation" title="Permanent link">#</a></h1>
 <p>The documentation source files are in <code>GenesisCore/documentation</code> folder.</p>
@@ -183,7 +125,7 @@ docs/
     index.md    # The documentation homepage
     ...         # Other markdown pages
     imgs/
-        ...     # Images
+        ...     # Images for documentation and README.md
     css/
         extra.css   # style file to customize based on site/theme.css and site/theme_extra.css
 site/           # You can ignore thing here, MkDocs generNates them when you deploy the page
@@ -247,7 +189,7 @@ INFO    -  Cleaning site directory
 <p>After you have made the changes, simply do this in the same directory as the <code>mkdocs.yml</code> file:</p>
 <pre><code>mkdocs gh-deploy --clean
 </code></pre>
-<p>The page will be updated on <a href="https://zt-yang.github.io/tom-minecraft/">https://ztyang-mit.github.io/tom-minecraft/</a>.</p>
+<p>The page will be updated on <a href="https://learning-and-intelligent-systems.github.io/kitchen-worlds/">https://learning-and-intelligent-systems.github.io/kitchen-worlds/</a>.</p>
 <p>Note that if you only made changes within the documentation folder, you don't have to <code>git push</code>. The deploy command does it for you.</p>
 <h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">#</a></h2>
 <p>In this article, you have learned how to install the MkDocs package, write documentation pages, and deloy the site.</p>
@@ -263,29 +205,21 @@ $ mkdocs serve              # before editting, start the MkDocs server
 </ul>
               
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../setup-repository/" class="btn btn-neutral float-left" title="Set up the Repository"><span class="icon icon-circle-arrow-left"></span> Previous</a>
         <a href="../setup-notes/" class="btn btn-neutral float-right" title="Editor's Notes">Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../setup-repository/" class="btn btn-neutral" title="Set up the Repository"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <!-- Copyright etc -->
-    
   </div>
 
-  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-      
+          
         </div>
       </div>
 
@@ -293,7 +227,7 @@ $ mkdocs serve              # before editting, start the MkDocs server
 
   </div>
 
-  <div class="rst-versions" role="note" aria-label="versions">
+  <div class="rst-versions" role="note" aria-label="Versions">
   <span class="rst-current-version" data-toggle="rst-current-version">
     
     

@@ -1,8 +1,8 @@
 nav:
     - Project:
       - Kitchen Worlds: index.md
-      - Minutes & Notes: project-minutes.md
-      - Plans & Priorities: project-plans.md
+      # - Minutes & Notes: project-minutes.md
+      # - Plans & Priorities: project-plans.md
     - Domains:
       - Kitchen: domain-kitchen.md
     - Experiments:

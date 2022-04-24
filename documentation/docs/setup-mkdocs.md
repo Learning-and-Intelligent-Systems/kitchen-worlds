@@ -112,7 +112,7 @@ After you have made the changes, simply do this in the same directory as the `mk
 mkdocs gh-deploy --clean
 ```
 
-The page will be updated on [https://ztyang-mit.github.io/tom-minecraft/](https://zt-yang.github.io/tom-minecraft/).
+The page will be updated on [https://learning-and-intelligent-systems.github.io/kitchen-worlds/](https://learning-and-intelligent-systems.github.io/kitchen-worlds/).
 
 Note that if you only made changes within the documentation folder, you don't have to `git push`. The deploy command does it for you.
 
