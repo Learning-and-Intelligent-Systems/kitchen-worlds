@@ -134,7 +134,7 @@ pre {
     display: block;
     padding: 12px;
     font-size: 12px;
-    margin-right: -50%;
+    /* margin-right: -50%; */
 }
 
 code, .rst-content tt, .rst-content code {

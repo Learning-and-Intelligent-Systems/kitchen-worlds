@@ -3,8 +3,11 @@ nav:
       - Kitchen Worlds: index.md
       # - Minutes & Notes: project-minutes.md
       # - Plans & Priorities: project-plans.md
+    - Tutorials:
+      - LISDF: tut-lisdf.md
+      - LISPDDL: tut-lispddl.md
     - Domains:
-      - Kitchen: domain-kitchen.md
+      - Rearrangement: domain-rearrangement.md
     - Experiments:
       - PDDLStream Baseline: exp-baseline.md
     - Set it up:

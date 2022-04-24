@@ -66,9 +66,16 @@
     </ul>
                   </li>
               </ul>
+              <p class="caption"><span class="caption-text">Tutorials</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="tut-lisdf/">LISDF</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="tut-lispddl/">LISPDDL</a>
+                  </li>
+              </ul>
               <p class="caption"><span class="caption-text">Domains</span></p>
               <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="domain-kitchen/">Kitchen</a>
+                  <li class="toctree-l1"><a class="reference internal" href="domain-rearrangement/">Rearrangement</a>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Experiments</span></p>
@@ -145,33 +152,8 @@ python test_parse_pddl.py
 <pre><code class="language-commandline">python test_world_builder.py
 </code></pre>
 <h2 id="lisdf-spec">LISDF Spec<a class="headerlink" href="#lisdf-spec" title="Permanent link">#</a></h2>
-<p>Current kitchen scenes in the format of  <code>.lisdf</code> are in path <code>asset/scenes/</code>, e.g. <code>kitchen_counter.lisdf</code> as simulated below. The LISDF format has a few additional tags inside <code>&lt;world&gt;&lt;/world&gt;</code> compared to <a href="http://sdformat.org/spec?ver=1.9&amp;elem=sdf">SDF</a>:</p>
-<ul>
-<li>add object and robot models with
-  <code>xml
-  &lt;include&gt;
-      &lt;uri&gt;URDF_file&lt;/uri&gt;
-      &lt;static&gt;true/false&lt;/static&gt;
-      &lt;pose&gt;x y z r p y&lt;/pose&gt;
-      &lt;scale&gt; an integer to scale model .obj with original ratio&lt;/scale&gt;
-  &lt;/include&gt;</code></li>
-<li>describe camera pose in a way that's easy to export from PyBullet</li>
-</ul>
-<p><code>xml
-  &lt;gui&gt;
-    &lt;camera name="default_camera" definition_type="lookat"&gt;
-      &lt;xyz&gt;3 6 3&lt;/xyz&gt;
-      &lt;point_to&gt;0 6 1&lt;/point_to&gt;
-    &lt;/camera&gt;
-  &lt;/gui&gt;</code>
-  apart from what SDF originally supports
-  <code>xml
-  &lt;gui&gt;
-    &lt;camera name="default_camera" definition_type="pose"&gt;
-      &lt;pose&gt;3 6 3 0 -2.15 0&lt;/pose&gt;
-    &lt;/camera&gt;
-  &lt;/gui&gt;</code>
-<img alt="kitchen_counter.lisdf in PyBullet" src="imgs/kitchen_counter.png" /></p>
+<p>Current kitchen scenes in the format of  <code>.lisdf</code> are in path <code>asset/scenes/</code>, e.g. <code>kitchen_counter.lisdf</code> as simulated below.</p>
+<p><img alt="kitchen_counter.lisdf in PyBullet" src="imgs/kitchen_counter.png" /></p>
 <h2 id="test-lisdf-pddl-streams-with-pddlstream">Test LISDF + PDDL + Streams with PDDLStream<a class="headerlink" href="#test-lisdf-pddl-streams-with-pddlstream" title="Permanent link">#</a></h2>
 <h3 id="set-up-pddlstream">Set up PDDLStream<a class="headerlink" href="#set-up-pddlstream" title="Permanent link">#</a></h3>
 <pre><code class="language-commandline"># git submodule add https://github.com/caelan/pddlstream.git
@@ -223,7 +205,7 @@ TypeError: 'NoneType' object is not iterable
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="domain-kitchen/" class="btn btn-neutral float-right" title="Kitchen">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="tut-lisdf/" class="btn btn-neutral float-right" title="LISDF">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -247,7 +229,7 @@ TypeError: 'NoneType' object is not iterable
     
     
     
-      <span><a href="domain-kitchen/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="tut-lisdf/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
