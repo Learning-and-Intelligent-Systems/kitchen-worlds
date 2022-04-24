@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../css/favicon.ico" />
+    <title>Set up MkDocs - KitchenWorlds</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+        <link href="../css/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Set up MkDocs";
+        var mkdocs_page_input_path = "setup-mkdocs.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> KitchenWorlds
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Project</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="..">Kitchen Worlds</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../project-minutes/">Minutes & Notes</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../project-plans/">Plans & Priorities</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Domains</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../domain-kitchen/">Kitchen</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Experiments</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="" href="../exp-baseline.md">PDDLStream Baseline</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Set it up</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../setup-repository/">Set up the Repository</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Set up MkDocs</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#step-1-install-mkdocs">Step 1: Install MkDocs</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#install-with-pip">Install with pip</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#install-with-a-package-manager">Install with a Package Manager</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#step-2-start-mkdocs-server">Step 2: Start MkDocs Server</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#step-3-edit-pages">Step 3: Edit Pages</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#add-a-page">Add a page</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#write-in-markdown">Write in Markdown</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#step-4-deploy-after-editing">Step 4: Deploy After Editing</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#routine-deploy-with-one-command">Routine deploy with one command</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#summary">Summary</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../setup-notes/">Editor's Notes</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">KitchenWorlds</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Set it up &raquo;</li><li>Set up MkDocs</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="set-up-the-documentation">Set up the documentation<a class="headerlink" href="#set-up-the-documentation" title="Permanent link">#</a></h1>
+<p>The documentation source files are in <code>GenesisCore/documentation</code> folder.</p>
+<p>Here is the layout of the documentation project:</p>
+<pre><code>mkdocs.yml      # The configuration file, e.g., for organizing the pages
+docs/
+    index.md    # The documentation homepage
+    ...         # Other markdown pages
+    imgs/
+        ...     # Images for documentation and README.md
+    css/
+        extra.css   # style file to customize based on site/theme.css and site/theme_extra.css
+site/           # You can ignore thing here, MkDocs generNates them when you deploy the page
+</code></pre>
+<h2 id="step-1-install-mkdocs">Step 1: Install MkDocs<a class="headerlink" href="#step-1-install-mkdocs" title="Permanent link">#</a></h2>
+<p><a href="https://www.mkdocs.org/#mkdocs">MkDocs</a> is a Python package for generating static sites, especially good for the documentation style. Documentation source files are written in Markdown, and configured with a single YAML configuration file.</p>
+<p>You can install MkDocs using pip or other package manager.</p>
+<h3 id="install-with-pip">Install with pip<a class="headerlink" href="#install-with-pip" title="Permanent link">#</a></h3>
+<p>If you use the Python package manager, <a href="https://pip.readthedocs.io/en/stable/installing/">pip</a>, then you can:</p>
+<pre><code>$ pip install --upgrade pip
+$ pip install mkdocs
+</code></pre>
+<p>To check that it is installed:</p>
+<pre><code>$ mkdocs --version
+mkdocs, version version 1.2.2 from ...
+</code></pre>
+<h3 id="install-with-a-package-manager">Install with a Package Manager<a class="headerlink" href="#install-with-a-package-manager" title="Permanent link">#</a></h3>
+<p>If you prefer useing another package manager (such as <code>apt-get</code>, <code>dnf</code>, <code>homebrew</code>, <code>yum</code>, <code>chocolatey</code>, etc.) to install packages on your system, then you may install <code>MkDocs</code> with your package manager.</p>
+<h2 id="step-2-start-mkdocs-server">Step 2: Start MkDocs Server<a class="headerlink" href="#step-2-start-mkdocs-server" title="Permanent link">#</a></h2>
+<p>MkDocs comes with a built-in dev-server that lets you preview your documentation as you work on it. Make sure you're in the same directory as the <code>mkdocs.yml</code> configuration file, and then start the server by running the <code>mkdocs serve</code> command:</p>
+<pre><code>$ mkdocs serve
+INFO    -  Building documentation...
+INFO    -  Cleaning site directory
+[I 160402 15:50:43 server:271] Serving on http://127.0.0.1:8000
+[I 160402 15:50:43 handlers:58] Start watching changes ...
+</code></pre>
+<!--- mkdocs serve --dev-addr '127.0.0.1:9000' --->
+
+<p>Now you can view the documentation site in <a href="http://127.0.0.1:8000/">http://127.0.0.1:8000/</a>, being updated in real time as you save your edits to the files.</p>
+<h2 id="step-3-edit-pages">Step 3: Edit Pages<a class="headerlink" href="#step-3-edit-pages" title="Permanent link">#</a></h2>
+<p>Before you make changes to the documentation, make sure to <code>git pull</code> the latest changes made by others to avoid conflict.</p>
+<h3 id="add-a-page">Add a page<a class="headerlink" href="#add-a-page" title="Permanent link">#</a></h3>
+<p>If you want to add a page to the wiki, reate a new markdown file in the <code>docs/</code> directory.</p>
+<p>Then, add its name and markdown file name to <code>mkdocs.yml</code>, where you will see:</p>
+<pre><code>nav:
+    - Genesis:
+      - Genesis System: index.md
+      - Contribute to Documentation: mkdocs.md
+    - Representation:
+      - Inner Language - Innerese: innerese.md
+      - ...
+    - Fundamentals:
+      - Inference by Rules: inference.md
+      - ...
+    -
+</code></pre>
+<p>The current hierarchy and order is designed so that a new student can use the documentation as a tutorial. Major reorganization is possible upon discussion with <a href="ztyang@mit.edu">Yang</a>:</p>
+<h3 id="write-in-markdown">Write in Markdown<a class="headerlink" href="#write-in-markdown" title="Permanent link">#</a></h3>
+<p>Our wiki pages are written in <a href="https://en.wikipedia.org/wiki/Markdown#Example">Markdown</a>, a lightweight markup language with plain text formatting syntax. The following cheatsheet designed by Theme Spectre showed the most frequently used syntax:</p>
+<p><img alt="" src="imgs/markdown.jpg" /></p>
+<p>To make it even easier to write in Markdown, you can add Markdown plugin to your editor. For example, I use <code>markdown-editor</code> in Atom to enjoy the following features:</p>
+<ul>
+<li>Toggle text styles using shortcut such as <code>Ctrl+B</code></li>
+<li>Continue lists and table rows when press <code>enter</code></li>
+<li>Correct ordered list numbers</li>
+</ul>
+<h2 id="step-4-deploy-after-editing">Step 4: Deploy After Editing<a class="headerlink" href="#step-4-deploy-after-editing" title="Permanent link">#</a></h2>
+<p>NOTE: At this moment, only Yang should deploy the changes to the website to avoid git merge problems. Please let her know of the changes you made.</p>
+<h3 id="routine-deploy-with-one-command">Routine deploy with one command<a class="headerlink" href="#routine-deploy-with-one-command" title="Permanent link">#</a></h3>
+<p>Currently, the wiki page is hosted publicly on GitHub. We may later shift over to private domains.</p>
+<p>After you have made the changes, simply do this in the same directory as the <code>mkdocs.yml</code> file:</p>
+<pre><code>mkdocs gh-deploy --clean
+</code></pre>
+<p>The page will be updated on <a href="https://zt-yang.github.io/tom-minecraft/">https://ztyang-mit.github.io/tom-minecraft/</a>.</p>
+<p>Note that if you only made changes within the documentation folder, you don't have to <code>git push</code>. The deploy command does it for you.</p>
+<h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">#</a></h2>
+<p>In this article, you have learned how to install the MkDocs package, write documentation pages, and deloy the site.</p>
+<ul>
+<li>Every time you make changes to the documentation, you need to use the following two commands at the project directory.</li>
+</ul>
+<pre><code>$ git pull
+$ mkdocs serve              # before editting, start the MkDocs server
+</code></pre>
+<ul>
+<li>During editing, you add and organize pages at the configuration page, <code>mkdocs.yml</code>.</li>
+<li>After editing, you should let Yang know of the changes you made and <code>git push</code></li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../setup-repository/" class="btn btn-neutral float-left" title="Set up the Repository"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../setup-notes/" class="btn btn-neutral float-right" title="Editor's Notes">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../setup-repository/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../setup-notes/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
