@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../css/favicon.ico">
+  
+  <title>All Egg Recipes - LEAPdocs</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  <link href="../css/extra.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "All Egg Recipes";
+    var mkdocs_page_input_path = "exp-egg-recipes.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> LEAPdocs</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <p class="caption"><span class="caption-text">Project</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">LEAP Architecture</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../project-minutes/">Minutes & Notes</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Domains</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../domain-grocery/">Grocery - action costs</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../domain-kitchen/">Kitchen - large universe</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-igibson/">iGibson's BEHAVIOR</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-alfred/">AI2THOR's Alfred</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-habitat/">Habitat's Rearrangement</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Strategists</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-iobig/">PLOI-like IOBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-sdbig/">HPN-like SDBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-ipbig/">HPN-like IPBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-hpn/">HPN [ NEW ]</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Experiments</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-goals/">Num of Goal Predicates</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-objects/">Num of Objects</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">All Egg Recipes</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#experiment-design">Experiment Design</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#experiment-results">Experiment Results</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#when-the-environment-conians-the-minumum-sets-of-objects">When the environment conians the minumum sets of objects:</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#when-the-environment-contains-10-eggs-and-10-veggies">When the environment contains 10 eggs and 10 veggies:</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#when-the-environment-contains-2-copies-of-every-utensil">When the environment contains 2 copies of every utensil:</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#when-the-environment-contains-both-10-eggs-veggies-and-2-copies-of-every-utensil">When the environment contains both 10 eggs &amp; veggies and 2 copies of every utensil:</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#when-the-environment-contains-both-10-eggs-veggies-and-4-copies-of-every-utensil">When the environment contains both 10 eggs &amp; veggies and 4 copies of every utensil:</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#five-egg-recipes-and-plans-by-fd">Five egg recipes and plans by FD</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#omelette">Omelette</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#scrambled-eggs">Scrambled eggs</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#sunny-side-up">Sunny Side Up</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#egg-in-a-hole">Egg in a Hole</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#poached-egg">Poached Egg</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#previous-weird-results-about-is-buttery">Previous weird results about is-buttery</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#when-the-environment-contains-10-eggs-and-10-veggies_1">When the environment contains 10 eggs and 10 veggies:</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#when-the-environment-contains-2-copies-of-every-utensil_1">When the environment contains 2 copies of every utensil:</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#when-the-environment-contains-both-10-eggs-veggies-and-2-copies-of-every-utensil_1">When the environment contains both 10 eggs &amp; veggies and 2 copies of every utensil:</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#when-the-environment-contains-both-10-eggs-veggies-and-4-copies-of-every-utensil_1">When the environment contains both 10 eggs &amp; veggies and 4 copies of every utensil:</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-two-dishes/">Two Dishes</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-planner-options/">Satisfising v.s. Optimizing</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-merged-domains/">Merged Domains</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-strategists/">Combine Strategists [ NEW ]</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Notes</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../notes-fd/">FastDownward</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Set it up</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-repository/">Set up the Repository</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-mkdocs/">Set up MkDocs</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-notes/">Editor's Notes</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">LEAPdocs</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Experiments &raquo;</li>
+        
+      
+    
+    <li>All Egg Recipes</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="different-egg-recipes-search-time-corresponds-to-of-axioms-and-depth-of-search-instead-of-of-operators-or-length-of-plan">Different egg recipes -&gt; Search time corresponds to # of axioms and depth of search, instead of # of operators or length of plan<a class="headerlink" href="#different-egg-recipes-search-time-corresponds-to-of-axioms-and-depth-of-search-instead-of-of-operators-or-length-of-plan" title="Permanent link">#</a></h1>
+<h2 id="experiment-design">Experiment Design<a class="headerlink" href="#experiment-design" title="Permanent link">#</a></h2>
+<p><code>test_egg_recipes_*.sh</code> tests the search complexity of 5 different egg-related recipes, with increasingly large domain (i.e. types, predicates, operators, axioms) and environments (i.e. objects). </p>
+<p>The five recipes include:</p>
+<ul>
+<li><code>omelette.pddl</code> specifies beaten, folded eggs with veggies</li>
+<li><code>scrambled_eggs.pddl</code> specifies beaten, scrambled eggs</li>
+<li><code>sunny_side_up.pddl</code> specifies fried, steamed eggs on frypan</li>
+<li><code>egg_in_hole.pddl</code> specifies fried egg in the hole of a bread</li>
+<li><code>poached_egg.pddl</code> specifies boiled egg with vinegar</li>
+</ul>
+<p>The five domains include:</p>
+<ul>
+<li><code>kitchen_egg_1</code> contains the minumum of knowledge for making omelette</li>
+<li><code>kitchen_egg_2</code> contains the minumum of knowledge for making omelette, scrambled_eggs</li>
+<li><code>kitchen_egg_3</code> contains the minumum of knowledge for making omelette, scrambled_eggs, sunny_side_up</li>
+<li><code>kitchen_egg_4</code> contains the minumum of knowledge for making omelette, scrambled_eggs, sunny_side_up, egg_in_hole</li>
+<li><code>kitchen_egg_5</code> contains the minumum of knowledge for making omelette, scrambled_eggs, sunny_side_up, egg_in_hole, and poached_egg</li>
+</ul>
+<p>The five sets of objects include:</p>
+<ul>
+<li><code>obj_0</code>, <code>obj_egg_4</code>, and <code>obj_egg_5</code> contain the minimum set of objects for <code>kitchen_egg_1</code>, <code>kitchen_egg_4</code> and <code>kitchen_egg_5</code> </li>
+<li><code>obj_3</code>, <code>obj_egg_4_m</code>, and <code>obj_egg_5_m</code> contain 10 eggs and 10 veggies</li>
+<li><code>obj_4</code>, <code>obj_egg_4_l</code>, and <code>obj_egg_5_l</code> contain 2 copies of every utensil</li>
+<li><code>obj_4_xl</code>, <code>obj_egg_4_xl</code>, and <code>obj_egg_5_xl</code> contain both (1) 10 eggs and 10 veggies, and (2) 2 copies of every utensil</li>
+<li><code>obj_4_xxl</code>, <code>obj_egg_4_xxl</code>, and <code>obj_egg_5_xxl</code> contain both (1) 10 eggs and 10 veggies, and (2) 4 copies of every utensil </li>
+</ul>
+<h2 id="experiment-results">Experiment Results<a class="headerlink" href="#experiment-results" title="Permanent link">#</a></h2>
+<p>Summary of results:</p>
+<ul>
+<li>with the minimum domain and object set, FD can solve a recipe within 0.001s</li>
+<li>when the environment contains both extended ingredients (e.g. eggs) and utensils (e.g. pans)</li>
+</ul>
+<p>Note:</p>
+<ul>
+<li>rows with <code>-</code> means exceeding 5 min timeout</li>
+<li>blank rows means running out of memory during instantiation, which results in failed planning</li>
+<li><code>var</code>, <code>op</code>, <code>axiom</code> columns contain the number of variables, operators, and axioms used during planning</li>
+<li><code>plan</code> column contain the length of searched plan</li>
+<li><code>cost</code> column contain the total cost of the plan (unit cost for now)</li>
+<li><code>parse</code>, <code>search</code> columns contain the timer in seconds for the parsing and search procedures </li>
+<li><code>state</code> column contain number of states expanded</li>
+</ul>
+<!--
+* run_name with `gi=` means the specified goal is ignored (i.e., deleted) from the problem file
+-->
+
+<h3 id="when-the-environment-conians-the-minumum-sets-of-objects">When the environment conians the minumum sets of objects:<a class="headerlink" href="#when-the-environment-conians-the-minumum-sets-of-objects" title="Permanent link">#</a></h3>
+<pre><code class="language-python">     t  run_name                                         var    op    axiom    plan    cost    parse      search    state
+------  ---------------------------------------------  -----  ----  -------  ------  ------  -------  ----------  -------
+210933  kitchen_egg_1, omelette, obj_0.pddl               60   932       27      47      47    0.511  0.0102195       165
+210934  kitchen_egg_2, omelette, obj_0.pddl               60   932       27      47      47    0.506  0.0102126       165
+210935  kitchen_egg_3, omelette, obj_0.pddl               60   932       27      47      47    0.501  0.0103028       165
+210939  kitchen_egg_4, omelette, obj_egg_4.pddl           91  2507      109      47      47    3.914  0.0372211       396
+210943  kitchen_egg_5, omelette, obj_egg_4.pddl          176  2409      109      53      53    4.182  0.0226506       253
+------  ---------------------------------------------  -----  ----  -------  ------  ------  -------  ----------  -------
+210944  kitchen_egg_2, scrambled_eggs, obj_0.pddl         56   931       27      41      41    0.518  0.0106634       167
+210945  kitchen_egg_3, scrambled_eggs, obj_0.pddl         56   931       27      41      41    0.513  0.0111647       167
+210949  kitchen_egg_4, scrambled_eggs, obj_egg_4.pddl     86  2504      109      41      41    3.847  0.0299068       316
+210953  kitchen_egg_5, scrambled_eggs, obj_egg_4.pddl    160  2296      109      47      47    3.889  0.0275968       299
+------  ---------------------------------------------  -----  ----  -------  ------  ------  -------  ----------  -------
+210957  kitchen_egg_3, sunny_side_up, obj_egg_4.pddl      55  2035       69      28      28    3.777  0.00625692       79
+211002  kitchen_egg_4, sunny_side_up, obj_egg_4.pddl      71  2048      106      28      28    4.012  0.00861308      113
+211006  kitchen_egg_5, sunny_side_up, obj_egg_4.pddl     125  1800      106      30      30    4.004  0.00890017      106
+------  ---------------------------------------------  -----  ----  -------  ------  ------  -------  ----------  -------
+211011  kitchen_egg_4, egg_in_hole, obj_egg_4.pddl        74  2051      107      30      30    4.467  0.00610388       89
+211016  kitchen_egg_5, egg_in_hole, obj_egg_4.pddl       139  1913      107      30      30    4.06   0.00703404       89
+------  ---------------------------------------------  -----  ----  -------  ------  ------  -------  ----------  -------
+211022  kitchen_egg_5, poached_egg, obj_egg_5.pddl       154  2273       76      22      22    6.156  0.00708321       85
+</code></pre>
+<p>Results by <code>lama</code>:</p>
+<pre><code class="language-python">     t  run_name                                    var    op    axiom  plan    cost      parse  search      state
+------  ----------------------------------------  -----  ----  -------  ------  ------  -------  ----------  -------
+142958  kitchen_egg_1, omelette, obj_0               60   932       27  -       -         0.616  (&gt;9.44)     -
+143008  kitchen_egg_2, omelette, obj_0               60   932       27  -       -         0.619  (&gt;9.43)     -
+143018  kitchen_egg_3, omelette, obj_0               60   932       27  -       -         0.617  (&gt;9.43)     -
+143028  kitchen_egg_4, omelette, obj_egg_4           91  2507      109  -       -         3.762  (&gt;6.29)     -
+143038  kitchen_egg_5, omelette, obj_egg_4          176  2409      109  47      47        3.88   0.11066937  (&gt;6.17)
+------  ---------------------------------------------  -----  ----  -------  ------  ------  -------  ----------  -------
+143049  kitchen_egg_2, scrambled_eggs, obj_0         56   931       27  -       -         0.594  (&gt;9.46)     -
+143059  kitchen_egg_3, scrambled_eggs, obj_0         56   931       27  -       -         0.64   (&gt;9.41)     -
+143109  kitchen_egg_4, scrambled_eggs, obj_egg_4     86  2504      109  40      40        3.811  0.11181831  (&gt;6.24)
+143119  kitchen_egg_5, scrambled_eggs, obj_egg_4    160  2296      109  40      40        3.922  0.11346054  (&gt;6.15)
+------  ---------------------------------------------  -----  ----  -------  ------  ------  -------  ----------  -------
+143130  kitchen_egg_3, sunny_side_up, obj_egg_4      55  2035       69  27      27        4.133  0.08899832  (&gt;5.95)
+143140  kitchen_egg_4, sunny_side_up, obj_egg_4      71  2048      106  -       -         3.768  (&gt;6.28)     -
+143150  kitchen_egg_5, sunny_side_up, obj_egg_4     125  1800      106  26      26        3.843  0.08267236  (&gt;6.20)
+------  ---------------------------------------------  -----  ----  -------  ------  ------  -------  ----------  -------
+143201  kitchen_egg_4, egg_in_hole, obj_egg_4        74  2051      107  -       -         3.7    (&gt;6.35)     -
+143211  kitchen_egg_5, egg_in_hole, obj_egg_4       139  1913      107  -       -         3.869  (&gt;6.17)     -
+------  ---------------------------------------------  -----  ----  -------  ------  ------  -------  ----------  -------
+143221  kitchen_egg_5, poached_egg, obj_egg_5       154  2273       76  -       -         5.968  (&gt;4.08)     -
+</code></pre>
+<h3 id="when-the-environment-contains-10-eggs-and-10-veggies">When the environment contains 10 eggs and 10 veggies:<a class="headerlink" href="#when-the-environment-contains-10-eggs-and-10-veggies" title="Permanent link">#</a></h3>
+<pre><code class="language-python">     t  run_name                                           var    op    axiom    plan    cost    parse     search    state
+------  -----------------------------------------------  -----  ----  -------  ------  ------  -------  ---------  -------
+211058  kitchen_egg_1, omelette, obj_3.pddl                294  3542      198      47      47    3.094  0.0526419      424
+211102  kitchen_egg_2, omelette, obj_3.pddl                294  3542      198      47      47    2.944  0.0616637      424
+211105  kitchen_egg_3, omelette, obj_3.pddl                294  3542      198      47      47    3.019  0.0565081      424
+211118  kitchen_egg_4, omelette, obj_egg_4_m.pddl          343  7529      316      56      56   12.792  0.0668754      404
+211133  kitchen_egg_5, omelette, obj_egg_4_m.pddl          626  7431      298      56      56   13.545  0.0705151      411
+------  -----------------------------------------------  -----  ----  -------  ------  ------  -------  ---------  -------
+211136  kitchen_egg_2, scrambled_eggs, obj_3.pddl          254  3532      108      40      40    2.903  0.0366719      308
+211139  kitchen_egg_3, scrambled_eggs, obj_3.pddl          254  3532      108      40      40    2.894  0.0412128      308
+211152  kitchen_egg_4, scrambled_eggs, obj_egg_4_m.pddl    293  7499      226      49      49   12.401  0.0757157      376
+211205  kitchen_egg_5, scrambled_eggs, obj_egg_4_m.pddl    466  6301      208      49      49   12.471  0.0562253      378
+------  -----------------------------------------------  -----  ----  -------  ------  ------  -------  ---------  -------
+211217  kitchen_egg_3, sunny_side_up, obj_egg_4_m.pddl     136  5896      141      27      27   11.877  0.0155547      114
+211229  kitchen_egg_4, sunny_side_up, obj_egg_4_m.pddl     161  6008      196      33      33   11.721  0.0161065      127
+211242  kitchen_egg_5, sunny_side_up, obj_egg_4_m.pddl     314  4770      178      33      33   12.421  0.0177018      132
+------  -----------------------------------------------  -----  ----  -------  ------  ------  -------  ---------  -------
+211255  kitchen_egg_4, egg_in_hole, obj_egg_4_m.pddl       137  5984      206      30      30   12.555  0.01446        111
+211308  kitchen_egg_5, egg_in_hole, obj_egg_4_m.pddl       202  3866      188      30      30   12.363  0.0149113      117
+------  -----------------------------------------------  -----  ----  -------  ------  ------  -------  ---------  -------
+211326  kitchen_egg_5, poached_egg, obj_egg_5_m.pddl       325  5288      130      22      22   17.672  0.012724        87
+</code></pre>
+<h3 id="when-the-environment-contains-2-copies-of-every-utensil">When the environment contains 2 copies of every utensil:<a class="headerlink" href="#when-the-environment-contains-2-copies-of-every-utensil" title="Permanent link">#</a></h3>
+<pre><code class="language-python">     t  run_name                                         var    op    axiom    plan    cost    parse    search     state
+------  -----------------------------------------------  -----  ----  -------  ------  ------  -------  ---------  -------
+214116  kitchen_egg_1, omelette, obj_4.pddl              124    2849  29       68      68      1.667    0.068268   680
+214118  kitchen_egg_2, omelette, obj_4.pddl              124    2849  29       68      68      1.658    0.0702724  680
+214120  kitchen_egg_3, omelette, obj_4.pddl              124    2849  29       68      68      1.673    0.0694334  680
+214133  kitchen_egg_4, omelette, obj_egg_4_l.pddl        221    7611  214      61      61      12.611   0.144819   798
+214147  kitchen_egg_5, omelette, obj_egg_4_l.pddl        286    7193  214      61      61      13.244   0.140403   795
+------  -----------------------------------------------  -----  ----  -------  ------  ------  -------  ---------  -------
+214149  kitchen_egg_2, scrambled_eggs, obj_4.pddl        120    2847  29       41      41      1.671    0.0206573  257
+214151  kitchen_egg_3, scrambled_eggs, obj_4.pddl        120    2847  29       41      41      1.681    0.0220964  257
+214231  kitchen_egg_4, scrambled_eggs, obj_egg_4_l.pddl  216    7605  214      -       -       -        -
+214613  kitchen_egg_5, scrambled_eggs, obj_egg_4_l.pddl
+------  -----------------------------------------------  -----  ----  -------  ------  ------  -------  ---------  -------
+214626  kitchen_egg_3, sunny_side_up, obj_egg_4_l.pddl   135    6008  144      29      29      12.612   0.0185011  147
+214639  kitchen_egg_4, sunny_side_up, obj_egg_4_l.pddl   161    6031  211      39      39      12.586   0.0221366  166
+214653  kitchen_egg_5, sunny_side_up, obj_egg_4_l.pddl   205    5053  211      39      39      13.067   0.0255738  189
+------  -----------------------------------------------  -----  ----  -------  ------  ------  -------  ---------  -------
+214706  kitchen_egg_4, egg_in_hole, obj_egg_4_l.pddl     164    6037  213      42      42      13.148   0.0352553  320
+214720  kitchen_egg_5, egg_in_hole, obj_egg_4_l.pddl     229    5479  213      42      42      13.249   0.0364352  323
+------  -----------------------------------------------  -----  ----  -------  ------  ------  -------  ---------  -------
+214741  kitchen_egg_5, poached_egg, obj_egg_5_l.pddl     251    6743  125      22      22      20.288   0.0145595  87
+</code></pre>
+<h3 id="when-the-environment-contains-both-10-eggs-veggies-and-2-copies-of-every-utensil">When the environment contains both 10 eggs &amp; veggies and 2 copies of every utensil:<a class="headerlink" href="#when-the-environment-contains-both-10-eggs-veggies-and-2-copies-of-every-utensil" title="Permanent link">#</a></h3>
+<pre><code class="language-python">     t  run_name                                          var    op     axiom    plan    cost    parse    search     state
+------  ------------------------------------------------  -----  -----  -------  ------  ------  -------  ---------  -------
+063459  kitchen_egg_1, omelette, obj_4_xl.pddl            358    9419   299      51      51      12.865   0.41591    1618
+063510  kitchen_egg_2, omelette, obj_4_xl.pddl            358    9419   299      51      51      10.020   0.300098   1618
+063520  kitchen_egg_3, omelette, obj_4_xl.pddl            358    9419   299      51      51      9.076    0.312746   1618
+063603  kitchen_egg_4, omelette, obj_egg_4_xl.pddl        473    20769  538      51      51      41.736   0.555485   1198
+063650  kitchen_egg_5, omelette, obj_egg_4_xl.pddl        916    20351  520      51      51      45.486   0.433745   1250
+------  -----------------------------------------------  -----  ----  -------  ------  ------  -------  ---------  -------
+063702  kitchen_egg_2, scrambled_eggs, obj_4_xl.pddl      318    9399   119      49      49      9.801    2.03623    11475
+063714  kitchen_egg_3, scrambled_eggs, obj_4_xl.pddl      318    9399   119      49      49      9.362    1.99511    11475
+064214  kitchen_egg_4, scrambled_eggs, obj_egg_4_xl.pddl  423    20709  358      -       -       -        -
+064715  kitchen_egg_5, scrambled_eggs, obj_egg_4_xl.pddl
+------  -----------------------------------------------  -----  ----  -------  ------  ------  -------  ---------  -------
+064759  kitchen_egg_3, sunny_side_up, obj_egg_4_xl.pddl   216    16304  243      28      28      43.585   0.0399582  176
+064843  kitchen_egg_4, sunny_side_up, obj_egg_4_xl.pddl   251    16498  328      32      32      43.429   0.062769   223
+064927  kitchen_egg_5, sunny_side_up, obj_egg_4_xl.pddl   484    11740  310      32      32      43.212   0.0515667  233
+------  -----------------------------------------------  -----  ----  -------  ------  ------  -------  ---------  -------
+065014  kitchen_egg_4, egg_in_hole, obj_egg_4_xl.pddl     227    16450  348      40      40      45.568   0.0986753  342
+065059  kitchen_egg_5, egg_in_hole, obj_egg_4_xl.pddl     292    8332   330      40      40      44.505   0.0635933  348
+------  -----------------------------------------------  -----  ----  -------  ------  ------  -------  ---------  -------
+065203  kitchen_egg_5, poached_egg, obj_egg_5_xl.pddl     521    13889  179      22      22      63.058   0.0241492  89
+</code></pre>
+<h3 id="when-the-environment-contains-both-10-eggs-veggies-and-4-copies-of-every-utensil">When the environment contains both 10 eggs &amp; veggies and 4 copies of every utensil:<a class="headerlink" href="#when-the-environment-contains-both-10-eggs-veggies-and-4-copies-of-every-utensil" title="Permanent link">#</a></h3>
+<pre><code class="language-python">     t  run_name                                           var    op     axiom    plan    cost    parse    search    state
+------  -------------------------------------------------  -----  -----  -------  ------  ------  -------  --------  -------
+065450  kitchen_egg_1, omelette, obj_4_xxl.pddl            444    32749  501      51      51      40.412   0.507984  1109
+065531  kitchen_egg_2, omelette, obj_4_xxl.pddl            444    32749  501      51      51      38.870   0.545349  1109
+065611  kitchen_egg_3, omelette, obj_4_xxl.pddl            444    32749  501      51      51      38.807   0.507466  1109
+070053  kitchen_egg_4, omelette, obj_egg_4_xxl.pddl        633    68565  1086     51      51      278.485  1.10617   1198
+070403  kitchen_egg_5, omelette, obj_egg_4_xxl.pddl        1496   66847  1068     51      51      186.607  1.09691   1250
+------  -----------------------------------------------  -----  ----  -------  ------  ------  -------  ---------  -------
+070447  kitchen_egg_2, scrambled_eggs, obj_4_xxl.pddl      404    32709  141      49      49      39.293   2.88542   6592
+070530  kitchen_egg_3, scrambled_eggs, obj_4_xxl.pddl      404    32709  141      49      49      39.271   2.92493   6592
+071030  kitchen_egg_4, scrambled_eggs, obj_egg_4_xxl.pddl  583    68445  726      -       -       -        -
+071531  kitchen_egg_5, scrambled_eggs, obj_egg_4_xxl.pddl  1036   50327  708      -       -       -        -
+------  -----------------------------------------------  -----  ----  -------  ------  ------  -------  ---------  -------
+071959  kitchen_egg_3, sunny_side_up, obj_egg_4_xxl.pddl   316    54536  551      28      28      265.509  0.153392  176
+072500  kitchen_egg_4, sunny_side_up, obj_egg_4_xxl.pddl
+073000  kitchen_egg_5, sunny_side_up, obj_egg_4_xxl.pddl
+------  -----------------------------------------------  -----  ----  -------  ------  ------  -------  ---------  -------
+073501  kitchen_egg_4, egg_in_hole, obj_egg_4_xxl.pddl
+074003  kitchen_egg_5, egg_in_hole, obj_egg_4_xxl.pddl
+------  -----------------------------------------------  -----  ----  -------  ------  ------  -------  ---------  -------
+074005  kitchen_egg_5, poached_egg, obj_egg_5_xxl.pddl
+</code></pre>
+<h2 id="five-egg-recipes-and-plans-by-fd">Five egg recipes and plans by FD<a class="headerlink" href="#five-egg-recipes-and-plans-by-fd" title="Permanent link">#</a></h2>
+<h3 id="omelette">Omelette<a class="headerlink" href="#omelette" title="Permanent link">#</a></h3>
+<pre><code class="language-lisp">  ( :derived ( exist-omelette ?env - env )
+    ( exists 
+      ( ?egg1 - egg ?veggies1 - ingredient ?plate1 - plate )
+      ( and 
+        ( inside ?plate1 ?egg1 )
+        ( beaten ?egg1 )
+        ( fried ?egg1 )
+        ( folded ?egg1 )
+        ( is-buttery ?egg1 )
+
+        ( fried ?veggies1 )
+        ( sauteed ?veggies1 )
+
+        ( has-seasoning ?egg1 nutmilk cup two )
+
+        ( has-seasoning ?egg1 chives tablespoon2 two )
+        ( seasoning-mixed ?egg1 chives )
+
+        ( has-seasoning ?egg1 salt gram two )
+        ( seasoning-mixed ?egg1 salt )
+
+        ( has-seasoning ?egg1 pepper gram two )
+        ( seasoning-mixed ?egg1 pepper )
+      )
+    )
+  )
+</code></pre>
+<p>The plan of making an Omelette (length = 47):</p>
+<pre><code class="language-python">pickup fork1 kitchentop robot (1)
+open fridge (1)
+getout milkbottle1 fridge robot (1)
+getout butter fridge robot (1)
+getout egg1 fridge robot (1)
+getout veggies1 fridge robot (1)
+close fridge (1)
+crack-egg egg1 smallbowl1 robot (1)
+add-ingredient butter smallbowl1 robot (1)
+open dcup1 (1)
+getout frypan1 dcup1 robot (1)
+close dcup1 (1)
+add-ingredient veggies1 smallbowl1 robot (1)
+mix egg1 fork1 smallbowl1 robot (1)
+putdown frypan1 burner robot (1)
+pour smallbowl1 nutmilk milkbottle1 cup robot (1)
+pour smallbowl1 nutmilk milkbottle1 cup robot (1)
+pickup tablespoon1 kitchentop robot (1)
+season egg1 salt salter1 tablespoon1 robot (1)
+season egg1 pepper shaker1 tablespoon1 robot (1)
+mix egg1 fork1 smallbowl1 robot (1)
+season egg1 chives container1 tablespoon1 robot (1)
+mix egg1 fork1 smallbowl1 robot (1)
+season egg1 chives container1 tablespoon1 robot (1)
+putdown tablespoon1 burner robot (1)
+pickup smallbowl1 kitchentop robot (1)
+transfer butter smallbowl1 frypan1 robot (1)
+transfer egg1 smallbowl1 frypan1 robot (1)
+transfer veggies1 smallbowl1 frypan1 robot (1)
+putdown smallbowl1 burner robot (1)
+switchon burner frypan1 (1)
+fry egg1 frypan1 burner butter (1)
+fry veggies1 frypan1 burner butter (1)
+switchoff burner frypan1 (1)
+pickup spatula1 kitchentop robot (1)
+fold egg1 frypan1 spatula1 robot (1)
+putdown spatula1 burner robot (1)
+pickup frypan1 burner robot (1)
+transfer egg1 frypan1 plate1 robot (1)
+putdown milkbottle1 burner robot (1)
+pickup salter1 kitchentop robot (1)
+sprinkle egg1 salt salter1 gram robot (1)
+sprinkle egg1 salt salter1 gram robot (1)
+putdown salter1 burner robot (1)
+pickup shaker1 kitchentop robot (1)
+sprinkle egg1 pepper shaker1 gram robot (1)
+sprinkle egg1 pepper shaker1 gram robot (1)
+</code></pre>
+<h3 id="scrambled-eggs">Scrambled eggs<a class="headerlink" href="#scrambled-eggs" title="Permanent link">#</a></h3>
+<pre><code class="language-lisp">  ( :derived ( exist-scrambled-eggs ?env - env )
+    ( exists 
+      ( ?egg1 - egg ?plate1 - plate )
+      ( and 
+        ( inside ?plate1 ?egg1 )
+        ( beaten ?egg1 )
+        ( fried ?egg1 )
+        ( scrambled ?egg1 )
+        ( is-buttery ?egg1 )
+
+        ( has-seasoning ?egg1 nutmilk cup two )
+
+        ( has-seasoning ?egg1 chives tablespoon1 one )
+        ( seasoning-mixed ?egg1 chives )
+
+        ( has-seasoning ?egg1 salt gram one )
+        ( seasoning-mixed ?egg1 salt )
+
+        ( has-seasoning ?egg1 pepper gram one )
+        ( seasoning-mixed ?egg1 pepper )
+      )
+    )
+  )
+</code></pre>
+<p>The plan of making Scrambled eggs (length = 41):</p>
+<pre><code class="language-python">pickup fork1 kitchentop robot (1)
+open fridge (1)
+getout milkbottle1 fridge robot (1)
+getout butter fridge robot (1)
+getout egg1 fridge robot (1)
+close fridge (1)
+crack-egg egg1 smallbowl1 robot (1)
+open dcup1 (1)
+getout frypan1 dcup1 robot (1)
+close dcup1 (1)
+add-ingredient butter smallbowl1 robot (1)
+mix egg1 fork1 smallbowl1 robot (1)
+putdown frypan1 burner robot (1)
+pour smallbowl1 nutmilk milkbottle1 cup robot (1)
+pour smallbowl1 nutmilk milkbottle1 cup robot (1)
+pickup tablespoon1 kitchentop robot (1)
+season egg1 chives container1 tablespoon1 robot (1)
+mix egg1 fork1 smallbowl1 robot (1)
+putdown tablespoon1 burner robot (1)
+pickup spatula1 kitchentop robot (1)
+putdown spatula1 burner robot (1)
+pickup salter1 kitchentop robot (1)
+sprinkle egg1 salt salter1 gram robot (1)
+mix egg1 fork1 smallbowl1 robot (1)
+putdown salter1 burner robot (1)
+pickup shaker1 kitchentop robot (1)
+sprinkle egg1 pepper shaker1 gram robot (1)
+mix egg1 fork1 smallbowl1 robot (1)
+putdown shaker1 burner robot (1)
+pickup smallbowl1 kitchentop robot (1)
+transfer butter smallbowl1 frypan1 robot (1)
+transfer egg1 smallbowl1 frypan1 robot (1)
+switchon burner frypan1 (1)
+fry egg1 frypan1 burner butter (1)
+switchoff burner frypan1 (1)
+putdown smallbowl1 burner robot (1)
+pickup spatula1 burner robot (1)
+scrape egg1 frypan1 spatula1 robot (1)
+putdown spatula1 burner robot (1)
+pickup frypan1 burner robot (1)
+transfer egg1 frypan1 plate1 robot (1)
+</code></pre>
+<h3 id="sunny-side-up">Sunny Side Up<a class="headerlink" href="#sunny-side-up" title="Permanent link">#</a></h3>
+<pre><code class="language-lisp">  ( :derived ( exist-sunny-side-up ?env - env )
+    ( exists 
+      ( ?egg1 - egg ?plate1 - plate )
+      ( and 
+        ( inside ?plate1 ?egg1 )
+        ( fried ?egg1 )
+        ( is-buttery ?egg1 )
+        ( steamed ?egg1 ) 
+        ( has-seasoning ?egg1 salt gram one )
+        ( has-seasoning ?egg1 pepper gram one )
+      )
+    )
+  )
+</code></pre>
+<p>The plan of making a Sunny Side Up (length = 28):</p>
+<pre><code class="language-python">pickup salter1 kitchentop robot (1)
+sprinkle egg1 salt salter1 gram robot (1)
+open fridge (1)
+getout egg1 fridge robot (1)
+close fridge (1)
+crack-egg egg1 smallbowl1 robot (1)
+open dcup2 (1)
+getout oilbottle1 dcup2 robot (1)
+close dcup2 (1)
+transfer oliveoil oilbottle1 frypan1 robot (1)
+open dcup1 (1)
+getout frypan1 dcup1 robot (1)
+getout pancover1 dcup1 robot (1)
+close dcup1 (1)
+putdown frypan1 burner robot (1)
+pickup shaker1 kitchentop robot (1)
+sprinkle egg1 pepper shaker1 gram robot (1)
+putdown shaker1 burner robot (1)
+pickup smallbowl1 kitchentop robot (1)
+transfer egg1 smallbowl1 frypan1 robot (1)
+switchon burner frypan1 (1)
+fry egg1 frypan1 burner oliveoil (1)
+puton pancover1 frypan1 robot (1)
+steam egg1 frypan1 burner (1)
+pickup frypan1 burner robot (1)
+transfer egg1 frypan1 plate1 robot (1)
+putdown frypan1 burner robot (1)
+switchoff burner frypan1 (1)
+</code></pre>
+<h3 id="egg-in-a-hole">Egg in a Hole<a class="headerlink" href="#egg-in-a-hole" title="Permanent link">#</a></h3>
+<pre><code class="language-lisp">  ( :derived ( exist-egg-in-hole ?env - env )
+    ( exists 
+      ( ?egg1 - egg ?bread1 - bread ?plate1 - plate )
+      ( and 
+        ( inside ?plate1 ?bread1 )
+        ( has-hole ?bread1 circle )
+        ( in-hole ?egg1 ?bread1 ) 
+        ( fried ?bread1 )
+        ( is-buttery ?bread1 ) 
+        ( has-seasoning ?egg1 salt gram one )
+        ( has-seasoning ?egg1 pepper gram one )
+      )
+    )
+  )
+</code></pre>
+<p>The plan of making an Egg in a Hole (length = 30):</p>
+<pre><code class="language-python">pickup holecutter1 kitchentop robot (1)
+make-hole bread1 holecutter1 circle robot (1)
+open fridge (1)
+getout butter fridge robot (1)
+getout egg1 fridge robot (1)
+close fridge (1)
+crack-egg egg1 bread1 robot (1)
+add-ingredient butter smallbowl1 robot (1)
+open dcup1 (1)
+getout frypan1 dcup1 robot (1)
+close dcup1 (1)
+putdown frypan1 burner robot (1)
+pickup salter1 kitchentop robot (1)
+sprinkle egg1 salt salter1 gram robot (1)
+putdown salter1 burner robot (1)
+pickup shaker1 kitchentop robot (1)
+sprinkle egg1 pepper shaker1 gram robot (1)
+putdown shaker1 burner robot (1)
+pickup bread1 kitchentop robot (1)
+add-ingredient bread1 smallbowl1 robot (1)
+putdown holecutter1 burner robot (1)
+pickup smallbowl1 kitchentop robot (1)
+transfer butter smallbowl1 frypan1 robot (1)
+transfer bread1 smallbowl1 frypan1 robot (1)
+switchon burner frypan1 (1)
+fry bread1 frypan1 burner butter (1)
+switchoff burner frypan1 (1)
+putdown smallbowl1 burner robot (1)
+pickup frypan1 burner robot (1)
+transfer bread1 frypan1 plate1 robot (1)
+</code></pre>
+<h3 id="poached-egg">Poached Egg<a class="headerlink" href="#poached-egg" title="Permanent link">#</a></h3>
+<pre><code class="language-lisp">  ( :derived ( exist-poached-egg ?env - env )
+    ( exists 
+      ( ?egg1 - egg ?plate1 - plate )
+      ( and 
+        ( boiled water )
+        ( boiled ?egg1 )
+        ( hardness ?egg1 outerside medium-hard )
+
+        ( has-vinegar water ) ; helps the whites set at a lower temperature while keeping the yolks runny
+
+        ;( hardness ?egg1 innerside soft ) ; encode cooking knowledge / causal models into operators and axoims
+      )
+    )
+  )
+</code></pre>
+<p>The plan of making a Poached Egg (length = 22):</p>
+<pre><code>open dcup1 (1)
+turn-tap-on faucet (1)
+getout pot1 dcup1 robot (1)
+add-liquid water faucet pot1 robot (1)
+turn-tap-off faucet (1)
+open fridge (1)
+getout egg1 fridge robot (1)
+close fridge (1)
+close dcup1 (1)
+crack-egg egg1 smallbowl1 robot (1)
+putdown pot1 burner robot (1)
+pickup smallbowl1 kitchentop robot (1)
+transfer egg1 smallbowl1 pot1 robot (1)
+open dcup2 (1)
+getout mediumbottle1 dcup2 robot (1)
+close dcup2 (1)
+switchon burner pot1 (1)
+change-level burner medium (1)
+pour-liquid whitevinegar mediumbottle1 pot1 robot (1)
+boil water pot1 burner (1)
+boil water pot1 burner (1)
+switchoff burner pot1 (1)
+</code></pre>
+<hr />
+<h2 id="previous-weird-results-about-is-buttery">Previous weird results about <code>is-buttery</code><a class="headerlink" href="#previous-weird-results-about-is-buttery" title="Permanent link">#</a></h2>
+<p>when (at-level high) and (not (is-liquid) param1) exists</p>
+<h3 id="when-the-environment-contains-10-eggs-and-10-veggies_1">When the environment contains 10 eggs and 10 veggies:<a class="headerlink" href="#when-the-environment-contains-10-eggs-and-10-veggies_1" title="Permanent link">#</a></h3>
+<pre><code class="language-python">     t  run_name                                                   var    op    axiom    plan    parse    search     state
+------  ---------------------------------------------------------  -----  ----  -------  ------  -------  ---------  -------
+203618  kitchen_egg_1, omelette, obj_3,                            294    3542  198      47      3.417    0.0560734  424
+203622  kitchen_egg_2, omelette, obj_3,                            294    3542  198      47      3.488    0.0572367  424
+203626  kitchen_egg_3, omelette, obj_3,                            294    3542  198      47      3.305    0.0700046  424
+203641  kitchen_egg_4, omelette, obj_egg_4_m,                      343    7529  316      56      14.740   0.0778197  404
+204142  kitchen_egg_5, omelette, obj_egg_4_m,                      633    7433  334      -       -        -          -
+204159  kitchen_egg_5, omelette, obj_egg_4_m, gi=is_buttery        623    7433  334      52      15.474   0.191407   811
+------  -------------------------------------------------------  -----  ----  -------  ------  -------  ----------  -------
+204203  kitchen_egg_2, scrambled_eggs, obj_3,                      254    3532  108      40      3.451    0.0562847  308
+204207  kitchen_egg_3, scrambled_eggs, obj_3,                      254    3532  108      40      3.683    0.0531232  308
+204223  kitchen_egg_4, scrambled_eggs, obj_egg_4_m,                293    7499  226      49      15.020   0.0699502  376
+204723  kitchen_egg_5, scrambled_eggs, obj_egg_4_m,                473    6303  244      -       -        -          -
+204742  kitchen_egg_5, scrambled_eggs, obj_egg_4_m, gi=is_buttery  463    6303  244      42      17.691   0.126726   482
+------  -------------------------------------------------------  -----  ----  -------  ------  -------  ----------  -------
+204759  kitchen_egg_3, sunny_side_up, obj_egg_4_m,                 136    5896  141      27      16.202   0.0266506  114
+204817  kitchen_egg_4, sunny_side_up, obj_egg_4_m,                 151    6008  196      27      18.018   0.031578   118
+204835  kitchen_egg_5, sunny_side_up, obj_egg_4_m,                 310    4772  202      29      17.406   0.0237115  137
+------  -------------------------------------------------------  -----  ----  -------  ------  -------  ----------  -------
+204853  kitchen_egg_4, egg_in_hole, obj_egg_4_m,                   137    5984  206      30      17.120   0.0253792  111
+205354  kitchen_egg_5, egg_in_hole, obj_egg_4_m,
+205413  kitchen_egg_5, egg_in_hole, obj_egg_4_m, gi=is_buttery     206    3868  212      32      18.340   0.0398749  125
+------  -------------------------------------------------------  -----  ----  -------  ------  -------  ----------  -------
+205441  kitchen_egg_5, poached_egg, obj_egg_5_m,                   330    5288  195      22      27.596   0.0144483  76
+</code></pre>
+<h3 id="when-the-environment-contains-2-copies-of-every-utensil_1">When the environment contains 2 copies of every utensil:<a class="headerlink" href="#when-the-environment-contains-2-copies-of-every-utensil_1" title="Permanent link">#</a></h3>
+<pre><code class="language-python">     t  run_name                                                   var    op    axiom    plan    parse    search     state
+------  ---------------------------------------------------------  -----  ----  -------  ------  -------  ---------  -------
+211648  kitchen_egg_1, omelette, obj_4,                            124    2849  29       68      1.714    0.0693452  680
+211650  kitchen_egg_2, omelette, obj_4,                            124    2849  29       68      1.690    0.074333   680
+211652  kitchen_egg_3, omelette, obj_4,                            124    2849  29       68      1.724    0.0710202  680
+211705  kitchen_egg_4, omelette, obj_egg_4_l,                      221    7611  214      61      12.614   0.139616   798
+212205  kitchen_egg_5, omelette, obj_egg_4_l,                      293    7195  280      -       -        -          -
+212220  kitchen_egg_5, omelette, obj_egg_4_l, gi=is_buttery        292    7195  280      61      13.934   0.152373   897
+------  ---------------------------------------------------------  -----  ----  -------  ------  -------  ---------  -------
+212222  kitchen_egg_2, scrambled_eggs, obj_4,                      120    2847  29       41      1.717    0.0221763  257
+212224  kitchen_egg_3, scrambled_eggs, obj_4,                      120    2847  29       41      1.691    0.0250289  257
+212324  kitchen_egg_4, scrambled_eggs, obj_egg_4_l,                216    7605  214      -       -        -          -
+212824  kitchen_egg_5, scrambled_eggs, obj_egg_4_l,
+212839  kitchen_egg_5, scrambled_eggs, obj_egg_4_l, gi=is_buttery  266    6769  280      41      14.341   0.0356264  220
+------  ---------------------------------------------------------  -----  ----  -------  ------  -------  ---------  -------
+212853  kitchen_egg_3, sunny_side_up, obj_egg_4_l,                 135    6008  144      29      13.422   0.0217398  147
+212907  kitchen_egg_4, sunny_side_up, obj_egg_4_l,                 160    6031  211      29      13.640   0.0236584  161
+212922  kitchen_egg_5, sunny_side_up, obj_egg_4_l,                 210    5055  255      29      14.233   0.027923   147
+------  ---------------------------------------------------------  -----  ----  -------  ------  -------  ---------  -------
+212936  kitchen_egg_4, egg_in_hole, obj_egg_4_l,                   164    6037  213      42      13.799   0.0374208  320
+213437  kitchen_egg_5, egg_in_hole, obj_egg_4_l,                   235    5481  257      -       -        -          -
+213452  kitchen_egg_5, egg_in_hole, obj_egg_4_l, gi=is_buttery     233    5481  257      33      14.725   0.0241682  148
+------  ---------------------------------------------------------  -----  ----  -------  ------  -------  ---------  -------
+213515  kitchen_egg_5, poached_egg, obj_egg_5_l,                   256    6743  245      25      22.505   0.019964   126
+</code></pre>
+<h3 id="when-the-environment-contains-both-10-eggs-veggies-and-2-copies-of-every-utensil_1">When the environment contains both 10 eggs &amp; veggies and 2 copies of every utensil:<a class="headerlink" href="#when-the-environment-contains-both-10-eggs-veggies-and-2-copies-of-every-utensil_1" title="Permanent link">#</a></h3>
+<pre><code class="language-python">     t  run_name                                                    var    op     axiom    plan    parse    search     state
+------  ----------------------------------------------------------  -----  -----  -------  ------  -------  ---------  -------
+214011  kitchen_egg_1, omelette, obj_4_xl,                          358    9419   299      51      9.306    0.316715   1618
+214021  kitchen_egg_2, omelette, obj_4_xl,                          358    9419   299      51      9.094    0.300642   1618
+214031  kitchen_egg_3, omelette, obj_4_xl,                          358    9419   299      51      9.210    0.340507   1618
+214113  kitchen_egg_4, omelette, obj_egg_4_xl,                      473    20769  538      51      40.750   0.389818   1198
+214613  kitchen_egg_5, omelette, obj_egg_4_xl,                      923    20353  586      -       -        -          -
+214712  kitchen_egg_5, omelette, obj_egg_4_xl, gi=is_buttery        913    20353  586      49      42.193   15.4131    46426
+------  ----------------------------------------------------------  -----  -----  -------  ------  -------  ---------  -------
+214724  kitchen_egg_2, scrambled_eggs, obj_4_xl,                    318    9399   119      49      9.341    2.11589    11475
+214758  kitchen_egg_3, scrambled_eggs, obj_4_xl,                    318    9399   119      49      25.856   7.72045    11475
+214859  kitchen_egg_4, scrambled_eggs, obj_egg_4_xl,                423    20709  358      -       -        -          -
+215359  kitchen_egg_5, scrambled_eggs, obj_egg_4_xl,                663    16093  406      -       -        -          -
+215445  kitchen_egg_5, scrambled_eggs, obj_egg_4_xl, gi=is_buttery  653    16093  406      40      44.970   0.232838   747
+------  ----------------------------------------------------------  -----  -----  -------  ------  -------  ---------  -------
+215529  kitchen_egg_3, sunny_side_up, obj_egg_4_xl,                 216    16304  243      28      43.134   0.0410474  176
+215614  kitchen_egg_4, sunny_side_up, obj_egg_4_xl,                 241    16498  328      28      44.347   0.0488374  205
+215659  kitchen_egg_5, sunny_side_up, obj_egg_4_xl,                 480    11742  354      32      44.575   0.044776   190
+------  ----------------------------------------------------------  -----  -----  -------  ------  -------  ---------  -------
+215744  kitchen_egg_4, egg_in_hole, obj_egg_4_xl,                   227    16450  348      40      43.797   0.07649    342
+220244  kitchen_egg_5, egg_in_hole, obj_egg_4_xl,                   298    8334   374      -       -        -          -
+220331  kitchen_egg_5, egg_in_hole, obj_egg_4_xl, gi=is_buttery     296    8334   374      37      45.679   0.0668695  278
+------  ----------------------------------------------------------  -----  -----  -------  ------  -------  ---------  -------
+220431  kitchen_egg_5, poached_egg, obj_egg_5_xl,
+</code></pre>
+<h3 id="when-the-environment-contains-both-10-eggs-veggies-and-4-copies-of-every-utensil_1">When the environment contains both 10 eggs &amp; veggies and 4 copies of every utensil:<a class="headerlink" href="#when-the-environment-contains-both-10-eggs-veggies-and-4-copies-of-every-utensil_1" title="Permanent link">#</a></h3>
+<pre><code class="language-python">     t  run_name                                                     var    op     axiom    plan    parse    search    state
+------  -----------------------------------------------------------  -----  -----  -------  ------  -------  --------  -------
+125126  kitchen_egg_1, omelette, obj_4_xxl,                          444    32749  501      51      38.347   0.495747  1109
+125205  kitchen_egg_2, omelette, obj_4_xxl,                          444    32749  501      51      37.076   0.501044  1109
+125244  kitchen_egg_3, omelette, obj_4_xxl,                          444    32749  501      51      37.568   0.490112  1109
+125344  kitchen_egg_4, omelette, obj_egg_4_xxl,
+125844  kitchen_egg_5, omelette, obj_egg_4_xxl,                      1503   66849  1194     -       -        -         -
+125944  kitchen_egg_5, omelette, obj_egg_4_xxl, gi=is_buttery        1503   66849  1194     -       -        -         -
+------  -----------------------------------------------------------  -----  -----  -------  ------  -------  --------  -------
+130032  kitchen_egg_2, scrambled_eggs, obj_4_xxl,                    404    32709  141      49      43.309   2.84812   6592
+130119  kitchen_egg_3, scrambled_eggs, obj_4_xxl,                    404    32709  141      49      42.441   3.16628   6592
+130219  kitchen_egg_4, scrambled_eggs, obj_egg_4_xxl,
+130720  kitchen_egg_5, scrambled_eggs, obj_egg_4_xxl,                1043   50329  834      -       -        -         -
+130820  kitchen_egg_5, scrambled_eggs, obj_egg_4_xxl, gi=is_buttery  1043   50329  834      -       -        -         -
+------  -----------------------------------------------------------  -----  -----  -------  ------  -------  --------  -------
+130920  kitchen_egg_3, sunny_side_up, obj_egg_4_xxl,                 1043   50329  834      -       -        -         -
+131020  kitchen_egg_4, sunny_side_up, obj_egg_4_xxl,                 1043   50329  834      -       -        -         -
+131121  kitchen_egg_5, sunny_side_up, obj_egg_4_xxl,                 1043   50329  834      -       -        -         -
+------  -----------------------------------------------------------  -----  -----  -------  ------  -------  --------  -------
+131221  kitchen_egg_4, egg_in_hole, obj_egg_4_xxl,                   1043   50329  834      -       -        -         -
+131721  kitchen_egg_5, egg_in_hole, obj_egg_4_xxl,                   478    23042  802      -       -        -         -
+132221  kitchen_egg_5, egg_in_hole, obj_egg_4_xxl, gi=is_buttery     478    23042  802      -       -        -         -
+------  -----------------------------------------------------------  -----  -----  -------  ------  -------  --------  -------
+132222  kitchen_egg_5, poached_egg, obj_egg_5_xxl,                   478    23042  802      -       -        -         -
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../exp-two-dishes/" class="btn btn-neutral float-right" title="Two Dishes">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../exp-objects/" class="btn btn-neutral" title="Num of Objects"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../exp-objects/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../exp-two-dishes/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

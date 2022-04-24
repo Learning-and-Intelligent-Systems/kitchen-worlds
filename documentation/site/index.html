@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="css/favicon.ico">
+  
+  <title>LEAP Architecture - LEAPdocs</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  <link href="css/extra.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "LEAP Architecture";
+    var mkdocs_page_input_path = "index.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="js/jquery-2.1.1.min.js" defer></script>
+  <script src="js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="." class="icon icon-home"> LEAPdocs</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <p class="caption"><span class="caption-text">Project</span></p>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href=".">LEAP Architecture</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#available-planners">Available Planners</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#available-strategists">Available Strategists</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#domains">Domains</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#kitchen-domain">Kitchen domain</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#experiments">Experiments</a>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="project-minutes/">Minutes & Notes</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Domains</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="domain-grocery/">Grocery - action costs</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="domain-kitchen/">Kitchen - large universe</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="sim-igibson/">iGibson's BEHAVIOR</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="sim-alfred/">AI2THOR's Alfred</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="sim-habitat/">Habitat's Rearrangement</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Strategists</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="str-iobig/">PLOI-like IOBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="str-sdbig/">HPN-like SDBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="str-ipbig/">HPN-like IPBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="str-hpn/">HPN [ NEW ]</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Experiments</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="exp-goals/">Num of Goal Predicates</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="exp-objects/">Num of Objects</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="exp-egg-recipes/">All Egg Recipes</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="exp-two-dishes/">Two Dishes</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="exp-planner-options/">Satisfising v.s. Optimizing</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="exp-merged-domains/">Merged Domains</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="exp-strategists/">Combine Strategists [ NEW ]</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Notes</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="notes-fd/">FastDownward</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Set it up</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="setup-repository/">Set up the Repository</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="setup-mkdocs/">Set up MkDocs</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="setup-notes/">Editor's Notes</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href=".">LEAPdocs</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Project &raquo;</li>
+        
+      
+    
+    <li>LEAP Architecture</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="leap-learning-enabled-abstraction-for-planning">LEAP (Learning-Enabled Abstraction for Planning)<a class="headerlink" href="#leap-learning-enabled-abstraction-for-planning" title="Permanent link">#</a></h1>
+<p><img alt="Diagram of LEAP architecture" src="imgs/diagram.png" /></p>
+<ul>
+<li>CogMan: cognitive manager that employs strategists and commonsense knowledge to solve big, complex problems<ul>
+<li>Pre-problem Strategists: a sequence of (learned) components that map a big problem into a sequence of smaller problems by making hierarchical or temporal abstractions<ul>
+<li>HPN: (v1) relax preconditions with fixed hierarchy (v2) with learned importance score</li>
+<li>PLOI: (v1) find minimum set of objects at the beginning of solving the problem (v2) change the set dynamically</li>
+<li>C2S2 (context-conditioned subgoal suggestor): (v1) with 3-gram models (v2) with language models </li>
+</ul>
+</li>
+<li>Post-problem Strategists: a sequence of components that improve a plan <ul>
+<li>VNS: to change the order of operators, e.g. open the fridge only once to get both the meat and cheese</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">#</a></h2>
+<p>Run <code>run.py</code> with the domain and problem pddl files, along with the sequence of strategists to use. The code searches for the pddl files in all sub-directories of <code>domains/</code>.</p>
+<pre><code>## the general template
+python run.py domain.pddl problem.pddl 
+    -o 'large_domain_objects.pddl' 
+    -p [fd/pp] 
+    -s 'hpn,c2s2,pre-strategists separated by comma' 
+    -v [0/1/2] 
+    -e 'experiment_output_directory'
+
+## this should work and generate an output dir with plan and log in experiments/dev
+python run.py kitchen_1.pddl omelette_5.pddl -o obj_3.pddl -v 2 -e 'experiments/dev'
+
+## this needs to run successfully for every new version of the code and domain files
+./tests.sh
+</code></pre>
+<p>Note that <code>kitchen_3.pddl</code> and <code>obj_eggs.pddl</code> are currently being actively developed for a larger kitchen domain.</p>
+<p>Helper functions:</p>
+<pre><code>## post_experiments.py prints a table of experimental stats in directory
+python generators/post_experiments.py experiments/kitchen_operators
+
+## init_objects.py converts doc/objects.md file to PDDL tuples of types and objects
+python generators/init_objects.py 
+</code></pre>
+<h3 id="available-planners">Available Planners<a class="headerlink" href="#available-planners" title="Permanent link">#</a></h3>
+<ul>
+<li><code>df</code>: FastDownward with lama-first. Better than PyperPlan in that it can take ADL expressions for using forall/exists/when. It also supports action costs and axioms (see <code>downward/driver/aliases.py</code> and <a href="http://www.fast-downward.org/Doc/Evaluator#Landmark-count_heuristic">Doc/Evaluator</a>). But it doesn't support PDDL 2+ and 3+ features, like fluents, numerical planning, temporal planning, soft goals &amp; preferences.</li>
+</ul>
+<pre><code class="language-python">ALIASES[&quot;lama-first&quot;] = [
+    &quot;--evaluator&quot;,
+    &quot;hlm=lmcount(lm_factory=lm_reasonable_orders_hps(lm_rhw()),transform=adapt_costs(one),pref=false)&quot;,
+    &quot;--evaluator&quot;, &quot;hff=ff(transform=adapt_costs(one))&quot;,
+    &quot;--search&quot;, &quot;&quot;&quot;lazy_greedy([hff,hlm],preferred=[hff,hlm],
+                               cost_type=one,reopen_closed=false)&quot;&quot;&quot;]
+</code></pre>
+<ul>
+<li><code>pp</code>: PyperPlan with Greedy Best First Search and FF heuristic</li>
+</ul>
+<h3 id="available-strategists">Available Strategists<a class="headerlink" href="#available-strategists" title="Permanent link">#</a></h3>
+<ul>
+<li><code>hpn</code>, <code>ploi</code> or <code>c2s2</code>: output the original domain and problem pddl</li>
+</ul>
+<h2 id="domains">Domains<a class="headerlink" href="#domains" title="Permanent link">#</a></h2>
+<p>In this project we focus on robot doing everyday household tasks instead of puzzle-like IPC domains (e.g. in <a href="https://fai.cs.uni-saarland.de/hoffmann/ff-domains.html">FF Domain Collection</a> and <a href="https://bitbucket.org/ipc2018-classical/domains/src/master/">IPC2018 domains</a>.</p>
+<p>Some of my thoughts</p>
+<ul>
+<li>Partial observability: doing the laundry requires finding dirty clothes in the room until no more can be found (as opposed to knowing how many clothes are dirty and where they are)</li>
+<li>The domain knowledge should be robot agnostic, i.e. same basic domain knowledge for robot with one arm and two arms</li>
+<li>Some aspects of the household tasks that are unable to do with PDDL 2.1 / FastDownward:<ul>
+<li>Some actions need to be prevented, like putting down a fork on the table instead of a burner because the burner would burn the fork, but because the way that axioms are derived, it cannot keep track of the fact that the fork has been burnt. so for now we write the surface must be safe to put the fork on</li>
+</ul>
+</li>
+</ul>
+<h3 id="kitchen-domain">Kitchen domain<a class="headerlink" href="#kitchen-domain" title="Permanent link">#</a></h3>
+<pre><code>    (exist-egg-in-hole ?x - env)
+    (exist-poached-egg ?x - env)
+    (exist-baked-egg ?x - env)
+    (exist-boiled-egg ?x - env)
+    (exist-deviled-egg ?x - env)
+    (exist-cloud-egg ?x - env)
+    (exist-quiche ?x - env)
+</code></pre>
+<hr />
+<h2 id="experiments">Experiments<a class="headerlink" href="#experiments" title="Permanent link">#</a></h2>
+<p>Write your test script like <code>test_goals.sh</code> with all test cases. </p>
+<p>You can also add the following lines to <code>tests.sh</code>:</p>
+<pre><code>chmod +x test_something.sh
+./test_something.sh
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="project-minutes/" class="btn btn-neutral float-right" title="Minutes & Notes">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+      <span><a href="project-minutes/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme_extra.js" defer></script>
+    <script src="js/theme.js" defer></script>
+      <script src="search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

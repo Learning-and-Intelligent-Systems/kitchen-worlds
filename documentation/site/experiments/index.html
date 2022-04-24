@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../css/favicon.ico">
+  
+  <title>Experiments & Results on Search Complexity - LEAPdocs</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  <link href="../css/extra.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Experiments & Results on Search Complexity";
+    var mkdocs_page_input_path = "experiments.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> LEAPdocs</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <p class="caption"><span class="caption-text">Project</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">LEAP Architecture</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../project-minutes/">Minutes & Notes</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Domains</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../domain-grocery/">Grocery - action costs</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../domain-kitchen/">Kitchen - large universe</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-igibson/">iGibson's BEHAVIOR</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-alfred/">AI2THOR's Alfred</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-habitat/">Habitat's Rearrangement</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Strategists</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-iobig/">PLOI-like IOBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-sdbig/">HPN-like SDBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-ipbig/">HPN-like IPBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-hpn/">HPN [ NEW ]</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Experiments</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-goals/">Num of Goal Predicates</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-objects/">Num of Objects</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-egg-recipes/">All Egg Recipes</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-two-dishes/">Two Dishes</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-planner-options/">Satisfising v.s. Optimizing</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-merged-domains/">Merged Domains</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-strategists/">Combine Strategists [ NEW ]</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Notes</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../notes-fd/">FastDownward</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Set it up</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-repository/">Set up the Repository</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-mkdocs/">Set up MkDocs</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-notes/">Editor's Notes</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">LEAPdocs</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Experiments & Results on Search Complexity</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="experiments-results-on-search-complexity">Experiments &amp; Results on Search Complexity<a class="headerlink" href="#experiments-results-on-search-complexity" title="Permanent link">#</a></h1>
+<h2 id="1-more-goal-predicates-search-time-increases-more-than-linearly">1. More goal predicates -&gt; Search time increases more than linearly<a class="headerlink" href="#1-more-goal-predicates-search-time-increases-more-than-linearly" title="Permanent link">#</a></h2>
+<p><code>test_goals.sh</code> tests the effect of increasing the number of goal predicates on search complexity, with the same <code>kitchen_1</code>.pddl and <code>obj_1</code>.pddl, i.e. minimum operators &amp; objects:
+* omelette_1.pddl has only eggs
+* omelette_2.pddl adds veggies
+* omelette_3.pddl adds salt and pepper
+* omelette_4.pddl adds nutmilk and chives
+* omelette_5.pddl contains all positive goal predicates without any use of axioms
+* omelette_6.pddl contains one negative goal predicate
+* omelette_6.pddl contains two negative goal predicates</p>
+<pre><code>     t  problem_name       var    op    axiom    plan    parse      search    state
+------  ---------------  -----  ----  -------  ------  -------  ----------  -------
+085529  omelette_1.pddl     39   700        8      16    0.632  0.0016525        29
+085530  omelette_2.pddl     43   702       11      20    0.618  0.00334604       40
+085531  omelette_3.pddl     44   703       11      24    0.666  0.00299829       48
+085532  omelette_4.pddl     58   843       11      50    0.675  0.0119693       246
+085533  omelette_5.pddl     66  1004       11      48    0.598  0.0155517       243
+085534  omelette_6.pddl     68  1004       13      64    0.579  0.0691776      1134
+085535  omelette_7.pddl     68  1004       13      64    0.592  0.0721683      1134
+</code></pre>
+<h2 id="2-more-objects-search-time-increases-linearly">2. More objects -&gt; Search time increases linearly<a class="headerlink" href="#2-more-objects-search-time-increases-linearly" title="Permanent link">#</a></h2>
+<p><code>test_objects.sh</code> tests the effect of increasing the number of objects on search complexity, with the same <code>kitchen_1.pddl</code> and <code>omelette_5.pddl</code>, i.e. full omelette:
+* obj_1.pddl contains the bare minimum set of objects
+* obj_2.pddl contains some alternative objects 
+* obj_3.pddl contains 12 eggs
+* obj_4.pddl contains multiples (two) of every object
+* obj_5.pddl contains multiples (ten) of every object
+* obj_eggs.pddl contains all objects for making 10 egg recipes</p>
+<pre><code>     t  problem_name      var    op    axiom    plan    parse     search    state
+------  --------------  -----  ----  -------  ------  -------  ---------  -------
+085837  obj_1.pddl         66  1004       11      48    0.61   0.0164124      243
+085839  obj_2.pddl         72  1626       14      53    1.448  0.0181531      215
+085843  obj_3.pddl        102  3086       44      53    3.889  0.0320748      215
+085855  obj_4.pddl        116  9510       46      50   11.723  0.0407923      219
+085909  obj_eggs.pddl     115  5416      102      50   13.549  0.031977       219
+</code></pre>
+<h2 id="3-different-recipes-search-time-corresponds-to-of-axioms-and-depth-of-search-instead-of-of-operators-or-length-of-plan">3. Different recipes -&gt; Search time corresponds to # of axioms and depth of search, instead of # of operators or length of plan<a class="headerlink" href="#3-different-recipes-search-time-corresponds-to-of-axioms-and-depth-of-search-instead-of-of-operators-or-length-of-plan" title="Permanent link">#</a></h2>
+<p><code>test_egg_recipes.sh</code> tests the search complexity of 10 different egg-related recipes, with the same <code>kitchen_3.pddl</code> and <code>obj_eggs.pddl</code>, i.e. with all definitions and objects for egg recipes:
+* scrambled_eggs.pddl specifies beaten, scrambled eggs
+* omelette.pddl specifies beaten, folded eggs with veggies
+* sunny_side_up.pddl specifies fried, steamed eggs on frypan
+* egg_in_hole.pddl specifies fried egg in the hole of a bread
+* poached_egg.pddl specifies boiled egg with vinegar</p>
+<pre><code>     t  problem_name                                                       var    op    axiom    plan    parse     search    state
+------  ---------------------------------------------------------------  -----  ----  -------  ------  -------  ---------  -------
+085358  kitchen_egg_4-scrambled_eggs-obj_egg_4.pddl-scrambled_eggs.pddl    312  6677      161      43    9.846  0.120834       749
+085408  kitchen_egg_4-omelette-obj_egg_4.pddl-omelette.pddl                350  6680      161      52   10.03   0.119653       711
+085419  kitchen_egg_4-sunny_side_up-obj_egg_4.pddl-sunny_side_up.pddl      142  4560      125      28   10.377  0.272117      2501
+085432  kitchen_egg_4-egg_in_hole-obj_egg_4.pddl-crack                     202  3234      172      50   10.129  2.14165      24498
+085447  kitchen_3-poached_egg-obj_eggs.pddl-poached_egg.pddl               368  4944      137      25   14.394  0.0189829      144
+</code></pre>
+<h2 id="4-more-operators-search-time-increases-linearly">4. More operators -&gt; Search time increases linearly<a class="headerlink" href="#4-more-operators-search-time-increases-linearly" title="Permanent link">#</a></h2>
+<p><code>test_operators</code> tests the effect of increasing the number of operators (for multiple recipes) on search complexity, with the same <code>omelette.pddl</code> and <code>obj_1.pddl</code>, i.e. minimum plan length &amp; objects:
+* kitchen_1.pddl contains all operators for omelette recipe
+* kitchen_2.pddl contains all operators for omelette + maintanance goals
+* kitchen_3.pddl contains all operators &amp; definitions for 10 egg recipes
+* kitchen_4.pddl contains all operators &amp; definitions for 10 egg recipes, with different action costs that reflect time costs
+* kitchen_5.pddl contains all operators &amp; definitions for egg &amp; baking recipes, with different action costs that reflect time costs</p>
+<pre><code>     t  problem_name                                           var    op    axiom    plan    parse     search    state
+------  ---------------------------------------------------  -----  ----  -------  ------  -------  ---------  -------
+090721  kitchen_1-omelette_5-obj_1.pddl-omelette_5.pddl         66  1004       11      48    0.659  0.0181792      243
+090722  kitchen_2-omelette-obj_1.pddl-omelette.pddl             70  1004       27      64    0.61   0.0349843      519
+090733  kitchen_egg_4-omelette-obj_egg_4.pddl-omelette.pddl    350  6680      161      52   10.058  0.115542       711
+</code></pre>
+<blockquote>
+<p>TODO: change the <code>obj_1.pddl</code> here to <code>obj_4</code>.pddl and <code>obj_eggs.pddl</code> to make the problem combinatorially complicated</p>
+</blockquote>
+<!--
+
+## Ongoing
+
+`test_effects.sh` tests how the complexity of operator effects affects the length of plan, with the same `kitchen_3.pddl` and `obj_eggs.pddl`, focusing on `crack-egg` action
+* scrambled_eggs.pddl + crack-egg-1
+* omelette.pddl + crack-egg-1
+* sunny_side_up.pddl + crack-egg-1
+* sunny_side_up.pddl + crack-egg-2 = FAIL
+* egg_in_hole.pddl + crack-egg-3
+* egg_in_hole.pddl + crack-egg-4 = LONGER
+
+
+<pre><code>     t  problem_name                            var    op    axiom  plan    parse    search    state
+------  ------------------------------------  -----  ----  -------  ------  -------  --------  -------
+090308  scrambled_eggs-1-scrambled_eggs.pddl    314  6677      167  43      9.577    0.112926  749
+090318  omelette-1-omelette.pddl                352  6680      167  50      9.792    0.115964  701
+090329  sunny_side_up-1-sunny_side_up.pddl      144  4560      131  28      9.687    0.277916  2531
+090349  sunny_side_up-2-sunny_side_up.pddl      157  4694      160  -       -        -         -
+090402  egg_in_hole-3-egg_in_hole.pddl          202  3234      172  50      10.123   2.50423   24498
+090415  egg_in_hole-4-egg_in_hole.pddl          139  4664      196  50      10.714   2.27736   24286
+</code></pre>
+
+-->
+              
+            </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

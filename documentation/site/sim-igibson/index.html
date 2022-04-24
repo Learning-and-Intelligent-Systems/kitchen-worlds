@@ -1,0 +1,2095 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../css/favicon.ico">
+  
+  <title>iGibson's BEHAVIOR - LEAPdocs</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  <link href="../css/extra.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "iGibson's BEHAVIOR";
+    var mkdocs_page_input_path = "sim-igibson.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> LEAPdocs</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <p class="caption"><span class="caption-text">Project</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">LEAP Architecture</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../project-minutes/">Minutes & Notes</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Domains</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../domain-grocery/">Grocery - action costs</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../domain-kitchen/">Kitchen - large universe</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">iGibson's BEHAVIOR</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#notes-on-their-paper">Notes on their paper</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#notes-on-their-implementation">Notes on their implementation</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#predicates-used">Predicates used</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#bddl-constructs">BDDL constructs</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#bddl-definition-of-example-activity">BDDL definition of example activity</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#urdf-definition-of-example-object">URDF definition of example object</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#bddl-goal-definitions-of-100-activities">BDDL goal definitions of 100 activities</a>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-alfred/">AI2THOR's Alfred</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-habitat/">Habitat's Rearrangement</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Strategists</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-iobig/">PLOI-like IOBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-sdbig/">HPN-like SDBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-ipbig/">HPN-like IPBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-hpn/">HPN [ NEW ]</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Experiments</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-goals/">Num of Goal Predicates</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-objects/">Num of Objects</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-egg-recipes/">All Egg Recipes</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-two-dishes/">Two Dishes</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-planner-options/">Satisfising v.s. Optimizing</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-merged-domains/">Merged Domains</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-strategists/">Combine Strategists [ NEW ]</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Notes</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../notes-fd/">FastDownward</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Set it up</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-repository/">Set up the Repository</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-mkdocs/">Set up MkDocs</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-notes/">Editor's Notes</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">LEAPdocs</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Domains &raquo;</li>
+        
+      
+    
+    <li>iGibson's BEHAVIOR</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="igibsons-behavior-stanford">iGibson's BEHAVIOR: @ Stanford<a class="headerlink" href="#igibsons-behavior-stanford" title="Permanent link">#</a></h1>
+<h2 id="notes-on-their-paper">Notes on their <a href="https://arxiv.org/abs/2108.03272">paper</a><a class="headerlink" href="#notes-on-their-paper" title="Permanent link">#</a></h2>
+<iframe src="https://docs.google.com/document/d/e/2PACX-1vTU2RXR6L6gZ5HZx8hzytlRW1uzOwxTHbzkdEOxCfLcjTzNvSDhfpF2FlorPi2RSVww1_t6LgZB0Rpf/pub?embedded=true" width='120%' height='800px' style='margin-bottom: 30px;'></iframe>
+
+<h2 id="notes-on-their-implementation">Notes on their implementation<a class="headerlink" href="#notes-on-their-implementation" title="Permanent link">#</a></h2>
+<ul>
+<li>uses <code>.bddl</code> files to specify goals, which include constructs <code>(forpairs</code> and <code>(forn</code> that are used like <code>(exists</code>, e.g. exists two pieces of shoes are put down next to the table</li>
+<li>only objects and init that are relevant in the problem are listed in <code>problem.bddl</code></li>
+<li>reconstructed video clips of one human demonstraction for each of the 100 activities in <a href="https://www.dropbox.com/sh/f3kxht6azp23we4/AAApoDOpqJq5zYTsjvy7cFZma?dl=0">Dropbox</a>, where image arrays are of size 128 by 128</li>
+</ul>
+<p><img alt="Reconstructed video clips for activity 'brushing_lint_off_clothing'" src="../imgs/igibson.jpg" /></p>
+<h2 id="predicates-used">Predicates used<a class="headerlink" href="#predicates-used" title="Permanent link">#</a></h2>
+<pre><code class="language-lisp">(inside ?obj1 ?obj2)
+(nextto ?obj1 ?obj2)
+(touching ?obj1 ?obj2)
+(ontop ?obj1 ?obj2)
+(onfloor ?obj1 ?obj2)
+(under ?obj1 ?obj2)
+(cooked ?obj1)
+(dusty ?obj1)
+(frozen ?obj1)
+(open ?obj1)
+(stained ?obj1)
+(sliced ?obj1)
+(soaked ?obj1)
+(toggled_on ?obj1)
+
+;; mentioned but not actually used
+(broken ?obj1)
+(timeset ?obj1)
+(burnt ?obj1)
+(perished ?obj1)
+(screwed ?obj1)
+</code></pre>
+<h2 id="bddl-constructs">BDDL constructs<a class="headerlink" href="#bddl-constructs" title="Permanent link">#</a></h2>
+<p><code>(forpairs (?var1 - type2) (?var2 - type2) &lt;condition&gt;)</code> specifies "for pairs of items that satisfy the condition":</p>
+<pre><code class="language-lisp">(forpairs 
+    (?stocking.n.01 - stocking.n.01) 
+    (?cube.n.05 - cube.n.05) 
+    (inside ?cube.n.05 ?stocking.n.01)
+) 
+</code></pre>
+<p><code>(forn (N) (?var - type) &lt;condition&gt;)</code> specifies "for examples N items that satisfy the condition":</p>
+<pre><code class="language-lisp">(forn 
+    (2) 
+    (?gym_shoe.n.01 - gym_shoe.n.01) 
+    (nextto ?gym_shoe.n.01 ?table.n.02_1)
+) 
+</code></pre>
+<p><code>(fornpairs</code> specifies "for examples N pairs of items that satisfy the condition".</p>
+<h2 id="bddl-definition-of-example-activity">BDDL definition of example activity<a class="headerlink" href="#bddl-definition-of-example-activity" title="Permanent link">#</a></h2>
+<pre><code class="language-lisp">(define (problem brushing_lint_off_clothing_0)
+    (:domain igibson)
+
+    (:objects
+        sweater.n.01_1 sweater.n.01_2 sweater.n.01_3 sweater.n.01_4 - sweater.n.01
+        floor.n.01_1 - floor.n.01
+        bed.n.01_1 - bed.n.01
+        scrub_brush.n.01_1 - scrub_brush.n.01
+        agent.n.01_1 - agent.n.01
+    )
+
+    (:init 
+        (onfloor sweater.n.01_1 floor.n.01_1) 
+        (onfloor sweater.n.01_2 floor.n.01_1) 
+        (ontop sweater.n.01_3 bed.n.01_1) 
+        (ontop sweater.n.01_4 bed.n.01_1) 
+        (dusty sweater.n.01_1) 
+        (dusty sweater.n.01_2) 
+        (dusty sweater.n.01_3) 
+        (dusty sweater.n.01_4) 
+        (onfloor scrub_brush.n.01_1 floor.n.01_1) 
+        (not 
+            (dusty scrub_brush.n.01_1)
+        ) 
+        (inroom floor.n.01_1 bedroom) 
+        (inroom bed.n.01_1 bedroom) 
+        (onfloor agent.n.01_1 floor.n.01_1)
+    )
+
+    (:goal 
+        (and 
+            (forall 
+                (?sweater.n.01 - sweater.n.01) 
+                (not 
+                    (dusty ?sweater.n.01)
+                )
+            ) 
+            (forall 
+                (?sweater.n.01 - sweater.n.01) 
+                (ontop ?sweater.n.01 ?bed.n.01_1)
+            )
+        )
+    )
+)
+</code></pre>
+<h2 id="urdf-definition-of-example-object">URDF definition of example object<a class="headerlink" href="#urdf-definition-of-example-object" title="Permanent link">#</a></h2>
+<p>Objects in <code>.bddl</code> appear in <code>object_scope</code> tag in <code>.urdf</code>. For example, the location of <code>sweater.n.01_1</code> is uniquely defined in file <code>/igibson/data/ig_dataset/scenes/Beechwood_1_int/urdf/Beechwood_1_int_task_brushing_lint_off_clothing_0_0.urdf</code> where <code>/igibson/data/ig_dataset</code> is extracted from downloaded <code>behavior_data_bundle.zip</code></p>
+<pre><code class="language-html">&lt;link bounding_box=&quot;0.0653052495083491 0.5302351523387753 0.41672515978519237&quot; 
+    category=&quot;sweater&quot; joint_positions=&quot;[{}]&quot; model=&quot;sweater_000&quot; 
+    name=&quot;sweater_100&quot; object_scope=&quot;sweater.n.01_1&quot; room=&quot;bedroom_0&quot; 
+    rpy=&quot;2.8526263153393647 1.5587201439643557 -1.7242493779318842&quot; 
+    states=&quot;{&amp;quot;VerticalAdjacency&amp;quot;: null, &amp;quot;HorizontalAdjacency&amp;quot;: null, &amp;quot;ContactBodies&amp;quot;: null, &amp;quot;AABB&amp;quot;: null, &amp;quot;Pose&amp;quot;: null, &amp;quot;Stained&amp;quot;: {&amp;quot;particles&amp;quot;: {&amp;quot;dirt_dump&amp;quot;: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], &amp;quot;random_bbox_dims&amp;quot;: [[0.026195604501169197, 0.026195604501169197, 0.004], [0.03573388195198314, 0.03573388195198314, 0.004], [0.024851839778765032, 0.024851839778765032, 0.004], [0.022419248633333857, 0.022419248633333857, 0.004], [0.03373335108174163, 0.03373335108174163, 0.004], [0.041424080732280585, 0.041424080732280585, 0.004], [0.038020350710816955, 0.038020350710816955, 0.004], [0.0329636571631501, 0.0329636571631501, 0.004], [0.02934565624343374, 0.02934565624343374, 0.004], [0.026772989501223518, 0.026772989501223518, 0.004], [0.022535692809698377, 0.022535692809698377, 0.004], [0.039959500855667116, 0.039959500855667116, 0.004], [0.029527386381408033, 0.029527386381408033, 0.004], [0.03542366024031154, 0.03542366024031154, 0.004], [0.03468628837029925, 0.03468628837029925, 0.004], [0.020809380058282288, 0.020809380058282288, 0.004], [0.025045343967904414, 0.025045343967904414, 0.004], [0.04092164786826981, 0.04092164786826981, 0.004], [0.02574179113939813, 0.02574179113939813, 0.004], [0.03457646574957623, 0.03457646574957623, 0.004]]}}, &amp;quot;Dusty&amp;quot;: {&amp;quot;particles&amp;quot;: [[null, [-6.4971513748168945, -3.404371976852417, 0.05141346901655197], [0.19125089049339294, 0.03617021441459656, -0.03086436726152897, 0.9803888201713562]], [null, [-6.446415424346924, -3.5374882221221924, 0.06482921540737152], [-0.03602251783013344, -0.010998752899467945, -0.018574034795165062, 0.9991177916526794]], [null, [-6.362188816070557, -3.3786730766296387, 0.045560769736766815], [0.009277323260903358, 0.00951681099832058, -0.5435599684715271, 0.8392651081085205]], [null, [-6.545812129974365, -3.489015817642212, 0.04524658992886543], [0.19416584074497223, -0.006309961434453726, -0.5295246839523315, 0.8257502317428589]], null, [null, [-6.408360958099365, -3.628054141998291, 0.0378640815615654], [-0.034921642392873764, 0.14623099565505981, -0.018998349085450172, 0.9884513020515442]], [null, [-6.516524791717529, -3.6305572986602783, 0.058602310717105865], [0.14024357497692108, -0.08579050004482269, -0.1966172158718109, 0.9665988683700562]], [null, [-6.485074520111084, -3.5070207118988037, 0.043625302612781525], [0.10483767837285995, 0.13317422568798065, -0.4169555902481079, 0.8929846882820129]], [null, [-6.546047210693359, -3.4792582988739014, 0.048361051827669144], [0.1851772516965866, 0.013391231186687946, -0.5655433535575867, 0.8035488128662109]], [null, [-6.631643772125244, -3.4663052558898926, 0.03845023736357689], [0.22211401164531708, -0.001216256059706211, -0.6665422916412354, 0.7116073369979858]], [null, [-6.575324058532715, -3.670689344406128, 0.044780243188142776], [0.006615441292524338, -0.10300734639167786, -0.3804311752319336, 0.9190309047698975]], [null, [-6.362612724304199, -3.7119691371917725, 0.044740889221429825], [-0.019456973299384117, 0.15591785311698914, -0.5151968002319336, 0.842545747756958]], [null, [-6.5113935470581055, -3.5679073333740234, 0.04981470853090286], [-0.14224763214588165, -0.09159466624259949, -0.4861069321632385, 0.8573657274246216]], null, [null, [-6.3777008056640625, -3.49575138092041, 0.03339405730366707], [-0.0606803297996521, 0.12671928107738495, -0.5964592695236206, 0.7902508974075317]], [null, [-6.478073596954346, -3.6925437450408936, 0.04874435067176819], [0.06432120501995087, 0.06500521302223206, -0.6130579113960266, 0.7847273945808411]], [null, [-6.367181777954102, -3.6412549018859863, 0.04565606266260147], [-0.03387808799743652, -0.12622994184494019, -0.24675683677196503, 0.9602235555648804]], null, null, [null, [-6.29764986038208, -3.3356051445007324, 0.05639209598302841], [-0.18679864704608917, -0.07720296084880829, -0.3072079122066498, 0.9299296736717224]]]}}&quot; 
+    xyz=&quot;-6.501590635708295 -3.5446136809926023 0.033868759894567044&quot;
+/&gt;
+
+&lt;joint name=&quot;j_sweater_100&quot; type=&quot;floating&quot;&gt;
+    &lt;origin rpy=&quot;2.8526263153393647 1.5587201439643557 -1.7242493779318842&quot; 
+        xyz=&quot;-6.501590635708295 -3.5446136809926023 0.033868759894567044&quot;/&gt;
+    &lt;child link=&quot;sweater_100&quot;/&gt;
+    &lt;parent link=&quot;world&quot;/&gt;
+&lt;/joint&gt;
+</code></pre>
+<h2 id="bddl-goal-definitions-of-100-activities">BDDL goal definitions of 100 activities<a class="headerlink" href="#bddl-goal-definitions-of-100-activities" title="Permanent link">#</a></h2>
+<pre><code class="language-lisp">(:igibson-problems
+
+   (:assembling_gift_baskets
+        (and 
+            (forpairs 
+                (?basket.n.01 - basket.n.01) 
+                (?candle.n.01 - candle.n.01) 
+                (inside ?candle.n.01 ?basket.n.01)
+            ) 
+            (forpairs 
+                (?basket.n.01 - basket.n.01) 
+                (?cheese.n.01 - cheese.n.01) 
+                (inside ?cheese.n.01 ?basket.n.01)
+            ) 
+            (forpairs 
+                (?basket.n.01 - basket.n.01) 
+                (?cookie.n.01 - cookie.n.01) 
+                (inside ?cookie.n.01 ?basket.n.01)
+            ) 
+            (forpairs 
+                (?basket.n.01 - basket.n.01) 
+                (?bow.n.08 - bow.n.08) 
+                (inside ?bow.n.08 ?basket.n.01)
+            )
+        )
+    )
+
+   (:bottling_fruit
+        (and 
+            (exists 
+                (?jar.n.01 - jar.n.01) 
+                (and 
+                    (inside ?strawberry.n.01_1 ?jar.n.01) 
+                    (not 
+                        (inside ?peach.n.03_1 ?jar.n.01)
+                    )
+                )
+            ) 
+            (exists 
+                (?jar.n.01 - jar.n.01) 
+                (and 
+                    (inside ?peach.n.03_1 ?jar.n.01) 
+                    (not 
+                        (inside ?strawberry.n.01_1 ?jar.n.01)
+                    )
+                )
+            ) 
+            (forall 
+                (?jar.n.01 - jar.n.01) 
+                (not 
+                    (open ?jar.n.01)
+                )
+            ) 
+            (sliced strawberry.n.01_1) 
+            (sliced peach.n.03_1)
+        )
+    )
+
+   (:boxing_books_up_for_storage
+        (and 
+            (forall 
+                (?book.n.02 - book.n.02) 
+                (inside ?book.n.02 ?carton.n.02_1)
+            )
+        )
+    )
+
+   (:bringing_in_wood
+        (and 
+            (forall 
+                (?plywood.n.01 - plywood.n.01) 
+                (onfloor ?plywood.n.01 ?floor.n.01_2)
+            )
+        )
+    )
+
+   (:brushing_lint_off_clothing
+        (and 
+            (forall 
+                (?sweater.n.01 - sweater.n.01) 
+                (not 
+                    (dusty ?sweater.n.01)
+                )
+            ) 
+            (forall 
+                (?sweater.n.01 - sweater.n.01) 
+                (ontop ?sweater.n.01 ?bed.n.01_1)
+            )
+        )
+    )
+
+   (:chopping_vegetables
+        (and 
+            (forall 
+                (?tomato.n.01 - tomato.n.01) 
+                (and 
+                    (exists 
+                        (?dish.n.01 - dish.n.01) 
+                        (inside ?tomato.n.01 ?dish.n.01)
+                    ) 
+                    (sliced ?tomato.n.01)
+                )
+            ) 
+            (forall 
+                (?mushroom.n.05 - mushroom.n.05) 
+                (and 
+                    (exists 
+                        (?dish.n.01 - dish.n.01) 
+                        (inside ?mushroom.n.05 ?dish.n.01)
+                    ) 
+                    (sliced ?mushroom.n.05)
+                )
+            ) 
+            (forall 
+                (?chestnut.n.03 - chestnut.n.03) 
+                (and 
+                    (exists 
+                        (?dish.n.01 - dish.n.01) 
+                        (inside ?chestnut.n.03 ?dish.n.01)
+                    ) 
+                    (sliced ?chestnut.n.03)
+                )
+            ) 
+            (forall 
+                (?vidalia_onion.n.01 - vidalia_onion.n.01) 
+                (and 
+                    (exists 
+                        (?dish.n.01 - dish.n.01) 
+                        (inside ?vidalia_onion.n.01 ?dish.n.01)
+                    ) 
+                    (sliced ?vidalia_onion.n.01)
+                )
+            )
+        )
+    )
+
+   (:cleaning_a_car
+        (and 
+            (not 
+                (dusty ?car.n.01_1)
+            ) 
+            (inside ?soap.n.01_1 ?bucket.n.01_1) 
+            (inside ?rag.n.01_1 ?bucket.n.01_1)
+        )
+    )
+
+   (:cleaning_barbecue_grill
+        (and 
+            (not 
+                (stained ?grill.n.02_1)
+            ) 
+            (not 
+                (dusty ?grill.n.02_1)
+            )
+        )
+    )
+
+   (:cleaning_bathrooms
+        (and 
+            (not 
+                (stained ?toilet.n.02_1)
+            ) 
+            (not 
+                (stained ?bathtub.n.01_1)
+            ) 
+            (not 
+                (stained ?sink.n.01_1)
+            ) 
+            (not 
+                (stained ?floor.n.01_1)
+            ) 
+            (and 
+                (soaked ?rag.n.01_1) 
+                (inside ?rag.n.01_1 ?bucket.n.01_1)
+            )
+        )
+    )
+
+   (:cleaning_bathtub
+        (and 
+            (not 
+                (stained ?bathtub.n.01_1)
+            )
+        )
+    )
+
+   (:cleaning_bedroom
+        (and 
+            (forall 
+                (?apparel.n.01 - apparel.n.01) 
+                (exists 
+                    (?cabinet.n.01 - cabinet.n.01) 
+                    (inside ?apparel.n.01 ?cabinet.n.01)
+                )
+            ) 
+            (and 
+                (inside ?jewelry.n.01_1 ?cabinet.n.01_1) 
+                (inside ?perfume.n.02_1 ?cabinet.n.01_1)
+            ) 
+            (ontop ?sheet.n.03_1 ?bed.n.01_1) 
+            (forall 
+                (?cabinet.n.01 - cabinet.n.01) 
+                (not 
+                    (dusty ?cabinet.n.01)
+                )
+            ) 
+            (nextto ?vacuum.n.04_1 ?bed.n.01_1) 
+            (ontop ?painting.n.01_1 ?sheet.n.03_1)
+        )
+    )
+
+   (:cleaning_carpets
+        (and 
+            (not 
+                (stained ?floor.n.01_1)
+            )
+        )
+    )
+
+   (:cleaning_closet
+        (and 
+            (forall 
+                (?jewelry.n.01 - jewelry.n.01) 
+                (inside ?jewelry.n.01 ?cabinet.n.01_3)
+            ) 
+            (not 
+                (inside ?umbrella.n.01_1 ?cabinet.n.01_3)
+            ) 
+            (or 
+                (inside ?hat.n.01_1 ?cabinet.n.01_1) 
+                (ontop ?hat.n.01_1 ?shelf.n.01_1)
+            ) 
+            (forall 
+                (?sandal.n.01 - sandal.n.01) 
+                (and 
+                    (nextto ?sandal.n.01 ?shelf.n.01_1) 
+                    (onfloor ?sandal.n.01 ?floor.n.01_1)
+                )
+            ) 
+            (not 
+                (dusty ?cabinet.n.01_3)
+            ) 
+            (not 
+                (dusty ?shelf.n.01_1)
+            ) 
+            (not 
+                (dusty ?floor.n.01_1)
+            )
+        )
+    )
+
+   (:cleaning_cupboards
+        (and 
+            (forall 
+                (?cabinet.n.01 - cabinet.n.01) 
+                (not 
+                    (dusty ?cabinet.n.01)
+                )
+            ) 
+            (forall 
+                (?book.n.02 - book.n.02) 
+                (forall 
+                    (?cabinet.n.01 - cabinet.n.01) 
+                    (not 
+                        (inside ?book.n.02 ?cabinet.n.01)
+                    )
+                )
+            )  
+            (inside ?screwdriver.n.01_1 ?bin.n.01_1) 
+            (forall 
+                (?marker.n.03 - marker.n.03) 
+                (inside ?marker.n.03 ?bucket.n.01_1)
+            ) 
+            (inside ?pen.n.01_1 ?bucket.n.01_1)
+        )
+    )
+
+   (:cleaning_floors
+        (and 
+            (not 
+                (stained ?floor.n.01_1)
+            ) 
+            (not 
+                (dusty ?floor.n.01_1)
+            )
+        )
+    )
+
+   (:cleaning_freezer
+        (and 
+            (not 
+                (stained ?electric_refrigerator.n.01_1)
+            ) 
+            (forall 
+                (?food.n.01 - food.n.01) 
+                (not 
+                    (inside ?food.n.01 ?electric_refrigerator.n.01_1)
+                )
+            )
+        )
+    )
+
+   (:cleaning_garage
+        (and 
+            (not 
+                (dusty ?floor.n.01_1)
+            ) 
+            (not 
+                (dusty ?cabinet.n.01_1)
+            ) 
+            (not 
+                (stained ?cabinet.n.01_1)
+            ) 
+            (forall 
+                (?newspaper.n.03 - newspaper.n.03) 
+                (or 
+                    (inside ?newspaper.n.03 ?bin.n.01_1) 
+                    (not 
+                        (onfloor ?newspaper.n.03 ?floor.n.01_1)
+                    )
+                )
+            ) 
+            (forall 
+                (?bottle.n.01 - bottle.n.01) 
+                (ontop ?bottle.n.01 ?table.n.02_1)
+            )
+        )
+    )
+
+   (:cleaning_high_chair
+        (and 
+            (not 
+                (dusty ?highchair.n.01_1)
+            )
+        )
+    )
+
+   (:cleaning_kitchen_cupboard
+        (and 
+            (forall 
+                (?cabinet.n.01 - cabinet.n.01) 
+                (not 
+                    (dusty ?cabinet.n.01)
+                )
+            ) 
+            (exists 
+                (?cabinet.n.01 - cabinet.n.01) 
+                (forall 
+                    (?bowl.n.01 - bowl.n.01) 
+                    (and 
+                        (inside ?bowl.n.01 ?cabinet.n.01) 
+                        (not 
+                            (inside ?cup.n.01_1 ?cabinet.n.01)
+                        )
+                    )
+                )
+            ) 
+            (exists 
+                (?cabinet.n.01 - cabinet.n.01) 
+                (forall 
+                    (?cup.n.01 - cup.n.01) 
+                    (and 
+                        (inside ?cup.n.01 ?cabinet.n.01) 
+                        (not 
+                            (inside ?bowl.n.01_1 ?cabinet.n.01)
+                        )
+                    )
+                )
+            )
+        )
+    )
+
+   (:cleaning_microwave_oven
+        (and 
+            (not 
+                (dusty ?microwave.n.02_1)
+            ) 
+            (not 
+                (stained ?microwave.n.02_1)
+            )
+        )
+    )
+
+   (:cleaning_out_drawers
+        (and 
+            (nextto ?piece_of_cloth.n.01_1 ?sink.n.01_1) 
+            (nextto ?bowl.n.01_1 ?sink.n.01_1) 
+            (nextto ?bowl.n.01_2 ?sink.n.01_1) 
+            (nextto ?spoon.n.01_1 ?sink.n.01_1) 
+            (nextto ?spoon.n.01_2 ?sink.n.01_1)
+        )
+    )
+
+   (:cleaning_oven
+        (and 
+            (forall 
+                (?rag.n.01 - rag.n.01) 
+                (soaked ?rag.n.01)
+            ) 
+            (soaked ?scrub_brush.n.01_1) 
+            (not 
+                (stained ?oven.n.01_1)
+            )
+        )
+    )
+
+   (:cleaning_shoes
+        (and 
+            (forall 
+                (?shoe.n.01 - shoe.n.01) 
+                (not 
+                    (stained ?shoe.n.01)
+                )
+            ) 
+            (forall 
+                (?shoe.n.01 - shoe.n.01) 
+                (not 
+                    (dusty ?shoe.n.01)
+                )
+            ) 
+            (onfloor ?towel.n.01_1 ?floor.n.01_1)
+        )
+    )
+
+   (:cleaning_sneakers
+        (and 
+            (ontop ?towel.n.01_1 ?countertop.n.01_1) 
+            (nextto ?brush.n.02_1 ?towel.n.01_1) 
+            (inside ?soap.n.01_1 ?sink.n.01_1) 
+            (forall 
+                (?gym_shoe.n.01 - gym_shoe.n.01) 
+                (not 
+                    (dusty ?gym_shoe.n.01)
+                )
+            ) 
+            (forall 
+                (?gym_shoe.n.01 - gym_shoe.n.01) 
+                (not 
+                    (stained ?gym_shoe.n.01)
+                )
+            ) 
+            (forn 
+                (2) 
+                (?gym_shoe.n.01 - gym_shoe.n.01) 
+                (nextto ?gym_shoe.n.01 ?table.n.02_1)
+            ) 
+            (forn 
+                (2) 
+                (?gym_shoe.n.01 - gym_shoe.n.01) 
+                (under ?gym_shoe.n.01 ?table.n.02_1)
+            ) 
+            (forall 
+                (?gym_shoe.n.01 - gym_shoe.n.01) 
+                (onfloor ?gym_shoe.n.01 ?floor.n.01_1)
+            )
+        )
+    )
+
+   (:cleaning_stove
+        (and 
+            (not 
+                (dusty ?stove.n.01_1)
+            ) 
+            (not 
+                (stained ?stove.n.01_1)
+            ) 
+            (nextto ?rag.n.01_1 ?sink.n.01_1) 
+            (nextto ?dishtowel.n.01_1 ?sink.n.01_1)
+        )
+    )
+
+   (:cleaning_table_after_clearing
+        (and 
+            (not 
+                (stained ?table.n.02_1)
+            )
+        )
+    )
+
+   (:cleaning_the_hot_tub
+        (and 
+            (onfloor ?pool.n.01_1 ?floor.n.01_1) 
+            (not 
+                (stained ?pool.n.01_1)
+            )
+        )
+    )
+
+   (:cleaning_the_pool
+        (and 
+            (onfloor ?pool.n.01_1 ?floor.n.01_1) 
+            (not 
+                (stained ?pool.n.01_1)
+            ) 
+            (ontop ?scrub_brush.n.01_1 ?shelf.n.01_1) 
+            (onfloor ?detergent.n.02_1 ?floor.n.01_1)
+        )
+    )
+
+   (:cleaning_toilet
+        (and 
+            (not 
+                (stained ?toilet.n.02_1)
+            ) 
+            (onfloor ?scrub_brush.n.01_1 ?floor.n.01_1) 
+            (onfloor ?detergent.n.02_1 ?floor.n.01_1)
+        )
+    )
+
+   (:cleaning_up_after_a_meal
+        (and 
+            (forall 
+                (?bowl.n.01 - bowl.n.01) 
+                (not 
+                    (stained ?bowl.n.01)
+                )
+            ) 
+            (forall 
+                (?plate.n.04 - plate.n.04) 
+                (not 
+                    (stained ?plate.n.04)
+                )
+            ) 
+            (forall 
+                (?cup.n.01 - cup.n.01) 
+                (not 
+                    (stained ?cup.n.01)
+                )
+            ) 
+            (forall 
+                (?hamburger.n.01 - hamburger.n.01) 
+                (inside ?hamburger.n.01 ?sack.n.01_1)
+            ) 
+            (onfloor ?sack.n.01_1 ?floor.n.01_1) 
+            (not 
+                (stained ?floor.n.01_1)
+            ) 
+            (not 
+                (stained ?chair.n.01_2)
+            ) 
+            (not 
+                (stained ?floor.n.01_1)
+            ) 
+            (not 
+                (stained ?table.n.02_1)
+            )
+        )
+    )
+
+   (:cleaning_up_refrigerator
+        (and 
+            (forall 
+                (?rag.n.01 - rag.n.01) 
+                (nextto ?rag.n.01 ?sink.n.01_1)
+            ) 
+            (inside ?soap.n.01_1 ?sink.n.01_1) 
+            (forall 
+                (?tray.n.01 - tray.n.01) 
+                (inside ?tray.n.01 ?electric_refrigerator.n.01_1)
+            ) 
+            (not 
+                (stained ?tray.n.01_1)
+            ) 
+            (not 
+                (stained ?tray.n.01_2)
+            ) 
+            (nextto ?bowl.n.01_1 ?sink.n.01_1) 
+            (not 
+                (dusty ?bowl.n.01_1)
+            ) 
+            (not 
+                (stained ?electric_refrigerator.n.01_1)
+            )
+        )
+    )
+
+   (:cleaning_up_the_kitchen_only
+        (and 
+            (ontop ?blender.n.01_1 ?countertop.n.01_1) 
+            (nextto ?soap.n.01_1 ?sink.n.01_1) 
+            (exists 
+                (?cabinet.n.01 - cabinet.n.01) 
+                (and 
+                    (inside ?vegetable_oil.n.01_1 ?cabinet.n.01) 
+                    (not 
+                        (inside ?plate.n.04_1 ?cabinet.n.01)
+                    )
+                )
+            ) 
+            (exists 
+                (?cabinet.n.01 - cabinet.n.01) 
+                (and 
+                    (inside ?plate.n.04_1 ?cabinet.n.01) 
+                    (not 
+                        (inside ?vegetable_oil.n.01_1 ?cabinet.n.01)
+                    )
+                )
+            ) 
+            (and 
+                (not 
+                    (dusty ?cabinet.n.01_1)
+                ) 
+                (not 
+                    (dusty ?cabinet.n.01_2)
+                ) 
+                (not 
+                    (dusty ?floor.n.01_1)
+                )
+            ) 
+            (not 
+                (stained ?plate.n.04_1)
+            ) 
+            (or 
+                (nextto ?rag.n.01_1 ?sink.n.01_1) 
+                (inside ?rag.n.01_1 ?sink.n.01_1)
+            ) 
+            (and 
+                (inside ?casserole.n.02_1 ?electric_refrigerator.n.01_1) 
+                (inside ?apple.n.01_1 ?electric_refrigerator.n.01_1)
+            )
+        )
+    )
+
+   (:cleaning_windows
+        (and 
+            (and 
+                (soaked ?rag.n.01_1) 
+                (soaked ?rag.n.01_2)
+            ) 
+            (and 
+                (not 
+                    (dusty ?window.n.01_1)
+                ) 
+                (not 
+                    (dusty ?window.n.01_2)
+                )
+            )
+        )
+    )
+
+   (:clearing_the_table_after_dinner
+        (and 
+            (forall 
+                (?cup.n.01 - cup.n.01) 
+                (exists 
+                    (?bucket.n.01 - bucket.n.01) 
+                    (inside ?cup.n.01 ?bucket.n.01)
+                )
+            ) 
+            (forall 
+                (?bowl.n.01 - bowl.n.01) 
+                (exists 
+                    (?bucket.n.01 - bucket.n.01) 
+                    (inside ?bowl.n.01 ?bucket.n.01)
+                )
+            ) 
+            (exists 
+                (?bucket.n.01 - bucket.n.01) 
+                (inside ?catsup.n.01_1 ?bucket.n.01)
+            )
+        )
+    )
+
+   (:collect_misplaced_items
+        (and 
+            (ontop ?gym_shoe.n.01_1 ?table.n.02_2) 
+            (ontop ?necklace.n.01_1 ?table.n.02_2) 
+            (ontop ?notebook.n.01_1 ?table.n.02_2) 
+            (forall 
+                (?sock.n.01 - sock.n.01) 
+                (ontop ?sock.n.01 ?table.n.02_2)
+            )
+        )
+    )
+
+   (:collecting_aluminum_cans
+        (and 
+            (forall 
+                (?pop.n.02 - pop.n.02) 
+                (inside ?pop.n.02 ?bucket.n.01_1)
+            )
+        )
+    )
+
+   (:defrosting_freezer
+        (and 
+            (nextto ?receptacle.n.01_1 ?electric_refrigerator.n.01_1) 
+            (nextto ?bucket.n.01_1 ?countertop.n.01_1) 
+            (ontop ?scraper.n.01_1 ?electric_refrigerator.n.01_1) 
+            (ontop ?towel.n.01_1 ?countertop.n.01_1) 
+            (inside ?rag.n.01_1 ?sink.n.01_1) 
+            (soaked ?rag.n.01_1) 
+            (forall 
+                (?food.n.02 - food.n.02) 
+                (inside ?food.n.02 ?bucket.n.01_1)
+            )
+        )
+    )
+
+   (:filling_a_Christmas_stocking
+        (and 
+            (forpairs 
+                (?stocking.n.01 - stocking.n.01) 
+                (?cube.n.05 - cube.n.05) 
+                (inside ?cube.n.05 ?stocking.n.01)
+            ) 
+            (forpairs 
+                (?stocking.n.01 - stocking.n.01) 
+                (?candy.n.01 - candy.n.01) 
+                (inside ?candy.n.01 ?stocking.n.01)
+            ) 
+            (forpairs 
+                (?stocking.n.01 - stocking.n.01) 
+                (?pen.n.01 - pen.n.01) 
+                (inside ?pen.n.01 ?stocking.n.01)
+            )
+        )
+    )
+
+   (:filling_an_Easter_basket
+        (and 
+            (forall 
+                (?basket.n.01 - basket.n.01) 
+                (ontop ?basket.n.01 ?countertop.n.01_1)
+            ) 
+            (forpairs 
+                (?basket.n.01 - basket.n.01) 
+                (?egg.n.02 - egg.n.02) 
+                (inside ?egg.n.02 ?basket.n.01)
+            ) 
+            (forpairs 
+                (?basket.n.01 - basket.n.01) 
+                (?candy.n.01 - candy.n.01) 
+                (inside ?candy.n.01 ?basket.n.01)
+            ) 
+            (exists 
+                (?basket.n.01 - basket.n.01) 
+                (and 
+                    (inside ?jewelry.n.01_1 ?basket.n.01) 
+                    (inside ?ball.n.01_1 ?basket.n.01)
+                )
+            ) 
+            (forpairs 
+                (?bow.n.08 - bow.n.08) 
+                (?basket.n.01 - basket.n.01) 
+                (or 
+                    (ontop ?bow.n.08 ?basket.n.01) 
+                    (inside ?bow.n.08 ?basket.n.01)
+                )
+            ) 
+            (forpairs 
+                (?book.n.02 - book.n.02) 
+                (?basket.n.01 - basket.n.01) 
+                (nextto ?book.n.02 ?basket.n.01)
+            )
+        )
+    )
+
+   (:installing_a_fax_machine
+        (and 
+            (ontop ?facsimile.n.02_1 ?table.n.02_1) 
+            (toggled_on ?facsimile.n.02_1)
+        )
+    )
+
+   (:installing_a_modem
+        (and 
+            (toggled_on ?modem.n.01_1) 
+            (under ?modem.n.01_1 ?table.n.02_1)
+        )
+    )
+
+   (:installing_a_printer
+        (and 
+            (ontop ?printer.n.03_1 ?table.n.02_1) 
+            (toggled_on ?printer.n.03_1)
+        )
+    )
+
+   (:installing_a_scanner
+        (and 
+            (toggled_on ?scanner.n.02_1) 
+            (under ?scanner.n.02_1 ?table.n.02_1)
+        )
+    )
+
+   (:installing_alarms
+        (and 
+            (forpairs 
+                (?alarm.n.02 - alarm.n.02) 
+                (?table.n.02 - table.n.02) 
+                (ontop ?alarm.n.02 ?table.n.02)
+            ) 
+            (forall 
+                (?alarm.n.02 - alarm.n.02) 
+                (toggled_on ?alarm.n.02)
+            )
+        )
+    )
+
+   (:laying_tile_floors
+        (and 
+            (forall 
+                (?tile.n.01 - tile.n.01) 
+                (onfloor ?tile.n.01 ?floor.n.01_2)
+            )
+        )
+    )
+
+   (:laying_wood_floors
+        (and 
+            (forall 
+                (?plywood.n.01 - plywood.n.01) 
+                (onfloor ?plywood.n.01 ?floor.n.01_2)
+            ) 
+            (forall 
+                (?plywood.n.01 - plywood.n.01) 
+                (or 
+                    (nextto ?plywood.n.01 ?plywood.n.01_1) 
+                    (nextto ?plywood.n.01 ?plywood.n.01_2) 
+                    (nextto ?plywood.n.01 ?plywood.n.01_3) 
+                    (nextto ?plywood.n.01 ?plywood.n.01_4)
+                )
+            )
+        )
+    )
+
+   (:loading_the_dishwasher
+        (and 
+            (forall 
+                (?plate.n.04 - plate.n.04) 
+                (inside ?plate.n.04 ?dishwasher.n.01_1)
+            ) 
+            (forall 
+                (?bowl.n.01 - bowl.n.01) 
+                (inside ?bowl.n.01 ?dishwasher.n.01_1)
+            ) 
+            (inside ?mug.n.04_1 ?dishwasher.n.01_1)
+        )
+    )
+
+   (:locking_every_door
+        (and 
+            (not 
+                (open ?door.n.01_1)
+            ) 
+            (not 
+                (open ?door.n.01_2)
+            )
+        )
+    )
+
+   (:locking_every_window
+        (and 
+            (not 
+                (open ?window.n.01_1)
+            ) 
+            (not 
+                (open ?window.n.01_2)
+            ) 
+            (not 
+                (open ?window.n.01_3)
+            ) 
+            (not 
+                (open ?window.n.01_4)
+            )
+        )
+    )
+
+   (:making_tea
+        (and 
+            (sliced ?lemon.n.01_1) 
+            (ontop ?teapot.n.01_1 ?stove.n.01_1) 
+            (inside ?tea_bag.n.01_1 ?teapot.n.01_1) 
+            (soaked ?tea_bag.n.01_1) 
+            (toggled_on ?stove.n.01_1)
+        )
+    )
+
+   (:mopping_floors
+        (and 
+            (not 
+                (stained ?floor.n.01_1)
+            ) 
+            (nextto ?bucket.n.01_1 ?sink.n.01_1) 
+            (inside ?soap.n.01_1 ?bucket.n.01_1) 
+            (nextto ?broom.n.01_1 ?sink.n.01_1)
+        )
+    )
+
+   (:moving_boxes_to_storage
+        (and 
+            (onfloor ?carton.n.02_1 ?floor.n.01_2)
+            (ontop ?carton.n.02_2 ?carton.n.02_1)
+        )
+    )
+
+   (:opening_packages
+        (and 
+            (forall 
+                (?package.n.02 - package.n.02) 
+                (open ?package.n.02)
+            )
+        )
+    )
+
+   (:opening_presents
+        (and 
+            (forall 
+                (?package.n.02 - package.n.02) 
+                (open ?package.n.02)
+            )
+        )
+    )
+
+   (:organizing_boxes_in_garage
+        (and 
+            (exists 
+                (?carton.n.02 - carton.n.02) 
+                (and 
+                    (forall 
+                        (?ball.n.01 - ball.n.01) 
+                        (inside ?ball.n.01 ?carton.n.02)
+                    ) 
+                    (forall 
+                        (?plate.n.04 - plate.n.04) 
+                        (inside ?plate.n.04 ?carton.n.02)
+                    ) 
+                    (inside ?saucepan.n.01_1 ?carton.n.02)
+                )
+            ) 
+            (forall 
+                (?carton.n.02 - carton.n.02) 
+                (onfloor ?carton.n.02 floor.n.01_1)
+            )
+        )
+    )
+
+   (:organizing_file_cabinet
+        (and 
+            (ontop ?marker.n.03_1 ?table.n.02_1) 
+            (forall 
+                (?document.n.01 - document.n.01) 
+                (inside ?document.n.01 ?cabinet.n.01_1)
+            ) 
+            (forall 
+                (?folder.n.02 - folder.n.02) 
+                (inside ?folder.n.02 ?cabinet.n.01_1)
+            )
+        )
+    )
+
+   (:organizing_school_stuff
+        (and 
+            (and 
+                (nextto ?folder.n.02_1 ?book.n.02_1) 
+                (nextto ?folder.n.02_1 ?backpack.n.01_1) 
+                (nextto ?book.n.02_1 ?backpack.n.01_1)
+            ) 
+            (inside ?highlighter.n.02_1 ?backpack.n.01_1) 
+            (inside ?pencil.n.01_1 ?backpack.n.01_1) 
+            (inside ?pen.n.01_1 ?backpack.n.01_1) 
+            (inside ?calculator.n.02_1 ?backpack.n.01_1) 
+            (ontop ?backpack.n.01_1 ?bed.n.01_1)
+        )
+    )
+
+   (:packing_adult_s_bags
+        (and 
+            (forall 
+                (?jewelry.n.01 - jewelry.n.01) 
+                (inside ?jewelry.n.01 ?backpack.n.01_1)
+            ) 
+            (forall 
+                (?makeup.n.01 - makeup.n.01) 
+                (inside ?makeup.n.01 ?backpack.n.01_1)
+            ) 
+            (inside ?toothbrush.n.01_1 ?backpack.n.01_1) 
+            (inside ?mouse.n.04_1 ?backpack.n.01_1) 
+            (onfloor ?backpack.n.01_1 ?floor.n.01_2)
+        )
+    )
+
+   (:packing_bags_or_suitcase
+        (and 
+            (forall 
+                (?underwear.n.01 - underwear.n.01) 
+                (inside ?underwear.n.01 ?backpack.n.01_1)
+            ) 
+            (inside ?toothbrush.n.01_1 ?backpack.n.01_1) 
+            (inside ?shampoo.n.01_1 ?backpack.n.01_1) 
+            (inside ?hardback.n.01_1 ?backpack.n.01_1) 
+            (inside ?toothpaste.n.01_1 ?backpack.n.01_1) 
+            (or 
+                (ontop ?backpack.n.01_1 ?bed.n.01_1) 
+                (onfloor ?backpack.n.01_1 ?floor.n.01_1)
+            )
+        )
+    )
+
+   (:packing_boxes_for_household_move_or_trip
+        (and 
+            (exists 
+                (?carton.n.02 - carton.n.02) 
+                (and 
+                    (forall 
+                        (?plate.n.04 - plate.n.04) 
+                        (inside ?plate.n.04 ?carton.n.02)
+                    ) 
+                    (inside ?dishtowel.n.01_1 ?carton.n.02)
+                )
+            ) 
+            (exists 
+                (?carton.n.02 - carton.n.02) 
+                (and 
+                    (forall 
+                        (?book.n.02 - book.n.02) 
+                        (inside ?book.n.02 ?carton.n.02)
+                    ) 
+                    (forall 
+                        (?shirt.n.01 - shirt.n.01) 
+                        (inside ?shirt.n.01 ?carton.n.02)
+                    ) 
+                    (inside ?sweater.n.01_1 ?carton.n.02)
+                )
+            )
+        )
+    )
+
+   (:packing_car_for_trip
+        (and 
+            (inside briefcase.n.01_1 car.n.01_1) 
+            (inside pencil_box.n.01_1 car.n.01_1) 
+            (inside headset.n.01_1 car.n.01_1) 
+            (inside duffel_bag.n.01_1 car.n.01_1)
+        )
+    )
+
+   (:packing_child_s_bag
+        (and 
+            (nextto ?backpack.n.01_1 ?bed.n.01_1) 
+            (inside ?sunglass.n.01_1 ?backpack.n.01_1) 
+            (inside ?notebook.n.01_1 ?backpack.n.01_1) 
+            (inside ?bracelet.n.02_1 ?backpack.n.01_1) 
+            (inside ?apple.n.01_1 ?backpack.n.01_1) 
+            (inside ?earphone.n.01_1 ?backpack.n.01_1)
+        )
+    )
+
+   (:packing_food_for_work
+        (and 
+            (inside ?sandwich.n.01_1 ?carton.n.02_1) 
+            (inside ?apple.n.01_1 ?carton.n.02_1) 
+            (inside ?snack_food.n.01_1 ?carton.n.02_1) 
+            (inside ?juice.n.01_1 ?carton.n.02_1) 
+            (or 
+                (onfloor ?carton.n.02_1 ?floor.n.01_1) 
+                (ontop ?carton.n.02_1 ?countertop.n.01_1)
+            )
+        )
+    )
+
+   (:packing_lunches
+        (and 
+            (forpairs 
+                (?chip.n.04 - chip.n.04) 
+                (?carton.n.02 - carton.n.02) 
+                (inside ?chip.n.04 ?carton.n.02)
+            ) 
+            (forpairs 
+                (?cookie.n.01 - cookie.n.01) 
+                (?carton.n.02 - carton.n.02) 
+                (inside ?cookie.n.01 ?carton.n.02)
+            ) 
+            (exists 
+                (?carton.n.02 - carton.n.02) 
+                (and 
+                    (inside ?salad.n.01_1 ?carton.n.02) 
+                    (inside ?juice.n.01_1 ?carton.n.02) 
+                    (not 
+                        (inside ?sandwich.n.01_1 ?carton.n.02)
+                    )
+                )
+            ) 
+            (exists 
+                (?carton.n.02 - carton.n.02) 
+                (and 
+                    (inside ?sandwich.n.01_1 ?carton.n.02) 
+                    (inside ?pop.n.02_1 ?carton.n.02) 
+                    (not 
+                        (inside ?salad.n.01_1 ?carton.n.02)
+                    )
+                )
+            ) 
+            (or 
+                (inside ?apple.n.01_1 ?carton.n.02_1) 
+                (inside ?banana.n.02_1 ?carton.n.02_1)
+            ) 
+            (or 
+                (inside ?apple.n.01_1 ?carton.n.02_2) 
+                (inside ?banana.n.02_1 ?carton.n.02_2)
+            )
+        )
+    )
+
+   (:packing_picnics
+        (and 
+            (exists 
+                (?carton.n.02 - carton.n.02) 
+                (and 
+                    (forall 
+                        (?chip.n.04 - chip.n.04) 
+                        (inside ?chip.n.04 ?carton.n.02)
+                    ) 
+                    (forall 
+                        (?sandwich.n.01 - sandwich.n.01) 
+                        (inside ?sandwich.n.01 ?carton.n.02)
+                    )
+                )
+            ) 
+            (exists 
+                (?carton.n.02 - carton.n.02) 
+                (and 
+                    (forall 
+                        (?strawberry.n.01 - strawberry.n.01) 
+                        (inside ?strawberry.n.01 ?carton.n.02)
+                    ) 
+                    (forall 
+                        (?grape.n.01 - grape.n.01) 
+                        (inside ?grape.n.01 ?carton.n.02)
+                    ) 
+                    (forall 
+                        (?peach.n.03 - peach.n.03) 
+                        (inside ?peach.n.03 ?carton.n.02)
+                    ) 
+                    (nextto ?melon.n.01_1 ?carton.n.02)
+                )
+            ) 
+            (exists 
+                (?carton.n.02 - carton.n.02) 
+                (and 
+                    (forall 
+                        (?pop.n.02 - pop.n.02) 
+                        (inside ?pop.n.02 ?carton.n.02)
+                    ) 
+                    (forall 
+                        (?beer.n.01 - beer.n.01) 
+                        (inside ?beer.n.01 ?carton.n.02)
+                    ) 
+                    (forall 
+                        (?water.n.06 - water.n.06) 
+                        (inside ?water.n.06 ?carton.n.02)
+                    )
+                )
+            )
+        )
+    )
+
+   (:picking_up_take-out_food
+        (and 
+            (forall 
+                (?carton.n.02 - carton.n.02) 
+                (ontop ?carton.n.02 ?table.n.02_1)
+            ) 
+            (inside ?sushi.n.01_1 ?carton.n.02_1) 
+            (inside ?hamburger.n.01_1 ?carton.n.02_1)
+        )
+    )
+
+   (:picking_up_trash
+        (and 
+            (forall 
+                (?pad.n.01 - pad.n.01) 
+                (inside ?pad.n.01 ?ashcan.n.01_1)
+            ) 
+            (forall 
+                (?pop.n.02 - pop.n.02) 
+                (inside ?pop.n.02 ?ashcan.n.01_1)
+            )
+        )
+    )
+
+   (:polishing_furniture
+        (and 
+            (not 
+                (dusty ?table.n.02_1)
+            ) 
+            (not 
+                (dusty ?shelf.n.01_1)
+            ) 
+            (under ?rag.n.01_1 ?table.n.02_1)
+        )
+    )
+
+   (:polishing_shoes
+        (and 
+            (nextto ?rag.n.01_1 ?sink.n.01_1) 
+            (soaked ?rag.n.01_1) 
+            (and 
+                (not 
+                    (stained ?shoe.n.01_1)
+                ) 
+                (not 
+                    (stained ?shoe.n.01_2)
+                )
+            )
+        )
+    )
+
+   (:polishing_silver
+        (and 
+            (not 
+                (dusty ?spoon.n.01_1)
+            ) 
+            (not 
+                (dusty ?spoon.n.01_2)
+            ) 
+            (not 
+                (dusty ?spoon.n.01_3)
+            ) 
+            (not 
+                (dusty ?spoon.n.01_4)
+            ) 
+            (not 
+                (inside ?rag.n.01_1 ?cabinet.n.01_1)
+            ) 
+            (inside ?spoon.n.01_1 ?cabinet.n.01_1) 
+            (inside ?spoon.n.01_2 ?cabinet.n.01_1) 
+            (inside ?spoon.n.01_3 ?cabinet.n.01_1) 
+            (inside ?spoon.n.01_4 ?cabinet.n.01_1)
+        )
+    )
+
+   (:preparing_a_shower_for_child
+        (and 
+            (onfloor ?towel.n.01_1 ?floor.n.01_1) 
+            (onfloor ?shampoo.n.01_1 ?floor.n.01_1) 
+            (nextto ?soap.n.01_1 ?sink.n.01_1)
+        )
+    )
+
+   (:preparing_salad
+        (and 
+            (forpairs 
+                (?lettuce.n.03 - lettuce.n.03) 
+                (?plate.n.04 - plate.n.04) 
+                (ontop ?lettuce.n.03 ?plate.n.04)
+            ) 
+            (forpairs 
+                (?apple.n.01 - apple.n.01) 
+                (?plate.n.04 - plate.n.04) 
+                (and 
+                    (sliced ?apple.n.01) 
+                    (ontop ?apple.n.01 ?plate.n.04)
+                )
+            ) 
+            (forpairs 
+                (?tomato.n.01 - tomato.n.01) 
+                (?plate.n.04 - plate.n.04) 
+                (and 
+                    (ontop ?tomato.n.01 ?plate.n.04) 
+                    (sliced ?tomato.n.01)
+                )
+            ) 
+            (forpairs 
+                (?radish.n.01 - radish.n.01) 
+                (?plate.n.04 - plate.n.04) 
+                (ontop ?radish.n.01 ?plate.n.04)
+            )
+        )
+    )
+
+   (:preserving_food
+        (and 
+            (forall 
+                (?strawberry.n.01 - strawberry.n.01) 
+                (sliced ?strawberry.n.01)
+            ) 
+            (forall 
+                (?strawberry.n.01 - strawberry.n.01) 
+                (cooked ?strawberry.n.01)
+            ) 
+            (forall 
+                (?strawberry.n.01 - strawberry.n.01) 
+                (inside ?strawberry.n.01 ?jar.n.01_1)
+            ) 
+            (not 
+                (open ?jar.n.01_1)
+            ) 
+            (inside ?beef.n.02_1 ?electric_refrigerator.n.01_1) 
+            (frozen ?beef.n.02_1)
+        )
+    )
+
+   (:putting_away_Christmas_decorations
+        (and 
+            (forall 
+                (?wreath.n.01 - wreath.n.01) 
+                (nextto ?wreath.n.01 ?cabinet.n.01_1)
+            ) 
+            (forall 
+                (?bow.n.08 - bow.n.08) 
+                (nextto ?bow.n.08 ?cabinet.n.01_1)
+            ) 
+            (forall 
+                (?ribbon.n.01 - ribbon.n.01) 
+                (inside ?ribbon.n.01 ?cabinet.n.01_1)
+            )
+        )
+    )
+
+   (:putting_away_Halloween_decorations
+        (and 
+            (forall 
+                (?pumpkin.n.02 - pumpkin.n.02) 
+                (inside ?pumpkin.n.02 ?cabinet.n.01_1)
+            ) 
+            (forall 
+                (?candle.n.01 - candle.n.01) 
+                (inside ?candle.n.01 ?cabinet.n.01_1)
+            ) 
+            (or 
+                (nextto ?sheet.n.03_1 ?table.n.02_1) 
+                (ontop ?sheet.n.03_1 ?table.n.02_1)
+            ) 
+            (nextto ?caldron.n.01_1 ?table.n.02_1)
+        )
+    )
+
+   (:putting_away_toys
+        (and 
+            (forall 
+                (?plaything.n.01 - plaything.n.01) 
+                (exists 
+                    (?carton.n.02 - carton.n.02) 
+                    (inside ?plaything.n.01 ?carton.n.02)
+                )
+            )
+        )
+    )
+
+   (:putting_dishes_away_after_cleaning
+        (and 
+            (exists 
+                (?cabinet.n.01 - cabinet.n.01) 
+                (forall 
+                    (?plate.n.04 - plate.n.04) 
+                    (inside ?plate.n.04 ?cabinet.n.01_1)
+                )
+            )
+        )
+    )
+
+   (:putting_leftovers_away
+        (and 
+            (forall 
+                (?pasta.n.02 - pasta.n.02) 
+                (inside ?pasta.n.02 ?electric_refrigerator.n.01_1)
+            ) 
+            (forall 
+                (?sauce.n.01 - sauce.n.01) 
+                (inside ?sauce.n.01 ?electric_refrigerator.n.01_1)
+            )
+        )
+    )
+
+   (:putting_up_Christmas_decorations_inside
+        (and 
+            (forall 
+                (?wrapping.n.01 - wrapping.n.01)
+                (or 
+                    (nextto ?wrapping.n.01 ?christmas_tree.n.05_1)
+                    (under ?wrapping.n.01 ?christmas_tree.n.05_1)
+                )
+            )
+            (forall 
+                (?candle.n.01 - candle.n.01)
+                (ontop ?candle.n.01 ?table.n.02_1)
+            )
+            (forn 
+                (1)
+                (?bow.n.08 - bow.n.08)
+                (ontop ?bow.n.08 ?table.n.02_1)
+            )
+            (forn
+                (2)
+                (?bow.n.08 - bow.n.08)
+                (ontop ?bow.n.08 ?sofa.n.01_1)
+            )
+            (ontop ?wreath.n.01_1 ?table.n.02_1)
+        )
+    )
+
+   (:re-shelving_library_books
+        (and 
+            (ontop ?book.n.02_1 ?shelf.n.01_1) 
+            (ontop ?book.n.02_2 ?shelf.n.01_1) 
+            (ontop ?book.n.02_3 ?shelf.n.01_1) 
+            (ontop ?book.n.02_4 ?shelf.n.01_1) 
+            (ontop ?book.n.02_5 ?table.n.02_1) 
+            (ontop ?book.n.02_6 ?table.n.02_1) 
+            (ontop ?book.n.02_7 ?table.n.02_1) 
+            (ontop ?book.n.02_8 ?table.n.02_1)
+        )
+    )
+
+   (:rearranging_furniture
+        (and 
+            (nextto ?lamp.n.02_1 ?door.n.01_1) 
+            (nextto ?lamp.n.02_2 ?window.n.01_1) 
+            (touching ?seat.n.03_1 ?bed.n.01_1) 
+            (nextto ?seat.n.03_2 ?window.n.01_1)
+        )
+    )
+
+   (:serving_a_meal
+        (and 
+            (forall 
+                (?plate.n.04 - plate.n.04) 
+                (ontop ?plate.n.04 ?table.n.02_1)
+            ) 
+            (forall 
+                (?knife.n.01 - knife.n.01) 
+                (ontop ?knife.n.01 ?table.n.02_1)
+            ) 
+            (forall 
+                (?fork.n.01 - fork.n.01) 
+                (ontop ?fork.n.01 ?table.n.02_1)
+            ) 
+            (forpairs 
+                (?spoon.n.01 - spoon.n.01) 
+                (?soup.n.01 - soup.n.01) 
+                (nextto ?spoon.n.01 ?soup.n.01)
+            ) 
+            (forall 
+                (?water.n.06 - water.n.06) 
+                (ontop ?water.n.06 ?table.n.02_1)
+            ) 
+            (forpairs 
+                (?chicken.n.01 - chicken.n.01) 
+                (?plate.n.04 - plate.n.04) 
+                (ontop ?chicken.n.01 ?plate.n.04)
+            ) 
+            (forpairs 
+                (?salad.n.01 - salad.n.01) 
+                (?plate.n.04 - plate.n.04) 
+                (nextto ?salad.n.01 ?plate.n.04)
+            ) 
+            (forpairs 
+                (?bread.n.01 - bread.n.01) 
+                (?plate.n.04 - plate.n.04) 
+                (nextto ?bread.n.01 ?plate.n.04)
+            ) 
+            (forpairs 
+                (?cake.n.03 - cake.n.03) 
+                (?plate.n.04 - plate.n.04) 
+                (nextto ?cake.n.03 ?plate.n.04)
+            )
+        )
+    )
+
+   (:serving_hors_d_oeuvres
+        (and 
+            (ontop ?tray.n.01_1 ?table.n.02_1) 
+            (forall 
+                (?cracker.n.01 - cracker.n.01) 
+                (ontop ?cracker.n.01 ?table.n.02_1)
+            ) 
+            (forpairs 
+                (?salad.n.01 - salad.n.01)
+                (?cracker.n.01 - cracker.n.01)
+                (nextto ?salad.n.01 ?cracker.n.01)
+            )
+            (forpairs 
+                (?cheese.n.01 - cheese.n.01) 
+                (?parsley.n.02 - parsley.n.02) 
+                (ontop ?parsley.n.02 ?cheese.n.01)
+            ) 
+        )
+    )
+
+   (:setting_mousetraps
+        (and 
+            (onfloor ?mousetrap.n.01_1 ?floor.n.01_1) 
+            (onfloor ?mousetrap.n.01_2 ?floor.n.01_1) 
+            (nextto ?mousetrap.n.01_3 ?toilet.n.02_1) 
+            (nextto ?mousetrap.n.01_4 ?toilet.n.02_1)
+        )
+    )
+
+   (:setting_up_candles
+        (and 
+            (forn 
+                (3) 
+                (?candle.n.01 - candle.n.01) 
+                (ontop ?candle.n.01 ?table.n.02_1)
+            ) 
+            (forn 
+                (3) 
+                (?candle.n.01 - candle.n.01) 
+                (ontop ?candle.n.01 ?table.n.02_2)
+            )
+        )
+    )
+
+   (:sorting_books
+        (and 
+            (forall 
+                (?hardback.n.01 - hardback.n.01) 
+                (ontop ?hardback.n.01 ?shelf.n.01_1)
+            ) 
+            (forall 
+                (?book.n.02 - book.n.02) 
+                (ontop ?book.n.02 ?shelf.n.01_1)
+            )
+        )
+    )
+
+   (:sorting_groceries
+        (and 
+            (inside ?bread.n.01_1 ?cabinet.n.01_1) 
+            (inside ?flour.n.01_1 ?cabinet.n.01_1) 
+            (and 
+                (inside ?milk.n.01_1 ?electric_refrigerator.n.01_1) 
+                (inside ?meat.n.01_1 ?electric_refrigerator.n.01_1) 
+                (inside ?cheese.n.01_1 ?electric_refrigerator.n.01_1) 
+                (inside ?yogurt.n.01_1 ?electric_refrigerator.n.01_1) 
+                (inside ?soup.n.01_1 ?electric_refrigerator.n.01_1)
+            ) 
+            (forall 
+                (?carrot.n.03 - carrot.n.03) 
+                (and 
+                    (inside ?carrot.n.03 ?electric_refrigerator.n.01_1) 
+                    (or 
+                        (nextto ?carrot.n.03 ?carrot.n.03_1) 
+                        (nextto ?carrot.n.03 ?carrot.n.03_2) 
+                        (nextto ?carrot.n.03 ?carrot.n.03_3)
+                    )
+                )
+            ) 
+            (inside ?broccoli.n.02_1 ?electric_refrigerator.n.01_1) 
+            (forall 
+                (?apple.n.01 - apple.n.01) 
+                (and 
+                    (inside ?apple.n.01 ?electric_refrigerator.n.01_1) 
+                    (or 
+                        (nextto ?apple.n.01 ?apple.n.01_1) 
+                        (nextto ?apple.n.01 ?apple.n.01_2)
+                    )
+                )
+            ) 
+            (forall 
+                (?orange.n.01 - orange.n.01) 
+                (and 
+                    (ontop ?orange.n.01 ?table.n.02_1) 
+                    (or 
+                        (nextto ?orange.n.01 ?orange.n.01_1) 
+                        (nextto ?orange.n.01 ?orange.n.01_2) 
+                        (nextto ?orange.n.01 ?orange.n.01_3)
+                    )
+                )
+            )
+        )
+    )
+
+   (:sorting_mail
+        (and 
+            (forall 
+                (?envelope.n.01 - envelope.n.01) 
+                (or 
+                    (touching ?envelope.n.01 ?envelope.n.01_1) 
+                    (touching ?envelope.n.01 ?envelope.n.01_2) 
+                    (touching ?envelope.n.01 ?envelope.n.01_3) 
+                    (touching ?envelope.n.01 ?envelope.n.01_4)
+                )
+            ) 
+            (forall 
+                (?newspaper.n.03 - newspaper.n.03) 
+                (or 
+                    (touching ?newspaper.n.03 ?newspaper.n.03_1) 
+                    (touching ?newspaper.n.03 ?newspaper.n.03_2) 
+                    (touching ?newspaper.n.03 ?newspaper.n.03_3) 
+                    (touching ?newspaper.n.03 ?newspaper.n.03_4)
+                )
+            )
+        )
+    )
+
+   (:storing_food
+        (and 
+            (inside ?oatmeal.n.01_1 ?cabinet.n.01_1) 
+            (inside ?oatmeal.n.01_2 ?cabinet.n.01_1) 
+            (inside ?chip.n.04_1 ?cabinet.n.01_1) 
+            (inside ?chip.n.04_2 ?cabinet.n.01_1) 
+            (inside ?vegetable_oil.n.01_1 ?cabinet.n.01_1) 
+            (inside ?vegetable_oil.n.01_2 ?cabinet.n.01_1) 
+            (inside ?sugar.n.01_1 ?cabinet.n.01_1) 
+            (inside ?sugar.n.01_2 ?cabinet.n.01_1)
+        )
+    )
+
+   (:storing_the_groceries
+        (and 
+            (inside ?cereal.n.03_1 ?cabinet.n.01_1) 
+            (inside ?cereal.n.03_2 ?cabinet.n.01_1) 
+            (nextto ?cereal.n.03_1 ?cereal.n.03_2) 
+            (inside ?lettuce.n.03_1 ?electric_refrigerator.n.01_1) 
+            (inside ?lettuce.n.03_2 ?electric_refrigerator.n.01_1) 
+            (nextto ?lettuce.n.03_1 ?lettuce.n.03_2) 
+            (inside ?broccoli.n.02_1 ?electric_refrigerator.n.01_1) 
+            (inside ?broccoli.n.02_2 ?electric_refrigerator.n.01_1) 
+            (nextto ?broccoli.n.02_1 ?broccoli.n.02_2) 
+            (inside ?raspberry.n.02_1 ?electric_refrigerator.n.01_1) 
+            (inside ?raspberry.n.02_2 ?electric_refrigerator.n.01_1) 
+            (nextto ?raspberry.n.02_1 ?raspberry.n.02_2) 
+            (inside ?pork.n.01_1 ?electric_refrigerator.n.01_1) 
+            (inside ?pork.n.01_2 ?electric_refrigerator.n.01_1) 
+            (nextto ?pork.n.01_1 ?pork.n.01_2)
+        )
+    )
+
+   (:thawing_frozen_food
+        (and 
+            (nextto ?date.n.08_1 ?fish.n.02_1) 
+            (nextto ?fish.n.02_1 ?sink.n.01_1) 
+            (nextto ?fish.n.02_2 ?sink.n.01_1) 
+            (nextto ?fish.n.02_3 ?sink.n.01_1) 
+            (nextto ?fish.n.02_4 ?sink.n.01_1) 
+            (nextto ?olive.n.04_1 ?sink.n.01_1)
+        )
+    )
+
+   (:throwing_away_leftovers
+        (and 
+            (forall 
+                (?hamburger.n.01 - hamburger.n.01) 
+                (inside ?hamburger.n.01 ?ashcan.n.01_1)
+            )
+        )
+    )
+
+   (:unpacking_suitcase
+        (and 
+            (onfloor ?carton.n.02_1 ?floor.n.01_1) 
+            (forall 
+                (?sock.n.01 - sock.n.01) 
+                (ontop ?sock.n.01 ?sofa.n.01_1)
+            ) 
+            (ontop ?perfume.n.02_1 ?sofa.n.01_1) 
+            (ontop ?toothbrush.n.01_1 ?sofa.n.01_1) 
+            (ontop ?notebook.n.01_1 ?sofa.n.01_1)
+        )
+    )
+
+   (:vacuuming_floors
+        (and 
+            (not 
+                (dusty ?floor.n.01_1)
+            )
+        )
+    )
+
+   (:washing_cars_or_other_vehicles
+        (and 
+            (not 
+                (dusty car.n.01_1)
+            ) 
+            (not 
+                (stained car.n.01_1)
+            )
+        )
+    )
+
+   (:washing_dishes
+        (and 
+            (forall 
+                (?plate.n.04 - plate.n.04) 
+                (not 
+                    (stained ?plate.n.04)
+                )
+            ) 
+            (not 
+                (stained ?cup.n.01_1)
+            ) 
+            (not 
+                (stained ?bowl.n.01_1)
+            )
+        )
+    )
+
+   (:washing_floor
+        (and 
+            (not 
+                (or 
+                    (dusty ?floor.n.01_1) 
+                    (stained ?floor.n.01_1)
+                )
+            )
+        )
+    )
+
+   (:washing_pots_and_pans
+        (and 
+            (forall 
+                (?pan.n.01 - pan.n.01) 
+                (and 
+                    (not 
+                        (stained ?pan.n.01)
+                    ) 
+                    (exists 
+                        (?cabinet.n.01 - cabinet.n.01) 
+                        (inside ?pan.n.01 ?cabinet.n.01)
+                    )
+                )
+            ) 
+            (forall 
+                (?kettle.n.01 - kettle.n.01) 
+                (and 
+                    (not 
+                        (stained ?kettle.n.01)
+                    ) 
+                    (exists 
+                        (?cabinet.n.01 - cabinet.n.01) 
+                        (inside ?kettle.n.01 ?cabinet.n.01)
+                    )
+                )
+            )
+            (forall 
+                (?teapot.n.01 - teapot.n.01) 
+                (and 
+                    (not 
+                        (stained ?teapot.n.01)
+                    ) 
+                    (exists 
+                        (?cabinet.n.01 - cabinet.n.01) 
+                        (inside ?teapot.n.01 ?cabinet.n.01)
+                    )
+                )
+            )
+        )
+    )
+
+   (:watering_houseplants
+        (and 
+            (forall 
+                (?pot_plant.n.01 - pot_plant.n.01) 
+                (soaked ?pot_plant.n.01)
+            )
+        )
+    )
+
+   (:waxing_cars_or_other_vehicles
+        (and 
+            (not 
+                (dusty ?vehicle.n.01_1)
+            ) 
+        )
+    )
+
+)
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../sim-alfred/" class="btn btn-neutral float-right" title="AI2THOR's Alfred">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../domain-kitchen/" class="btn btn-neutral" title="Kitchen - large universe"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../domain-kitchen/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../sim-alfred/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

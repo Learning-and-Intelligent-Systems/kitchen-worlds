@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../css/favicon.ico">
+  
+  <title>PLOI-like IOBIG [ NEW ] - LEAPdocs</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  <link href="../css/extra.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "PLOI-like IOBIG [ NEW ]";
+    var mkdocs_page_input_path = "str-iobig.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> LEAPdocs</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <p class="caption"><span class="caption-text">Project</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">LEAP Architecture</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../project-minutes/">Minutes & Notes</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Domains</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../domain-grocery/">Grocery - action costs</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../domain-kitchen/">Kitchen - large universe</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-igibson/">iGibson's BEHAVIOR</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-alfred/">AI2THOR's Alfred</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-habitat/">Habitat's Rearrangement</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Strategists</span></p>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">PLOI-like IOBIG [ NEW ]</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#influence-graph">Influence Graph</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#iobig-ignore-objects-based-on-influence-graph">IOBIG: Ignore Objects Based on Influence Graph</a>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-sdbig/">HPN-like SDBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-ipbig/">HPN-like IPBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-hpn/">HPN [ NEW ]</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Experiments</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-goals/">Num of Goal Predicates</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-objects/">Num of Objects</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-egg-recipes/">All Egg Recipes</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-two-dishes/">Two Dishes</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-planner-options/">Satisfising v.s. Optimizing</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-merged-domains/">Merged Domains</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-strategists/">Combine Strategists [ NEW ]</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Notes</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../notes-fd/">FastDownward</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Set it up</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-repository/">Set up the Repository</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-mkdocs/">Set up MkDocs</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-notes/">Editor's Notes</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">LEAPdocs</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Strategists &raquo;</li>
+        
+      
+    
+    <li>PLOI-like IOBIG [ NEW ]</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="pre-strategist-iobig">Pre-Strategist: IOBIG<a class="headerlink" href="#pre-strategist-iobig" title="Permanent link">#</a></h1>
+<h2 id="influence-graph">Influence Graph<a class="headerlink" href="#influence-graph" title="Permanent link">#</a></h2>
+<p>To prune objects and operators unrelated to the current problem, LEAP constructs Influence Graphs, analysing ungrounded operators and predicates in a domain:</p>
+<ul>
+<li>Types are represented in green triangles</li>
+<li>Objects (defined in problem and appeared in domain) are represented in orange inverted triangles</li>
+<li>Predicates are represented in ellipse boxes, with their positive forms in pink and negative forms in grey</li>
+<li>Operators are represented in rectangle boxes, with incoming edges from types, objects, preconditions, and conditions in conditional effects, and outgoing edges to effects</li>
+</ul>
+<p><img alt="influence graph" src="../imgs/influence-graph.png" /></p>
+<p>The first step of analysis involves pruning any predicates and operators that are causally unrelated to the goal:</p>
+<ul>
+<li>Predicates appeared in goal definition are marked by double octagon, while those appeared in initial state definition are marked by double circles</li>
+<li>Predicates and operators appeared in the ancestors of goal nodes are marked in blue. The other edges and nodes are pruned.</li>
+</ul>
+<h2 id="iobig-ignore-objects-based-on-influence-graph">IOBIG: Ignore Objects Based on Influence Graph<a class="headerlink" href="#iobig-ignore-objects-based-on-influence-graph" title="Permanent link">#</a></h2>
+<pre><code class="language-python">     t  run_name             var     op    axiom    plan    cost    prep    parse     search    state
+------  -----------------  -----  -----  -------  ------  ------  ------  -------  ---------  -------
+200914  obj_0,                56    932       11      48      48   0        0.472  0.0109751      177
+200917  obj_0, prep=IOBIG     56    904       11      48      48   0.013    0.496  0.0109033      177
+------  -----------------  -----  -----  -------  ------  ------  ------  -------  ---------  -------
+200918  obj_1,                61   1522       13      55      55   0        1.176  0.019095       348
+200922  obj_1, prep=IOBIG     61   1488       13      55      55   0.013    1.212  0.0204309      348
+------  -----------------  -----  -----  -------  ------  ------  ------  -------  ---------  -------
+200923  obj_2,                60   1280       13      54      54   0        0.846  0.0360807      580
+200926  obj_2, prep=IOBIG     56    904       11      48      48   0.013    0.482  0.0108716      177
+------  -----------------  -----  -----  -------  ------  ------  ------  -------  ---------  -------
+200929  obj_3,               101   2939       56      48      48   0        2.678  0.0189154      175
+200932  obj_3, prep=IOBIG     74   1804       29      48      48   0.013    1.395  0.014408       177
+------  -----------------  -----  -----  -------  ------  ------  ------  -------  ---------  -------
+200935  obj_4,               119   2849       11      63      63   0        1.656  0.067888       678
+200937  obj_4, prep=IOBIG     56    904       11      48      48   0.014    0.487  0.0107854      177
+------  -----------------  -----  -----  -------  ------  ------  ------  -------  ---------  -------
+201016  obj_5,               431  56777       11      53      53   0       36.668  0.53791        907
+201023  obj_5, prep=IOBIG     56    904       11      48      48   0.015    0.493  0.01018        177
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../str-sdbig/" class="btn btn-neutral float-right" title="HPN-like SDBIG [ NEW ]">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../sim-habitat/" class="btn btn-neutral" title="Habitat's Rearrangement"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../sim-habitat/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../str-sdbig/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../css/favicon.ico">
+  
+  <title>Merged Domains - LEAPdocs</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  <link href="../css/extra.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Merged Domains";
+    var mkdocs_page_input_path = "exp-merged-domains.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> LEAPdocs</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <p class="caption"><span class="caption-text">Project</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">LEAP Architecture</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../project-minutes/">Minutes & Notes</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Domains</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../domain-grocery/">Grocery - action costs</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../domain-kitchen/">Kitchen - large universe</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-igibson/">iGibson's BEHAVIOR</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-alfred/">AI2THOR's Alfred</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-habitat/">Habitat's Rearrangement</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Strategists</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-iobig/">PLOI-like IOBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-sdbig/">HPN-like SDBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-ipbig/">HPN-like IPBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-hpn/">HPN [ NEW ]</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Experiments</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-goals/">Num of Goal Predicates</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-objects/">Num of Objects</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-egg-recipes/">All Egg Recipes</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-two-dishes/">Two Dishes</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-planner-options/">Satisfising v.s. Optimizing</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Merged Domains</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#two-separate-domains-minimum-objects">Two separate domains + minimum objects</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#two-interdependent-domains-minimum-objects">Two interdependent domains + minimum objects</a>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-strategists/">Combine Strategists [ NEW ]</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Notes</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../notes-fd/">FastDownward</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Set it up</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-repository/">Set up the Repository</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-mkdocs/">Set up MkDocs</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-notes/">Editor's Notes</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">LEAPdocs</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Experiments &raquo;</li>
+        
+      
+    
+    <li>Merged Domains</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="merged-domains">Merged domains<a class="headerlink" href="#merged-domains" title="Permanent link">#</a></h1>
+<p><code>test_merge.sh</code> tests the increase in planning time when multiple domains are merged together.</p>
+<h2 id="two-separate-domains-minimum-objects">Two separate domains + minimum objects<a class="headerlink" href="#two-separate-domains-minimum-objects" title="Permanent link">#</a></h2>
+<ul>
+<li>timeout is 10 sec</li>
+<li><code>shop_veggies.pddl</code> has the goal of <code>(in fridge veggie1)</code></li>
+<li><code>shop_lambchop.pddl</code> has the goal of <code>(in fridge veggie1)</code> and <code>(in fridge lambchop)</code></li>
+<li>the initial state of combined domain is the initial state of both domains minus the goal of the grocery domain (<code>obj_grocery_costs+obj_extended2</code> and <code>obj_grocery_costs+obj_lambchop2</code>)</li>
+</ul>
+<pre><code class="language-python">     t  run_name                                                         var    op    axiom    plan    cost    parse       search  state
+------  -------------------------------------------------------------  -----  ----  -------  ------  ------  -------  -----------  --------
+222715  grocery_costs, shop_veggies, lama_first, obj_grocery_costs       148   392      170       8      75    0.09   0.000394     11
+222720  kitchen_extended, omelette, lama_first, obj_extended             187  2149       97      45      71    4.96   0.0258232    225
+222727  grocery_costs+kitchen_extended, omelette_extended, lama_first    366  2616      272      58     155    5.823  0.0427716    305
+------  -------------------------------------------------------------  -----  ----  -------  ------  ------  -------  -----------  --------
+222727  grocery_costs, shop_veggies, lama, obj_grocery_costs             148   392      170      18      67    0.093  0.0977727    3191
+222738  kitchen_extended, omelette, lama, obj_extended                   187  2149       97      45      64    5.057  0.137848     (&gt;4.99)
+222748  grocery_costs+kitchen_extended, omelette_extended, lama          366  2616      272      58     155    5.816  0.177432     (&gt;4.24)
+------  -------------------------------------------------------------  -----  ----  -------  ------  ------  -------  -----------  --------
+222748  grocery_costs, shop_lambchop, lama_first, obj_grocery_costs      154   395      172      22     310    0.09   0.000909792  28
+222758  kitchen_lambchop, omelette, lama_first, obj_lambchop             211  2924      110      45      71    9.227  0.0303339    225
+222808  kitchen_lambchop, lambchop, lama_first, obj_lambchop             268  3556      113      71     117    9.06   0.0622388    384
+222818  grocery_costs+kitchen_lambchop, omelette_lambchop, lama_first    445  3964      285      89     417    9.191  0.149499     942
+------  -------------------------------------------------------------  -----  ----  -------  ------  ------  -------  -----------  --------
+222819  grocery_costs, shop_lambchop, lama, obj_grocery_costs            154   395      172      27     122    0.093  0.445976     12599
+222829  kitchen_lambchop, omelette, lama, obj_lambchop                   211  2924      110      45      64    9.736  0.186976     (&gt;0.32)
+222839  kitchen_lambchop, lambchop, lama, obj_lambchop                   268  3556      113      67      98    9.154  0.26242      (&gt;0.90)
+222900  grocery_costs+kitchen_lambchop, omelette_lambchop, lama          445  3964      285     100     233    9.925  0.429303     (&gt;10.13)
+</code></pre>
+<h2 id="two-interdependent-domains-minimum-objects">Two interdependent domains + minimum objects<a class="headerlink" href="#two-interdependent-domains-minimum-objects" title="Permanent link">#</a></h2>
+<p>There're 2 ways to Make Customer Pay, each of which involves 3 combo meals, each of which includes 2 egg or lamb dishes, each of which requires purchase of different ingredients.</p>
+<ul>
+<li>timeout is 30 sec (<code>lama</code> can't finish search even when timeout is 300 sec)</li>
+<li>for simplifying the table, <code>grocery</code> is short for <code>grocery_costs.pddl</code>, <code>kitchen</code> is short for <code>kitchen.pddl</code>, </li>
+<li><code>shop_lambchop.pddl</code> has the goal of <code>(in fridge veggie1)</code> and <code>(in fridge lambchop)</code></li>
+<li>the initial state of combined domain is the initial state of both domains minus the goal of the grocery domain (<code>obj_grocery_costs+obj_happy2</code> for all problems)</li>
+</ul>
+<pre><code class="language-python">     t  run_name                                                            var    op    axiom    plan    cost    parse       search  state
+------  ----------------------------------------------------------------  -----  ----  -------  ------  ------  -------  -----------  --------
+011917  grocery, shop_lambchop_egg_veggie, lama_first, obj_grocery_costs    165   408      172      24     341    0.095   0.00105371  32
+011927  kitchen, lambchop_omelette, lama_first, obj_happy                   290  3793      123      76     126    9.48    0.103596    601
+011937  grocery+kitchen, lambchop_omelette_extended, lama_first             506  4224      299      97     458    9.657   0.170804    1042
+------  ----------------------------------------------------------------  -----  ----  -------  ------  ------  -------  -----------  --------
+011938  grocery, shop_lambchop_egg_bread, lama_first, obj_grocery_costs     164   403      176      34     493    0.095   0.00176229  55
+011948  kitchen, lambchop_hole, lama_first, obj_happy                       202  2670      117      54      88    9.519   0.0303301   217
+011958  grocery+kitchen, lambchop_hole_extended, lama_first                 418  3101      293      92     613    9.594   0.103603    675
+------  ----------------------------------------------------------------  -----  ----  -------  ------  ------  -------  -----------  --------
+011959  grocery, shop_lambchop_egg_pot, lama_first, obj_grocery_costs       160   403      172      28     401    0.093   0.00122154  38
+012009  kitchen, lambchop_poached, lama_first, obj_happy                    264  3428      123      56      93    9.563   0.0663781   446
+012019  grocery+kitchen, lambchop_poached_extended, lama_first              480  3859      299      91     501    9.551   0.224359    1247
+------  ----------------------------------------------------------------  -----  ----  -------  ------  ------  -------  -----------  --------
+012029  kitchen, customer_happy, lama_first, obj_happy                      356  4397      136      63      99    9.508   0.0676363   392
+012040  grocery+kitchen, customer_happy_extended, lama_first                572  4828      312      92     505    9.793   0.340019    1788
+------  ----------------------------------------------------------------  -----  ----  -------  ------  ------  -------  -----------  --------
+012051  kitchen, customer_pay, lama_first, obj_happy                        364  4401      143      55      92    9.554   0.0931746   552
+012101  grocery+kitchen, customer_pay_extended, lama_first                  580  4832      319      90     506    9.687   0.219314    1432
+------  ----------------------------------------------------------------  -----  ----  -------  ------  ------  -------  -----------  --------
+------  ----------------------------------------------------------------  -----  ----  -------  ------  ------  -------  -----------  --------
+012116  grocery, shop_lambchop_egg_veggie, lama, obj_grocery_costs          165   408      172      29     133    0.098  14.2988      399417
+012147  kitchen, lambchop_omelette, lama, obj_happy                         290  3793      123      67     100    9.801   0.299012    (&gt;20.25)
+012217  grocery+kitchen, lambchop_omelette_extended, lama                   506  4224      299     110     247    9.727   0.38173     (&gt;20.33)
+------  ----------------------------------------------------------------  -----  ----  -------  ------  ------  -------  -----------  --------
+012246  grocery, shop_lambchop_egg_bread, lama, obj_grocery_costs           164   403      176      36     157    0.095  27.7832      815333
+012316  kitchen, lambchop_hole, lama, obj_happy                             202  2670      117      54      88    9.729   0.183835    (&gt;20.33)
+012346  grocery+kitchen, lambchop_hole_extended, lama                       418  3101      293     100     252    9.828   0.273357    (&gt;20.23)
+------  ----------------------------------------------------------------  -----  ----  -------  ------  ------  -------  -----------  --------
+012357  grocery, shop_lambchop_egg_pot, lama, obj_grocery_costs             160   403      172      30     137    0.094  10.4946      321486
+012427  kitchen, lambchop_poached, lama, obj_happy                          264  3428      123      53      84    9.673   0.242294    (&gt;20.38)
+012458  grocery+kitchen, lambchop_poached_extended, lama                    480  3859      299      92     231    9.853   0.40539     (&gt;20.21)
+------  ----------------------------------------------------------------  -----  ----  -------  ------  ------  -------  -----------  --------
+012528  kitchen, customer_happy, lama, obj_happy                            356  4397      136      56      84    9.631   0.278214    (&gt;20.42)
+012559  grocery+kitchen, customer_happy_extended, lama                      572  4828      312     108     245    9.658   0.501497    (&gt;20.40)
+------  ----------------------------------------------------------------  -----  ----  -------  ------  ------  -------  -----------  --------
+012629  kitchen, customer_pay, lama, obj_happy                              364  4401      143      54      78    9.563   0.243385    (&gt;20.49)
+012700  grocery+kitchen, customer_pay_extended, lama                        580  4832      319     121     307    9.944   0.360204    (&gt;20.12)
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../exp-strategists/" class="btn btn-neutral float-right" title="Combine Strategists [ NEW ]">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../exp-planner-options/" class="btn btn-neutral" title="Satisfising v.s. Optimizing"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../exp-planner-options/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../exp-strategists/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

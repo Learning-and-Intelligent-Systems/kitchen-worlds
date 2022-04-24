@@ -1,0 +1,25 @@
+nav:
+    - Project:
+      - Kitchen Worlds: index.md
+      - Minutes & Notes: project-minutes.md
+      - Plans & Priorities: project-plans.md
+    - Domains:
+      - Kitchen: domain-kitchen.md
+    - Experiments:
+      - PDDLStream Baseline: exp-baseline.md
+    - Set it up:
+      - Set up the Repository: setup-repository.md
+      - Set up MkDocs: setup-mkdocs.md
+      - Editor's Notes: setup-notes.md
+
+site_name: KitchenWorlds
+theme: readthedocs
+# theme:
+#     name: null
+#     custom_dir: '/miniconda3/lib/python3.7/site-packages/mkdocs/themes/readthediary/'
+
+site_favicon: css/favicon.ico
+extra_css: [css/extra.css]
+markdown_extensions:
+    - toc:
+        permalink: "#"

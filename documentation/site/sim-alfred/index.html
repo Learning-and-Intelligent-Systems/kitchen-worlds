@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../css/favicon.ico">
+  
+  <title>AI2THOR's Alfred - LEAPdocs</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  <link href="../css/extra.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "AI2THOR's Alfred";
+    var mkdocs_page_input_path = "sim-alfred.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> LEAPdocs</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <p class="caption"><span class="caption-text">Project</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">LEAP Architecture</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../project-minutes/">Minutes & Notes</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Domains</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../domain-grocery/">Grocery - action costs</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../domain-kitchen/">Kitchen - large universe</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-igibson/">iGibson's BEHAVIOR</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">AI2THOR's Alfred</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#example-goal-definition">Example goal definition</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#pick_and_place_simple-pillow-none-armchair-225">pick_and_place_simple-Pillow-None-ArmChair-225</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#pick_and_place_with_movable_recep-fork-mug-diningtable-18">pick_and_place_with_movable_recep-Fork-Mug-DiningTable-18</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#pick_clean_then_place_in_recep-cup-none-microwave-1">pick_clean_then_place_in_recep-Cup-None-Microwave-1</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#example-problem-definition">Example problem definition</a>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-habitat/">Habitat's Rearrangement</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Strategists</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-iobig/">PLOI-like IOBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-sdbig/">HPN-like SDBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-ipbig/">HPN-like IPBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-hpn/">HPN [ NEW ]</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Experiments</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-goals/">Num of Goal Predicates</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-objects/">Num of Objects</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-egg-recipes/">All Egg Recipes</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-two-dishes/">Two Dishes</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-planner-options/">Satisfising v.s. Optimizing</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-merged-domains/">Merged Domains</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-strategists/">Combine Strategists [ NEW ]</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Notes</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../notes-fd/">FastDownward</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Set it up</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-repository/">Set up the Repository</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-mkdocs/">Set up MkDocs</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-notes/">Editor's Notes</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">LEAPdocs</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Domains &raquo;</li>
+        
+      
+    
+    <li>AI2THOR's Alfred</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="ai2thors-alfred-uw">AI2THOR's Alfred @ UW<a class="headerlink" href="#ai2thors-alfred-uw" title="Permanent link">#</a></h1>
+<p>ALFRED (Action Learning From Realistic Environments and Directives), is a new benchmark for learning a mapping from natural language instructions and egocentric vision to sequences of actions for household tasks. </p>
+<p>The ALFRED dataset contains 8k+ expert demostrations with 3 or more language annotations each. A trajectory consists of a sequence of expert actions, the corresponding image observations, and language annotations describing segments of the trajectory.</p>
+<p><img alt="Tasks in Alfred dataset" src="../imgs/tasks-alfred.png" /></p>
+<ul>
+<li>path are planned in gridspace</li>
+<li>example task videos in <a href="https://www.dropbox.com/sh/pzcqk76gwzhx2m9/AADq9Lirc5KWe7Uh6ETelnAIa?dl=0">Dropbox</a>, where image arrays are of size 300 by 300</li>
+</ul>
+<h2 id="example-goal-definition">Example goal definition<a class="headerlink" href="#example-goal-definition" title="Permanent link">#</a></h2>
+<h3 id="pick_and_place_simple-pillow-none-armchair-225">pick_and_place_simple-Pillow-None-ArmChair-225<a class="headerlink" href="#pick_and_place_simple-pillow-none-armchair-225" title="Permanent link">#</a></h3>
+<p>from file <code>full_2.1.0/train/pick_and_place_simple-Pillow-None-ArmChair-225/trial_T20190908_104554_100496/problem_0.pddl</code></p>
+<pre><code class="language-lisp">        (:goal
+            (and
+                (exists (?r - receptacle)
+                    (exists (?o - object)
+                        (and 
+                            (inReceptacle ?o ?r) 
+                            (objectType ?o PillowType) 
+                            (receptacleType ?r ArmChairType)
+                        )
+                    )
+                )
+                (forall (?re - receptacle)
+                    (not (opened ?re))
+                )
+            )
+        )
+</code></pre>
+<h3 id="pick_and_place_with_movable_recep-fork-mug-diningtable-18">pick_and_place_with_movable_recep-Fork-Mug-DiningTable-18<a class="headerlink" href="#pick_and_place_with_movable_recep-fork-mug-diningtable-18" title="Permanent link">#</a></h3>
+<p>from file <code>full_2.1.0/train/pick_and_place_with_movable_recep-Fork-Mug-DiningTable-18/trial_T20190911_012507_770604/problem_0.pddl</code></p>
+<pre><code class="language-lisp">                (:goal
+                    (and
+                        (exists (?r - receptacle)
+                            (and 
+                                (receptacleType ?r DiningTableType)
+                                (exists (?o - object)
+                                    (and
+                                        (objectType ?o ForkType)
+                                        (exists (?mo - object)
+                                            (and
+                                                (objectType ?mo MugType)
+                                                (isReceptacleObject ?mo)
+                                                (inReceptacleObject ?o ?mo)
+                                                (inReceptacle ?mo ?r)
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                        (forall (?re - receptacle)
+                            (not (opened ?re))
+                        )
+                    )
+                )
+</code></pre>
+<h3 id="pick_clean_then_place_in_recep-cup-none-microwave-1">pick_clean_then_place_in_recep-Cup-None-Microwave-1<a class="headerlink" href="#pick_clean_then_place_in_recep-cup-none-microwave-1" title="Permanent link">#</a></h3>
+<p>from file <code>full_2.1.0/train/pick_clean_then_place_in_recep-Cup-None-Microwave-1/trial_T20190909_150843_298006/problem_0.pddl</code></p>
+<pre><code class="language-lisp">        (:goal
+            (and
+                (forall (?re - receptacle)
+                    (not (opened ?re))
+                )
+                (exists (?r - receptacle)
+                    (exists (?o - object)
+                        (and 
+                            (cleanable ?o)
+                            (objectType ?o CupType) 
+                            (receptacleType ?r MicrowaveType)
+                            (isClean ?o)
+                            (inReceptacle ?o ?r) 
+                        )
+                    )
+                )
+            )
+        )
+</code></pre>
+<h2 id="example-problem-definition">Example problem definition<a class="headerlink" href="#example-problem-definition" title="Permanent link">#</a></h2>
+<p>the full problem definition from file <code>full_2.1.0/train/pick_and_place_simple-Pillow-None-ArmChair-225/trial_T20190908_104554_100496/problem_0.pddl</code></p>
+<pre><code class="language-lisp">
+(define (problem plan_0_690)
+    (:domain put_task)
+    (:metric minimize (totalCost))
+    (:objects
+        agent1 - agent
+        Statue - object
+        TissueBox - object
+        CellPhone - object
+        TeddyBear - object
+        Pot - object
+        SoapBottle - object
+        Book - object
+        SoapBar - object
+        Glassbottle - object
+        CD - object
+        Bowl - object
+        Apple - object
+        Newspaper - object
+        HousePlant - object
+        Pencil - object
+        Window - object
+        FloorLamp - object
+        WineBottle - object
+        Plunger - object
+        PepperShaker - object
+        Poster - object
+        Candle - object
+        PaperTowel - object
+        Knife - object
+        RemoteControl - object
+        Toaster - object
+        Spatula - object
+        LightSwitch - object
+        Vase - object
+        AlarmClock - object
+        SprayBottle - object
+        Television - object
+        Fork - object
+        BaseballBat - object
+        Potato - object
+        Kettle - object
+        Ladle - object
+        ShowerGlass - object
+        PaperTowelRoll - object
+        Spoon - object
+        DeskLamp - object
+        Towel - object
+        Pillow - object
+        Mirror - object
+        Lettuce - object
+        Mug - object
+        Egg - object
+        Bathtub - object
+        WateringCan - object
+        Plate - object
+        ScrubBrush - object
+        LaundryHamperLid - object
+        Watch - object
+        Painting - object
+        TennisRacket - object
+        Tomato - object
+        DishSponge - object
+        Curtains - object
+        ToiletPaper - object
+        Cup - object
+        Chair - object
+        ToiletPaperRoll - object
+        Blinds - object
+        Cloth - object
+        BasketBall - object
+        Sink - object
+        Pen - object
+        Pan - object
+        KeyChain - object
+        ShowerDoor - object
+        Footstool - object
+        HandTowel - object
+        Laptop - object
+        Boots - object
+        ButterKnife - object
+        StoveKnob - object
+        CreditCard - object
+        SaltShaker - object
+        Bread - object
+        Box - object
+        StatueType - otype
+        TissueBoxType - otype
+        CellPhoneType - otype
+        TeddyBearType - otype
+        PotType - otype
+        SoapBottleType - otype
+        BookType - otype
+        SoapBarType - otype
+        GlassbottleType - otype
+        CDType - otype
+        BowlType - otype
+        AppleType - otype
+        NewspaperType - otype
+        HousePlantType - otype
+        PencilType - otype
+        WindowType - otype
+        FloorLampType - otype
+        WineBottleType - otype
+        PlungerType - otype
+        PepperShakerType - otype
+        PosterType - otype
+        CandleType - otype
+        PaperTowelType - otype
+        KnifeType - otype
+        RemoteControlType - otype
+        ToasterType - otype
+        SpatulaType - otype
+        LightSwitchType - otype
+        VaseType - otype
+        AlarmClockType - otype
+        SprayBottleType - otype
+        TelevisionType - otype
+        ForkType - otype
+        BaseballBatType - otype
+        PotatoType - otype
+        KettleType - otype
+        LadleType - otype
+        ShowerGlassType - otype
+        PaperTowelRollType - otype
+        SpoonType - otype
+        DeskLampType - otype
+        TowelType - otype
+        PillowType - otype
+        MirrorType - otype
+        LettuceType - otype
+        MugType - otype
+        EggType - otype
+        BathtubType - otype
+        WateringCanType - otype
+        PlateType - otype
+        ScrubBrushType - otype
+        LaundryHamperLidType - otype
+        WatchType - otype
+        PaintingType - otype
+        TennisRacketType - otype
+        TomatoType - otype
+        DishSpongeType - otype
+        CurtainsType - otype
+        ToiletPaperType - otype
+        CupType - otype
+        ChairType - otype
+        ToiletPaperRollType - otype
+        BlindsType - otype
+        ClothType - otype
+        BasketBallType - otype
+        SinkType - otype
+        PenType - otype
+        PanType - otype
+        KeyChainType - otype
+        ShowerDoorType - otype
+        FootstoolType - otype
+        HandTowelType - otype
+        LaptopType - otype
+        BootsType - otype
+        ButterKnifeType - otype
+        StoveKnobType - otype
+        CreditCardType - otype
+        SaltShakerType - otype
+        BreadType - otype
+        BoxType - otype
+        CartType - rtype
+        SideTableType - rtype
+        LaundryHamperType - rtype
+        ShelfType - rtype
+        DresserType - rtype
+        MicrowaveType - rtype
+        SinkBasinType - rtype
+        HandTowelHolderType - rtype
+        StoveBurnerType - rtype
+        ArmChairType - rtype
+        ToiletType - rtype
+        CounterTopType - rtype
+        BathtubBasinType - rtype
+        CoffeeTableType - rtype
+        DrawerType - rtype
+        BedType - rtype
+        DiningTableType - rtype
+        SofaType - rtype
+        OttomanType - rtype
+        CabinetType - rtype
+        CoffeeMachineType - rtype
+        DeskType - rtype
+        GarbageCanType - rtype
+        SafeType - rtype
+        ToiletPaperHangerType - rtype
+        FridgeType - rtype
+        TowelHolderType - rtype
+
+
+        Pillow__minus_17_dot_697546_comma__minus_17_dot_697546_comma_9_dot_57340716_comma_9_dot_57340716_comma_1_dot_9374274_comma_1_dot_9374274 - object
+        Pillow__minus_9_dot_48670484_comma__minus_9_dot_48670484_comma_17_dot_64955328_comma_17_dot_64955328_comma_1_dot_937426_comma_1_dot_937426 - object
+        Sofa__minus_8_dot_5_comma__minus_8_dot_5_comma_18_dot_232_comma_18_dot_232_comma__minus_0_dot_016_comma__minus_0_dot_016 - receptacle
+        Sofa__minus_18_dot_28_comma__minus_18_dot_28_comma_7_dot_6_comma_7_dot_6_comma__minus_0_dot_016_comma__minus_0_dot_016 - receptacle
+        SideTable__minus_18_dot_452_comma__minus_18_dot_452_comma_13_dot_3852_comma_13_dot_3852_comma_0_dot_024_comma_0_dot_024 - receptacle
+        CoffeeTable__minus_7_dot_892_comma__minus_7_dot_892_comma_10_dot_4616_comma_10_dot_4616_comma_0_dot_0084_comma_0_dot_0084 - receptacle
+        Drawer__minus_17_dot_733296_comma__minus_17_dot_733296_comma_13_dot_37799932_comma_13_dot_37799932_comma_1_dot_8938998_comma_1_dot_8938998 - receptacle
+        Shelf__minus_1_dot_85999584_comma__minus_1_dot_85999584_comma_12_dot_15600204_comma_12_dot_15600204_comma_0_dot_6968_comma_0_dot_6968 - receptacle
+        Shelf__minus_1_dot_346000672_comma__minus_1_dot_346000672_comma_10_dot_696_comma_10_dot_696_comma_0_dot_7032_comma_0_dot_7032 - receptacle
+        Shelf__minus_1_dot_85999584_comma__minus_1_dot_85999584_comma_12_dot_15600204_comma_12_dot_15600204_comma_1_dot_6748_comma_1_dot_6748 - receptacle
+        Shelf__minus_1_dot_846003892_comma__minus_1_dot_846003892_comma_9_dot_21560192_comma_9_dot_21560192_comma_1_dot_9108_comma_1_dot_9108 - receptacle
+        Shelf__minus_1_dot_860004_comma__minus_1_dot_860004_comma_9_dot_21760176_comma_9_dot_21760176_comma_0_dot_7012_comma_0_dot_7012 - receptacle
+        Shelf__minus_1_dot_85999584_comma__minus_1_dot_85999584_comma_12_dot_15600204_comma_12_dot_15600204_comma_2_dot_2752_comma_2_dot_2752 - receptacle
+        GarbageCan__minus_0_dot_90916252_comma__minus_0_dot_90916252_comma_19_dot_11539076_comma_19_dot_11539076_comma_0_dot_023272708_comma_0_dot_023272708 - receptacle
+        ArmChair__minus_3_dot_504_comma__minus_3_dot_504_comma_2_dot_264_comma_2_dot_264_comma__minus_0_dot_1316_comma__minus_0_dot_1316 - receptacle
+        loc_bar__minus_10_bar_13_bar_0_bar_45 - location
+        loc_bar__minus_5_bar_10_bar_1_bar_60 - location
+        loc_bar__minus_5_bar_13_bar_1_bar_60 - location
+        loc_bar__minus_9_bar_15_bar_0_bar_60 - location
+        loc_bar__minus_17_bar_17_bar_2_bar_60 - location
+        loc_bar__minus_6_bar_8_bar_1_bar_45 - location
+        loc_bar__minus_4_bar_7_bar_2_bar_60 - location
+        loc_bar__minus_14_bar_11_bar_3_bar_45 - location
+        loc_bar__minus_4_bar_11_bar_3_bar_60 - location
+        loc_bar__minus_13_bar_8_bar_3_bar_45 - location
+        loc_bar__minus_6_bar_14_bar_1_bar_45 - location
+        loc_bar__minus_15_bar_10_bar_3_bar_60 - location
+        loc_bar__minus_1_bar_17_bar_0_bar_60 - location
+        loc_bar__minus_6_bar_14_bar_1_bar_60 - location
+        loc_bar__minus_7_bar_15_bar_0_bar_60 - location
+        loc_bar__minus_6_bar_7_bar_1_bar_60 - location
+        loc_bar__minus_10_bar_9_bar_2_bar_30 - location
+        )
+
+
+    (:init
+        (= (totalCost) 0)
+        (canContain ToiletType DishSpongeType)
+        (canContain ToiletType TissueBoxType)
+        (canContain ToiletType ClothType)
+        (canContain ToiletType SoapBottleType)
+        (canContain ToiletType SoapBarType)
+        (canContain ToiletType SprayBottleType)
+        (canContain ToiletType HandTowelType)
+        (canContain ToiletType NewspaperType)
+        (canContain ToiletType PaperTowelType)
+        (canContain ToiletType ToiletPaperType)
+        (canContain ToiletType CandleType)
+        (canContain ToiletType ToiletPaperRollType)
+        (canContain CounterTopType TissueBoxType)
+        (canContain CounterTopType CellPhoneType)
+        (canContain CounterTopType PotType)
+        (canContain CounterTopType SoapBottleType)
+        (canContain CounterTopType SoapBarType)
+        (canContain CounterTopType GlassbottleType)
+        (canContain CounterTopType BookType)
+        (canContain CounterTopType CDType)
+        (canContain CounterTopType BowlType)
+        (canContain CounterTopType AppleType)
+        (canContain CounterTopType NewspaperType)
+        (canContain CounterTopType PencilType)
+        (canContain CounterTopType WineBottleType)
+        (canContain CounterTopType PepperShakerType)
+        (canContain CounterTopType CandleType)
+        (canContain CounterTopType PaperTowelType)
+        (canContain CounterTopType KnifeType)
+        (canContain CounterTopType RemoteControlType)
+        (canContain CounterTopType SpatulaType)
+        (canContain CounterTopType AlarmClockType)
+        (canContain CounterTopType VaseType)
+        (canContain CounterTopType SprayBottleType)
+        (canContain CounterTopType BreadType)
+        (canContain CounterTopType ForkType)
+        (canContain CounterTopType BaseballBatType)
+        (canContain CounterTopType PotatoType)
+        (canContain CounterTopType KettleType)
+        (canContain CounterTopType LadleType)
+        (canContain CounterTopType SpoonType)
+        (canContain CounterTopType LettuceType)
+        (canContain CounterTopType MugType)
+        (canContain CounterTopType WateringCanType)
+        (canContain CounterTopType EggType)
+        (canContain CounterTopType PlateType)
+        (canContain CounterTopType WatchType)
+        (canContain CounterTopType TennisRacketType)
+        (canContain CounterTopType TomatoType)
+        (canContain CounterTopType DishSpongeType)
+        (canContain CounterTopType ToiletPaperType)
+        (canContain CounterTopType BoxType)
+        (canContain CounterTopType ToiletPaperRollType)
+        (canContain CounterTopType CupType)
+        (canContain CounterTopType PenType)
+        (canContain CounterTopType ClothType)
+        (canContain CounterTopType BasketBallType)
+        (canContain CounterTopType PanType)
+        (canContain CounterTopType KeyChainType)
+        (canContain CounterTopType HandTowelType)
+        (canContain CounterTopType ButterKnifeType)
+        (canContain CounterTopType LaptopType)
+        (canContain CounterTopType CreditCardType)
+        (canContain CounterTopType SaltShakerType)
+        (canContain CounterTopType StatueType)
+        (canContain SideTableType TissueBoxType)
+        (canContain SideTableType CellPhoneType)
+        (canContain SideTableType PotType)
+        (canContain SideTableType SoapBottleType)
+        (canContain SideTableType SoapBarType)
+        (canContain SideTableType GlassbottleType)
+        (canContain SideTableType BookType)
+        (canContain SideTableType CDType)
+        (canContain SideTableType BowlType)
+        (canContain SideTableType AppleType)
+        (canContain SideTableType NewspaperType)
+        (canContain SideTableType PencilType)
+        (canContain SideTableType WineBottleType)
+        (canContain SideTableType PepperShakerType)
+        (canContain SideTableType CandleType)
+        (canContain SideTableType PaperTowelType)
+        (canContain SideTableType KnifeType)
+        (canContain SideTableType RemoteControlType)
+        (canContain SideTableType SpatulaType)
+        (canContain SideTableType AlarmClockType)
+        (canContain SideTableType VaseType)
+        (canContain SideTableType SprayBottleType)
+        (canContain SideTableType BreadType)
+        (canContain SideTableType ForkType)
+        (canContain SideTableType BaseballBatType)
+        (canContain SideTableType PotatoType)
+        (canContain SideTableType KettleType)
+        (canContain SideTableType LadleType)
+        (canContain SideTableType SpoonType)
+        (canContain SideTableType LettuceType)
+        (canContain SideTableType MugType)
+        (canContain SideTableType WateringCanType)
+        (canContain SideTableType EggType)
+        (canContain SideTableType PlateType)
+        (canContain SideTableType WatchType)
+        (canContain SideTableType TennisRacketType)
+        (canContain SideTableType TomatoType)
+        (canContain SideTableType DishSpongeType)
+        (canContain SideTableType ToiletPaperType)
+        (canContain SideTableType BoxType)
+        (canContain SideTableType ToiletPaperRollType)
+        (canContain SideTableType CupType)
+        (canContain SideTableType PenType)
+        (canContain SideTableType ClothType)
+        (canContain SideTableType BasketBallType)
+        (canContain SideTableType PanType)
+        (canContain SideTableType KeyChainType)
+        (canContain SideTableType HandTowelType)
+        (canContain SideTableType ButterKnifeType)
+        (canContain SideTableType LaptopType)
+        (canContain SideTableType CreditCardType)
+        (canContain SideTableType SaltShakerType)
+        (canContain SideTableType StatueType)
+        (canContain BathtubBasinType DishSpongeType)
+        (canContain BathtubBasinType SoapBarType)
+        (canContain BathtubBasinType ClothType)
+        (canContain BathtubBasinType HandTowelType)
+        (canContain DrawerType TissueBoxType)
+        (canContain DrawerType CellPhoneType)
+        (canContain DrawerType SoapBottleType)
+        (canContain DrawerType BookType)
+        (canContain DrawerType SoapBarType)
+        (canContain DrawerType CDType)
+        (canContain DrawerType NewspaperType)
+        (canContain DrawerType PencilType)
+        (canContain DrawerType PepperShakerType)
+        (canContain DrawerType CandleType)
+        (canContain DrawerType KnifeType)
+        (canContain DrawerType RemoteControlType)
+        (canContain DrawerType SpatulaType)
+        (canContain DrawerType SprayBottleType)
+        (canContain DrawerType ForkType)
+        (canContain DrawerType LadleType)
+        (canContain DrawerType SpoonType)
+        (canContain DrawerType WateringCanType)
+        (canContain DrawerType WatchType)
+        (canContain DrawerType DishSpongeType)
+        (canContain DrawerType ToiletPaperType)
+        (canContain DrawerType ToiletPaperRollType)
+        (canContain DrawerType PenType)
+        (canContain DrawerType ClothType)
+        (canContain DrawerType KeyChainType)
+        (canContain DrawerType HandTowelType)
+        (canContain DrawerType ButterKnifeType)
+        (canContain DrawerType CreditCardType)
+        (canContain DrawerType SaltShakerType)
+        (canContain LaundryHamperType ClothType)
+        (canContain BedType CellPhoneType)
+        (canContain BedType BasketBallType)
+        (canContain BedType BookType)
+        (canContain BedType BaseballBatType)
+        (canContain BedType LaptopType)
+        (canContain BedType TennisRacketType)
+        (canContain BedType NewspaperType)
+        (canContain BedType PillowType)
+        (canContain DiningTableType TissueBoxType)
+        (canContain DiningTableType CellPhoneType)
+        (canContain DiningTableType PotType)
+        (canContain DiningTableType SoapBottleType)
+        (canContain DiningTableType SoapBarType)
+        (canContain DiningTableType GlassbottleType)
+        (canContain DiningTableType BookType)
+        (canContain DiningTableType CDType)
+        (canContain DiningTableType BowlType)
+        (canContain DiningTableType AppleType)
+        (canContain DiningTableType NewspaperType)
+        (canContain DiningTableType PencilType)
+        (canContain DiningTableType WineBottleType)
+        (canContain DiningTableType PepperShakerType)
+        (canContain DiningTableType CandleType)
+        (canContain DiningTableType PaperTowelType)
+        (canContain DiningTableType KnifeType)
+        (canContain DiningTableType RemoteControlType)
+        (canContain DiningTableType SpatulaType)
+        (canContain DiningTableType AlarmClockType)
+        (canContain DiningTableType VaseType)
+        (canContain DiningTableType SprayBottleType)
+        (canContain DiningTableType BreadType)
+        (canContain DiningTableType ForkType)
+        (canContain DiningTableType BaseballBatType)
+        (canContain DiningTableType PotatoType)
+        (canContain DiningTableType KettleType)
+        (canContain DiningTableType LadleType)
+        (canContain DiningTableType SpoonType)
+        (canContain DiningTableType LettuceType)
+        (canContain DiningTableType MugType)
+        (canContain DiningTableType WateringCanType)
+        (canContain DiningTableType EggType)
+        (canContain DiningTableType PlateType)
+        (canContain DiningTableType WatchType)
+        (canContain DiningTableType TennisRacketType)
+        (canContain DiningTableType TomatoType)
+        (canContain DiningTableType DishSpongeType)
+        (canContain DiningTableType ToiletPaperType)
+        (canContain DiningTableType BoxType)
+        (canContain DiningTableType ToiletPaperRollType)
+        (canContain DiningTableType CupType)
+        (canContain DiningTableType PenType)
+        (canContain DiningTableType ClothType)
+        (canContain DiningTableType BasketBallType)
+        (canContain DiningTableType PanType)
+        (canContain DiningTableType KeyChainType)
+        (canContain DiningTableType HandTowelType)
+        (canContain DiningTableType ButterKnifeType)
+        (canContain DiningTableType LaptopType)
+        (canContain DiningTableType CreditCardType)
+        (canContain DiningTableType SaltShakerType)
+        (canContain DiningTableType StatueType)
+        (canContain SofaType ClothType)
+        (canContain SofaType RemoteControlType)
+        (canContain SofaType CellPhoneType)
+        (canContain SofaType BasketBallType)
+        (canContain SofaType BookType)
+        (canContain SofaType KeyChainType)
+        (canContain SofaType LaptopType)
+        (canContain SofaType NewspaperType)
+        (canContain SofaType CreditCardType)
+        (canContain SofaType PillowType)
+        (canContain SofaType BoxType)
+        (canContain ShelfType TissueBoxType)
+        (canContain ShelfType CellPhoneType)
+        (canContain ShelfType PotType)
+        (canContain ShelfType SoapBottleType)
+        (canContain ShelfType GlassbottleType)
+        (canContain ShelfType SoapBarType)
+        (canContain ShelfType BookType)
+        (canContain ShelfType CDType)
+        (canContain ShelfType BowlType)
+        (canContain ShelfType NewspaperType)
+        (canContain ShelfType PencilType)
+        (canContain ShelfType WineBottleType)
+        (canContain ShelfType PepperShakerType)
+        (canContain ShelfType CandleType)
+        (canContain ShelfType PaperTowelType)
+        (canContain ShelfType RemoteControlType)
+        (canContain ShelfType AlarmClockType)
+        (canContain ShelfType VaseType)
+        (canContain ShelfType SprayBottleType)
+        (canContain ShelfType KettleType)
+        (canContain ShelfType MugType)
+        (canContain ShelfType WateringCanType)
+        (canContain ShelfType PlateType)
+        (canContain ShelfType WatchType)
+        (canContain ShelfType DishSpongeType)
+        (canContain ShelfType ToiletPaperType)
+        (canContain ShelfType ToiletPaperRollType)
+        (canContain ShelfType CupType)
+        (canContain ShelfType PenType)
+        (canContain ShelfType ClothType)
+        (canContain ShelfType KeyChainType)
+        (canContain ShelfType HandTowelType)
+        (canContain ShelfType CreditCardType)
+        (canContain ShelfType SaltShakerType)
+        (canContain ShelfType StatueType)
+        (canContain ShelfType BoxType)
+        (canContain OttomanType ClothType)
+        (canContain OttomanType RemoteControlType)
+        (canContain OttomanType CellPhoneType)
+        (canContain OttomanType BasketBallType)
+        (canContain OttomanType BookType)
+        (canContain OttomanType KeyChainType)
+        (canContain OttomanType LaptopType)
+        (canContain OttomanType NewspaperType)
+        (canContain OttomanType CreditCardType)
+        (canContain OttomanType PillowType)
+        (canContain OttomanType BoxType)
+        (canContain DresserType TissueBoxType)
+        (canContain DresserType CellPhoneType)
+        (canContain DresserType GlassbottleType)
+        (canContain DresserType BookType)
+        (canContain DresserType CDType)
+        (canContain DresserType BowlType)
+        (canContain DresserType NewspaperType)
+        (canContain DresserType PencilType)
+        (canContain DresserType WineBottleType)
+        (canContain DresserType CandleType)
+        (canContain DresserType RemoteControlType)
+        (canContain DresserType AlarmClockType)
+        (canContain DresserType VaseType)
+        (canContain DresserType SprayBottleType)
+        (canContain DresserType MugType)
+        (canContain DresserType WateringCanType)
+        (canContain DresserType PlateType)
+        (canContain DresserType WatchType)
+        (canContain DresserType TennisRacketType)
+        (canContain DresserType ToiletPaperType)
+        (canContain DresserType CupType)
+        (canContain DresserType ToiletPaperRollType)
+        (canContain DresserType PenType)
+        (canContain DresserType ClothType)
+        (canContain DresserType BasketBallType)
+        (canContain DresserType KeyChainType)
+        (canContain DresserType LaptopType)
+        (canContain DresserType CreditCardType)
+        (canContain DresserType StatueType)
+        (canContain DresserType BoxType)
+        (canContain MicrowaveType MugType)
+        (canContain MicrowaveType EggType)
+        (canContain MicrowaveType PlateType)
+        (canContain MicrowaveType GlassbottleType)
+        (canContain MicrowaveType BreadType)
+        (canContain MicrowaveType PotatoType)
+        (canContain MicrowaveType BowlType)
+        (canContain MicrowaveType TomatoType)
+        (canContain MicrowaveType AppleType)
+        (canContain MicrowaveType CupType)
+        (canContain CartType MugType)
+        (canContain CartType DishSpongeType)
+        (canContain CartType TissueBoxType)
+        (canContain CartType ClothType)
+        (canContain CartType SoapBottleType)
+        (canContain CartType VaseType)
+        (canContain CartType SoapBarType)
+        (canContain CartType SprayBottleType)
+        (canContain CartType HandTowelType)
+        (canContain CartType PaperTowelType)
+        (canContain CartType PlungerType)
+        (canContain CartType ToiletPaperType)
+        (canContain CartType StatueType)
+        (canContain CartType CandleType)
+        (canContain CartType ToiletPaperRollType)
+        (canContain SafeType CellPhoneType)
+        (canContain SafeType VaseType)
+        (canContain SafeType KeyChainType)
+        (canContain SafeType WatchType)
+        (canContain SafeType CDType)
+        (canContain SafeType CreditCardType)
+        (canContain SafeType StatueType)
+        (canContain CabinetType TissueBoxType)
+        (canContain CabinetType PotType)
+        (canContain CabinetType SoapBottleType)
+        (canContain CabinetType GlassbottleType)
+        (canContain CabinetType SoapBarType)
+        (canContain CabinetType BookType)
+        (canContain CabinetType CDType)
+        (canContain CabinetType BowlType)
+        (canContain CabinetType NewspaperType)
+        (canContain CabinetType WineBottleType)
+        (canContain CabinetType PlungerType)
+        (canContain CabinetType PepperShakerType)
+        (canContain CabinetType CandleType)
+        (canContain CabinetType VaseType)
+        (canContain CabinetType SprayBottleType)
+        (canContain CabinetType KettleType)
+        (canContain CabinetType LadleType)
+        (canContain CabinetType MugType)
+        (canContain CabinetType WateringCanType)
+        (canContain CabinetType PlateType)
+        (canContain CabinetType DishSpongeType)
+        (canContain CabinetType ToiletPaperType)
+        (canContain CabinetType ToiletPaperRollType)
+        (canContain CabinetType CupType)
+        (canContain CabinetType ClothType)
+        (canContain CabinetType PanType)
+        (canContain CabinetType HandTowelType)
+        (canContain CabinetType SaltShakerType)
+        (canContain CabinetType BoxType)
+        (canContain CoffeeMachineType MugType)
+        (canContain DeskType TissueBoxType)
+        (canContain DeskType CellPhoneType)
+        (canContain DeskType SoapBottleType)
+        (canContain DeskType GlassbottleType)
+        (canContain DeskType BookType)
+        (canContain DeskType CDType)
+        (canContain DeskType BowlType)
+        (canContain DeskType NewspaperType)
+        (canContain DeskType PencilType)
+        (canContain DeskType WineBottleType)
+        (canContain DeskType CandleType)
+        (canContain DeskType RemoteControlType)
+        (canContain DeskType AlarmClockType)
+        (canContain DeskType VaseType)
+        (canContain DeskType SprayBottleType)
+        (canContain DeskType MugType)
+        (canContain DeskType WateringCanType)
+        (canContain DeskType PlateType)
+        (canContain DeskType WatchType)
+        (canContain DeskType TennisRacketType)
+        (canContain DeskType ToiletPaperType)
+        (canContain DeskType CupType)
+        (canContain DeskType ToiletPaperRollType)
+        (canContain DeskType PenType)
+        (canContain DeskType ClothType)
+        (canContain DeskType BasketBallType)
+        (canContain DeskType KeyChainType)
+        (canContain DeskType LaptopType)
+        (canContain DeskType CreditCardType)
+        (canContain DeskType StatueType)
+        (canContain DeskType BoxType)
+        (canContain GarbageCanType TissueBoxType)
+        (canContain GarbageCanType SoapBottleType)
+        (canContain GarbageCanType SoapBarType)
+        (canContain GarbageCanType CDType)
+        (canContain GarbageCanType AppleType)
+        (canContain GarbageCanType NewspaperType)
+        (canContain GarbageCanType PencilType)
+        (canContain GarbageCanType WineBottleType)
+        (canContain GarbageCanType PaperTowelType)
+        (canContain GarbageCanType SprayBottleType)
+        (canContain GarbageCanType PotatoType)
+        (canContain GarbageCanType LettuceType)
+        (canContain GarbageCanType EggType)
+        (canContain GarbageCanType TomatoType)
+        (canContain GarbageCanType DishSpongeType)
+        (canContain GarbageCanType ToiletPaperType)
+        (canContain GarbageCanType ToiletPaperRollType)
+        (canContain GarbageCanType PenType)
+        (canContain GarbageCanType ClothType)
+        (canContain GarbageCanType HandTowelType)
+        (canContain GarbageCanType BreadType)
+        (canContain HandTowelHolderType HandTowelType)
+        (canContain SinkBasinType PotType)
+        (canContain SinkBasinType SoapBarType)
+        (canContain SinkBasinType GlassbottleType)
+        (canContain SinkBasinType BowlType)
+        (canContain SinkBasinType AppleType)
+        (canContain SinkBasinType KnifeType)
+        (canContain SinkBasinType SpatulaType)
+        (canContain SinkBasinType ForkType)
+        (canContain SinkBasinType PotatoType)
+        (canContain SinkBasinType KettleType)
+        (canContain SinkBasinType LadleType)
+        (canContain SinkBasinType SpoonType)
+        (canContain SinkBasinType LettuceType)
+        (canContain SinkBasinType MugType)
+        (canContain SinkBasinType EggType)
+        (canContain SinkBasinType PlateType)
+        (canContain SinkBasinType TomatoType)
+        (canContain SinkBasinType DishSpongeType)
+        (canContain SinkBasinType CupType)
+        (canContain SinkBasinType ClothType)
+        (canContain SinkBasinType PanType)
+        (canContain SinkBasinType HandTowelType)
+        (canContain SinkBasinType ButterKnifeType)
+        (canContain StoveBurnerType PanType)
+        (canContain StoveBurnerType KettleType)
+        (canContain StoveBurnerType PotType)
+        (canContain CoffeeTableType TissueBoxType)
+        (canContain CoffeeTableType CellPhoneType)
+        (canContain CoffeeTableType PotType)
+        (canContain CoffeeTableType SoapBottleType)
+        (canContain CoffeeTableType SoapBarType)
+        (canContain CoffeeTableType GlassbottleType)
+        (canContain CoffeeTableType BookType)
+        (canContain CoffeeTableType CDType)
+        (canContain CoffeeTableType BowlType)
+        (canContain CoffeeTableType AppleType)
+        (canContain CoffeeTableType NewspaperType)
+        (canContain CoffeeTableType PencilType)
+        (canContain CoffeeTableType WineBottleType)
+        (canContain CoffeeTableType PepperShakerType)
+        (canContain CoffeeTableType CandleType)
+        (canContain CoffeeTableType PaperTowelType)
+        (canContain CoffeeTableType KnifeType)
+        (canContain CoffeeTableType RemoteControlType)
+        (canContain CoffeeTableType SpatulaType)
+        (canContain CoffeeTableType AlarmClockType)
+        (canContain CoffeeTableType VaseType)
+        (canContain CoffeeTableType SprayBottleType)
+        (canContain CoffeeTableType BreadType)
+        (canContain CoffeeTableType ForkType)
+        (canContain CoffeeTableType BaseballBatType)
+        (canContain CoffeeTableType PotatoType)
+        (canContain CoffeeTableType KettleType)
+        (canContain CoffeeTableType LadleType)
+        (canContain CoffeeTableType SpoonType)
+        (canContain CoffeeTableType LettuceType)
+        (canContain CoffeeTableType MugType)
+        (canContain CoffeeTableType WateringCanType)
+        (canContain CoffeeTableType EggType)
+        (canContain CoffeeTableType PlateType)
+        (canContain CoffeeTableType WatchType)
+        (canContain CoffeeTableType TennisRacketType)
+        (canContain CoffeeTableType TomatoType)
+        (canContain CoffeeTableType DishSpongeType)
+        (canContain CoffeeTableType ToiletPaperType)
+        (canContain CoffeeTableType BoxType)
+        (canContain CoffeeTableType ToiletPaperRollType)
+        (canContain CoffeeTableType CupType)
+        (canContain CoffeeTableType PenType)
+        (canContain CoffeeTableType ClothType)
+        (canContain CoffeeTableType BasketBallType)
+        (canContain CoffeeTableType PanType)
+        (canContain CoffeeTableType KeyChainType)
+        (canContain CoffeeTableType HandTowelType)
+        (canContain CoffeeTableType ButterKnifeType)
+        (canContain CoffeeTableType LaptopType)
+        (canContain CoffeeTableType CreditCardType)
+        (canContain CoffeeTableType SaltShakerType)
+        (canContain CoffeeTableType StatueType)
+        (canContain ToiletPaperHangerType ToiletPaperType)
+        (canContain ToiletPaperHangerType ToiletPaperRollType)
+        (canContain FridgeType MugType)
+        (canContain FridgeType EggType)
+        (canContain FridgeType PotType)
+        (canContain FridgeType PlateType)
+        (canContain FridgeType PanType)
+        (canContain FridgeType GlassbottleType)
+        (canContain FridgeType BreadType)
+        (canContain FridgeType PotatoType)
+        (canContain FridgeType BowlType)
+        (canContain FridgeType TomatoType)
+        (canContain FridgeType AppleType)
+        (canContain FridgeType WineBottleType)
+        (canContain FridgeType LettuceType)
+        (canContain FridgeType CupType)
+        (canContain TowelHolderType TowelType)
+
+
+        (receptacleType Sofa__minus_8_dot_5_comma__minus_8_dot_5_comma_18_dot_232_comma_18_dot_232_comma__minus_0_dot_016_comma__minus_0_dot_016 SofaType)
+        (receptacleType Sofa__minus_18_dot_28_comma__minus_18_dot_28_comma_7_dot_6_comma_7_dot_6_comma__minus_0_dot_016_comma__minus_0_dot_016 SofaType)
+        (receptacleType SideTable__minus_18_dot_452_comma__minus_18_dot_452_comma_13_dot_3852_comma_13_dot_3852_comma_0_dot_024_comma_0_dot_024 SideTableType)
+        (receptacleType CoffeeTable__minus_7_dot_892_comma__minus_7_dot_892_comma_10_dot_4616_comma_10_dot_4616_comma_0_dot_0084_comma_0_dot_0084 CoffeeTableType)
+        (receptacleType Drawer__minus_17_dot_733296_comma__minus_17_dot_733296_comma_13_dot_37799932_comma_13_dot_37799932_comma_1_dot_8938998_comma_1_dot_8938998 DrawerType)
+        (receptacleType Shelf__minus_1_dot_85999584_comma__minus_1_dot_85999584_comma_12_dot_15600204_comma_12_dot_15600204_comma_0_dot_6968_comma_0_dot_6968 ShelfType)
+        (receptacleType Shelf__minus_1_dot_346000672_comma__minus_1_dot_346000672_comma_10_dot_696_comma_10_dot_696_comma_0_dot_7032_comma_0_dot_7032 ShelfType)
+        (receptacleType Shelf__minus_1_dot_85999584_comma__minus_1_dot_85999584_comma_12_dot_15600204_comma_12_dot_15600204_comma_1_dot_6748_comma_1_dot_6748 ShelfType)
+        (receptacleType Shelf__minus_1_dot_846003892_comma__minus_1_dot_846003892_comma_9_dot_21560192_comma_9_dot_21560192_comma_1_dot_9108_comma_1_dot_9108 ShelfType)
+        (receptacleType Shelf__minus_1_dot_860004_comma__minus_1_dot_860004_comma_9_dot_21760176_comma_9_dot_21760176_comma_0_dot_7012_comma_0_dot_7012 ShelfType)
+        (receptacleType Shelf__minus_1_dot_85999584_comma__minus_1_dot_85999584_comma_12_dot_15600204_comma_12_dot_15600204_comma_2_dot_2752_comma_2_dot_2752 ShelfType)
+        (receptacleType GarbageCan__minus_0_dot_90916252_comma__minus_0_dot_90916252_comma_19_dot_11539076_comma_19_dot_11539076_comma_0_dot_023272708_comma_0_dot_023272708 GarbageCanType)
+        (receptacleType ArmChair__minus_3_dot_504_comma__minus_3_dot_504_comma_2_dot_264_comma_2_dot_264_comma__minus_0_dot_1316_comma__minus_0_dot_1316 ArmChairType)
+        (objectType Pillow__minus_17_dot_697546_comma__minus_17_dot_697546_comma_9_dot_57340716_comma_9_dot_57340716_comma_1_dot_9374274_comma_1_dot_9374274 PillowType)
+        (objectType Pillow__minus_9_dot_48670484_comma__minus_9_dot_48670484_comma_17_dot_64955328_comma_17_dot_64955328_comma_1_dot_937426_comma_1_dot_937426 PillowType)
+
+        (openable Drawer__minus_17_dot_733296_comma__minus_17_dot_733296_comma_13_dot_37799932_comma_13_dot_37799932_comma_1_dot_8938998_comma_1_dot_8938998)
+
+        (atLocation agent1 loc_bar__minus_10_bar_9_bar_2_bar_30)
+
+
+
+
+
+
+
+
+
+
+
+
+        (inReceptacle Pillow__minus_9_dot_48670484_comma__minus_9_dot_48670484_comma_17_dot_64955328_comma_17_dot_64955328_comma_1_dot_937426_comma_1_dot_937426 Sofa__minus_8_dot_5_comma__minus_8_dot_5_comma_18_dot_232_comma_18_dot_232_comma__minus_0_dot_016_comma__minus_0_dot_016)
+        (inReceptacle Pillow__minus_17_dot_697546_comma__minus_17_dot_697546_comma_9_dot_57340716_comma_9_dot_57340716_comma_1_dot_9374274_comma_1_dot_9374274 Sofa__minus_18_dot_28_comma__minus_18_dot_28_comma_7_dot_6_comma_7_dot_6_comma__minus_0_dot_016_comma__minus_0_dot_016)
+        (wasInReceptacle  Pillow__minus_9_dot_48670484_comma__minus_9_dot_48670484_comma_17_dot_64955328_comma_17_dot_64955328_comma_1_dot_937426_comma_1_dot_937426 Sofa__minus_8_dot_5_comma__minus_8_dot_5_comma_18_dot_232_comma_18_dot_232_comma__minus_0_dot_016_comma__minus_0_dot_016)
+        (wasInReceptacle  Pillow__minus_17_dot_697546_comma__minus_17_dot_697546_comma_9_dot_57340716_comma_9_dot_57340716_comma_1_dot_9374274_comma_1_dot_9374274 Sofa__minus_18_dot_28_comma__minus_18_dot_28_comma_7_dot_6_comma_7_dot_6_comma__minus_0_dot_016_comma__minus_0_dot_016)
+        (= (distance loc_bar__minus_10_bar_13_bar_0_bar_45 loc_bar__minus_6_bar_8_bar_1_bar_45) 13)
+        (= (distance loc_bar__minus_6_bar_8_bar_1_bar_45 loc_bar__minus_10_bar_13_bar_0_bar_45) 13)
+        (= (distance loc_bar__minus_10_bar_13_bar_0_bar_45 loc_bar__minus_14_bar_11_bar_3_bar_45) 10)
+        (= (distance loc_bar__minus_14_bar_11_bar_3_bar_45 loc_bar__minus_10_bar_13_bar_0_bar_45) 10)
+        (= (distance loc_bar__minus_10_bar_13_bar_0_bar_45 loc_bar__minus_4_bar_11_bar_3_bar_60) 13)
+        (= (distance loc_bar__minus_4_bar_11_bar_3_bar_60 loc_bar__minus_10_bar_13_bar_0_bar_45) 13)
+        (= (distance loc_bar__minus_10_bar_13_bar_0_bar_45 loc_bar__minus_13_bar_8_bar_3_bar_45) 12)
+        (= (distance loc_bar__minus_13_bar_8_bar_3_bar_45 loc_bar__minus_10_bar_13_bar_0_bar_45) 12)
+        (= (distance loc_bar__minus_10_bar_13_bar_0_bar_45 loc_bar__minus_1_bar_17_bar_0_bar_60) 17)
+        (= (distance loc_bar__minus_1_bar_17_bar_0_bar_60 loc_bar__minus_10_bar_13_bar_0_bar_45) 17)
+        (= (distance loc_bar__minus_10_bar_13_bar_0_bar_45 loc_bar__minus_4_bar_7_bar_2_bar_60) 16)
+        (= (distance loc_bar__minus_4_bar_7_bar_2_bar_60 loc_bar__minus_10_bar_13_bar_0_bar_45) 16)
+        (= (distance loc_bar__minus_10_bar_13_bar_0_bar_45 loc_bar__minus_7_bar_15_bar_0_bar_60) 9)
+        (= (distance loc_bar__minus_7_bar_15_bar_0_bar_60 loc_bar__minus_10_bar_13_bar_0_bar_45) 9)
+        (= (distance loc_bar__minus_10_bar_13_bar_0_bar_45 loc_bar__minus_10_bar_9_bar_2_bar_30) 8)
+        (= (distance loc_bar__minus_10_bar_9_bar_2_bar_30 loc_bar__minus_10_bar_13_bar_0_bar_45) 8)
+        (= (distance loc_bar__minus_10_bar_13_bar_0_bar_45 loc_bar__minus_5_bar_10_bar_1_bar_60) 13)
+        (= (distance loc_bar__minus_5_bar_10_bar_1_bar_60 loc_bar__minus_10_bar_13_bar_0_bar_45) 13)
+        (= (distance loc_bar__minus_10_bar_13_bar_0_bar_45 loc_bar__minus_5_bar_13_bar_1_bar_60) 8)
+        (= (distance loc_bar__minus_5_bar_13_bar_1_bar_60 loc_bar__minus_10_bar_13_bar_0_bar_45) 8)
+        (= (distance loc_bar__minus_10_bar_13_bar_0_bar_45 loc_bar__minus_9_bar_15_bar_0_bar_60) 7)
+        (= (distance loc_bar__minus_9_bar_15_bar_0_bar_60 loc_bar__minus_10_bar_13_bar_0_bar_45) 7)
+        (= (distance loc_bar__minus_10_bar_13_bar_0_bar_45 loc_bar__minus_17_bar_17_bar_2_bar_60) 15)
+        (= (distance loc_bar__minus_17_bar_17_bar_2_bar_60 loc_bar__minus_10_bar_13_bar_0_bar_45) 15)
+        (= (distance loc_bar__minus_10_bar_13_bar_0_bar_45 loc_bar__minus_6_bar_14_bar_1_bar_45) 7)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_45 loc_bar__minus_10_bar_13_bar_0_bar_45) 7)
+        (= (distance loc_bar__minus_10_bar_13_bar_0_bar_45 loc_bar__minus_15_bar_10_bar_3_bar_60) 13)
+        (= (distance loc_bar__minus_15_bar_10_bar_3_bar_60 loc_bar__minus_10_bar_13_bar_0_bar_45) 13)
+        (= (distance loc_bar__minus_10_bar_13_bar_0_bar_45 loc_bar__minus_6_bar_14_bar_1_bar_60) 8)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_60 loc_bar__minus_10_bar_13_bar_0_bar_45) 8)
+        (= (distance loc_bar__minus_10_bar_13_bar_0_bar_45 loc_bar__minus_6_bar_7_bar_1_bar_60) 15)
+        (= (distance loc_bar__minus_6_bar_7_bar_1_bar_60 loc_bar__minus_10_bar_13_bar_0_bar_45) 15)
+        (= (distance loc_bar__minus_6_bar_8_bar_1_bar_45 loc_bar__minus_14_bar_11_bar_3_bar_45) 14)
+        (= (distance loc_bar__minus_14_bar_11_bar_3_bar_45 loc_bar__minus_6_bar_8_bar_1_bar_45) 14)
+        (= (distance loc_bar__minus_6_bar_8_bar_1_bar_45 loc_bar__minus_4_bar_11_bar_3_bar_60) 9)
+        (= (distance loc_bar__minus_4_bar_11_bar_3_bar_60 loc_bar__minus_6_bar_8_bar_1_bar_45) 9)
+        (= (distance loc_bar__minus_6_bar_8_bar_1_bar_45 loc_bar__minus_13_bar_8_bar_3_bar_45) 10)
+        (= (distance loc_bar__minus_13_bar_8_bar_3_bar_45 loc_bar__minus_6_bar_8_bar_1_bar_45) 10)
+        (= (distance loc_bar__minus_6_bar_8_bar_1_bar_45 loc_bar__minus_1_bar_17_bar_0_bar_60) 17)
+        (= (distance loc_bar__minus_1_bar_17_bar_0_bar_60 loc_bar__minus_6_bar_8_bar_1_bar_45) 17)
+        (= (distance loc_bar__minus_6_bar_8_bar_1_bar_45 loc_bar__minus_4_bar_7_bar_2_bar_60) 6)
+        (= (distance loc_bar__minus_4_bar_7_bar_2_bar_60 loc_bar__minus_6_bar_8_bar_1_bar_45) 6)
+        (= (distance loc_bar__minus_6_bar_8_bar_1_bar_45 loc_bar__minus_7_bar_15_bar_0_bar_60) 13)
+        (= (distance loc_bar__minus_7_bar_15_bar_0_bar_60 loc_bar__minus_6_bar_8_bar_1_bar_45) 13)
+        (= (distance loc_bar__minus_6_bar_8_bar_1_bar_45 loc_bar__minus_10_bar_9_bar_2_bar_30) 10)
+        (= (distance loc_bar__minus_10_bar_9_bar_2_bar_30 loc_bar__minus_6_bar_8_bar_1_bar_45) 10)
+        (= (distance loc_bar__minus_6_bar_8_bar_1_bar_45 loc_bar__minus_5_bar_10_bar_1_bar_60) 7)
+        (= (distance loc_bar__minus_5_bar_10_bar_1_bar_60 loc_bar__minus_6_bar_8_bar_1_bar_45) 7)
+        (= (distance loc_bar__minus_6_bar_8_bar_1_bar_45 loc_bar__minus_5_bar_13_bar_1_bar_60) 10)
+        (= (distance loc_bar__minus_5_bar_13_bar_1_bar_60 loc_bar__minus_6_bar_8_bar_1_bar_45) 10)
+        (= (distance loc_bar__minus_6_bar_8_bar_1_bar_45 loc_bar__minus_9_bar_15_bar_0_bar_60) 15)
+        (= (distance loc_bar__minus_9_bar_15_bar_0_bar_60 loc_bar__minus_6_bar_8_bar_1_bar_45) 15)
+        (= (distance loc_bar__minus_6_bar_8_bar_1_bar_45 loc_bar__minus_17_bar_17_bar_2_bar_60) 25)
+        (= (distance loc_bar__minus_17_bar_17_bar_2_bar_60 loc_bar__minus_6_bar_8_bar_1_bar_45) 25)
+        (= (distance loc_bar__minus_6_bar_8_bar_1_bar_45 loc_bar__minus_6_bar_14_bar_1_bar_45) 9)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_45 loc_bar__minus_6_bar_8_bar_1_bar_45) 9)
+        (= (distance loc_bar__minus_6_bar_8_bar_1_bar_45 loc_bar__minus_15_bar_10_bar_3_bar_60) 15)
+        (= (distance loc_bar__minus_15_bar_10_bar_3_bar_60 loc_bar__minus_6_bar_8_bar_1_bar_45) 15)
+        (= (distance loc_bar__minus_6_bar_8_bar_1_bar_45 loc_bar__minus_6_bar_14_bar_1_bar_60) 10)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_60 loc_bar__minus_6_bar_8_bar_1_bar_45) 10)
+        (= (distance loc_bar__minus_6_bar_8_bar_1_bar_45 loc_bar__minus_6_bar_7_bar_1_bar_60) 5)
+        (= (distance loc_bar__minus_6_bar_7_bar_1_bar_60 loc_bar__minus_6_bar_8_bar_1_bar_45) 5)
+        (= (distance loc_bar__minus_14_bar_11_bar_3_bar_45 loc_bar__minus_4_bar_11_bar_3_bar_60) 16)
+        (= (distance loc_bar__minus_4_bar_11_bar_3_bar_60 loc_bar__minus_14_bar_11_bar_3_bar_45) 16)
+        (= (distance loc_bar__minus_14_bar_11_bar_3_bar_45 loc_bar__minus_13_bar_8_bar_3_bar_45) 9)
+        (= (distance loc_bar__minus_13_bar_8_bar_3_bar_45 loc_bar__minus_14_bar_11_bar_3_bar_45) 9)
+        (= (distance loc_bar__minus_14_bar_11_bar_3_bar_45 loc_bar__minus_1_bar_17_bar_0_bar_60) 24)
+        (= (distance loc_bar__minus_1_bar_17_bar_0_bar_60 loc_bar__minus_14_bar_11_bar_3_bar_45) 24)
+        (= (distance loc_bar__minus_14_bar_11_bar_3_bar_45 loc_bar__minus_4_bar_7_bar_2_bar_60) 19)
+        (= (distance loc_bar__minus_4_bar_7_bar_2_bar_60 loc_bar__minus_14_bar_11_bar_3_bar_45) 19)
+        (= (distance loc_bar__minus_14_bar_11_bar_3_bar_45 loc_bar__minus_7_bar_15_bar_0_bar_60) 16)
+        (= (distance loc_bar__minus_7_bar_15_bar_0_bar_60 loc_bar__minus_14_bar_11_bar_3_bar_45) 16)
+        (= (distance loc_bar__minus_14_bar_11_bar_3_bar_45 loc_bar__minus_10_bar_9_bar_2_bar_30) 11)
+        (= (distance loc_bar__minus_10_bar_9_bar_2_bar_30 loc_bar__minus_14_bar_11_bar_3_bar_45) 11)
+        (= (distance loc_bar__minus_14_bar_11_bar_3_bar_45 loc_bar__minus_5_bar_10_bar_1_bar_60) 14)
+        (= (distance loc_bar__minus_5_bar_10_bar_1_bar_60 loc_bar__minus_14_bar_11_bar_3_bar_45) 14)
+        (= (distance loc_bar__minus_14_bar_11_bar_3_bar_45 loc_bar__minus_5_bar_13_bar_1_bar_60) 15)
+        (= (distance loc_bar__minus_5_bar_13_bar_1_bar_60 loc_bar__minus_14_bar_11_bar_3_bar_45) 15)
+        (= (distance loc_bar__minus_14_bar_11_bar_3_bar_45 loc_bar__minus_9_bar_15_bar_0_bar_60) 14)
+        (= (distance loc_bar__minus_9_bar_15_bar_0_bar_60 loc_bar__minus_14_bar_11_bar_3_bar_45) 14)
+        (= (distance loc_bar__minus_14_bar_11_bar_3_bar_45 loc_bar__minus_17_bar_17_bar_2_bar_60) 14)
+        (= (distance loc_bar__minus_17_bar_17_bar_2_bar_60 loc_bar__minus_14_bar_11_bar_3_bar_45) 14)
+        (= (distance loc_bar__minus_14_bar_11_bar_3_bar_45 loc_bar__minus_6_bar_14_bar_1_bar_45) 14)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_45 loc_bar__minus_14_bar_11_bar_3_bar_45) 14)
+        (= (distance loc_bar__minus_14_bar_11_bar_3_bar_45 loc_bar__minus_15_bar_10_bar_3_bar_60) 6)
+        (= (distance loc_bar__minus_15_bar_10_bar_3_bar_60 loc_bar__minus_14_bar_11_bar_3_bar_45) 6)
+        (= (distance loc_bar__minus_14_bar_11_bar_3_bar_45 loc_bar__minus_6_bar_14_bar_1_bar_60) 15)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_60 loc_bar__minus_14_bar_11_bar_3_bar_45) 15)
+        (= (distance loc_bar__minus_14_bar_11_bar_3_bar_45 loc_bar__minus_6_bar_7_bar_1_bar_60) 16)
+        (= (distance loc_bar__minus_6_bar_7_bar_1_bar_60 loc_bar__minus_14_bar_11_bar_3_bar_45) 16)
+        (= (distance loc_bar__minus_4_bar_11_bar_3_bar_60 loc_bar__minus_13_bar_8_bar_3_bar_45) 16)
+        (= (distance loc_bar__minus_13_bar_8_bar_3_bar_45 loc_bar__minus_4_bar_11_bar_3_bar_60) 16)
+        (= (distance loc_bar__minus_4_bar_11_bar_3_bar_60 loc_bar__minus_1_bar_17_bar_0_bar_60) 13)
+        (= (distance loc_bar__minus_1_bar_17_bar_0_bar_60 loc_bar__minus_4_bar_11_bar_3_bar_60) 13)
+        (= (distance loc_bar__minus_4_bar_11_bar_3_bar_60 loc_bar__minus_4_bar_7_bar_2_bar_60) 6)
+        (= (distance loc_bar__minus_4_bar_7_bar_2_bar_60 loc_bar__minus_4_bar_11_bar_3_bar_60) 6)
+        (= (distance loc_bar__minus_4_bar_11_bar_3_bar_60 loc_bar__minus_7_bar_15_bar_0_bar_60) 9)
+        (= (distance loc_bar__minus_7_bar_15_bar_0_bar_60 loc_bar__minus_4_bar_11_bar_3_bar_60) 9)
+        (= (distance loc_bar__minus_4_bar_11_bar_3_bar_60 loc_bar__minus_10_bar_9_bar_2_bar_30) 12)
+        (= (distance loc_bar__minus_10_bar_9_bar_2_bar_30 loc_bar__minus_4_bar_11_bar_3_bar_60) 12)
+        (= (distance loc_bar__minus_4_bar_11_bar_3_bar_60 loc_bar__minus_5_bar_10_bar_1_bar_60) 5)
+        (= (distance loc_bar__minus_5_bar_10_bar_1_bar_60 loc_bar__minus_4_bar_11_bar_3_bar_60) 5)
+        (= (distance loc_bar__minus_4_bar_11_bar_3_bar_60 loc_bar__minus_5_bar_13_bar_1_bar_60) 6)
+        (= (distance loc_bar__minus_5_bar_13_bar_1_bar_60 loc_bar__minus_4_bar_11_bar_3_bar_60) 6)
+        (= (distance loc_bar__minus_4_bar_11_bar_3_bar_60 loc_bar__minus_9_bar_15_bar_0_bar_60) 11)
+        (= (distance loc_bar__minus_9_bar_15_bar_0_bar_60 loc_bar__minus_4_bar_11_bar_3_bar_60) 11)
+        (= (distance loc_bar__minus_4_bar_11_bar_3_bar_60 loc_bar__minus_17_bar_17_bar_2_bar_60) 23)
+        (= (distance loc_bar__minus_17_bar_17_bar_2_bar_60 loc_bar__minus_4_bar_11_bar_3_bar_60) 23)
+        (= (distance loc_bar__minus_4_bar_11_bar_3_bar_60 loc_bar__minus_6_bar_14_bar_1_bar_45) 9)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_45 loc_bar__minus_4_bar_11_bar_3_bar_60) 9)
+        (= (distance loc_bar__minus_4_bar_11_bar_3_bar_60 loc_bar__minus_15_bar_10_bar_3_bar_60) 15)
+        (= (distance loc_bar__minus_15_bar_10_bar_3_bar_60 loc_bar__minus_4_bar_11_bar_3_bar_60) 15)
+        (= (distance loc_bar__minus_4_bar_11_bar_3_bar_60 loc_bar__minus_6_bar_14_bar_1_bar_60) 8)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_60 loc_bar__minus_4_bar_11_bar_3_bar_60) 8)
+        (= (distance loc_bar__minus_4_bar_11_bar_3_bar_60 loc_bar__minus_6_bar_7_bar_1_bar_60) 9)
+        (= (distance loc_bar__minus_6_bar_7_bar_1_bar_60 loc_bar__minus_4_bar_11_bar_3_bar_60) 9)
+        (= (distance loc_bar__minus_13_bar_8_bar_3_bar_45 loc_bar__minus_1_bar_17_bar_0_bar_60) 26)
+        (= (distance loc_bar__minus_1_bar_17_bar_0_bar_60 loc_bar__minus_13_bar_8_bar_3_bar_45) 26)
+        (= (distance loc_bar__minus_13_bar_8_bar_3_bar_45 loc_bar__minus_4_bar_7_bar_2_bar_60) 15)
+        (= (distance loc_bar__minus_4_bar_7_bar_2_bar_60 loc_bar__minus_13_bar_8_bar_3_bar_45) 15)
+        (= (distance loc_bar__minus_13_bar_8_bar_3_bar_45 loc_bar__minus_7_bar_15_bar_0_bar_60) 18)
+        (= (distance loc_bar__minus_7_bar_15_bar_0_bar_60 loc_bar__minus_13_bar_8_bar_3_bar_45) 18)
+        (= (distance loc_bar__minus_13_bar_8_bar_3_bar_45 loc_bar__minus_10_bar_9_bar_2_bar_30) 9)
+        (= (distance loc_bar__minus_10_bar_9_bar_2_bar_30 loc_bar__minus_13_bar_8_bar_3_bar_45) 9)
+        (= (distance loc_bar__minus_13_bar_8_bar_3_bar_45 loc_bar__minus_5_bar_10_bar_1_bar_60) 14)
+        (= (distance loc_bar__minus_5_bar_10_bar_1_bar_60 loc_bar__minus_13_bar_8_bar_3_bar_45) 14)
+        (= (distance loc_bar__minus_13_bar_8_bar_3_bar_45 loc_bar__minus_5_bar_13_bar_1_bar_60) 17)
+        (= (distance loc_bar__minus_5_bar_13_bar_1_bar_60 loc_bar__minus_13_bar_8_bar_3_bar_45) 17)
+        (= (distance loc_bar__minus_13_bar_8_bar_3_bar_45 loc_bar__minus_9_bar_15_bar_0_bar_60) 16)
+        (= (distance loc_bar__minus_9_bar_15_bar_0_bar_60 loc_bar__minus_13_bar_8_bar_3_bar_45) 16)
+        (= (distance loc_bar__minus_13_bar_8_bar_3_bar_45 loc_bar__minus_17_bar_17_bar_2_bar_60) 18)
+        (= (distance loc_bar__minus_17_bar_17_bar_2_bar_60 loc_bar__minus_13_bar_8_bar_3_bar_45) 18)
+        (= (distance loc_bar__minus_13_bar_8_bar_3_bar_45 loc_bar__minus_6_bar_14_bar_1_bar_45) 16)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_45 loc_bar__minus_13_bar_8_bar_3_bar_45) 16)
+        (= (distance loc_bar__minus_13_bar_8_bar_3_bar_45 loc_bar__minus_15_bar_10_bar_3_bar_60) 8)
+        (= (distance loc_bar__minus_15_bar_10_bar_3_bar_60 loc_bar__minus_13_bar_8_bar_3_bar_45) 8)
+        (= (distance loc_bar__minus_13_bar_8_bar_3_bar_45 loc_bar__minus_6_bar_14_bar_1_bar_60) 17)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_60 loc_bar__minus_13_bar_8_bar_3_bar_45) 17)
+        (= (distance loc_bar__minus_13_bar_8_bar_3_bar_45 loc_bar__minus_6_bar_7_bar_1_bar_60) 12)
+        (= (distance loc_bar__minus_6_bar_7_bar_1_bar_60 loc_bar__minus_13_bar_8_bar_3_bar_45) 12)
+        (= (distance loc_bar__minus_1_bar_17_bar_0_bar_60 loc_bar__minus_4_bar_7_bar_2_bar_60) 16)
+        (= (distance loc_bar__minus_4_bar_7_bar_2_bar_60 loc_bar__minus_1_bar_17_bar_0_bar_60) 16)
+        (= (distance loc_bar__minus_1_bar_17_bar_0_bar_60 loc_bar__minus_7_bar_15_bar_0_bar_60) 13)
+        (= (distance loc_bar__minus_7_bar_15_bar_0_bar_60 loc_bar__minus_1_bar_17_bar_0_bar_60) 13)
+        (= (distance loc_bar__minus_1_bar_17_bar_0_bar_60 loc_bar__minus_10_bar_9_bar_2_bar_30) 22)
+        (= (distance loc_bar__minus_10_bar_9_bar_2_bar_30 loc_bar__minus_1_bar_17_bar_0_bar_60) 22)
+        (= (distance loc_bar__minus_1_bar_17_bar_0_bar_60 loc_bar__minus_5_bar_10_bar_1_bar_60) 15)
+        (= (distance loc_bar__minus_5_bar_10_bar_1_bar_60 loc_bar__minus_1_bar_17_bar_0_bar_60) 15)
+        (= (distance loc_bar__minus_1_bar_17_bar_0_bar_60 loc_bar__minus_5_bar_13_bar_1_bar_60) 12)
+        (= (distance loc_bar__minus_5_bar_13_bar_1_bar_60 loc_bar__minus_1_bar_17_bar_0_bar_60) 12)
+        (= (distance loc_bar__minus_1_bar_17_bar_0_bar_60 loc_bar__minus_9_bar_15_bar_0_bar_60) 15)
+        (= (distance loc_bar__minus_9_bar_15_bar_0_bar_60 loc_bar__minus_1_bar_17_bar_0_bar_60) 15)
+        (= (distance loc_bar__minus_1_bar_17_bar_0_bar_60 loc_bar__minus_17_bar_17_bar_2_bar_60) 19)
+        (= (distance loc_bar__minus_17_bar_17_bar_2_bar_60 loc_bar__minus_1_bar_17_bar_0_bar_60) 19)
+        (= (distance loc_bar__minus_1_bar_17_bar_0_bar_60 loc_bar__minus_6_bar_14_bar_1_bar_45) 13)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_45 loc_bar__minus_1_bar_17_bar_0_bar_60) 13)
+        (= (distance loc_bar__minus_1_bar_17_bar_0_bar_60 loc_bar__minus_15_bar_10_bar_3_bar_60) 25)
+        (= (distance loc_bar__minus_15_bar_10_bar_3_bar_60 loc_bar__minus_1_bar_17_bar_0_bar_60) 25)
+        (= (distance loc_bar__minus_1_bar_17_bar_0_bar_60 loc_bar__minus_6_bar_14_bar_1_bar_60) 12)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_60 loc_bar__minus_1_bar_17_bar_0_bar_60) 12)
+        (= (distance loc_bar__minus_1_bar_17_bar_0_bar_60 loc_bar__minus_6_bar_7_bar_1_bar_60) 19)
+        (= (distance loc_bar__minus_6_bar_7_bar_1_bar_60 loc_bar__minus_1_bar_17_bar_0_bar_60) 19)
+        (= (distance loc_bar__minus_4_bar_7_bar_2_bar_60 loc_bar__minus_7_bar_15_bar_0_bar_60) 14)
+        (= (distance loc_bar__minus_7_bar_15_bar_0_bar_60 loc_bar__minus_4_bar_7_bar_2_bar_60) 14)
+        (= (distance loc_bar__minus_4_bar_7_bar_2_bar_60 loc_bar__minus_10_bar_9_bar_2_bar_30) 15)
+        (= (distance loc_bar__minus_10_bar_9_bar_2_bar_30 loc_bar__minus_4_bar_7_bar_2_bar_60) 15)
+        (= (distance loc_bar__minus_4_bar_7_bar_2_bar_60 loc_bar__minus_5_bar_10_bar_1_bar_60) 8)
+        (= (distance loc_bar__minus_5_bar_10_bar_1_bar_60 loc_bar__minus_4_bar_7_bar_2_bar_60) 8)
+        (= (distance loc_bar__minus_4_bar_7_bar_2_bar_60 loc_bar__minus_5_bar_13_bar_1_bar_60) 11)
+        (= (distance loc_bar__minus_5_bar_13_bar_1_bar_60 loc_bar__minus_4_bar_7_bar_2_bar_60) 11)
+        (= (distance loc_bar__minus_4_bar_7_bar_2_bar_60 loc_bar__minus_9_bar_15_bar_0_bar_60) 16)
+        (= (distance loc_bar__minus_9_bar_15_bar_0_bar_60 loc_bar__minus_4_bar_7_bar_2_bar_60) 16)
+        (= (distance loc_bar__minus_4_bar_7_bar_2_bar_60 loc_bar__minus_17_bar_17_bar_2_bar_60) 28)
+        (= (distance loc_bar__minus_17_bar_17_bar_2_bar_60 loc_bar__minus_4_bar_7_bar_2_bar_60) 28)
+        (= (distance loc_bar__minus_4_bar_7_bar_2_bar_60 loc_bar__minus_6_bar_14_bar_1_bar_45) 14)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_45 loc_bar__minus_4_bar_7_bar_2_bar_60) 14)
+        (= (distance loc_bar__minus_4_bar_7_bar_2_bar_60 loc_bar__minus_15_bar_10_bar_3_bar_60) 18)
+        (= (distance loc_bar__minus_15_bar_10_bar_3_bar_60 loc_bar__minus_4_bar_7_bar_2_bar_60) 18)
+        (= (distance loc_bar__minus_4_bar_7_bar_2_bar_60 loc_bar__minus_6_bar_14_bar_1_bar_60) 13)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_60 loc_bar__minus_4_bar_7_bar_2_bar_60) 13)
+        (= (distance loc_bar__minus_4_bar_7_bar_2_bar_60 loc_bar__minus_6_bar_7_bar_1_bar_60) 6)
+        (= (distance loc_bar__minus_6_bar_7_bar_1_bar_60 loc_bar__minus_4_bar_7_bar_2_bar_60) 6)
+        (= (distance loc_bar__minus_7_bar_15_bar_0_bar_60 loc_bar__minus_10_bar_9_bar_2_bar_30) 14)
+        (= (distance loc_bar__minus_10_bar_9_bar_2_bar_30 loc_bar__minus_7_bar_15_bar_0_bar_60) 14)
+        (= (distance loc_bar__minus_7_bar_15_bar_0_bar_60 loc_bar__minus_5_bar_10_bar_1_bar_60) 11)
+        (= (distance loc_bar__minus_5_bar_10_bar_1_bar_60 loc_bar__minus_7_bar_15_bar_0_bar_60) 11)
+        (= (distance loc_bar__minus_7_bar_15_bar_0_bar_60 loc_bar__minus_5_bar_13_bar_1_bar_60) 8)
+        (= (distance loc_bar__minus_5_bar_13_bar_1_bar_60 loc_bar__minus_7_bar_15_bar_0_bar_60) 8)
+        (= (distance loc_bar__minus_7_bar_15_bar_0_bar_60 loc_bar__minus_9_bar_15_bar_0_bar_60) 5)
+        (= (distance loc_bar__minus_9_bar_15_bar_0_bar_60 loc_bar__minus_7_bar_15_bar_0_bar_60) 5)
+        (= (distance loc_bar__minus_7_bar_15_bar_0_bar_60 loc_bar__minus_17_bar_17_bar_2_bar_60) 15)
+        (= (distance loc_bar__minus_17_bar_17_bar_2_bar_60 loc_bar__minus_7_bar_15_bar_0_bar_60) 15)
+        (= (distance loc_bar__minus_7_bar_15_bar_0_bar_60 loc_bar__minus_6_bar_14_bar_1_bar_45) 7)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_45 loc_bar__minus_7_bar_15_bar_0_bar_60) 7)
+        (= (distance loc_bar__minus_7_bar_15_bar_0_bar_60 loc_bar__minus_15_bar_10_bar_3_bar_60) 17)
+        (= (distance loc_bar__minus_15_bar_10_bar_3_bar_60 loc_bar__minus_7_bar_15_bar_0_bar_60) 17)
+        (= (distance loc_bar__minus_7_bar_15_bar_0_bar_60 loc_bar__minus_6_bar_14_bar_1_bar_60) 6)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_60 loc_bar__minus_7_bar_15_bar_0_bar_60) 6)
+        (= (distance loc_bar__minus_7_bar_15_bar_0_bar_60 loc_bar__minus_6_bar_7_bar_1_bar_60) 13)
+        (= (distance loc_bar__minus_6_bar_7_bar_1_bar_60 loc_bar__minus_7_bar_15_bar_0_bar_60) 13)
+        (= (distance loc_bar__minus_10_bar_9_bar_2_bar_30 loc_bar__minus_5_bar_10_bar_1_bar_60) 12)
+        (= (distance loc_bar__minus_5_bar_10_bar_1_bar_60 loc_bar__minus_10_bar_9_bar_2_bar_30) 12)
+        (= (distance loc_bar__minus_10_bar_9_bar_2_bar_30 loc_bar__minus_5_bar_13_bar_1_bar_60) 15)
+        (= (distance loc_bar__minus_5_bar_13_bar_1_bar_60 loc_bar__minus_10_bar_9_bar_2_bar_30) 15)
+        (= (distance loc_bar__minus_10_bar_9_bar_2_bar_30 loc_bar__minus_9_bar_15_bar_0_bar_60) 12)
+        (= (distance loc_bar__minus_9_bar_15_bar_0_bar_60 loc_bar__minus_10_bar_9_bar_2_bar_30) 12)
+        (= (distance loc_bar__minus_10_bar_9_bar_2_bar_30 loc_bar__minus_17_bar_17_bar_2_bar_60) 22)
+        (= (distance loc_bar__minus_17_bar_17_bar_2_bar_60 loc_bar__minus_10_bar_9_bar_2_bar_30) 22)
+        (= (distance loc_bar__minus_10_bar_9_bar_2_bar_30 loc_bar__minus_6_bar_14_bar_1_bar_45) 14)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_45 loc_bar__minus_10_bar_9_bar_2_bar_30) 14)
+        (= (distance loc_bar__minus_10_bar_9_bar_2_bar_30 loc_bar__minus_15_bar_10_bar_3_bar_60) 12)
+        (= (distance loc_bar__minus_15_bar_10_bar_3_bar_60 loc_bar__minus_10_bar_9_bar_2_bar_30) 12)
+        (= (distance loc_bar__minus_10_bar_9_bar_2_bar_30 loc_bar__minus_6_bar_14_bar_1_bar_60) 15)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_60 loc_bar__minus_10_bar_9_bar_2_bar_30) 15)
+        (= (distance loc_bar__minus_10_bar_9_bar_2_bar_30 loc_bar__minus_6_bar_7_bar_1_bar_60) 10)
+        (= (distance loc_bar__minus_6_bar_7_bar_1_bar_60 loc_bar__minus_10_bar_9_bar_2_bar_30) 10)
+        (= (distance loc_bar__minus_5_bar_10_bar_1_bar_60 loc_bar__minus_5_bar_13_bar_1_bar_60) 6)
+        (= (distance loc_bar__minus_5_bar_13_bar_1_bar_60 loc_bar__minus_5_bar_10_bar_1_bar_60) 6)
+        (= (distance loc_bar__minus_5_bar_10_bar_1_bar_60 loc_bar__minus_9_bar_15_bar_0_bar_60) 13)
+        (= (distance loc_bar__minus_9_bar_15_bar_0_bar_60 loc_bar__minus_5_bar_10_bar_1_bar_60) 13)
+        (= (distance loc_bar__minus_5_bar_10_bar_1_bar_60 loc_bar__minus_17_bar_17_bar_2_bar_60) 23)
+        (= (distance loc_bar__minus_17_bar_17_bar_2_bar_60 loc_bar__minus_5_bar_10_bar_1_bar_60) 23)
+        (= (distance loc_bar__minus_5_bar_10_bar_1_bar_60 loc_bar__minus_6_bar_14_bar_1_bar_45) 11)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_45 loc_bar__minus_5_bar_10_bar_1_bar_60) 11)
+        (= (distance loc_bar__minus_5_bar_10_bar_1_bar_60 loc_bar__minus_15_bar_10_bar_3_bar_60) 13)
+        (= (distance loc_bar__minus_15_bar_10_bar_3_bar_60 loc_bar__minus_5_bar_10_bar_1_bar_60) 13)
+        (= (distance loc_bar__minus_5_bar_10_bar_1_bar_60 loc_bar__minus_6_bar_14_bar_1_bar_60) 10)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_60 loc_bar__minus_5_bar_10_bar_1_bar_60) 10)
+        (= (distance loc_bar__minus_5_bar_10_bar_1_bar_60 loc_bar__minus_6_bar_7_bar_1_bar_60) 9)
+        (= (distance loc_bar__minus_6_bar_7_bar_1_bar_60 loc_bar__minus_5_bar_10_bar_1_bar_60) 9)
+        (= (distance loc_bar__minus_5_bar_13_bar_1_bar_60 loc_bar__minus_9_bar_15_bar_0_bar_60) 10)
+        (= (distance loc_bar__minus_9_bar_15_bar_0_bar_60 loc_bar__minus_5_bar_13_bar_1_bar_60) 10)
+        (= (distance loc_bar__minus_5_bar_13_bar_1_bar_60 loc_bar__minus_17_bar_17_bar_2_bar_60) 20)
+        (= (distance loc_bar__minus_17_bar_17_bar_2_bar_60 loc_bar__minus_5_bar_13_bar_1_bar_60) 20)
+        (= (distance loc_bar__minus_5_bar_13_bar_1_bar_60 loc_bar__minus_6_bar_14_bar_1_bar_45) 8)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_45 loc_bar__minus_5_bar_13_bar_1_bar_60) 8)
+        (= (distance loc_bar__minus_5_bar_13_bar_1_bar_60 loc_bar__minus_15_bar_10_bar_3_bar_60) 16)
+        (= (distance loc_bar__minus_15_bar_10_bar_3_bar_60 loc_bar__minus_5_bar_13_bar_1_bar_60) 16)
+        (= (distance loc_bar__minus_5_bar_13_bar_1_bar_60 loc_bar__minus_6_bar_14_bar_1_bar_60) 7)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_60 loc_bar__minus_5_bar_13_bar_1_bar_60) 7)
+        (= (distance loc_bar__minus_5_bar_13_bar_1_bar_60 loc_bar__minus_6_bar_7_bar_1_bar_60) 12)
+        (= (distance loc_bar__minus_6_bar_7_bar_1_bar_60 loc_bar__minus_5_bar_13_bar_1_bar_60) 12)
+        (= (distance loc_bar__minus_9_bar_15_bar_0_bar_60 loc_bar__minus_17_bar_17_bar_2_bar_60) 13)
+        (= (distance loc_bar__minus_17_bar_17_bar_2_bar_60 loc_bar__minus_9_bar_15_bar_0_bar_60) 13)
+        (= (distance loc_bar__minus_9_bar_15_bar_0_bar_60 loc_bar__minus_6_bar_14_bar_1_bar_45) 9)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_45 loc_bar__minus_9_bar_15_bar_0_bar_60) 9)
+        (= (distance loc_bar__minus_9_bar_15_bar_0_bar_60 loc_bar__minus_15_bar_10_bar_3_bar_60) 15)
+        (= (distance loc_bar__minus_15_bar_10_bar_3_bar_60 loc_bar__minus_9_bar_15_bar_0_bar_60) 15)
+        (= (distance loc_bar__minus_9_bar_15_bar_0_bar_60 loc_bar__minus_6_bar_14_bar_1_bar_60) 8)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_60 loc_bar__minus_9_bar_15_bar_0_bar_60) 8)
+        (= (distance loc_bar__minus_9_bar_15_bar_0_bar_60 loc_bar__minus_6_bar_7_bar_1_bar_60) 15)
+        (= (distance loc_bar__minus_6_bar_7_bar_1_bar_60 loc_bar__minus_9_bar_15_bar_0_bar_60) 15)
+        (= (distance loc_bar__minus_17_bar_17_bar_2_bar_60 loc_bar__minus_6_bar_14_bar_1_bar_45) 17)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_45 loc_bar__minus_17_bar_17_bar_2_bar_60) 17)
+        (= (distance loc_bar__minus_17_bar_17_bar_2_bar_60 loc_bar__minus_15_bar_10_bar_3_bar_60) 13)
+        (= (distance loc_bar__minus_15_bar_10_bar_3_bar_60 loc_bar__minus_17_bar_17_bar_2_bar_60) 13)
+        (= (distance loc_bar__minus_17_bar_17_bar_2_bar_60 loc_bar__minus_6_bar_14_bar_1_bar_60) 16)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_60 loc_bar__minus_17_bar_17_bar_2_bar_60) 16)
+        (= (distance loc_bar__minus_17_bar_17_bar_2_bar_60 loc_bar__minus_6_bar_7_bar_1_bar_60) 23)
+        (= (distance loc_bar__minus_6_bar_7_bar_1_bar_60 loc_bar__minus_17_bar_17_bar_2_bar_60) 23)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_45 loc_bar__minus_15_bar_10_bar_3_bar_60) 17)
+        (= (distance loc_bar__minus_15_bar_10_bar_3_bar_60 loc_bar__minus_6_bar_14_bar_1_bar_45) 17)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_45 loc_bar__minus_6_bar_14_bar_1_bar_60) 2)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_60 loc_bar__minus_6_bar_14_bar_1_bar_45) 2)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_45 loc_bar__minus_6_bar_7_bar_1_bar_60) 11)
+        (= (distance loc_bar__minus_6_bar_7_bar_1_bar_60 loc_bar__minus_6_bar_14_bar_1_bar_45) 11)
+        (= (distance loc_bar__minus_15_bar_10_bar_3_bar_60 loc_bar__minus_6_bar_14_bar_1_bar_60) 16)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_60 loc_bar__minus_15_bar_10_bar_3_bar_60) 16)
+        (= (distance loc_bar__minus_15_bar_10_bar_3_bar_60 loc_bar__minus_6_bar_7_bar_1_bar_60) 15)
+        (= (distance loc_bar__minus_6_bar_7_bar_1_bar_60 loc_bar__minus_15_bar_10_bar_3_bar_60) 15)
+        (= (distance loc_bar__minus_6_bar_14_bar_1_bar_60 loc_bar__minus_6_bar_7_bar_1_bar_60) 10)
+        (= (distance loc_bar__minus_6_bar_7_bar_1_bar_60 loc_bar__minus_6_bar_14_bar_1_bar_60) 10)
+        (receptacleAtLocation Sofa__minus_8_dot_5_comma__minus_8_dot_5_comma_18_dot_232_comma_18_dot_232_comma__minus_0_dot_016_comma__minus_0_dot_016 loc_bar__minus_10_bar_13_bar_0_bar_45)
+        (receptacleAtLocation Sofa__minus_18_dot_28_comma__minus_18_dot_28_comma_7_dot_6_comma_7_dot_6_comma__minus_0_dot_016_comma__minus_0_dot_016 loc_bar__minus_13_bar_8_bar_3_bar_45)
+        (receptacleAtLocation SideTable__minus_18_dot_452_comma__minus_18_dot_452_comma_13_dot_3852_comma_13_dot_3852_comma_0_dot_024_comma_0_dot_024 loc_bar__minus_17_bar_17_bar_2_bar_60)
+        (receptacleAtLocation CoffeeTable__minus_7_dot_892_comma__minus_7_dot_892_comma_10_dot_4616_comma_10_dot_4616_comma_0_dot_0084_comma_0_dot_0084 loc_bar__minus_4_bar_11_bar_3_bar_60)
+        (receptacleAtLocation Drawer__minus_17_dot_733296_comma__minus_17_dot_733296_comma_13_dot_37799932_comma_13_dot_37799932_comma_1_dot_8938998_comma_1_dot_8938998 loc_bar__minus_14_bar_11_bar_3_bar_45)
+        (receptacleAtLocation Shelf__minus_1_dot_85999584_comma__minus_1_dot_85999584_comma_12_dot_15600204_comma_12_dot_15600204_comma_0_dot_6968_comma_0_dot_6968 loc_bar__minus_6_bar_14_bar_1_bar_60)
+        (receptacleAtLocation Shelf__minus_1_dot_346000672_comma__minus_1_dot_346000672_comma_10_dot_696_comma_10_dot_696_comma_0_dot_7032_comma_0_dot_7032 loc_bar__minus_6_bar_8_bar_1_bar_45)
+        (receptacleAtLocation Shelf__minus_1_dot_85999584_comma__minus_1_dot_85999584_comma_12_dot_15600204_comma_12_dot_15600204_comma_1_dot_6748_comma_1_dot_6748 loc_bar__minus_6_bar_14_bar_1_bar_45)
+        (receptacleAtLocation Shelf__minus_1_dot_846003892_comma__minus_1_dot_846003892_comma_9_dot_21560192_comma_9_dot_21560192_comma_1_dot_9108_comma_1_dot_9108 loc_bar__minus_5_bar_10_bar_1_bar_60)
+        (receptacleAtLocation Shelf__minus_1_dot_860004_comma__minus_1_dot_860004_comma_9_dot_21760176_comma_9_dot_21760176_comma_0_dot_7012_comma_0_dot_7012 loc_bar__minus_6_bar_7_bar_1_bar_60)
+        (receptacleAtLocation Shelf__minus_1_dot_85999584_comma__minus_1_dot_85999584_comma_12_dot_15600204_comma_12_dot_15600204_comma_2_dot_2752_comma_2_dot_2752 loc_bar__minus_5_bar_13_bar_1_bar_60)
+        (receptacleAtLocation GarbageCan__minus_0_dot_90916252_comma__minus_0_dot_90916252_comma_19_dot_11539076_comma_19_dot_11539076_comma_0_dot_023272708_comma_0_dot_023272708 loc_bar__minus_1_bar_17_bar_0_bar_60)
+        (receptacleAtLocation ArmChair__minus_3_dot_504_comma__minus_3_dot_504_comma_2_dot_264_comma_2_dot_264_comma__minus_0_dot_1316_comma__minus_0_dot_1316 loc_bar__minus_4_bar_7_bar_2_bar_60)
+        (objectAtLocation Pillow__minus_17_dot_697546_comma__minus_17_dot_697546_comma_9_dot_57340716_comma_9_dot_57340716_comma_1_dot_9374274_comma_1_dot_9374274 loc_bar__minus_15_bar_10_bar_3_bar_60)
+        (objectAtLocation Pillow__minus_9_dot_48670484_comma__minus_9_dot_48670484_comma_17_dot_64955328_comma_17_dot_64955328_comma_1_dot_937426_comma_1_dot_937426 loc_bar__minus_9_bar_15_bar_0_bar_60)
+        )
+
+
+        (:goal
+            (and
+                (exists (?r - receptacle)
+                    (exists (?o - object)
+                        (and 
+                            (inReceptacle ?o ?r) 
+                            (objectType ?o PillowType) 
+                            (receptacleType ?r ArmChairType)
+                        )
+                    )
+                )
+                (forall (?re - receptacle)
+                    (not (opened ?re))
+                )
+            )
+        )
+    )
+
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../sim-habitat/" class="btn btn-neutral float-right" title="Habitat's Rearrangement">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../sim-igibson/" class="btn btn-neutral" title="iGibson's BEHAVIOR"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../sim-igibson/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../sim-habitat/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

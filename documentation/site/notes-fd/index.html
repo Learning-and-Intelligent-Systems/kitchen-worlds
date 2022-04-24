@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../css/favicon.ico">
+  
+  <title>FastDownward - LEAPdocs</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  <link href="../css/extra.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "FastDownward";
+    var mkdocs_page_input_path = "notes-fd.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> LEAPdocs</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <p class="caption"><span class="caption-text">Project</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">LEAP Architecture</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../project-minutes/">Minutes & Notes</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Domains</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../domain-grocery/">Grocery - action costs</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../domain-kitchen/">Kitchen - large universe</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-igibson/">iGibson's BEHAVIOR</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-alfred/">AI2THOR's Alfred</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-habitat/">Habitat's Rearrangement</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Strategists</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-iobig/">PLOI-like IOBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-sdbig/">HPN-like SDBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-ipbig/">HPN-like IPBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-hpn/">HPN [ NEW ]</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Experiments</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-goals/">Num of Goal Predicates</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-objects/">Num of Objects</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-egg-recipes/">All Egg Recipes</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-two-dishes/">Two Dishes</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-planner-options/">Satisfising v.s. Optimizing</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-merged-domains/">Merged Domains</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-strategists/">Combine Strategists [ NEW ]</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Notes</span></p>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">FastDownward</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#with-minimum-set-of-objects">with minimum set of objects</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#example-variable-with-two-values">Example variable with two values</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#example-var-with-a-lot-of-values-mutex">Example var with a lot of values (mutex)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#example-mutex-group">Example mutex group</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#example-rule">Example rule</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#simple-rule-with-one-cond-and-one-effect">simple rule with one cond and one effect</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#example-goal">Example goal</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#example-rule_1">Example rule</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Set it up</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-repository/">Set up the Repository</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-mkdocs/">Set up MkDocs</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-notes/">Editor's Notes</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">LEAPdocs</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Notes &raquo;</li>
+        
+      
+    
+    <li>FastDownward</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="studying-outputsas">Studying output.sas<a class="headerlink" href="#studying-outputsas" title="Permanent link">#</a></h1>
+<h2 id="with-minimum-set-of-objects">with minimum set of objects<a class="headerlink" href="#with-minimum-set-of-objects" title="Permanent link">#</a></h2>
+<p>effects of extraneous objects:
+* there exists 11 variables (var138 to var var148) on where <code>oliveoil</code> is
+* there exists 11 values on where <code>tablespoon1</code>/<code>bread1</code> is
+* there exists 13 values on where <code>egg1</code> is</p>
+<pre><code class="language-python">begin_variable
+var174
+-1
+13
+Atom holding(egg1, robot)
+Atom in(dcup1, egg1)
+Atom in(dcup2, egg1)
+Atom in(drawer1, egg1)
+Atom in(fridge1, egg1)
+Atom in(ucup1, egg1)
+Atom in(ucup2, egg1)
+Atom in-hole(egg1, bread1)
+Atom in-hole(egg1, butter)
+Atom on(burner, egg1)
+Atom on(kitchentop, egg1)
+Atom on(sink, egg1)
+&lt;none of those&gt;
+end_variable
+</code></pre>
+<ul>
+<li>there exists 8 variables for all types of seasoning the egg may have (2 values for 4 types of seasoning mentioned in goal)</li>
+</ul>
+<pre><code class="language-python">var166
+-1
+2
+Atom has-seasoning(egg1, salt, gram, one)
+NegatedAtom has-seasoning(egg1, salt, gram, one)
+end_variable
+begin_variable
+var167
+-1
+2
+Atom has-seasoning(egg1, salt, gram, two)
+NegatedAtom has-seasoning(egg1, salt, gram, two)
+end_variable
+</code></pre>
+<h3 id="example-variable-with-two-values">Example variable with two values<a class="headerlink" href="#example-variable-with-two-values" title="Permanent link">#</a></h3>
+<p>SAS variable</p>
+<pre><code class="language-python">begin_variable
+var2
+-1 
+2
+Atom closed(ucup2)
+Atom opened(ucup2)
+end_variable
+</code></pre>
+<p>PDDL operator</p>
+<pre><code class="language-python">  ( :action open
+      :parameters ( ?param1 - furniture )
+      :precondition( and
+           ( closed ?param1 ) 
+      )
+      :effect( and
+         ( not ( closed ?param1 ) )
+         ( opened ?param1 )
+         ( increase ( total-cost ) 1 )
+      )
+  )
+</code></pre>
+<p>SAS operator</p>
+<pre><code class="language-python">begin_operator
+close ucup2
+0  ## 0 preconditions, each has two numbers &lt;v, d&gt;
+1  ## 1 effect, each has four numbers &lt;cond, v, d, d'&gt;
+0 2 1 0  ## the first effect: no precondition, value of var2 changes from value1 (opened(ucup2)) to value0 (closed(ucup2))
+1 
+end_operator
+
+### 
+begin_operator
+open ucup2
+0
+1
+0 2 0 1 ##
+1
+end_operator
+</code></pre>
+<h3 id="example-var-with-a-lot-of-values-mutex">Example var with a lot of values (mutex)<a class="headerlink" href="#example-var-with-a-lot-of-values-mutex" title="Permanent link">#</a></h3>
+<p>where container1 is, which is mutually exclusive</p>
+<pre><code class="language-python">begin_variable
+var37
+-1
+10
+Atom holding(container1, robot)
+Atom in(dcup1, container1)
+Atom in(dcup2, container1)
+Atom in(drawer1, container1)
+Atom in(fridge1, container1)
+Atom in(ucup1, container1)
+Atom in(ucup2, container1)
+Atom on(burner, container1)
+Atom on(kitchentop, container1)
+Atom on(sink, container1)
+end_variable
+</code></pre>
+<pre><code class="language-python">begin_mutex_group
+3
+156 1
+174 7
+174 8
+end_mutex_group
+</code></pre>
+<h3 id="example-mutex-group">Example mutex group<a class="headerlink" href="#example-mutex-group" title="Permanent link">#</a></h3>
+<pre><code class="language-python">begin_mutex_group
+11
+156 0
+174 0
+174 1
+174 2
+174 3
+174 4
+174 5
+174 6
+174 9
+174 10
+174 11
+end_mutex_group
+</code></pre>
+<pre><code class="language-python">begin_variable
+var156
+-1
+2
+Atom cracked(egg1)
+Atom raw(egg1)
+end_variable
+</code></pre>
+<pre><code class="language-python">begin_variable
+var174
+-1
+13
+Atom holding(egg1, robot)
+Atom in(dcup1, egg1)
+Atom in(dcup2, egg1)
+Atom in(drawer1, egg1)
+Atom in(fridge1, egg1)
+Atom in(ucup1, egg1)
+Atom in(ucup2, egg1)
+Atom in-hole(egg1, bread1)
+Atom in-hole(egg1, butter)
+Atom on(burner, egg1)
+Atom on(kitchentop, egg1)
+Atom on(sink, egg1)
+&lt;none of those&gt;
+end_variable
+</code></pre>
+<h3 id="example-rule">Example rule<a class="headerlink" href="#example-rule" title="Permanent link">#</a></h3>
+<h4 id="simple-rule-with-one-cond-and-one-effect">simple rule with one cond and one effect<a class="headerlink" href="#simple-rule-with-one-cond-and-one-effect" title="Permanent link">#</a></h4>
+<pre><code class="language-python">begin_rule
+1  ## 1 condition
+14 0  ## cond
+18 0 1  ## effect
+end_rule
+</code></pre>
+<pre><code class="language-python">begin_variable  ## cond 
+var14
+0
+2
+Atom new-axiom@0() ## one variable for each defined axiom
+NegatedAtom new-axiom@0()
+end_variable
+
+begin_variable  ## effect 
+var18
+1
+2
+Atom is-egg(veggies1)
+NegatedAtom is-egg(veggies1)
+end_variable
+</code></pre>
+<h3 id="example-goal">Example goal<a class="headerlink" href="#example-goal" title="Permanent link">#</a></h3>
+<pre><code class="language-python">begin_goal
+2
+181 0
+183 0
+end_goal
+</code></pre>
+<p>2 destination values, in which </p>
+<pre><code class="language-python">begin_variable
+var181
+1 
+2
+Atom organized(kitchen)
+NegatedAtom organized(kitchen)
+end_variable
+</code></pre>
+<h3 id="example-rule_1">Example rule<a class="headerlink" href="#example-rule_1" title="Permanent link">#</a></h3>
+<p>the effect is making an axiom true, which makes the goal true</p>
+<pre><code class="language-python">begin_rule
+6  ## 6 conditions
+7 0   ## cond
+6 0
+5 0
+4 0
+3 0
+2 0
+8 0 1   ## effect
+end_rule
+
+begin_rule
+4
+8 1
+176 1
+1 1
+180 0
+181 1 0
+end_rule
+</code></pre>
+<pre><code class="language-python">begin_variable ## cond
+var7
+-1
+2
+Atom closed(dcup1)
+Atom opened(dcup1)
+end_variable
+
+begin_variable   ## effect
+var8
+0
+2
+Atom new-axiom@1()
+NegatedAtom new-axiom@1()
+end_variable
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../setup-repository/" class="btn btn-neutral float-right" title="Set up the Repository">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../exp-strategists/" class="btn btn-neutral" title="Combine Strategists [ NEW ]"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../exp-strategists/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../setup-repository/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

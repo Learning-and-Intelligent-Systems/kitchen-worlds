@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../css/favicon.ico">
+  
+  <title>Satisfising v.s. Optimizing - LEAPdocs</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  <link href="../css/extra.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Satisfising v.s. Optimizing";
+    var mkdocs_page_input_path = "exp-planner-options.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> LEAPdocs</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <p class="caption"><span class="caption-text">Project</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">LEAP Architecture</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../project-minutes/">Minutes & Notes</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Domains</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../domain-grocery/">Grocery - action costs</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../domain-kitchen/">Kitchen - large universe</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-igibson/">iGibson's BEHAVIOR</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-alfred/">AI2THOR's Alfred</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-habitat/">Habitat's Rearrangement</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Strategists</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-iobig/">PLOI-like IOBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-sdbig/">HPN-like SDBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-ipbig/">HPN-like IPBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-hpn/">HPN [ NEW ]</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Experiments</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-goals/">Num of Goal Predicates</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-objects/">Num of Objects</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-egg-recipes/">All Egg Recipes</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-two-dishes/">Two Dishes</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Satisfising v.s. Optimizing</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#make-egg-dishes">Make egg dishes</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#make-customer-happy">Make customer happy</a>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-merged-domains/">Merged Domains</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-strategists/">Combine Strategists [ NEW ]</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Notes</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../notes-fd/">FastDownward</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Set it up</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-repository/">Set up the Repository</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-mkdocs/">Set up MkDocs</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-notes/">Editor's Notes</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">LEAPdocs</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Experiments &raquo;</li>
+        
+      
+    
+    <li>Satisfising v.s. Optimizing</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="planner-modes">Planner Modes<a class="headerlink" href="#planner-modes" title="Permanent link">#</a></h1>
+<h2 id="make-egg-dishes">Make egg dishes<a class="headerlink" href="#make-egg-dishes" title="Permanent link">#</a></h2>
+<p><code>test_FD.sh</code> tests the planning time and performance of Satisfising LAMA (<code>lama_first</code>) and Optimizing LAMA (<code>lama</code>).</p>
+<p>Note that for each planner run, total timeout for translation and search is 10 sec. When <code>state</code> shows <code>(&gt;number)</code>, it means the search is still finding more plans. The best plan so far is reported here.</p>
+<pre><code class="language-python">     t  run_name                          var    op    axiom    plan    cost    parse      search  state
+------  ------------------------------  -----  ----  -------  ------  ------  -------  ----------  -------
+190628  omelette, pln=lama_first          187  2149       97      45      71    5.076  0.0226832   225
+190638  omelette, pln=lama                187  2149       97      45      64    5.274  0.139128    (&gt;4.79)
+------  ------------------------------  -----  ----  -------  ------  ------  -------  ----------  -------
+190644  scrambled_eggs, pln=lama_first    187  2149       97      53      85    5.234  0.0322311   306
+190655  scrambled_eggs, pln=lama          187  2149       97      44      61    5.516  0.189056    (&gt;4.54)
+------  ------------------------------  -----  ----  -------  ------  ------  -------  ----------  -------
+190700  sunny_side_up, pln=lama_first     187  2149       97      27      42    5.267  0.00612013  66
+190711  sunny_side_up, pln=lama           187  2149       97      28      41    5.178  0.114958    (&gt;4.87)
+------  ------------------------------  -----  ----  -------  ------  ------  -------  ----------  -------
+190716  egg_in_hole, pln=lama_first       187  2149       97      32      48    5.151  0.00806562  119
+190727  egg_in_hole, pln=lama             187  2149       97      30      41    5.121  0.112132    (&gt;4.95)
+------  ------------------------------  -----  ----  -------  ------  ------  -------  ----------  -------
+190732  poached_egg, pln=lama_first       225  2459      103      23      36    5.117  0.00811542  103
+190743  poached_egg, pln=lama             225  2459      103      20      31    5.007  0.119612    (&gt;5.04)
+</code></pre>
+<p>Goal of <code>poached_egg.pddl</code></p>
+<pre><code class="language-lisp">  ( :derived ( exist-poached-egg ?env - env )
+    ( exists 
+      ( ?egg1 - egg ?plate1 - plate ) ( enable-poached-egg ?egg1 ?plate1 )
+    )
+  )
+
+  ( :action declare-poached-egg
+    :parameters ( ?egg1 - egg ?plate1 - plate )
+    :precondition( and
+      ( boiled water )
+      ( boiled ?egg1 )
+      ( hardness ?egg1 outerside medium-hard )
+      ( has-vinegar water )
+    )
+    :effect( and
+      ( enable-poached-egg ?egg1 ?plate1 )
+
+      ;( not ( boiled water ) )
+      ( not ( boiled ?egg1 ) )
+      ( not ( hardness ?egg1 outerside medium-hard ) )
+      ;( not ( has-vinegar water ) )
+
+      ( increase ( total-cost ) 1 )
+    )
+  )
+</code></pre>
+<p>Plan of length 23 by <code>lama_first</code>:</p>
+<pre><code class="language-python">open dcup1 (1)
+getout pot1 dcup1 robot (1)
+close dcup1 (1)
+putdown pot1 burner robot (2)
+pickup faucet kitchentop robot (2)  ## it's unnecessary to pick up the faucet
+transfer water faucet pot1 robot (1)
+open fridge1 (1)
+getout egg1 fridge1 robot (1)
+close fridge1 (1)
+crack-egg egg1 smallbowl1 robot (1)
+putdown faucet burner robot (2)
+pickup smallbowl1 kitchentop robot (2)
+transfer egg1 smallbowl1 pot1 robot (1)
+open dcup1 (1)
+getout mediumbottle1 dcup1 robot (1)
+close dcup1 (1)
+switchon burner pot1 (1)
+change-level burner medium (1)
+boil water pot1 burner (5)
+boil water pot1 burner (5)
+switchoff burner pot1 (1)
+pour-liquid whitevinegar mediumbottle1 pot1 robot (2) ## chosen by lama_first
+declare-poached-egg egg1 plate1 (1)
+</code></pre>
+<p>Plan of length 20 by <code>lama</code>:</p>
+<pre><code class="language-python">pickup faucet kitchentop robot (2)
+transfer water faucet pot1 robot (1)
+open dcup1 (1)
+getout pot1 dcup1 robot (1)
+getout mediumbottle1 dcup1 robot (1)
+close dcup1 (1)
+open fridge1 (1)
+getout egg1 fridge1 robot (1)
+close fridge1 (1)
+crack-egg egg1 smallbowl1 robot (1)
+putdown pot1 burner robot (2)
+switchon burner pot1 (1)
+change-level burner medium (1)
+boil water pot1 burner (5)
+pickup smallbowl1 kitchentop robot (2)
+transfer egg1 smallbowl1 pot1 robot (1)
+boil water pot1 burner (5)
+switchoff burner pot1 (1)
+transfer whitevinegar mediumbottle1 pot1 robot (1) ## a better action chosen by lama
+declare-poached-egg egg1 plate1 (1)
+</code></pre>
+<h2 id="make-customer-happy">Make customer happy<a class="headerlink" href="#make-customer-happy" title="Permanent link">#</a></h2>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../exp-merged-domains/" class="btn btn-neutral float-right" title="Merged Domains">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../exp-two-dishes/" class="btn btn-neutral" title="Two Dishes"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../exp-two-dishes/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../exp-merged-domains/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

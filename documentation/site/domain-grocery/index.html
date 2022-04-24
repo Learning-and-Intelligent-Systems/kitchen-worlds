@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../css/favicon.ico">
+  
+  <title>Grocery - action costs - LEAPdocs</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  <link href="../css/extra.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Grocery - action costs";
+    var mkdocs_page_input_path = "domain-grocery.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> LEAPdocs</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <p class="caption"><span class="caption-text">Project</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">LEAP Architecture</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../project-minutes/">Minutes & Notes</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Domains</span></p>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Grocery - action costs</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#types-and-predicates">Types and Predicates</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#action-costs">Action costs</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#cost-of-traveling-time">Cost of traveling time:</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#cost-of-shopping">Cost of shopping:</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#other-costs">Other costs:</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#category-of-shopping">Category of shopping:</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#experimental-results-on-action-costs">Experimental results on action costs</a>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../domain-kitchen/">Kitchen - large universe</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-igibson/">iGibson's BEHAVIOR</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-alfred/">AI2THOR's Alfred</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-habitat/">Habitat's Rearrangement</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Strategists</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-iobig/">PLOI-like IOBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-sdbig/">HPN-like SDBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-ipbig/">HPN-like IPBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-hpn/">HPN [ NEW ]</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Experiments</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-goals/">Num of Goal Predicates</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-objects/">Num of Objects</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-egg-recipes/">All Egg Recipes</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-two-dishes/">Two Dishes</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-planner-options/">Satisfising v.s. Optimizing</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-merged-domains/">Merged Domains</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-strategists/">Combine Strategists [ NEW ]</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Notes</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../notes-fd/">FastDownward</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Set it up</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-repository/">Set up the Repository</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-mkdocs/">Set up MkDocs</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-notes/">Editor's Notes</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">LEAPdocs</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Domains &raquo;</li>
+        
+      
+    
+    <li>Grocery - action costs</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="grocery-shopping-domain">Grocery shopping domain<a class="headerlink" href="#grocery-shopping-domain" title="Permanent link">#</a></h1>
+<p>The grocery shopping domain is designed where action costs depend on the mode of transportation, distance between locations, and places to shop. </p>
+<p>The great city of Boston is simulated:</p>
+<p><img alt="Map of Boston" src="../imgs/grocery-map.png" /></p>
+<h2 id="types-and-predicates">Types and Predicates<a class="headerlink" href="#types-and-predicates" title="Permanent link">#</a></h2>
+<ul>
+<li>Transportation happens between <code>location</code>s, which are marked either by dots or squares</li>
+<li>An <code>area</code>, represented by a black dot, is a large <code>location</code>. </li>
+<li>Areas contain precise <code>location</code>s, which are represented by colored squares. Each precise <code>location</code> also contains a unmarked <code>parkinglot</code>, which is also of type <code>location</code></li>
+</ul>
+<h2 id="action-costs">Action costs<a class="headerlink" href="#action-costs" title="Permanent link">#</a></h2>
+<h4 id="cost-of-traveling-time">Cost of traveling time:<a class="headerlink" href="#cost-of-traveling-time" title="Permanent link">#</a></h4>
+<ul>
+<li>Between areas, cost of driving is 4, while cost of walking is 8</li>
+<li>Between an area and its locations, cost of driving or walking is 2</li>
+<li>Between locations in an area, cost of driving or walking is 4 = 2 + 2</li>
+</ul>
+<h4 id="cost-of-shopping">Cost of shopping:<a class="headerlink" href="#cost-of-shopping" title="Permanent link">#</a></h4>
+<ul>
+<li>In terms of pricing, <code>brothers-market</code> (1) &gt; <code>wholefoods</code> (4) &gt; <code>traderjoes</code>/<code>star-market</code>/<code>c-mart</code> (4), whose costs are 30, 20, 10 for each iterm respectively</li>
+<li>At <code>butchers-shop</code> (2), each item costs 30</li>
+<li>At <code>chocolate-shop</code> (3), each item costs 20</li>
+<li>At <code>pastry</code> (4), each item costs 10</li>
+</ul>
+<h4 id="other-costs">Other costs:<a class="headerlink" href="#other-costs" title="Permanent link">#</a></h4>
+<ul>
+<li>Cost of parking is 5 anywhere</li>
+<li>Costs of other operators are 1</li>
+</ul>
+<h4 id="category-of-shopping">Category of shopping:<a class="headerlink" href="#category-of-shopping" title="Permanent link">#</a></h4>
+<ul>
+<li>All markets sell <code>ingredient</code></li>
+<li>Places that sell <code>utensil</code>: <code>wholefoods</code>, <code>star-market</code>, <code>cmart</code></li>
+<li>Places that sell <code>lambchop</code>: <code>butchers</code></li>
+<li>Places that sell <code>bread</code>: <code>pastry</code></li>
+<li>Places that sell <code>alcohol</code>: <code>brothers-market</code>, <code>wholefoods</code>, <code>star-market</code></li>
+<li>Places that sell <code>pasta</code>: <code>brothers-market</code></li>
+<li>Places that sell <code>chocolate</code>: <code>chocolate-shop</code></li>
+<li><code>cmart</code> doesn't sell <code>seafood</code></li>
+<li><code>traderjoes</code> doesn't sell <code>baverages</code> </li>
+</ul>
+<h2 id="experimental-results-on-action-costs">Experimental results on action costs<a class="headerlink" href="#experimental-results-on-action-costs" title="Permanent link">#</a></h2>
+<p>There are 9 places that sell <code>veggie1</code> and <code>egg1</code>, and 2 places that sell <code>lamb-chop1</code></p>
+<ul>
+<li>
+<p><code>shop-veggie.pddl</code> requires purchase of <code>veggie1</code>; <code>shop-omelette.pddl</code> requires purchase of <code>veggies1</code> and <code>egg1</code></p>
+<ul>
+<li><code>lama-firt</code> chose to walk to Brother's Market, which is close but expensive</li>
+<li><code>lama</code> chose to drive to Trader Joe's Newburry Street, which is farther but cheapest</li>
+</ul>
+</li>
+<li>
+<p><code>shop-lamb-plate.pddl</code> requires purchase of <code>veggies1</code> and <code>lamb-chop1</code>:</p>
+<ul>
+<li>Both chose to buy <code>lambchop</code> at Butcher's Shop Beason Hill</li>
+<li><code>lama-firt</code> chose to buy <code>veggie1</code> at Brother's Market </li>
+<li><code>lama</code> chose to buy <code>veggie1</code> at Trader Joe's Newburry Street</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-python">     t  run_name                           var    op    axiom    plan    cost    parse       search    state
+------  -------------------------------  -----  ----  -------  ------  ------  -------  -----------  -------
+115254  shop_veggies, pln=lama_first       148   392      170       8      75    0.089  0.00033575        11
+115255  shop_veggies, pln=lama             148   392      170      18      67    0.086  0.0968291       3191
+------  -------------------------------  -----  ----  -------  ------  ------  -------  -----------  -------
+115255  shop_omelette, pln=lama_first      159   402      170      10     106    0.088  0.000423083       14
+115256  shop_omelette, pln=lama            159   402      170      20      78    0.087  0.390508       12204
+------  -------------------------------  -----  ----  -------  ------  ------  -------  -----------  -------
+115256  shop_lamb_plate, pln=lama_first    154   395      172      22     310    0.089  0.000801125       28
+115257  shop_lamb_plate, pln=lama          154   395      172      27     122    0.087  0.410943       12599
+</code></pre>
+<!--
+## Example problems and expected results
+
+Note that in the following calculation of costs, the cost of the same operations are omitted (e.g., parking once, entering building).
+
+![Map of Boston](imgs/grocery-map.png)
+
+#### `shop-veggie.pddl` requires purchase of `veggie1`:
+
+* `lama-firt` would choose `brothers-market`, cost = 2+2 + 30 + 2+2 = 38
+* `lama` would choose `wholefoods-cs` or `wholefoods-cp`, cost = 2+4+2 + 20 + 2+4+2 = 36
+
+#### `shop-omelette.pddl` requires purchase of `veggies1` and `egg1`:
+
+* `lama-firt` would choose `brothers-market`, cost = 2+2 + 60 + 2+2 = 68 
+* `lama` would choose `traderjoes-ns` or `starmarket-ns`, cost = 2+4+4+2 + 20 + 2+4+4+2 = 44
+
+#### `shop-lamb-plate.pddl` requires purchase of `veggies1` and `lamb-chop1`:
+
+* `lama-firt` would choose to park at `beacon-hill`, shop at `wholefoods-bh` and `butchers-shop-bh`, cost = 2+4+4 + 5 + 2 + 30 + 2+2 + 20 + 2+4+4+2 = 83
+* `lama` would choose to first shop at`traderjoes-ns` or `starmarket-ns`, then shop at `butchers-shop-bh`, parking twice and traveling further, cost = 2+4+4+2 + 5 + 10 + 2+4+2 + 5 + 30 + 2+4+4+2 = 82
+-->
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../domain-kitchen/" class="btn btn-neutral float-right" title="Kitchen - large universe">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../project-minutes/" class="btn btn-neutral" title="Minutes & Notes"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../project-minutes/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../domain-kitchen/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

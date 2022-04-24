@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../css/favicon.ico">
+  
+  <title>Two Dishes - LEAPdocs</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  <link href="../css/extra.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Two Dishes";
+    var mkdocs_page_input_path = "exp-two-dishes.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> LEAPdocs</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <p class="caption"><span class="caption-text">Project</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">LEAP Architecture</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../project-minutes/">Minutes & Notes</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Domains</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../domain-grocery/">Grocery - action costs</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../domain-kitchen/">Kitchen - large universe</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-igibson/">iGibson's BEHAVIOR</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-alfred/">AI2THOR's Alfred</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-habitat/">Habitat's Rearrangement</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Strategists</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-iobig/">PLOI-like IOBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-sdbig/">HPN-like SDBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-ipbig/">HPN-like IPBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-hpn/">HPN [ NEW ]</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Experiments</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-goals/">Num of Goal Predicates</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-objects/">Num of Objects</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-egg-recipes/">All Egg Recipes</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Two Dishes</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#make-two-dishes-of-the-same-kind">Make two dishes of the same kind</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#make-multiple-dishes-of-different-kind">Make multiple dishes of different kind</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#difference-between-plans">Difference between plans</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#lama-firts-plan-for-making-scrambled_eggs-and-egg_in_hole-64">lama-firt's Plan for making scrambled_eggs and egg_in_hole (64)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#lamas-plan-for-making-scrambled_eggs-and-egg_in_hole-54">lama's Plan for making scrambled_eggs and egg_in_hole (54)</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-planner-options/">Satisfising v.s. Optimizing</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-merged-domains/">Merged Domains</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-strategists/">Combine Strategists [ NEW ]</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Notes</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../notes-fd/">FastDownward</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Set it up</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-repository/">Set up the Repository</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-mkdocs/">Set up MkDocs</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-notes/">Editor's Notes</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">LEAPdocs</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Experiments &raquo;</li>
+        
+      
+    
+    <li>Two Dishes</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="making-multiple-different-dishes-take-longer-time-than-planning-individually">Making multiple different dishes take longer time than planning individually<a class="headerlink" href="#making-multiple-different-dishes-take-longer-time-than-planning-individually" title="Permanent link">#</a></h1>
+<h2 id="make-two-dishes-of-the-same-kind">Make two dishes of the same kind<a class="headerlink" href="#make-two-dishes-of-the-same-kind" title="Permanent link">#</a></h2>
+<p><code>test_serve_declare.sh</code>. The length of plan for making two poached egg is much smaller than making one poached egg because actions like <code>open fridge</code> and <code>switchoff burner pot1</code> need not be done again.</p>
+<pre><code class="language-python">     t  run_name              var    op    axiom    plan    parse     search    state
+------  ------------------  -----  ----  -------  ------  -------  ---------  -------
+102036  scrambled_eggs        362  4620      186      46   11.018  0.0549285      328
+102048  two_scrambled_eggs    362  4620      190      60   10.684  0.101157       689
+------  ------------------  -----  ----  -------  ------  -------  ---------  -------
+102059  omelette              370  4620      194      47   10.524  0.0495447      322
+102110  two_omelette          370  4620      202      66   10.048  0.114891       676
+------  ------------------  -----  ----  -------  ------  -------  ---------  -------
+102121  sunny_side_up         362  4620      186      30   10.633  0.0186152      118
+102132  two_sunny_side_up     362  4620      190      41   10.469  0.0331593      197
+------  ------------------  -----  ----  -------  ------  -------  ---------  -------
+102143  egg_in_hole           370  4620      194      34   10.37   0.0241679      185
+102155  two_egg_in_hole       370  4620      202      53   11.293  0.0766958      497
+------  ------------------  -----  ----  -------  ------  -------  ---------  -------
+102207  poached_egg           406  4993      218      24   10.932  0.0165712      112
+102219  two_poached_egg       406  4993      222      27   11.683  0.0159511      124
+</code></pre>
+<p>Instead of getting <code>( enable-poached-egg ?egg1 ?plate1 )</code> from axioms, we get it from the effects of operartors, which also include effects that reverse the preconditions. This enables flexible negation, for certain effects like <code>( not ( boiled water ) )</code> needs not be achieved again</p>
+<pre><code class="language-lisp">  ( :action declare-poached-egg
+    :parameters ( ?egg1 - egg ?plate1 - plate )
+    :precondition( and
+      ( boiled water )
+      ( boiled ?egg1 )
+      ( hardness ?egg1 outerside medium-hard )
+      ( has-vinegar water )
+    )
+    :effect( and
+      ( enable-poached-egg ?egg1 ?plate1 )
+
+      ;( not ( boiled water ) )
+      ( not ( boiled ?egg1 ) )
+      ( not ( hardness ?egg1 outerside medium-hard ) )
+      ;( not ( has-vinegar water ) )
+
+      ( increase ( total-cost ) 1 )
+    )
+  )
+</code></pre>
+<p>With the reversed effects, it's not only able to make two dishes of the same kind, but also of different kinds</p>
+<h2 id="make-multiple-dishes-of-different-kind">Make multiple dishes of different kind<a class="headerlink" href="#make-multiple-dishes-of-different-kind" title="Permanent link">#</a></h2>
+<p><code>test_serve_multiple.sh</code></p>
+<pre><code class="language-python">     t  run_name                          var    op    axiom    plan    cost    parse     search  state
+------  ------------------------------  -----  ----  -------  ------  ------  -------  ---------  -------
+225521  omelette, pln=lama_first          370  4619      167      46      72   10.295  0.0506214  291
+225533  egg_in_hole, pln=lama_first       370  4619      167      33      50   10.298  0.0257594  172
+225544  multiple_14, pln=lama_first       387  4619      183      68     107   10.206  0.180543   924
+------  ------------------------------  -----  ----  -------  ------  ------  -------  ---------  -------
+225559  omelette, pln=lama                370  4619      167      46      66   10.395  0.222248   (&gt;4.65)
+225615  egg_in_hole, pln=lama             370  4619      167      32      43   11.087  0.267335   (&gt;4.06)
+225631  multiple_14, pln=lama             387  4619      183      60      86   11.642  0.347518   (&gt;3.44)
+------  ------------------------------  -----  ----  -------  ------  ------  -------  ---------  -------
+225643  scrambled_eggs, pln=lama_first    362  4619      159      45      71   10.882  0.0535775  310
+225654  egg_in_hole, pln=lama_first       370  4619      167      33      50   10.258  0.0261091  172
+225706  multiple_24, pln=lama_first       379  4619      175      64     101   10.417  0.272622   1515
+------  ------------------------------  -----  ----  -------  ------  ------  -------  ---------  -------
+225721  scrambled_eggs, pln=lama          362  4619      159      43      60   10.584  0.229554   (&gt;4.46)
+225737  egg_in_hole, pln=lama             370  4619      167      32      43   10.635  0.206529   (&gt;4.43)
+225753  multiple_24, pln=lama             379  4619      175      54      76   10.407  0.397696   (&gt;4.64)
+</code></pre>
+<p>The tricky thing about using effects to separate multiple dishes is the need to prevent the same action being taken twice on the same ingredient, thus operators like <code>fry</code> and <code>steam</code> need to include preconditions like <code>( not ( fried ?i ) )</code> and <code>( not ( steamed ?i ) )</code>.</p>
+<h3 id="difference-between-plans">Difference between plans<a class="headerlink" href="#difference-between-plans" title="Permanent link">#</a></h3>
+<p>Steps in plan by <code>lama-first</code> but not by <code>lama</code>:</p>
+<pre><code class="language-python">['putdown egg1 burner robot (2)',
+ 'putdown milkbottle1 burner robot (2)',
+ 'putdown holecutter1 burner robot (2)',
+ 'pickup egg1 burner robot (2)',
+ 'getout container1 dcup2 robot (1)',
+ 'pour-liquid oliveoil oilbottle1 frypan1 robot (2)',
+ 'putdown tablespoon1 burner robot (2)',
+ 'pickup milkbottle1 burner robot (2)',
+ 'putdown oilbottle1 burner robot (2)',
+ 'putdown salter1 burner robot (2)',
+ 'putdown shaker1 burner robot (2)',
+ 'putdown milkbottle1 burner robot (2)',
+ 'putdown smallbowl1 burner robot (2)',
+ 'putdown spatula1 burner robot (2)']
+</code></pre>
+<p>Steps in plan by <code>lama</code> but not by <code>lama-first</code>:</p>
+<pre><code class="language-python">['puton holecutter1 bread1 robot (1)',
+ 'transfer oliveoil oilbottle1 frypan1 robot (1)',
+ 'puton tablespoon1 bread1 robot (1)',
+ 'puton salter1 bread1 robot (1)',
+ 'puton shaker1 bread1 robot (1)',
+ 'puton oilbottle1 bread1 robot (1)',
+ 'puton smallbowl1 bread1 robot (1)',
+ 'puton spatula1 bread1 robot (1)']
+</code></pre>
+<h3 id="lama-firts-plan-for-making-scrambled_eggs-and-egg_in_hole-64"><code>lama-firt</code>'s Plan for making scrambled_eggs and egg_in_hole (64)<a class="headerlink" href="#lama-firts-plan-for-making-scrambled_eggs-and-egg_in_hole-64" title="Permanent link">#</a></h3>
+<pre><code class="language-python">open fridge (1)
+getout egg1 fridge robot (1)
+getout milkbottle1 fridge robot (1)
+close fridge (1)
+putdown egg1 burner robot (2)
+pickup holecutter1 kitchentop robot (2)
+putdown milkbottle1 burner robot (2)
+make-hole toast1 holecutter1 circle robot (1)
+pickup fork1 kitchentop robot (2)
+putdown holecutter1 burner robot (2)
+open dcup2 (1)
+pickup egg1 burner robot (2)
+getout container1 dcup2 robot (1)
+getout oilbottle1 dcup2 robot (1)
+close dcup2 (1)
+pour-liquid oliveoil oilbottle1 frypan1 robot (2)
+open dcup1 (1)
+getout frypan1 dcup1 robot (1)
+close dcup1 (1)
+putdown frypan1 burner robot (2)
+pickup tablespoon1 kitchentop robot (2)
+crack-egg egg1 smallbowl1 robot (1)
+season egg1 chives container1 tablespoon1 robot (1)
+season egg1 pepper shaker1 tablespoon1 robot (1)
+season egg1 salt salter1 tablespoon1 robot (1)
+mix egg1 fork1 smallbowl1 robot (3)
+putdown tablespoon1 burner robot (2)
+pickup milkbottle1 burner robot (2)
+putdown oilbottle1 burner robot (2)
+pour smallbowl1 nutmilk milkbottle1 cup robot (1)
+pour smallbowl1 nutmilk milkbottle1 cup robot (1)
+pickup salter1 kitchentop robot (2)
+sprinkle egg1 salt salter1 gram robot (1)
+open fridge (1)
+getout egg4 fridge robot (1)
+close fridge (1)
+crack-egg egg4 toast1 robot (1)
+sprinkle egg4 salt salter1 gram robot (1)
+putdown salter1 burner robot (2)
+pickup shaker1 kitchentop robot (2)
+sprinkle egg1 pepper shaker1 gram robot (1)
+sprinkle egg4 pepper shaker1 gram robot (1)
+putdown shaker1 burner robot (2)
+pickup toast1 kitchentop robot (2)
+add-ingredient toast1 smallbowl1 robot (1)
+putdown milkbottle1 burner robot (2)
+pickup smallbowl1 kitchentop robot (2)
+transfer toast1 smallbowl1 frypan1 robot (1)
+transfer egg1 smallbowl1 frypan1 robot (1)
+putdown smallbowl1 burner robot (2)
+switchon burner frypan1 (1)
+fry toast1 frypan1 burner oliveoil (5)
+fry egg1 frypan1 burner oliveoil (5)
+switchoff burner frypan1 (1)
+pickup frypan1 burner robot (2)
+transfer toast1 frypan1 plate1 robot (1)
+declare-egg-in-hole egg4 toast1 plate1 (1)
+putdown frypan1 burner robot (2)
+pickup spatula1 kitchentop robot (2)
+scrape egg1 frypan1 spatula1 robot (3)
+putdown spatula1 burner robot (2)
+pickup frypan1 burner robot (2)
+transfer egg1 frypan1 plate1 robot (1)
+declare-scrambled-eggs egg1 plate1 (1)
+</code></pre>
+<h3 id="lamas-plan-for-making-scrambled_eggs-and-egg_in_hole-54"><code>lama</code>'s Plan for making scrambled_eggs and egg_in_hole (54)<a class="headerlink" href="#lamas-plan-for-making-scrambled_eggs-and-egg_in_hole-54" title="Permanent link">#</a></h3>
+<pre><code class="language-python">pickup holecutter1 kitchentop robot (2)
+make-hole toast1 holecutter1 circle robot (1)
+puton holecutter1 bread1 robot (1)
+pickup tablespoon1 kitchentop robot (2)
+open dcup2 (1)
+getout oilbottle1 dcup2 robot (1)
+close dcup2 (1)
+transfer oliveoil oilbottle1 frypan1 robot (1)
+open dcup1 (1)
+getout frypan1 dcup1 robot (1)
+close dcup1 (1)
+putdown frypan1 burner robot (2)
+switchon burner frypan1 (1)
+pickup fork1 kitchentop robot (2)
+open fridge (1)
+getout milkbottle1 fridge robot (1)
+getout egg1 fridge robot (1)
+crack-egg egg1 smallbowl1 robot (1)
+getout egg4 fridge robot (1)
+close fridge (1)
+crack-egg egg4 toast1 robot (1)
+season egg1 chives container1 tablespoon1 robot (1)
+season egg1 pepper shaker1 tablespoon1 robot (1)
+season egg1 salt salter1 tablespoon1 robot (1)
+mix egg1 fork1 smallbowl1 robot (3)
+puton tablespoon1 bread1 robot (1)
+pickup salter1 kitchentop robot (2)
+sprinkle egg1 salt salter1 gram robot (1)
+sprinkle egg4 salt salter1 gram robot (1)
+puton salter1 bread1 robot (1)
+pickup shaker1 kitchentop robot (2)
+sprinkle egg1 pepper shaker1 gram robot (1)
+sprinkle egg4 pepper shaker1 gram robot (1)
+puton shaker1 bread1 robot (1)
+pickup toast1 kitchentop robot (2)
+add-ingredient toast1 smallbowl1 robot (1)
+puton oilbottle1 bread1 robot (1)
+pickup smallbowl1 kitchentop robot (2)
+pour smallbowl1 nutmilk milkbottle1 cup robot (1)
+pour smallbowl1 nutmilk milkbottle1 cup robot (1)
+transfer toast1 smallbowl1 frypan1 robot (1)
+fry toast1 frypan1 burner oliveoil (5)
+transfer egg1 smallbowl1 frypan1 robot (1)
+fry egg1 frypan1 burner oliveoil (5)
+switchoff burner frypan1 (1)
+puton smallbowl1 bread1 robot (1)
+pickup frypan1 burner robot (2)
+transfer toast1 frypan1 plate1 robot (1)
+declare-egg-in-hole egg4 toast1 plate1 (1)
+puton milkbottle1 bread1 robot (1)
+pickup spatula1 kitchentop robot (2)
+scrape egg1 frypan1 spatula1 robot (3)
+transfer egg1 frypan1 plate1 robot (1)
+declare-scrambled-eggs egg1 plate1 (1)
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../exp-planner-options/" class="btn btn-neutral float-right" title="Satisfising v.s. Optimizing">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../exp-egg-recipes/" class="btn btn-neutral" title="All Egg Recipes"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../exp-egg-recipes/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../exp-planner-options/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

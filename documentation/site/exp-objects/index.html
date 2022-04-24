@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../css/favicon.ico">
+  
+  <title>Num of Objects - LEAPdocs</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  <link href="../css/extra.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Num of Objects";
+    var mkdocs_page_input_path = "exp-objects.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> LEAPdocs</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <p class="caption"><span class="caption-text">Project</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">LEAP Architecture</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../project-minutes/">Minutes & Notes</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Domains</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../domain-grocery/">Grocery - action costs</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../domain-kitchen/">Kitchen - large universe</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-igibson/">iGibson's BEHAVIOR</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-alfred/">AI2THOR's Alfred</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-habitat/">Habitat's Rearrangement</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Strategists</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-iobig/">PLOI-like IOBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-sdbig/">HPN-like SDBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-ipbig/">HPN-like IPBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-hpn/">HPN [ NEW ]</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Experiments</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-goals/">Num of Goal Predicates</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Num of Objects</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#conclusion-1-search-time-increases-linearly-with-alternative-utensils">Conclusion 1: Search time increases linearly with alternative utensils</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#note-1-use-axioms-to-define-recipe">Note 1: Use Axioms to define recipe</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#definition-of-an-omelette-in-kitchen_1pddl">Definition of an omelette in kitchen_1.pddl</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#note-2-objects-init-and-goals-in-omelette_5pddl">Note 2: Objects, Init, and Goals in omelette_5.pddl</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#note-3-the-objects-duplicated-in-obj_4pddl-and-obj_5pddl">Note 3: the Objects Duplicated in obj_4.pddl and obj_5.pddl</a>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-egg-recipes/">All Egg Recipes</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-two-dishes/">Two Dishes</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-planner-options/">Satisfising v.s. Optimizing</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-merged-domains/">Merged Domains</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-strategists/">Combine Strategists [ NEW ]</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Notes</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../notes-fd/">FastDownward</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Set it up</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-repository/">Set up the Repository</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-mkdocs/">Set up MkDocs</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-notes/">Editor's Notes</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">LEAPdocs</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Experiments &raquo;</li>
+        
+      
+    
+    <li>Num of Objects</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="more-objects-search-time-increases-linearly-with-alternative-utensils">More objects -&gt; Search time increases linearly with alternative utensils<a class="headerlink" href="#more-objects-search-time-increases-linearly-with-alternative-utensils" title="Permanent link">#</a></h1>
+<p><code>test_objects.sh</code> tests the effect of increasing the number of objects on search complexity by adding objects to <code>obj_0.pddl</code>, with the same set of operators in <code>kitchen_1.pddl</code> and the same goal definition in <code>omelette_5.pddl</code>, i.e. a full omelette:</p>
+<ul>
+<li><code>obj_0.pddl</code> contains the bare minimum set of objects --&gt; <a href="#note-2-objects-init-and-goals-in-omelette_5pddl">[Note 2]</a></li>
+<li><code>obj_1.pddl</code> adds 3 extranuous objects (i.e. pot/pan, bread/veggies, oliveoil/butter) </li>
+<li><code>obj_2.pddl</code> adds 3 alternative objects (i.e. knife/fork, bigbowl/smallbowl, saltedbutter/butter)</li>
+<li><code>obj_3.pddl</code> contains 10 eggs and 10 veggies (the goal mentions egg1 and veggie1) --&gt; <a href="#note-1-use-axioms-to-define-recipe">[Note 1]</a></li>
+<li><code>obj_4.pddl</code> contains multiples (2) of every utensil (11) --&gt; <a href="#note-3-the-objects-duplicated-in-obj_4pddl-and-obj_5pddl">[Note 3]</a></li>
+<li><code>obj_5.pddl</code> contains multiples (10) of every utensil (11) --&gt; <a href="#conclusion-1-search-time-increases-linearly-with-alternative-utensils">[Conclusion 1]</a> </li>
+<li><code>obj_eggs_0.pddl</code> contains the bare minimum set of objects for making 10 egg recipes</li>
+</ul>
+<pre><code class="language-python">     t  problem_name      var     op    axiom    plan    parse     search    state
+------  --------------  -----  -----  -------  ------  -------  ---------  -------
+142459  obj_0.pddl         56    932       11      48    0.483  0.0119011 *    177 
+142501  obj_1.pddl         61   1522       13      55    1.211  0.0194257      348 
+142502  obj_2.pddl         60   1280       13      54    0.898  0.0389651 *    580
+142505  obj_3.pddl         92   2930       46      48    2.721  0.0209925      181 
+142507  obj_4.pddl        119   2849       11      63    1.701  0.0684566 *    678 
+142546  obj_5.pddl        429  56083       11      53   37.081  0.596486  *    907 
+</code></pre>
+<h2 id="conclusion-1-search-time-increases-linearly-with-alternative-utensils">Conclusion 1: Search time increases linearly with alternative utensils<a class="headerlink" href="#conclusion-1-search-time-increases-linearly-with-alternative-utensils" title="Permanent link">#</a></h2>
+<p>Looking at line 1, line 3 (added 3 alternative utensil), line 5 (duplicated number of utensils by 2), and line 6 (duplicated number of utensils by 10), we notice that </p>
+<ul>
+<li>search time increases almost linearly</li>
+<li>number of operators increases more than linearly</li>
+<li>number of axioms doesn't change</li>
+<li>plan lengths are different (strange)</li>
+</ul>
+<h2 id="note-1-use-axioms-to-define-recipe">Note 1: Use Axioms to define recipe<a class="headerlink" href="#note-1-use-axioms-to-define-recipe" title="Permanent link">#</a></h2>
+<p>Note that 10 eggs and 10 veggies only has a small effect when the goal mentions only the existance of egg and veggies, as opposed to mentioning <code>egg1</code> and <code>veggie1</code>:</p>
+<ul>
+<li><code>obj_0.pddl</code> + <code>omelette_5.pddl</code> (<code>obj_0.pddl</code> contains the bare minimum set of objects)</li>
+<li><code>obj_3.pddl</code> + <code>omelette_5.pddl</code> (<code>obj_3.pddl</code> contains 10 eggs and 10 veggies)</li>
+<li><code>obj_3.pddl</code> + <code>omelette_5b.pddl</code>, which contains goal <code>(exist-omelette kitchen)</code> </li>
+</ul>
+<pre><code class="language-python">     t  problem_name               var    op    axiom    plan    parse     search    state
+------  -----------------------  -----  ----  -------  ------  -------  ---------  -------
+144457  obj_0, omelette_5.pddl      56   932       11      48    0.495  0.0104259      177
+144500  obj_3, omelette_5.pddl      92  2930       46      48    2.709  0.0198585      181
+144504  obj_3, omelette_5b.pddl    269  3524       83      49    2.763  0.0517935      409
+</code></pre>
+<p>the following are results containing goal of <code>(exist-omelette kitchen)</code> </p>
+<pre><code class="language-python">     t  run_name                                         var      op    axiom    plan    cost    parse      search    state
+------  ---------------------------------------------  -----    ----  -------  ------  ------  -------  ----------  -------
+210933  kitchen_egg_1, omelette, obj_0.pddl               60     932       27      47      47    0.511   0.0102195      165
+211058  kitchen_egg_1, omelette, obj_3.pddl              294    3542      198      47      47    3.094   0.0526419      424
+214116  kitchen_egg_1, omelette, obj_4.pddl              124    2849       29      68      68    1.667    0.068268      680
+063459  kitchen_egg_1, omelette, obj_4_xl.pddl           358    9419      299      51      51   12.865     0.41591     1618
+065450  kitchen_egg_1, omelette, obj_4_xxl.pddl          444   32749      501      51      51   40.412    0.507984     1109
+</code></pre>
+<h3 id="definition-of-an-omelette-in-kitchen_1pddl">Definition of an omelette in <code>kitchen_1.pddl</code><a class="headerlink" href="#definition-of-an-omelette-in-kitchen_1pddl" title="Permanent link">#</a></h3>
+<pre><code>  ( :derived ( exist-omelette ?env - env )
+    ( exists 
+      ( ?egg1 - egg ?veggies1 - ingredient ?plate1 - plate ?p - normalcontainer )
+      ( and 
+        ( inside ?plate1 ?egg1 )
+        ( beaten ?egg1 )
+        ( fried ?egg1 )
+        ( folded ?egg1 )
+        ( is-buttery ?egg1 )
+
+        ( fried ?veggies1 )
+        ( sauteed ?veggies1 )
+
+        ( has-seasoning ?egg1 nutmilk cup two )
+
+        ( has-seasoning ?egg1 chives tablespoon1 two )
+        ( seasoning-mixed ?egg1 chives )
+
+        ( has-seasoning ?egg1 salt gram two )
+        ( seasoning-mixed ?egg1 salt )
+
+        ( has-seasoning ?egg1 pepper gram two )
+        ( seasoning-mixed ?egg1 pepper )
+      )
+    )
+  )
+</code></pre>
+<h2 id="note-2-objects-init-and-goals-in-omelette_5pddl">Note 2: Objects, Init, and Goals in <code>omelette_5.pddl</code><a class="headerlink" href="#note-2-objects-init-and-goals-in-omelette_5pddl" title="Permanent link">#</a></h2>
+<pre><code>(define (problem Omelette)
+  (:domain Kitchen)
+
+  (:objects
+
+    ucup1 ucup2 dcup1 dcup2 drawer1 fridge - furniture
+    burner - appliance
+    kitchentop sink - worktop
+
+    salt pepper chives - seasoning
+    butter - oil
+    nutmilk - liquid
+    veggies1 - ingredient
+    egg1 - egg
+
+    fork1 - normalutensil
+    spatula1 - cookingutensil
+    tablespoon1 - measureutensil
+    whisk1 - whiskutensil
+
+    plate1 - plate
+    salter1 shaker1 container1 - normalcontainer
+    milkbottle1 - liquidcontainer
+    smallbowl1 - specialcontainer
+    frypan1 - cookingcontainer
+    robot - agent
+
+    one two three four - number
+    gram cup - measureunit
+    kitchen - env 
+
+  )
+
+  (:init
+
+    ; ----------------------
+    ; properties of places that cannot move
+    ; ----------------------
+    (closed drawer1)
+    (closed dcup1)
+    (closed fridge)
+    (closed dcup2)
+    (closed ucup1)
+    (closed ucup2)
+    (switchedoff burner)
+
+    ; ----------------------
+    ; stored in places that cannot move
+    ; ----------------------
+    (in dcup1 frypan1)
+    (in dcup2 container1)
+
+    (in fridge egg1)
+    (in fridge veggies1)
+    (in fridge milkbottle1)
+    (in fridge butter)
+
+    (on kitchentop salter1)
+    (on kitchentop shaker1)
+    (on kitchentop tablespoon1)
+    (on kitchentop fork1)
+    (on kitchentop spatula1)
+    (on kitchentop whisk1)
+    (on kitchentop plate1)
+    (on kitchentop smallbowl1)
+
+    ; ----------------------
+    ; stored in movables
+    ; ----------------------
+    (inside salter1 salt)
+    (inside shaker1 pepper)
+    (inside container1 chives)
+    (inside milkbottle1 nutmilk)
+
+    ; ----------------------
+    ; properties of ingredients
+    ; ----------------------
+    (raw egg1)
+    (sauteed veggies1)
+    (is-butter butter)
+
+  )
+
+  (:goal
+    (and
+      (closed ucup1)
+      (closed ucup2)
+      (closed dcup1)
+      (closed dcup2)
+      (closed drawer1)
+      (closed fridge)
+      (switchedoff burner)
+
+      (beaten egg1)
+      (fried egg1)
+      (folded egg1)
+      (is-buttery egg1)
+
+      (fried veggies1)
+
+      (has-seasoning egg1 salt gram four)
+      (seasoning-mixed egg1 salt)
+
+      (has-seasoning egg1 pepper gram four)
+      (seasoning-mixed egg1 pepper)
+
+      (has-seasoning egg1 chives tablespoon1 two)
+      (seasoning-mixed egg1 chives)
+
+      (has-seasoning egg1 nutmilk cup two)
+    )
+  )
+)
+</code></pre>
+<h2 id="note-3-the-objects-duplicated-in-obj_4pddl-and-obj_5pddl">Note 3: the Objects Duplicated in <code>obj_4.pddl</code> and <code>obj_5.pddl</code><a class="headerlink" href="#note-3-the-objects-duplicated-in-obj_4pddl-and-obj_5pddl" title="Permanent link">#</a></h2>
+<pre><code>    (in dcup1 frypan2)
+    (in dcup2 container2)
+
+    (in fridge milkbottle2)
+
+    (on kitchentop salter2)
+    (on kitchentop shaker2)
+    (on kitchentop tablespoon2)
+    (on kitchentop fork2)
+    (on kitchentop spatula2)
+    (on kitchentop whisk2)
+    (on kitchentop plate2)
+    (on kitchentop smallbowl2)
+
+    (inside salter2 salt)
+    (inside shaker2 pepper)
+    (inside container2 chives)
+    (inside milkbottle2 nutmilk)
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../exp-egg-recipes/" class="btn btn-neutral float-right" title="All Egg Recipes">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../exp-goals/" class="btn btn-neutral" title="Num of Goal Predicates"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../exp-goals/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../exp-egg-recipes/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

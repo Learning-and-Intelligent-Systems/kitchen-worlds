@@ -38,6 +38,8 @@ from pddlstream.algorithms.meta import solve, create_parser
 from pybullet_planning.lisdf_tools.lisdf_loader import load_lisdf_pybullet
 from pybullet_planning.lisdf_tools.lisdf_planning import pddl_to_init_goal, Problem
 
+DEFAULT_TEST = 'kitchen' ## 'blocks_pick'
+
 def get_stream_map(p, c, l, t):
     # p = problem
     # c = collisions
@@ -159,7 +161,7 @@ def main(exp_name, partial=False, defer=False, verbose=True):
     args = parser.parse_args()
     print('Arguments:', args)
 
-    exp_dir = exp_dir = join(EXP_PATH, args.test)
+    exp_dir = join(EXP_PATH, args.test)
     world = load_lisdf_pybullet(join(exp_dir, 'scene.lisdf'))
     world.summarize_all_objects()
     saver = WorldSaver()
@@ -204,4 +206,4 @@ def main(exp_name, partial=False, defer=False, verbose=True):
     disconnect()
 
 if __name__ == '__main__':
-    main(exp_name='test_pick')
+    main(exp_name=DEFAULT_TEST)

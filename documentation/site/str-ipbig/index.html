@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../css/favicon.ico">
+  
+  <title>HPN-like IPBIG [ NEW ] - LEAPdocs</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  <link href="../css/extra.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "HPN-like IPBIG [ NEW ]";
+    var mkdocs_page_input_path = "str-ipbig.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> LEAPdocs</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <p class="caption"><span class="caption-text">Project</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">LEAP Architecture</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../project-minutes/">Minutes & Notes</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Domains</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../domain-grocery/">Grocery - action costs</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../domain-kitchen/">Kitchen - large universe</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-igibson/">iGibson's BEHAVIOR</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-alfred/">AI2THOR's Alfred</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sim-habitat/">Habitat's Rearrangement</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Strategists</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../str-iobig/">PLOI-like IOBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-sdbig/">HPN-like SDBIG [ NEW ]</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">HPN-like IPBIG [ NEW ]</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#example-refinement-time-costs-are-negligible">Example refinement time costs are negligible</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#example-high-level-plan">Example high level plan</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#example-refinement-during-execution">Example refinement during execution</a>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../str-hpn/">HPN [ NEW ]</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Experiments</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-goals/">Num of Goal Predicates</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-objects/">Num of Objects</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-egg-recipes/">All Egg Recipes</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-two-dishes/">Two Dishes</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-planner-options/">Satisfising v.s. Optimizing</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-merged-domains/">Merged Domains</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../exp-strategists/">Combine Strategists [ NEW ]</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Notes</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../notes-fd/">FastDownward</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Set it up</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-repository/">Set up the Repository</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-mkdocs/">Set up MkDocs</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../setup-notes/">Editor's Notes</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">LEAPdocs</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Strategists &raquo;</li>
+        
+      
+    
+    <li>HPN-like IPBIG [ NEW ]</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="ignore-preconditions-based-on-influence-graphs">Ignore Preconditions Based on Influence Graphs<a class="headerlink" href="#ignore-preconditions-based-on-influence-graphs" title="Permanent link">#</a></h1>
+<p>Results from <code>tests/test_ipbig.sh</code>. All tasks are planned by satisfising LAMA, on merged domain <code>grocery_costs.pddl+kitchen_extended.pddl</code> and problem <code>omelette_extended.pddl</code></p>
+<ul>
+<li><code>IPBIG[0]</code>: ignores <code>agent-at</code></li>
+<li><code>IPBIG[1]</code>: ignores <code>holding</code></li>
+<li><code>IPBIG[3]</code>: ignores <code>at-loc</code></li>
+<li><code>IPBIG[5]</code>: ignores <code>handsfull</code></li>
+<li><code>IPBIG[7]</code>: ignores <code>agent-has</code></li>
+<li><code>IPBIG[8]</code>: ignores <code>has-seasoning</code></li>
+</ul>
+<pre><code class="language-python">     t  run_name         var    op    axiom    plan    cost    prep    parse      search    state
+------  -------------  -----  ----  -------  ------  ------  ------  -------  ----------  -------
+130413                   415  2952      266      57     156   0        5.409  0.0515112       475
+130427  prep=IPBIG[0]    272  2570       90      48     133   0.04     5.372  2.84759       25475
+130605  prep=IPBIG[1]    543  3538      237      23      38   0.039    5.08   0.00866371       54
+130618  prep=IPBIG[3]    595  3957      240      52     146   0.05     6.254  0.0295362       199
+130629  prep=IPBIG[5]    403  2908      264      47     163   0.06     5.346  0.0403495       180
+130641  prep=IPBIG[7]    514  3549      222      40      55   0.051    5.827  0.0402433       201
+130650  prep=IPBIG[8]    388  2560      266      41     133   0.055    2.114  0.0100458       104
+</code></pre>
+<h2 id="example-refinement-time-costs-are-negligible">Example refinement time costs are negligible<a class="headerlink" href="#example-refinement-time-costs-are-negligible" title="Permanent link">#</a></h2>
+<p>Refinement costs for <code>prep=IPBIG[0]</code></p>
+<pre><code class="language-python">     t  run_name                      var    op    axiom    plan    cost    prep    parse       search    state
+------  --------------------------  -----  ----  -------  ------  ------  ------  -------  -----------  -------
+132617  pay-grocery-30 veggies1       149   393      170       4       4   0.041    5.448  0.000204958        4
+132642  pay-grocery-30 egg2           149   393      170       1       1   0.041    5.338  0.000110542        2
+132652  store-obj veggies1            268  1464      211       4       4   0.041    5.353  0.000397709        7
+132717  store-obj egg2                268  1464      211       1       1   0.041    5.932  0.000291625        4
+</code></pre>
+<h2 id="example-high-level-plan">Example high level plan<a class="headerlink" href="#example-high-level-plan" title="Permanent link">#</a></h2>
+<p>Action number 2-5 are abstract actions that need to be refined (there's '---no-' in the operator name). The plan is given to the executor. An action is executed if it's primitive action and is refined if it's abstract. During refinement, IPBIG computes the grounded effects of taking the abstract action, and using it as the goal of a new planning task, whose domain includes all the original operators.</p>
+<pre><code>open fridge1 (1)
+pay-grocery-30---no-shopping-at veggies1 market1 card1 robot (30)
+pay-grocery-30---no-shopping-at egg2 market1 card1 robot (30)
+store-obj---no-agent-at veggies1 fridge1 robot (1)
+store-obj---no-agent-at egg2 fridge1 robot (1)
+getout egg2 fridge1 robot (1)
+getout veggies1 fridge1 robot (1)
+getout milkbottle1 fridge1 robot (1)
+add-ingredient egg2 smallbowl1 robot (1)
+add-ingredient veggies1 smallbowl1 robot (1)
+pour-to-ingredient egg2 smallbowl1 nutmilk milkbottle1 cup robot (1)
+pour-to-ingredient egg2 smallbowl1 nutmilk milkbottle1 cup robot (1)
+putdown milkbottle1 burner robot (2)
+pickup fork1 kitchentop robot (2)
+mix egg2 fork1 smallbowl1 robot (3)
+putdown fork1 burner robot (2)
+pickup salter1 kitchentop robot (2)
+sprinkle egg2 salt salter1 cup robot (1)
+sprinkle egg2 salt salter1 gram robot (1)
+sprinkle egg2 salt salter1 gram robot (1)
+putdown salter1 burner robot (2)
+pickup shaker1 kitchentop robot (2)
+sprinkle egg2 pepper shaker1 cup robot (1)
+sprinkle egg2 pepper shaker1 gram robot (1)
+sprinkle egg2 pepper shaker1 gram robot (1)
+putdown shaker1 burner robot (2)
+pickup smallbowl1 kitchentop robot (2)
+transfer veggies1 smallbowl1 frypan1 robot (1)
+transfer egg2 smallbowl1 frypan1 robot (1)
+open dcup1 (1)
+getout frypan1 dcup1 robot (1)
+getout container1 dcup1 robot (1)
+getout oilbottle1 dcup1 robot (1)
+sprinkle egg2 chives container1 cup robot (1)
+pour-liquid oliveoil oilbottle1 frypan1 robot (2)
+putdown smallbowl1 burner robot (2)
+pickup tablespoon1 kitchentop robot (2)
+season egg2 chives container1 tablespoon1 robot (1)
+season egg2 chives container1 tablespoon1 robot (1)
+putdown tablespoon1 burner robot (2)
+pickup spatula1 kitchentop robot (2)
+putdown frypan1 burner robot (2)
+pickup fork1 burner robot (2)
+switchon burner frypan1 (1)
+fry veggies1 frypan1 burner oliveoil (5)
+fry egg2 frypan1 burner oliveoil (5)
+fold egg2 frypan1 spatula1 robot (3)
+declare-omelette egg2 veggies1 plate1 (1)
+</code></pre>
+<h2 id="example-refinement-during-execution">Example refinement during execution<a class="headerlink" href="#example-refinement-during-execution" title="Permanent link">#</a></h2>
+<ul>
+<li><code>add</code> includes added effect of the action</li>
+<li><code>del</code> includes deleted effect of the action</li>
+<li><code>add-sim</code> includes the simple literals in the current state that's not present in initial state</li>
+<li><code>del-sim</code> includes the simple literals in the initial state that's not present in current state</li>
+<li><code>add-der</code> includes the derived literals in the current state that's not present in initial state</li>
+<li><code>del-der</code> includes the derived literals in the initial state that's not present in current state</li>
+</ul>
+<pre><code class="language-lisp">[0/47]   a = open fridge1 (1)
+         add: (opened fridge1)
+         del: (closed fridge1)
+         add-sim: (opened fridge1)
+         del-sim: (closed fridge1)
+         add-der: 
+         del-der: 
+
+refinement goal: ['(paid veggies1)', '(agent-has robot veggies1)', '(agent-owns robot veggies1)', '(not (at-loc veggies1 market1))']
+
+[1/50]   a = exit-building home ashdown robot (1)
+         add: (agent-at robot ashdown)
+         del: (agent-at robot home)
+         add-sim: (opened fridge1) (agent-at robot ashdown)
+         del-sim: (closed fridge1) (agent-at robot home)
+         add-der: 
+         del-der: 
+
+[2/50]   a = walk-within-area mit-campus ashdown brothers-market robot (1)
+         add: (agent-at robot brothers-market)
+         del: (agent-at robot ashdown)
+         add-sim: (agent-at robot brothers-market) (opened fridge1)
+         del-sim: (closed fridge1) (agent-at robot home)
+         add-der: 
+         del-der: 
+
+[3/50]   a = enter-building market1 brothers-market robot (1)
+         add: (agent-at robot market1) (shopping-at robot market1)
+         del: (agent-at robot brothers-market)
+         add-sim: (agent-at robot market1) (opened fridge1)
+         del-sim: (closed fridge1) (agent-at robot home)
+         add-der: (shopping-at robot market1)
+         del-der: 
+
+[4/50]   a = pay-grocery-30 veggies1 market1 card1 robot (1)
+         add: (agent-owns robot veggies1) (agent-has robot veggies1) (paid veggies1)
+         del: (at-loc veggies1 market1)
+         add-sim: (agent-at robot market1) (agent-has robot veggies1) (opened fridge1) (agent-owns robot veggies1) (paid veggies1)
+         del-sim: (at-loc veggies1 market1) (closed fridge1) (agent-at robot home)
+         add-der: (shopping-at robot market1)
+         del-der: 
+
+refinement goal: ['(paid egg2)', '(agent-has robot egg2)', '(agent-owns robot egg2)', '(not (at-loc egg2 market1))']
+
+[5/50]   a = pay-grocery-30 egg2 market1 card1 robot (1)
+         add: (agent-has robot egg2) (paid egg2) (agent-owns robot egg2)
+         del: (at-loc egg2 market1)
+         add-sim: (agent-at robot market1) (paid egg2) (agent-has robot veggies1) (opened fridge1) (agent-owns robot veggies1) (agent-owns robot egg2) (paid veggies1) (agent-has robot egg2)
+         del-sim: (at-loc veggies1 market1) (closed fridge1) (agent-at robot home) (at-loc egg2 market1)
+         add-der: (shopping-at robot market1)
+         del-der: 
+
+refinement goal: ['(not (agent-has robot veggies1))', '(in fridge1 veggies1)']
+
+[6/53]   a = exit-building market1 brothers-market robot (1)
+         add: (agent-at robot brothers-market)
+         del: (agent-at robot market1) (shopping-at robot market1)
+         add-sim: (paid egg2) (agent-has robot veggies1) (opened fridge1) (agent-owns robot veggies1) (agent-owns robot egg2) (paid veggies1) (agent-has robot egg2) (agent-at robot brothers-market)
+         del-sim: (at-loc veggies1 market1) (closed fridge1) (agent-at robot home) (at-loc egg2 market1)
+         add-der: 
+         del-der: 
+
+[7/53]   a = walk-within-area mit-campus brothers-market ashdown robot (1)
+         add: (agent-at robot ashdown)
+         del: (agent-at robot brothers-market)
+         add-sim: (paid egg2) (agent-has robot veggies1) (opened fridge1) (agent-owns robot veggies1) (agent-owns robot egg2) (paid veggies1) (agent-has robot egg2) (agent-at robot ashdown)
+         del-sim: (at-loc veggies1 market1) (closed fridge1) (agent-at robot home) (at-loc egg2 market1)
+         add-der: 
+         del-der: 
+
+[8/53]   a = enter-building home ashdown robot (1)
+         add: (agent-at robot home)
+         del: (agent-at robot ashdown)
+         add-sim: (paid egg2) (agent-has robot veggies1) (opened fridge1) (agent-owns robot veggies1) (agent-owns robot egg2) (paid veggies1) (agent-has robot egg2)
+         del-sim: (at-loc veggies1 market1) (closed fridge1) (at-loc egg2 market1)
+         add-der: 
+         del-der: 
+
+[9/53]   a = store-obj veggies1 fridge1 robot (1)
+         add: (in fridge1 veggies1)
+         del: (agent-has robot veggies1)
+         add-sim: (paid egg2) (in fridge1 veggies1) (opened fridge1) (agent-owns robot veggies1) (agent-owns robot egg2) (paid veggies1) (agent-has robot egg2)
+         del-sim: (at-loc veggies1 market1) (closed fridge1) (at-loc egg2 market1)
+         add-der: 
+         del-der: 
+
+refinement goal: ['(not (agent-has robot egg2))', '(in fridge1 egg2)']
+
+[10/53]  a = store-obj egg2 fridge1 robot (1)
+         add: (in fridge1 egg2)
+         del: (agent-has robot egg2)
+         add-sim: (paid egg2) (in fridge1 veggies1) (opened fridge1) (agent-owns robot veggies1) (agent-owns robot egg2) (paid veggies1) (in fridge1 egg2)
+         del-sim: (at-loc veggies1 market1) (closed fridge1) (at-loc egg2 market1)
+         add-der: 
+         del-der: 
+
+[11/53]  a = getout egg2 fridge1 robot (1)
+         add: (handsfull robot) (holding egg2 robot)
+         del: (in fridge1 egg2)
+         add-sim: (handsfull robot) (paid egg2) (in fridge1 veggies1) (opened fridge1) (agent-owns robot veggies1) (agent-owns robot egg2) (paid veggies1) (holding egg2 robot)
+         del-sim: (at-loc veggies1 market1) (closed fridge1) (at-loc egg2 market1)
+         add-der: 
+         del-der: 
+
+[12/53]  a = getout veggies1 fridge1 robot (1)
+         add: (holding veggies1 robot)
+         del: (in fridge1 veggies1)
+         add-sim: (handsfull robot) (paid egg2) (opened fridge1) (agent-owns robot veggies1) (agent-owns robot egg2) (paid veggies1) (holding veggies1 robot) (holding egg2 robot)
+         del-sim: (at-loc veggies1 market1) (closed fridge1) (at-loc egg2 market1)
+         add-der: 
+         del-der: 
+
+[13/53]  a = getout milkbottle1 fridge1 robot (1)
+         add: (holding milkbottle1 robot)
+         del: (in fridge1 milkbottle1)
+         add-sim: (handsfull robot) (paid egg2) (opened fridge1) (holding milkbottle1 robot) (agent-owns robot veggies1) (agent-owns robot egg2) (paid veggies1) (holding veggies1 robot) (holding egg2 robot)
+         del-sim: (at-loc veggies1 market1) (in fridge1 milkbottle1) (closed fridge1) (at-loc egg2 market1)
+         add-der: 
+         del-der: 
+
+[14/53]  a = add-ingredient egg2 smallbowl1 robot (1)
+         add: (inside smallbowl1 egg2)
+         del: (holding egg2 robot)
+         add-sim: (handsfull robot) (paid egg2) (opened fridge1) (holding milkbottle1 robot) (agent-owns robot veggies1) (agent-owns robot egg2) (paid veggies1) (holding veggies1 robot) (inside smallbowl1 egg2)
+         del-sim: (at-loc veggies1 market1) (in fridge1 milkbottle1) (closed fridge1) (at-loc egg2 market1)
+         add-der: 
+         del-der: 
+
+...
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../str-hpn/" class="btn btn-neutral float-right" title="HPN [ NEW ]">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../str-sdbig/" class="btn btn-neutral" title="HPN-like SDBIG [ NEW ]"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../str-sdbig/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../str-hpn/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
