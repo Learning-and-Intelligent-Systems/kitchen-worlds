@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="shortcut icon" href="../css/favicon.ico" />
-    <title>Editor's Notes - KitchenWorlds</title>
+    <title>LISPDDL - KitchenWorlds</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
@@ -13,8 +13,8 @@
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Editor\u0027s Notes";
-        var mkdocs_page_input_path = "setup-notes.md";
+        var mkdocs_page_name = "LISPDDL";
+        var mkdocs_page_input_path = "tut-lispddl.md";
         var mkdocs_page_url = null;
       </script>
     
@@ -47,10 +47,14 @@
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Tutorials</span></p>
-              <ul>
+              <ul class="current">
                   <li class="toctree-l1"><a class="reference internal" href="../tut-lisdf/">LISDF</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../tut-lispddl/">LISPDDL</a>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">LISPDDL</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#test-parsing-lispddl">Test Parsing LISPDDL</a>
+    </li>
+    </ul>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Domains</span></p>
@@ -64,18 +68,12 @@
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Set it up</span></p>
-              <ul class="current">
+              <ul>
                   <li class="toctree-l1"><a class="reference internal" href="../setup-repository/">Set up the Repository</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../setup-mkdocs/">Set up MkDocs</a>
                   </li>
-                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Editor's Notes</a>
-    <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#editors">Editors</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#programmers">Programmers</a>
-    </li>
-    </ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../setup-notes/">Editor's Notes</a>
                   </li>
               </ul>
       </div>
@@ -92,7 +90,7 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
-          <li>Set it up &raquo;</li><li>Editor's Notes</li>
+          <li>Tutorials &raquo;</li><li>LISPDDL</li>
     <li class="wy-breadcrumbs-aside">
     </li>
   </ul>
@@ -102,30 +100,27 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="notes">Notes<a class="headerlink" href="#notes" title="Permanent link">#</a></h1>
-<h2 id="editors">Editors<a class="headerlink" href="#editors" title="Permanent link">#</a></h2>
-<p>To embed codes in this documentation, I use <a href="https://emgithub.com/">https://emgithub.com/</a></p>
-<p>To embed Google Doc/Sheet/Slides in this documentation, go to that document, click menu bar <code>File &gt; Publich to the Web &gt; Embed &gt; Publish</code>.</p>
-<h2 id="programmers">Programmers<a class="headerlink" href="#programmers" title="Permanent link">#</a></h2>
-<p>To run a test script, instead of <code>./test_some_script.sh</code>  use <code>./test_some_script.sh 2&gt; /dev/null</code> to suppress warning from killing ghost programs.</p>
-<p>For easier debugging and learning about unfamiliar packages (e.g. PDDLGym), I'm using PyCharm. But somehow the packages need to be imported from a different path, compared to when I'm testing my script from command line. The following code changes the import script automatically:</p>
-<pre><code class="language-python">import sys
-if sys.stdin and sys.stdin.isatty():
-    ## to use pddlgym from command line
-    ## e.g., python run.py kitchen_extended.pddl scrambled_eggs.pddl -o obj_extended.pddl -v 0 -e 'experiments/planner_FD'
-    from .pddlgym.pddlgym.parser import PDDLDomainParser, PDDLProblemParser
-    from .pddlgym.pddlgym.core import PDDLEnv
-else:
-    ## to use pddlgym from PyCharm
-    ## e.g., when testing `experiments/env.py`, or `experiments/pddlgym/pddlgym/downward_translator/normalize.py`
-    from pddlgym.pddlgym.parser import PDDLDomainParser, PDDLProblemParser
-    from pddlgym.pddlgym.core import PDDLEnv
+                <h1 id="lispddl-lis-extended-version-to-pddl-for-describing-tamp-problems">LISPDDL = LIS extended version to PDDL for describing TAMP problems<a class="headerlink" href="#lispddl-lis-extended-version-to-pddl-for-describing-tamp-problems" title="Permanent link">#</a></h1>
+<p>To enable the specification and parsing of continuous objects in PDDL, the LISPDDL format has a few extensions compared to <a href="https://planning.wiki/ref/pddl/problem">PDDL 1.2</a>:</p>
+<h2 id="test-parsing-lispddl">Test Parsing LISPDDL<a class="headerlink" href="#test-parsing-lispddl" title="Permanent link">#</a></h2>
+<p>You may test parse your problem pddl file with the following:</p>
+<pre><code>cd tests
+python test_pybullet_lisdf -s path/to/lisdf -d path/to/domain -d path/to/problem
+
+## for example
+python test_parse_pddl -s path/to/lisdf -d path/to/domain -d path/to/problem
 </code></pre>
+<p>Note that it requires three input:</p>
+<ul>
+<li>A scene described in LISDF, so that the bodies and links referred as strings in the pddl files can be grounded in the simulator.</li>
+<li>A partial domain described in PDDL, where the operators are taken out.</li>
+</ul>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../setup-mkdocs/" class="btn btn-neutral float-left" title="Set up MkDocs"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../tut-lisdf/" class="btn btn-neutral float-left" title="LISDF"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../domain-rearrangement/" class="btn btn-neutral float-right" title="Rearrangement">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -148,8 +143,10 @@ else:
   <span class="rst-current-version" data-toggle="rst-current-version">
     
     
-      <span><a href="../setup-mkdocs/" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../tut-lisdf/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
+    
+      <span><a href="../domain-rearrangement/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
