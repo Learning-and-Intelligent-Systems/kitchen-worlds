@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="shortcut icon" href="css/favicon.ico" />
-    <title>Kitchen Worlds - KitchenWorlds</title>
+    <title>Kitchen Worlds - Dev Notes</title>
     <link rel="stylesheet" href="css/theme.css" />
     <link rel="stylesheet" href="css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
@@ -32,7 +32,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
     <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-          <a href="." class="icon icon-home"> KitchenWorlds
+          <a href="." class="icon icon-home"> Dev Notes
         </a><div role="search">
   <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
       <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
@@ -49,28 +49,13 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#lisdf-spec">LISDF Spec</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#test-lisdf-pddl-streams-with-pddlstream">Test LISDF + PDDL + Streams with PDDLStream</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#set-up-pddlstream">Set up PDDLStream</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#troubleshooting">Troubleshooting</a>
-    </li>
-        </ul>
-    </li>
     <li class="toctree-l2"><a class="reference internal" href="#acknowledgements">Acknowledgements</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#todo">TODO</a>
     </li>
     </ul>
                   </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Tutorials</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="tut-lisdf/">LISDF</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="tut-lispddl/">LISPDDL</a>
+                  <li class="toctree-l1"><a class="reference internal" href="project-challenges/">Challenges of TAMP</a>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Domains</span></p>
@@ -78,9 +63,14 @@
                   <li class="toctree-l1"><a class="reference internal" href="domain-rearrangement/">Rearrangement</a>
                   </li>
               </ul>
+              <p class="caption"><span class="caption-text">Planning Approach</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="planner-baselines/">Baseline Planners</a>
+                  </li>
+              </ul>
               <p class="caption"><span class="caption-text">Experiments</span></p>
               <ul>
-                  <li class="toctree-l1"><a class="" href="exp-baseline.md">PDDLStream Baseline</a>
+                  <li class="toctree-l1"><a class="" href="exp-problems.md">Planning Problems</a>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Set it up</span></p>
@@ -92,6 +82,15 @@
                   <li class="toctree-l1"><a class="reference internal" href="setup-notes/">Editor's Notes</a>
                   </li>
               </ul>
+              <p class="caption"><span class="caption-text">Tutorials</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="tut-lisdf/">LISDF</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="tut-lispddl/">LISPDDL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="tut-pddlstream/">PDDLStream</a>
+                  </li>
+              </ul>
       </div>
     </div>
     </nav>
@@ -99,7 +98,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
       <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href=".">KitchenWorlds</a>
+          <a href=".">Dev Notes</a>
         
       </nav>
       <div class="wy-nav-content">
@@ -123,7 +122,10 @@
 <li>solve a TAMP problem using PDDLStream defined with a scene.lisdf, problem.pddl, domain.pddl, stream.pddl</li>
 <li>procedurally generate scenes with rigid and articulated objects</li>
 </ul>
-<p><img alt="kitchen_basics.lisdf in PyBullet" src="imgs/kitchen_basics.png" /></p>
+<video autoplay loop muted playsinline width=100%>
+  <source src="mp4/demo-cabbage.mp4" type="video/mp4">
+</video>
+
 <h2 id="setup">Setup<a class="headerlink" href="#setup" title="Permanent link">#</a></h2>
 <p>Grab the <a href="https://github.com/Learning-and-Intelligent-Systems/lisdf">lisdf</a> package:</p>
 <pre><code class="language-shell">cd kitchen-worlds
@@ -151,26 +153,6 @@ python test_parse_pddl.py
 <p>To build some scenes</p>
 <pre><code class="language-commandline">python test_world_builder.py
 </code></pre>
-<h2 id="lisdf-spec">LISDF Spec<a class="headerlink" href="#lisdf-spec" title="Permanent link">#</a></h2>
-<p>Current kitchen scenes in the format of  <code>.lisdf</code> are in path <code>asset/scenes/</code>, e.g. <code>kitchen_counter.lisdf</code> as simulated below.</p>
-<p><img alt="kitchen_counter.lisdf in PyBullet" src="imgs/kitchen_counter.png" /></p>
-<h2 id="test-lisdf-pddl-streams-with-pddlstream">Test LISDF + PDDL + Streams with PDDLStream<a class="headerlink" href="#test-lisdf-pddl-streams-with-pddlstream" title="Permanent link">#</a></h2>
-<h3 id="set-up-pddlstream">Set up PDDLStream<a class="headerlink" href="#set-up-pddlstream" title="Permanent link">#</a></h3>
-<pre><code class="language-commandline"># git submodule add https://github.com/caelan/pddlstream.git
-cd pddlstream
-git submodule update --init --recursive  ## may take a few minutes
-./downward/build.py ## may take a few minutes
-
-cd examples/pybullet/utils
-git pull origin master
-cd motion
-git pull origin master
-</code></pre>
-<h3 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">#</a></h3>
-<pre><code>File &quot;/Users/z/Documents/simulators/PyBullet/kitchen-worlds/pddlstream/examples/pybullet/utils/pybullet_tools/utils.py&quot;, line 3572, in get_closest_points
-    return [CollisionInfo(*info) for info in results]
-TypeError: 'NoneType' object is not iterable
-</code></pre>
 <h2 id="acknowledgements">Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permanent link">#</a></h2>
 <p>This repo works thanks for the tools provided by LIS lab members and alum:</p>
 <ul>
@@ -193,19 +175,23 @@ TypeError: 'NoneType' object is not iterable
 <li>[x] upload test scene files with <code>&lt;world&gt;&lt;gui&gt;&lt;camera&gt;&lt;pose&gt;</code></li>
 <li>[x] update problem files in the format of <code>problem.pddl</code></li>
 <li>[x] upload implicit domain files in the format of <code>domain.pddl</code></li>
-<li>[x] add instructions to solve the example problems with TAMP planner <a href="https://github.com/caelan/pddlstream/tree/main">PDDLStream</a></li>
 <li>
-<p>[x] add instructions on generating kitchen scenes with scripts in <a href="https://github.mit.edu/ztyang/cognitive-architectures/tree/master/bullet">cognitive-architectures</a></p>
+<p>[x] add instructions to solve the example problems with TAMP planner <a href="https://github.com/caelan/pddlstream/tree/main">PDDLStream</a></p>
 </li>
 <li>
-<p>[ ]</p>
+<p>[ ] run PDDLStream on one problem in each category, with the same domain, different scenes and goals</p>
 </li>
+<li>[ ] run PDDLStream with execution noise</li>
+<li>[ ] run PDDLStream+HPN with execution noise</li>
+<li>[ ] run TTM with execution noise</li>
+<li>[ ] add instructions on sampling scenes</li>
+<li>[ ] add instructions on sampling goals</li>
 </ul>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="tut-lisdf/" class="btn btn-neutral float-right" title="LISDF">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="project-challenges/" class="btn btn-neutral float-right" title="Challenges of TAMP">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -229,7 +215,7 @@ TypeError: 'NoneType' object is not iterable
     
     
     
-      <span><a href="tut-lisdf/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="project-challenges/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="shortcut icon" href="../css/favicon.ico" />
-    <title>Rearrangement - KitchenWorlds</title>
+    <title>Rearrangement - Dev Notes</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
@@ -32,7 +32,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
     <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-          <a href=".." class="icon icon-home"> KitchenWorlds
+          <a href=".." class="icon icon-home"> Dev Notes
         </a><div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
       <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
@@ -45,32 +45,42 @@
               <ul>
                   <li class="toctree-l1"><a class="reference internal" href="..">Kitchen Worlds</a>
                   </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Tutorials</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../tut-lisdf/">LISDF</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../tut-lispddl/">LISPDDL</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../project-challenges/">Challenges of TAMP</a>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Domains</span></p>
               <ul class="current">
                   <li class="toctree-l1 current"><a class="reference internal current" href="./">Rearrangement</a>
     <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#general-purpose-skills">General-Purpose Skills</a>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#four-categories-of-problems">Four Categories of Problems</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#the-domain">The Domain</a>
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#operators">Operators</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#pick">Pick</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#place">Place</a>
     </li>
         </ul>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#the-axioms">The Axioms</a>
     </li>
     </ul>
                   </li>
               </ul>
+              <p class="caption"><span class="caption-text">Planning Approach</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../planner-baselines/">Baseline Planners</a>
+                  </li>
+              </ul>
               <p class="caption"><span class="caption-text">Experiments</span></p>
               <ul>
-                  <li class="toctree-l1"><a class="" href="../exp-baseline.md">PDDLStream Baseline</a>
+                  <li class="toctree-l1"><a class="" href="../exp-problems.md">Planning Problems</a>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Set it up</span></p>
@@ -82,6 +92,15 @@
                   <li class="toctree-l1"><a class="reference internal" href="../setup-notes/">Editor's Notes</a>
                   </li>
               </ul>
+              <p class="caption"><span class="caption-text">Tutorials</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../tut-lisdf/">LISDF</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../tut-lispddl/">LISPDDL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../tut-pddlstream/">PDDLStream</a>
+                  </li>
+              </ul>
       </div>
     </div>
     </nav>
@@ -89,7 +108,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
       <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="..">KitchenWorlds</a>
+          <a href="..">Dev Notes</a>
         
       </nav>
       <div class="wy-nav-content">
@@ -108,18 +127,133 @@
               
                 <h1 id="the-rearrangement-domain">The Rearrangement Domain<a class="headerlink" href="#the-rearrangement-domain" title="Permanent link">#</a></h1>
 <p>As an example of long-horizon TAMP problems in large, complex environment, we created the domain <code>rearrangement.pddl</code> that includes the operators and axioms for a variety of household rearrangement problems.</p>
-<h2 id="four-categories-of-problems">Four Categories of Problems<a class="headerlink" href="#four-categories-of-problems" title="Permanent link">#</a></h2>
-<p>The</p>
-<h2 id="the-domain">The Domain<a class="headerlink" href="#the-domain" title="Permanent link">#</a></h2>
-<h3 id="operators">Operators<a class="headerlink" href="#operators" title="Permanent link">#</a></h3>
-<pre><code>
+<h2 id="general-purpose-skills">General-Purpose Skills<a class="headerlink" href="#general-purpose-skills" title="Permanent link">#</a></h2>
+<table class="multicol">
+
+<tr>
+<td width="34%">
+
+<img src="../gifs/skill-pick-place.gif"></img>
+
+<pre><code class="language-txt">
+Pick and place
 </code></pre>
+
+
+</td>
+<td width="36.25%">
+
+<img src="../gifs/skill-pull-drawer.gif"></img>
+
+
+<pre><code class="language-txt">
+Open a drawer
+</code></pre>
+
+
+</td>
+<td width="27.5%">
+
+<img src="../gifs/skill-knob-door.gif"></img>
+
+<pre><code class="language-txt">
+Open a door
+</code></pre>
+
+
+</td>
+</tr>
+</table>
+
+<p>Actions on one object/link may cause effects on the state of other object/link.</p>
+<table class="multicol">
+<tr>
+<td width="50%">
+
+<img src="../gifs/skill-knob-faucet.gif"></img>
+
+
+<pre><code class="language-txt">
+Turn a knob from the top
+</code></pre>
+
+
+</td>
+<td width="50%">
+
+<img src="../gifs/skill-knob-stove.gif"></img>
+
+
+<pre><code class="language-txt">
+Turn a knob from any direction
+</code></pre>
+
+
+</td>
+</tr>
+</table>
+
+<h2 id="four-categories-of-problems">Four Categories of Problems<a class="headerlink" href="#four-categories-of-problems" title="Permanent link">#</a></h2>
+<h2 id="the-domain">The Domain<a class="headerlink" href="#the-domain" title="Permanent link">#</a></h2>
+<p>The skills and corresponding constraints with the world are included in the domain via PDDL operators.</p>
+<h3 id="operators">Operators<a class="headerlink" href="#operators" title="Permanent link">#</a></h3>
+<h4 id="pick"><strong>Pick</strong><a class="headerlink" href="#pick" title="Permanent link">#</a></h4>
+<pre><code>(:action pick
+  :parameters (?a ?o ?p ?g ?q ?t ?w)
+  :precondition (and (KinWConf ?a ?o ?p ?g ?q ?t ?w)
+                     (AtPose ?o ?p) (HandEmpty ?a)
+                     (AtBConf ?q) (InWConf ?w)
+                     (not (UnsafeApproach ?o ?p ?g))
+                     (not (UnsafeATraj ?t))
+                )
+  :effect (and (AtGrasp ?a ?o ?g) (CanMove)
+               (not (AtPose ?o ?p)) (not (HandEmpty ?a))
+               (increase (total-cost) (PickCost))
+          )
+)
+</code></pre>
+<p>Pick with a single gripper grasp requires</p>
+<ul>
+<li>the joint sampling of grasp <code>?g</code> and arm trajectory <code>?t</code> with <code>(KinWConf ?a ?o ?p ?g ?q ?t ?w)</code>, which is a constraint that says <em>"pick with arm <code>?a</code> the object <code>?o</code> from its original pose <code>?p</code> by going to base configuration <code>?q</code> with arm trajectory <code>?t</code>, in world configuration <code>?w</code>"</em></li>
+</ul>
+<pre><code>(:stream inverse-kinematics-wconf
+  :inputs (?a ?o ?p ?g ?w)
+  :domain (and (Controllable ?a) (Pose ?o ?p) (Grasp ?o ?g) (WConf ?w))
+  :outputs (?q ?t)
+  :certified (and (BConf ?q) (ATraj ?t) (KinWConf ?a ?o ?p ?g ?q ?t ?w))
+)
+</code></pre>
+<ul>
+<li>checking that the grasp approach path (straight line) is free of collisions from movable objects with <code>(not (UnsafeApproach ?o ?p ?g))</code></li>
+<li>checking that the arm path from default arm pose to grasp approach pose is free of collisions from movable objects with <code>(not (UnsafeATraj ?t))</code></li>
+</ul>
+<h4 id="place"><strong>Place</strong><a class="headerlink" href="#place" title="Permanent link">#</a></h4>
+<p>Place, compared to pick, requires additionally</p>
+<ul>
+<li>sampling of placement pose <code>?p</code> with</li>
+</ul>
+<pre><code>(:action place
+  :parameters (?a ?o ?p ?g ?q ?t ?w)
+  :precondition (and (KinWConf ?a ?o ?p ?g ?q ?t ?w)
+                     (AtGrasp ?a ?o ?g) (AtBConf ?q) (InWConf ?w)
+                     (not (UnsafePose ?o ?p))
+                     (not (UnsafeApproach ?o ?p ?g))
+                     (not (UnsafeATraj ?t))
+                )
+  :effect (and (AtPose ?o ?p) (HandEmpty ?a) (CanMove)
+               (not (AtGrasp ?a ?o ?g))
+               (increase (total-cost) (PlaceCost))
+          )
+)
+</code></pre>
+<hr />
+<h2 id="the-axioms">The Axioms<a class="headerlink" href="#the-axioms" title="Permanent link">#</a></h2>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../tut-lispddl/" class="btn btn-neutral float-left" title="LISPDDL"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../setup-repository/" class="btn btn-neutral float-right" title="Set up the Repository">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../project-challenges/" class="btn btn-neutral float-left" title="Challenges of TAMP"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../planner-baselines/" class="btn btn-neutral float-right" title="Baseline Planners">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -142,10 +276,10 @@
   <span class="rst-current-version" data-toggle="rst-current-version">
     
     
-      <span><a href="../tut-lispddl/" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../project-challenges/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../setup-repository/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../planner-baselines/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
