@@ -89,8 +89,6 @@ The current hierarchy and order is designed so that a new student can use the do
 
 Our wiki pages are written in [Markdown](https://en.wikipedia.org/wiki/Markdown#Example), a lightweight markup language with plain text formatting syntax. The following cheatsheet designed by Theme Spectre showed the most frequently used syntax:
 
-![](imgs/markdown.jpg)
-
 To make it even easier to write in Markdown, you can add Markdown plugin to your editor. For example, I use `markdown-editor` in Atom to enjoy the following features:
 
 * Toggle text styles using shortcut such as `Ctrl+B`

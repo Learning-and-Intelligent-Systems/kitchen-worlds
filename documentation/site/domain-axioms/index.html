@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="shortcut icon" href="../css/favicon.ico" />
-    <title>LISPDDL - Dev Notes</title>
+    <title>III) Axioms - Dev Notes</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
@@ -13,8 +13,8 @@
     
       <script>
         // Current page data
-        var mkdocs_page_name = "LISPDDL";
-        var mkdocs_page_input_path = "tut-lispddl.md";
+        var mkdocs_page_name = "III) Axioms";
+        var mkdocs_page_input_path = "domain-axioms.md";
         var mkdocs_page_url = null;
       </script>
     
@@ -49,14 +49,26 @@
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Planning Domains</span></p>
-              <ul>
+              <ul class="current">
                   <li class="toctree-l1"><a class="reference internal" href="../domain-rearrangement/">Rearrangement Domain</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../domain-predicates/">I) Predicates</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../domain-operators/">II) Operators</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../domain-axioms/">III) Axioms</a>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">III) Axioms</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#1-low-level-routines">1. Low-level routines</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-abstracting-away">2. Abstracting away</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3-semantic-equivalence">3. Semantic equivalence</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#4-task-specific-goals">4. Task-specific goals</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#limitations">Limitations</a>
+    </li>
+    </ul>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Planning Approach</span></p>
@@ -79,14 +91,10 @@
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Tutorials</span></p>
-              <ul class="current">
+              <ul>
                   <li class="toctree-l1"><a class="reference internal" href="../tut-lisdf/">LISDF</a>
                   </li>
-                  <li class="toctree-l1 current"><a class="reference internal current" href="./">LISPDDL</a>
-    <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#test-parsing-lispddl">Test Parsing LISPDDL</a>
-    </li>
-    </ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../tut-lispddl/">LISPDDL</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../tut-pddlstream/">PDDLStream</a>
                   </li>
@@ -105,7 +113,7 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
-          <li>Tutorials &raquo;</li><li>LISPDDL</li>
+          <li>Planning Domains &raquo;</li><li>III) Axioms</li>
     <li class="wy-breadcrumbs-aside">
     </li>
   </ul>
@@ -115,27 +123,90 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="lispddl-lis-extended-version-to-pddl-for-describing-tamp-problems">LISPDDL = LIS extended version to PDDL for describing TAMP problems<a class="headerlink" href="#lispddl-lis-extended-version-to-pddl-for-describing-tamp-problems" title="Permanent link">#</a></h1>
-<p>To enable the specification and parsing of continuous objects in PDDL, the LISPDDL format has a few extensions compared to <a href="https://planning.wiki/ref/pddl/problem">PDDL 1.2</a>:</p>
-<h2 id="test-parsing-lispddl">Test Parsing LISPDDL<a class="headerlink" href="#test-parsing-lispddl" title="Permanent link">#</a></h2>
-<p>You may test parse your problem pddl file with the following:</p>
-<pre><code>cd tests
-python test_pybullet_lisdf -s path/to/lisdf -d path/to/domain -d path/to/problem
-
-## for example
-python test_parse_pddl -s path/to/lisdf -d path/to/domain -d path/to/problem
-</code></pre>
-<p>Note that it requires three input:</p>
+                <h1 id="iii-axioms">III) Axioms<a class="headerlink" href="#iii-axioms" title="Permanent link">#</a></h1>
+<p>Axioms are important for many reasons:</p>
 <ul>
-<li>A scene described in LISDF, so that the bodies and links referred as strings in the pddl files can be grounded in the simulator.</li>
-<li>A partial domain described in PDDL, where the operators are taken out.</li>
+<li>they can simplify the effects of operators, e.g. arm trajectory is valid if it doesn't collide with all movable objects</li>
 </ul>
+<pre><code>(:derived (UnsafeBTraj ?t)
+  (exists (?o2 ?p2) (and
+    (BTraj ?t) (Pose ?o2 ?p2) (AtPose ?o2 ?p2) (not (CFreeBTrajPose ?t ?o2 ?p2))))
+)
+</code></pre>
+<ul>
+<li>they can abstract away continuous variables, e.g. objects is <code>on</code> a surface as long as it's supported by the surface</li>
+</ul>
+<pre><code>(:derived (On ?o ?r)
+  (exists (?p) (and (Supported ?o ?p ?r) (AtPose ?o ?p)))
+)
+</code></pre>
+<ul>
+<li>they can introduce semantic equivalence, e.g. a heated edible object is considered cooked while a heated inflammable object is considered dangerous</li>
+</ul>
+<pre><code>(:derived (Cooked ?o)
+  (and (Heated ?o) (Edible ?o))
+)
+</code></pre>
+<ul>
+<li>they can encode complicated symbolic goals, e.g. make fried rice in my kitchen means having rice served in a container, where the rice has been cooked, seasoned with sea salt, and covered by oven-roasted assorted veggies and two pieces of cooked lunch meat.</li>
+</ul>
+<pre><code>( :derived ( EnableFridRice ?rice1 ?veggie1 ?veggie2 ?meat1 ?meat2 ?container1 )
+  ( and
+      ( Cooked ?rice1 )
+      ( Cleaned ?veggie1 )
+      ( Cleaned ?veggie2 )
+      ( Roasted ?veggie1 )
+      ( Roasted ?veggie2 )
+      ( Cooked ?veggie1 )
+      ( Cooked ?veggie2 )
+      ( Cooked ?meat1 )
+      ( Cooked ?meat2 )
+
+      ( Above ?veggie1 ?rice1 )
+      ( Above ?veggie2 ?rice1 )
+      ( Above ?meat1 ?rice1 )
+      ( Above ?meat2 ?rice1 )
+      ( In ?rice1 ?container1 )
+  )
+)
+
+( :derived ( ExistOmelette ?table1 )
+    ( exists ( ?rice1 ?veggie1 ?veggie2 ?meat1 ?meat2 ?container1 )
+        ( and
+            ( Rice ?rice1 ) ( Plate ?plate1 ) ( Table ?table1 ) ( On ?container1 ?table1 )
+            ( Veggie ?veggie1 ) ( Veggie ?veggie2 ) ( not ( Equal ?veggie1 ?veggie2 ) )
+            ( Meat ?meat1 ) ( Meat ?meat2 ) ( not ( Equal ?meat1 ?meat2 ) )
+            ( EnableFridRice ?egg1 ?veggie1 ?plate1 )
+            ( On ?container1 ?table1 )
+        )
+    )
+)
+</code></pre>
+<p>Let's categorize all the axioms included in the rearrangement domain by their level of abstractions.</p>
+<h2 id="1-low-level-routines">1. Low-level routines<a class="headerlink" href="#1-low-level-routines" title="Permanent link">#</a></h2>
+<h2 id="2-abstracting-away">2. Abstracting away<a class="headerlink" href="#2-abstracting-away" title="Permanent link">#</a></h2>
+<h2 id="3-semantic-equivalence">3. Semantic equivalence<a class="headerlink" href="#3-semantic-equivalence" title="Permanent link">#</a></h2>
+<h2 id="4-task-specific-goals">4. Task-specific goals<a class="headerlink" href="#4-task-specific-goals" title="Permanent link">#</a></h2>
+<h2 id="limitations">Limitations<a class="headerlink" href="#limitations" title="Permanent link">#</a></h2>
+<ul>
+<li>The effects derived from axioms disappears once the preconditions doesn't hold. For example, it's impossible to encode the common sense rule that objects become and stay cooked after they are placed on a heating surface (pot) that's activated (as the burner underneath it is turned on). Instead, an high-level operator <code>cook</code> needs to be introduced.</li>
+</ul>
+<pre><code>(:action cook
+  :parameters (?o ?r)
+  :precondition (and (Stackable ?o ?r) (Stove ?r) (On ?o ?r) )
+  :effect (and (Heated ?o))
+)
+</code></pre>
+<ul>
+<li>They cause a single effect, while many transitions have multiple effects on the geometric and symbolic levels</li>
+</ul>
+<p>instead of</p>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../tut-lisdf/" class="btn btn-neutral float-left" title="LISDF"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../tut-pddlstream/" class="btn btn-neutral float-right" title="PDDLStream">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../domain-operators/" class="btn btn-neutral float-left" title="II) Operators"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../planner-baselines/" class="btn btn-neutral float-right" title="Baseline Planners">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -158,10 +229,10 @@ python test_parse_pddl -s path/to/lisdf -d path/to/domain -d path/to/problem
   <span class="rst-current-version" data-toggle="rst-current-version">
     
     
-      <span><a href="../tut-lisdf/" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../domain-operators/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../tut-pddlstream/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../planner-baselines/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="shortcut icon" href="../css/favicon.ico" />
-    <title>Rearrangement - Dev Notes</title>
+    <title>Rearrangement Domain - Dev Notes</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
@@ -13,7 +13,7 @@
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Rearrangement";
+        var mkdocs_page_name = "Rearrangement Domain";
         var mkdocs_page_input_path = "domain-rearrangement.md";
         var mkdocs_page_url = null;
       </script>
@@ -48,29 +48,21 @@
                   <li class="toctree-l1"><a class="reference internal" href="../project-challenges/">Challenges of TAMP</a>
                   </li>
               </ul>
-              <p class="caption"><span class="caption-text">Domains</span></p>
+              <p class="caption"><span class="caption-text">Planning Domains</span></p>
               <ul class="current">
-                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Rearrangement</a>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Rearrangement Domain</a>
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#general-purpose-skills">General-Purpose Skills</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#four-categories-of-problems">Four Categories of Problems</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#the-domain">The Domain</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#operators">Operators</a>
-        <ul>
-    <li class="toctree-l4"><a class="reference internal" href="#pick">Pick</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#place">Place</a>
-    </li>
-        </ul>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#the-axioms">The Axioms</a>
-    </li>
     </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../domain-predicates/">I) Predicates</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../domain-operators/">II) Operators</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../domain-axioms/">III) Axioms</a>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Planning Approach</span></p>
@@ -80,7 +72,7 @@
               </ul>
               <p class="caption"><span class="caption-text">Experiments</span></p>
               <ul>
-                  <li class="toctree-l1"><a class="" href="../exp-problems.md">Planning Problems</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../exp-problems/">Planning Problems</a>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Set it up</span></p>
@@ -115,7 +107,7 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
-          <li>Domains &raquo;</li><li>Rearrangement</li>
+          <li>Planning Domains &raquo;</li><li>Rearrangement Domain</li>
     <li class="wy-breadcrumbs-aside">
     </li>
   </ul>
@@ -194,66 +186,12 @@ Turn a knob from any direction
 </table>
 
 <h2 id="four-categories-of-problems">Four Categories of Problems<a class="headerlink" href="#four-categories-of-problems" title="Permanent link">#</a></h2>
-<h2 id="the-domain">The Domain<a class="headerlink" href="#the-domain" title="Permanent link">#</a></h2>
-<p>The skills and corresponding constraints with the world are included in the domain via PDDL operators.</p>
-<h3 id="operators">Operators<a class="headerlink" href="#operators" title="Permanent link">#</a></h3>
-<h4 id="pick"><strong>Pick</strong><a class="headerlink" href="#pick" title="Permanent link">#</a></h4>
-<pre><code>(:action pick
-  :parameters (?a ?o ?p ?g ?q ?t ?w)
-  :precondition (and (KinWConf ?a ?o ?p ?g ?q ?t ?w)
-                     (AtPose ?o ?p) (HandEmpty ?a)
-                     (AtBConf ?q) (InWConf ?w)
-                     (not (UnsafeApproach ?o ?p ?g))
-                     (not (UnsafeATraj ?t))
-                )
-  :effect (and (AtGrasp ?a ?o ?g) (CanMove)
-               (not (AtPose ?o ?p)) (not (HandEmpty ?a))
-               (increase (total-cost) (PickCost))
-          )
-)
-</code></pre>
-<p>Pick with a single gripper grasp requires</p>
-<ul>
-<li>the joint sampling of grasp <code>?g</code> and arm trajectory <code>?t</code> with <code>(KinWConf ?a ?o ?p ?g ?q ?t ?w)</code>, which is a constraint that says <em>"pick with arm <code>?a</code> the object <code>?o</code> from its original pose <code>?p</code> by going to base configuration <code>?q</code> with arm trajectory <code>?t</code>, in world configuration <code>?w</code>"</em></li>
-</ul>
-<pre><code>(:stream inverse-kinematics-wconf
-  :inputs (?a ?o ?p ?g ?w)
-  :domain (and (Controllable ?a) (Pose ?o ?p) (Grasp ?o ?g) (WConf ?w))
-  :outputs (?q ?t)
-  :certified (and (BConf ?q) (ATraj ?t) (KinWConf ?a ?o ?p ?g ?q ?t ?w))
-)
-</code></pre>
-<ul>
-<li>checking that the grasp approach path (straight line) is free of collisions from movable objects with <code>(not (UnsafeApproach ?o ?p ?g))</code></li>
-<li>checking that the arm path from default arm pose to grasp approach pose is free of collisions from movable objects with <code>(not (UnsafeATraj ?t))</code></li>
-</ul>
-<h4 id="place"><strong>Place</strong><a class="headerlink" href="#place" title="Permanent link">#</a></h4>
-<p>Place, compared to pick, requires additionally</p>
-<ul>
-<li>sampling of placement pose <code>?p</code> with</li>
-</ul>
-<pre><code>(:action place
-  :parameters (?a ?o ?p ?g ?q ?t ?w)
-  :precondition (and (KinWConf ?a ?o ?p ?g ?q ?t ?w)
-                     (AtGrasp ?a ?o ?g) (AtBConf ?q) (InWConf ?w)
-                     (not (UnsafePose ?o ?p))
-                     (not (UnsafeApproach ?o ?p ?g))
-                     (not (UnsafeATraj ?t))
-                )
-  :effect (and (AtPose ?o ?p) (HandEmpty ?a) (CanMove)
-               (not (AtGrasp ?a ?o ?g))
-               (increase (total-cost) (PlaceCost))
-          )
-)
-</code></pre>
-<hr />
-<h2 id="the-axioms">The Axioms<a class="headerlink" href="#the-axioms" title="Permanent link">#</a></h2>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
         <a href="../project-challenges/" class="btn btn-neutral float-left" title="Challenges of TAMP"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../planner-baselines/" class="btn btn-neutral float-right" title="Baseline Planners">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../domain-predicates/" class="btn btn-neutral float-right" title="I) Predicates">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -279,7 +217,7 @@ Turn a knob from any direction
       <span><a href="../project-challenges/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../planner-baselines/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../domain-predicates/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

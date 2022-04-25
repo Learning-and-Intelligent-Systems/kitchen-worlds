@@ -4,8 +4,11 @@ nav:
       - Challenges of TAMP: project-challenges.md
       # - Minutes & Notes: project-minutes.md
       # - Plans & Priorities: project-plans.md
-    - Domains:
-      - Rearrangement: domain-rearrangement.md
+    - Planning Domains:
+      - Rearrangement Domain: domain-rearrangement.md
+      - I) Predicates: domain-predicates.md
+      - II) Operators: domain-operators.md
+      - III) Axioms: domain-axioms.md
     - Planning Approach:
       - Baseline Planners: planner-baselines.md
       # - Approach - HPN: planner-pddlstream.md

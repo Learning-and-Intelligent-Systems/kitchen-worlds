@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="shortcut icon" href="../css/favicon.ico" />
-    <title>LISPDDL - Dev Notes</title>
+    <title>Planning Problems - Dev Notes</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
@@ -13,8 +13,8 @@
     
       <script>
         // Current page data
-        var mkdocs_page_name = "LISPDDL";
-        var mkdocs_page_input_path = "tut-lispddl.md";
+        var mkdocs_page_name = "Planning Problems";
+        var mkdocs_page_input_path = "exp-problems.md";
         var mkdocs_page_url = null;
       </script>
     
@@ -65,8 +65,10 @@
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Experiments</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../exp-problems/">Planning Problems</a>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Planning Problems</a>
+    <ul class="current">
+    </ul>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Set it up</span></p>
@@ -79,14 +81,10 @@
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Tutorials</span></p>
-              <ul class="current">
+              <ul>
                   <li class="toctree-l1"><a class="reference internal" href="../tut-lisdf/">LISDF</a>
                   </li>
-                  <li class="toctree-l1 current"><a class="reference internal current" href="./">LISPDDL</a>
-    <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#test-parsing-lispddl">Test Parsing LISPDDL</a>
-    </li>
-    </ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../tut-lispddl/">LISPDDL</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../tut-pddlstream/">PDDLStream</a>
                   </li>
@@ -105,7 +103,7 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
-          <li>Tutorials &raquo;</li><li>LISPDDL</li>
+          <li>Experiments &raquo;</li><li>Planning Problems</li>
     <li class="wy-breadcrumbs-aside">
     </li>
   </ul>
@@ -115,27 +113,13 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="lispddl-lis-extended-version-to-pddl-for-describing-tamp-problems">LISPDDL = LIS extended version to PDDL for describing TAMP problems<a class="headerlink" href="#lispddl-lis-extended-version-to-pddl-for-describing-tamp-problems" title="Permanent link">#</a></h1>
-<p>To enable the specification and parsing of continuous objects in PDDL, the LISPDDL format has a few extensions compared to <a href="https://planning.wiki/ref/pddl/problem">PDDL 1.2</a>:</p>
-<h2 id="test-parsing-lispddl">Test Parsing LISPDDL<a class="headerlink" href="#test-parsing-lispddl" title="Permanent link">#</a></h2>
-<p>You may test parse your problem pddl file with the following:</p>
-<pre><code>cd tests
-python test_pybullet_lisdf -s path/to/lisdf -d path/to/domain -d path/to/problem
-
-## for example
-python test_parse_pddl -s path/to/lisdf -d path/to/domain -d path/to/problem
-</code></pre>
-<p>Note that it requires three input:</p>
-<ul>
-<li>A scene described in LISDF, so that the bodies and links referred as strings in the pddl files can be grounded in the simulator.</li>
-<li>A partial domain described in PDDL, where the operators are taken out.</li>
-</ul>
+                <h1 id="a-set-of-challenging-tamp-problems">A Set of Challenging TAMP Problems<a class="headerlink" href="#a-set-of-challenging-tamp-problems" title="Permanent link">#</a></h1>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../tut-lisdf/" class="btn btn-neutral float-left" title="LISDF"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../tut-pddlstream/" class="btn btn-neutral float-right" title="PDDLStream">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../planner-baselines/" class="btn btn-neutral float-left" title="Baseline Planners"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../setup-repository/" class="btn btn-neutral float-right" title="Set up the Repository">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -158,10 +142,10 @@ python test_parse_pddl -s path/to/lisdf -d path/to/domain -d path/to/problem
   <span class="rst-current-version" data-toggle="rst-current-version">
     
     
-      <span><a href="../tut-lisdf/" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../planner-baselines/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../tut-pddlstream/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../setup-repository/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
