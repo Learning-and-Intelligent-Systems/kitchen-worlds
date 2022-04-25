@@ -1,0 +1,192 @@
+/* Style changes at readthediary directory,
+    - added fonts.css and the original font files so I can see the right fonts during offline
+    - added comment section using disqus
+    - revised footnote
+*/
+
+/* change the picture behind the search box */
+.wy-side-nav-search {
+    z-index: 200;
+    background-image: url(stata.jpg);
+    text-shadow: 2px 2px #000000;
+    background-color: #edf0f2;
+    background-size: 320px;
+    text-align: center;
+    padding: 0.809em;
+    display: block;
+    color: #f1c40f;
+    margin-bottom: 0.809em;
+}
+
+/* change the border color of the search box */
+.wy-side-nav-search>a, .wy-side-nav-search .wy-dropdown>a {
+    color: #f1c40f;
+    font-size: 119%;
+    font-weight: bold;
+    display: inline-block;
+    padding: 4px 6px;
+    margin-bottom: 0.809em;
+}
+
+.wy-side-nav-search input[type=text] {
+    width: 100%;
+    border-radius: 50px;
+    padding: 6px 12px;
+    border-color: #edf0f2;
+}
+
+/* change the font size of table of articles */
+.wy-menu-vertical .subnav li.current > ul li a {
+    padding-left: 2.3em;
+    font-size: 90%;
+}
+
+/* change the left margin of table of articles */
+.wy-menu-vertical span {
+    line-height: 18px;
+    padding: 0.8045em 0em;
+    display: block;
+    position: relative;
+    font-size: 100%;
+    color: #f1c40f;
+}
+
+.wy-menu-vertical a {
+    display: inline-block;
+    line-height: 18px;
+    padding: .4045em 2.618em;
+    display: block;
+    position: relative;
+    font-size: 90%;
+    color: #d9d9d9;
+}
+
+.wy-menu-vertical li.on a, .wy-menu-vertical li.current>a {
+    color: #404040;
+    padding: .4045em 2.618em;
+    font-weight: bold;
+    position: relative;
+    background: #fcfcfc;
+    border: none;
+}
+
+/* make bold more bold with a yellow background */
+b, strong {
+    font-weight: bold;
+    background: #ffeaa7;
+}
+
+/* give italic a gray background */
+em {
+   background: #efefef;
+}
+
+/* make comments */
+mark {
+  color: #f1c40f;
+  background: #FFFFFF;
+  font-weight: normal;
+}
+
+/* make blockquote more explicit */
+.rst-content blockquote {
+    margin-left: 29px;
+    margin-right: 39px;
+    line-height: 24px;
+    margin-bottom: 24px;
+    font-style: italic;
+    color: #535c68;
+}
+
+/* make text wrap in tables */
+.wy-table-responsive table td, .wy-table-responsive table th {
+  word-wrap: break-word;
+  white-space: normal;
+  vertical-align: top !important;
+}
+
+/* make table borders invisible for a natural multi-column look */
+.multicol td, th {
+  border: none !important;
+  background: #FcFcFc !important;
+}
+
+.multicol pre {
+  margin-bottom: -6px !important;
+}
+
+.multicol img {
+  /* margin-top: 15px; */
+  /* margin-bottom: 15px; */
+}
+
+.tightframes table.docutils td, .tightframes table.docutils th, .tightframes table.field-list td, .tightframes table.field-list th, .tightframes td, .tightframes th {
+  font-size: 90%;
+  margin: 0;
+  overflow: visible;
+  padding: 6px 6px !important;
+}
+
+/* remove margin before lists */
+.rst-content .section ul {
+  list-style: disc;
+  line-height: 24px;
+  margin-top: -24px;
+  margin-bottom: 24px;
+}
+
+/* change the color of search box */
+.wy-nav-top {
+    background: #f1c40f;
+    color: #404040;
+    padding: 0.4045em 0.809em;
+    position: relative;
+    line-height: 50px;
+    text-align: center;
+    font-size: 100%;
+    *zoom: 1;
+}
+
+/* shift the menu icon of site a bit to the middle and right */
+.wy-nav-top i {
+    font-size: 30px;
+    float: left;
+    cursor: pointer;
+    padding-top: 9px;
+    padding-left: 7px;
+}
+
+      /* shift the name of site a bit to the middle */
+.wy-nav-top a {
+    color: #fff;
+    font-weight: bold;
+    margin-left: -5px;
+}
+
+/* increase padding after code blocks */
+pre {
+    white-space: pre;
+    margin-bottom: 32px;
+    margin-top: -12px;
+}
+
+.rst-content pre code {
+    white-space: pre;
+    word-wrap: normal;
+    display: block;
+    padding: 12px;
+    font-size: 12px;
+    /* margin-right: -50%; */
+}
+
+code, .rst-content tt, .rst-content code {
+    white-space: nowrap;
+    max-width: 150%;
+    background: #fff;
+    border: solid 1px #e1e4e5;
+    font-size: 75%;
+    padding: 0 5px;
+    font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",Courier,monospace;
+    color: #E74C3C;
+    overflow-x: auto;
+}
