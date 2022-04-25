@@ -111,13 +111,20 @@ mark {
   background: #FcFcFc !important;
 }
 
+.multicol pre {
+  margin-bottom: -6px !important;
+}
+
 .multicol img {
   /* margin-top: 15px; */
   /* margin-bottom: 15px; */
 }
 
-.multicol pre {
-  margin-bottom: -6px !important;
+.tightframes table.docutils td, .tightframes table.docutils th, .tightframes table.field-list td, .tightframes table.field-list th, .tightframes td, .tightframes th {
+  font-size: 90%;
+  margin: 0;
+  overflow: visible;
+  padding: 6px 6px !important;
 }
 
 /* remove margin before lists */

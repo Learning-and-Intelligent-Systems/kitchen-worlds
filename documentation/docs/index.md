@@ -10,6 +10,25 @@ A library of long-horizon Task-and-Motion-Planning (TAMP) problems in kitchen an
   <source src="mp4/demo-cabbage.mp4" type="video/mp4">
 </video>
 
+<table class="multicol tightframes">
+<tr>
+<td width="33%">
+
+<img src="../imgs/demo-cabbage-1.png"></img>
+
+</td>
+<td width="33%">
+
+<img src="../imgs/demo-cabbage-2.png"></img>
+
+</td>
+<td width="33%">
+
+<img src="../imgs/demo-cabbage-4.png"></img>
+
+</td>
+</tr>
+</table>
 
 ## Setup
 
