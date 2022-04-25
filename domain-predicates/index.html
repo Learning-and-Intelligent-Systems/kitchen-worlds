@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="shortcut icon" href="../css/favicon.ico" />
-    <title>LISPDDL - Dev Notes</title>
+    <title>I) Predicates - Dev Notes</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
@@ -13,8 +13,8 @@
     
       <script>
         // Current page data
-        var mkdocs_page_name = "LISPDDL";
-        var mkdocs_page_input_path = "tut-lispddl.md";
+        var mkdocs_page_name = "I) Predicates";
+        var mkdocs_page_input_path = "domain-predicates.md";
         var mkdocs_page_url = null;
       </script>
     
@@ -49,10 +49,14 @@
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Planning Domains</span></p>
-              <ul>
+              <ul class="current">
                   <li class="toctree-l1"><a class="reference internal" href="../domain-rearrangement/">Rearrangement Domain</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../domain-predicates/">I) Predicates</a>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">I) Predicates</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#_1"></a>
+    </li>
+    </ul>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../domain-operators/">II) Operators</a>
                   </li>
@@ -79,14 +83,10 @@
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Tutorials</span></p>
-              <ul class="current">
+              <ul>
                   <li class="toctree-l1"><a class="reference internal" href="../tut-lisdf/">LISDF</a>
                   </li>
-                  <li class="toctree-l1 current"><a class="reference internal current" href="./">LISPDDL</a>
-    <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#test-parsing-lispddl">Test Parsing LISPDDL</a>
-    </li>
-    </ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../tut-lispddl/">LISPDDL</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../tut-pddlstream/">PDDLStream</a>
                   </li>
@@ -105,7 +105,7 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
-          <li>Tutorials &raquo;</li><li>LISPDDL</li>
+          <li>Planning Domains &raquo;</li><li>I) Predicates</li>
     <li class="wy-breadcrumbs-aside">
     </li>
   </ul>
@@ -115,27 +115,15 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="lispddl-lis-extended-version-to-pddl-for-describing-tamp-problems">LISPDDL = LIS extended version to PDDL for describing TAMP problems<a class="headerlink" href="#lispddl-lis-extended-version-to-pddl-for-describing-tamp-problems" title="Permanent link">#</a></h1>
-<p>To enable the specification and parsing of continuous objects in PDDL, the LISPDDL format has a few extensions compared to <a href="https://planning.wiki/ref/pddl/problem">PDDL 1.2</a>:</p>
-<h2 id="test-parsing-lispddl">Test Parsing LISPDDL<a class="headerlink" href="#test-parsing-lispddl" title="Permanent link">#</a></h2>
-<p>You may test parse your problem pddl file with the following:</p>
-<pre><code>cd tests
-python test_pybullet_lisdf -s path/to/lisdf -d path/to/domain -d path/to/problem
-
-## for example
-python test_parse_pddl -s path/to/lisdf -d path/to/domain -d path/to/problem
-</code></pre>
-<p>Note that it requires three input:</p>
-<ul>
-<li>A scene described in LISDF, so that the bodies and links referred as strings in the pddl files can be grounded in the simulator.</li>
-<li>A partial domain described in PDDL, where the operators are taken out.</li>
-</ul>
+                <h1 id="i-predicates">I) Predicates<a class="headerlink" href="#i-predicates" title="Permanent link">#</a></h1>
+<p>The preconditions, effects, and goals are described by predicates and evaluated by the corresponding functions.</p>
+<h2 id="_1"><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../tut-lisdf/" class="btn btn-neutral float-left" title="LISDF"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../tut-pddlstream/" class="btn btn-neutral float-right" title="PDDLStream">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../domain-rearrangement/" class="btn btn-neutral float-left" title="Rearrangement Domain"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../domain-operators/" class="btn btn-neutral float-right" title="II) Operators">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -158,10 +146,10 @@ python test_parse_pddl -s path/to/lisdf -d path/to/domain -d path/to/problem
   <span class="rst-current-version" data-toggle="rst-current-version">
     
     
-      <span><a href="../tut-lisdf/" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../domain-rearrangement/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../tut-pddlstream/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../domain-operators/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
