@@ -70,10 +70,15 @@
     border: none;
 }
 
-/* make bold more bold */
+/* make bold more bold with a yellow background */
 b, strong {
     font-weight: bold;
     background: #ffeaa7;
+}
+
+/* give italic a gray background */
+em {
+   background: #efefef;
 }
 
 /* make comments */
@@ -91,6 +96,36 @@ mark {
     margin-bottom: 24px;
     font-style: italic;
     color: #535c68;
+}
+
+/* make text wrap in tables */
+.wy-table-responsive table td, .wy-table-responsive table th {
+  word-wrap: break-word;
+  white-space: normal;
+  vertical-align: top !important;
+}
+
+/* make table borders invisible for a natural multi-column look */
+.multicol td, th {
+  border: none !important;
+  background: #FcFcFc !important;
+}
+
+.multicol img {
+  /* margin-top: 15px; */
+  /* margin-bottom: 15px; */
+}
+
+.multicol pre {
+  margin-bottom: -6px !important;
+}
+
+/* remove margin before lists */
+.rst-content .section ul {
+  list-style: disc;
+  line-height: 24px;
+  margin-top: -24px;
+  margin-bottom: 24px;
 }
 
 /* change the color of search box */

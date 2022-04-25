@@ -41,3 +41,13 @@ You may visualize your LISDF in PyBullet with the following code:
 cd tests
 python test_pybullet_lisdf -path path/to/lisdf
 ```
+
+For example, running with the scene
+
+```
+python test_pybullet_lisdf -path assets/scenes/kitchen_counter.lisdf
+```
+
+results in Pybullet simulation below with the specified camera pose targeted at the pot.
+
+![kitchen_counter.lisdf in PyBullet](imgs/kitchen_counter.png)

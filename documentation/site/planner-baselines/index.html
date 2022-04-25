@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="shortcut icon" href="../css/favicon.ico" />
-    <title>Editor's Notes - Dev Notes</title>
+    <title>Baseline Planners - Dev Notes</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
@@ -13,8 +13,8 @@
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Editor\u0027s Notes";
-        var mkdocs_page_input_path = "setup-notes.md";
+        var mkdocs_page_name = "Baseline Planners";
+        var mkdocs_page_input_path = "planner-baselines.md";
         var mkdocs_page_url = null;
       </script>
     
@@ -54,8 +54,18 @@
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Planning Approach</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../planner-baselines/">Baseline Planners</a>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Baseline Planners</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#integrated-tamp-pddlstream">Integrated TAMP: PDDLStream</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#task-then-motion-planning-ttm">Task-Then-Motion Planning: TTM</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#references">References</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Experiments</span></p>
@@ -64,18 +74,12 @@
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Set it up</span></p>
-              <ul class="current">
+              <ul>
                   <li class="toctree-l1"><a class="reference internal" href="../setup-repository/">Set up the Repository</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../setup-mkdocs/">Set up MkDocs</a>
                   </li>
-                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Editor's Notes</a>
-    <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#editors">Editors</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#programmers">Programmers</a>
-    </li>
-    </ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../setup-notes/">Editor's Notes</a>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Tutorials</span></p>
@@ -101,7 +105,7 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
-          <li>Set it up &raquo;</li><li>Editor's Notes</li>
+          <li>Planning Approach &raquo;</li><li>Baseline Planners</li>
     <li class="wy-breadcrumbs-aside">
     </li>
   </ul>
@@ -111,31 +115,19 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="notes">Notes<a class="headerlink" href="#notes" title="Permanent link">#</a></h1>
-<h2 id="editors">Editors<a class="headerlink" href="#editors" title="Permanent link">#</a></h2>
-<p>To embed codes in this documentation, I use <a href="https://emgithub.com/">https://emgithub.com/</a></p>
-<p>To embed Google Doc/Sheet/Slides in this documentation, go to that document, click menu bar <code>File &gt; Publich to the Web &gt; Embed &gt; Publish</code>.</p>
-<h2 id="programmers">Programmers<a class="headerlink" href="#programmers" title="Permanent link">#</a></h2>
-<p>To run a test script, instead of <code>./test_some_script.sh</code>  use <code>./test_some_script.sh 2&gt; /dev/null</code> to suppress warning from killing ghost programs.</p>
-<p>For easier debugging and learning about unfamiliar packages (e.g. PDDLGym), I'm using PyCharm. But somehow the packages need to be imported from a different path, compared to when I'm testing my script from command line. The following code changes the import script automatically:</p>
-<pre><code class="language-python">import sys
-if sys.stdin and sys.stdin.isatty():
-    ## to use pddlgym from command line
-    ## e.g., python run.py kitchen_extended.pddl scrambled_eggs.pddl -o obj_extended.pddl -v 0 -e 'experiments/planner_FD'
-    from .pddlgym.pddlgym.parser import PDDLDomainParser, PDDLProblemParser
-    from .pddlgym.pddlgym.core import PDDLEnv
-else:
-    ## to use pddlgym from PyCharm
-    ## e.g., when testing `experiments/env.py`, or `experiments/pddlgym/pddlgym/downward_translator/normalize.py`
-    from pddlgym.pddlgym.parser import PDDLDomainParser, PDDLProblemParser
-    from pddlgym.pddlgym.core import PDDLEnv
-</code></pre>
+                <h1 id="baseline-planners">Baseline Planners<a class="headerlink" href="#baseline-planners" title="Permanent link">#</a></h1>
+<h2 id="integrated-tamp-pddlstream">Integrated TAMP: PDDLStream<a class="headerlink" href="#integrated-tamp-pddlstream" title="Permanent link">#</a></h2>
+<h2 id="task-then-motion-planning-ttm">Task-Then-Motion Planning: TTM<a class="headerlink" href="#task-then-motion-planning-ttm" title="Permanent link">#</a></h2>
+<h3 id="references">References<a class="headerlink" href="#references" title="Permanent link">#</a></h3>
+<ol>
+<li>Garrett, Caelan Reed, et al. "Integrated task and motion planning." Annual review of control, robotics, and autonomous systems 4 (2021): 265-293.</li>
+</ol>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../setup-mkdocs/" class="btn btn-neutral float-left" title="Set up MkDocs"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../tut-lisdf/" class="btn btn-neutral float-right" title="LISDF">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../domain-rearrangement/" class="btn btn-neutral float-left" title="Rearrangement"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../setup-repository/" class="btn btn-neutral float-right" title="Set up the Repository">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -158,10 +150,10 @@ else:
   <span class="rst-current-version" data-toggle="rst-current-version">
     
     
-      <span><a href="../setup-mkdocs/" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../domain-rearrangement/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../tut-lisdf/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../setup-repository/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

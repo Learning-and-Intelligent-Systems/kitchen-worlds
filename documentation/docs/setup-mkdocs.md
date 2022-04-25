@@ -1,6 +1,6 @@
 # Set up the documentation
 
-The documentation source files are in `GenesisCore/documentation` folder.
+The documentation source files are in `kitchen-worlds/documentation` folder.
 
 Here is the layout of the documentation project:
 

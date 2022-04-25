@@ -6,7 +6,9 @@ A library of long-horizon Task-and-Motion-Planning (TAMP) problems in kitchen an
 - solve a TAMP problem using PDDLStream defined with a scene.lisdf, problem.pddl, domain.pddl, stream.pddl
 - procedurally generate scenes with rigid and articulated objects
 
-![kitchen_basics.lisdf in PyBullet](imgs/kitchen_basics.png)
+<video autoplay loop muted playsinline width=100%>
+  <source src="mp4/demo-cabbage.mp4" type="video/mp4">
+</video>
 
 
 ## Setup
@@ -50,36 +52,6 @@ To build some scenes
 python test_world_builder.py
 ```
 
-## LISDF Spec
-
-Current kitchen scenes in the format of  `.lisdf` are in path `asset/scenes/`, e.g. `kitchen_counter.lisdf` as simulated below.
-
-![kitchen_counter.lisdf in PyBullet](imgs/kitchen_counter.png)
-
-## Test LISDF + PDDL + Streams with PDDLStream
-
-### Set up PDDLStream
-
-```commandline
-# git submodule add https://github.com/caelan/pddlstream.git
-cd pddlstream
-git submodule update --init --recursive  ## may take a few minutes
-./downward/build.py ## may take a few minutes
-
-cd examples/pybullet/utils
-git pull origin master
-cd motion
-git pull origin master
-```
-
-### Troubleshooting
-
-```
-File "/Users/z/Documents/simulators/PyBullet/kitchen-worlds/pddlstream/examples/pybullet/utils/pybullet_tools/utils.py", line 3572, in get_closest_points
-    return [CollisionInfo(*info) for info in results]
-TypeError: 'NoneType' object is not iterable
-```
-
 ## Acknowledgements
 
 This repo works thanks for the tools provided by LIS lab members and alum:
@@ -106,6 +78,10 @@ All the object models and urdf files are downloaded for free from the following 
 - [x] update problem files in the format of `problem.pddl`
 - [x] upload implicit domain files in the format of `domain.pddl`
 - [x] add instructions to solve the example problems with TAMP planner [PDDLStream](https://github.com/caelan/pddlstream/tree/main)
-- [x] add instructions on generating kitchen scenes with scripts in [cognitive-architectures](https://github.mit.edu/ztyang/cognitive-architectures/tree/master/bullet)
 
-- [ ]
+- [ ] run PDDLStream on one problem in each category, with the same domain, different scenes and goals
+- [ ] run PDDLStream with execution noise
+- [ ] run PDDLStream+HPN with execution noise
+- [ ] run TTM with execution noise
+- [ ] add instructions on sampling scenes
+- [ ] add instructions on sampling goals
