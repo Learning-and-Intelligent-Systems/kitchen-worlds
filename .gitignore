@@ -6,6 +6,6 @@ assets/tmp/*
 *.pyc
 
 documentation/
-!/documentation/docs/index.md
+!documentation/docs/index.md
 !documentation/docs/css/gif_looper_update.py
 !documentation/docs/css/extra.css

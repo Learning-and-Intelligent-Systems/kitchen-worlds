@@ -1,0 +1,729 @@
+----------------
+PART I: world objects |
+1      |  pr2    |  Pose: (0, 0, 0, 0)
+2      |  milkbottle#1    |  Pose: (0.7, 4.8, 1.479, 1.815)
+3      |  floor1    |  Pose: (2.3, 4.7, -0.002, 0)
+4      |  counter#1    |  Pose: (0.5, 7.6, 1.394, 0)
+5      |  braiserbody#1    |  Pose: (0.55, 8.181, 0.818, 2.525)
+6      |  microwave#1    |  Pose: (0.4, 6.4, 1.019, -3.141)
+7      |  braiserlid#1    |  Pose: (0.55, 8.181, 0.821, 2.525)
+8      |  meatturkeyleg#1    |  Pose: (0.7, 8.9, 0.844, 2.9)
+9      |  oven#1    |  Pose: (0.6, 8, 0.602, -3.141)
+10      |  dishwasher#1    |  Pose: (0.7, 6.4, 0.366, -3.141)
+11      |  basin#1    |  Pose: (0.5, 5.6, 0.364, -3.141)
+12      |  faucet#1    |  Pose: (0.3, 5.6, 0.985, -3.141)
+13      |  fridge#1    |  Pose: (0.5, 4.8, 1.031, -3.141)
+14      |  veggiecabbage#1    |  Pose: (0.7, 4.8, 0.838, 0.764)
+----------------
+----------------
+Initial facts (103)
+   = [['=', ('PickCost',), 1], ['=', ('PlaceCost',), 1]]
+   aconf [['aconf', 'left', aq208=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223)], ['aconf', 'right', aq112=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000)]]
+   arm [['arm', 'left'], ['arm', 'right']]
+   ataconf [['ataconf', 'left', aq208=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223)], ['ataconf', 'right', aq112=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000)]]
+   atbconf [['atbconf', q16=(2.5, 6, 3.142)]]
+   atlinkpose [['atlinkpose', (13, 1)], ['atlinkpose', (9, 4)], ['atlinkpose', (12, 5)], ['atlinkpose', (12, 3)]]
+   atpose [['atpose', 14, p0=(0.7, 4.8, 0.838, 0.764)], ['atpose', 7, p1=(0.55, 8.181, 0.821, 2.525)], ['atpose', 8, p2=(0.7, 8.9, 0.844, 2.9)]]
+   atposition [['atposition', (13, 1), pstn0=1.2], ['atposition', (9, 4), pstn1=0], ['atposition', (12, 5), pstn2=0], ['atposition', (12, 3), pstn3=0]]
+   basin [['basin', 11]]
+   bconf [['bconf', q16=(2.5, 6, 3.142)]]
+   braiserbody [['braiserbody', 5]]
+   braiserlid [['braiserlid', 7]]
+   canmove [['canmove']]
+   canpull [['canpull']]
+   cleaningsurface [['cleaningsurface', (11, None, 3)]]
+   controllable [['controllable', 'left']]
+   controlledby [['controlledby', (5, None, 1), (9, 4)], ['controlledby', (11, None, 3), (12, 3)]]
+   counter [['counter', 4]]
+   defaultconf [['defaultconf', 'left', aq208=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223)], ['defaultconf', 'right', aq112=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000)]]
+   dishwasher [['dishwasher', 10]]
+   door [['door', (13, 1)]]
+   edible [['edible', 14], ['edible', 8]]
+   faucet [['faucet', 12]]
+   floor [['floor', 3]]
+   fridge [['fridge', 13]]
+   graspable [['graspable', 14], ['graspable', 7], ['graspable', 8]]
+   handempty [['handempty', 'left'], ['handempty', 'right']]
+   heatingsurface [['heatingsurface', (5, None, 1)]]
+   inwconf [['InWConf', wconf696(0)]]
+   isclosedposition [['isclosedposition', (13, 1), pstn0=1.2], ['isclosedposition', (9, 4), pstn1=0], ['isclosedposition', (12, 5), pstn2=0], ['isclosedposition', (12, 3), pstn3=0]]
+   isjointto [['isjointto', (13, 1), 13], ['isjointto', (9, 4), 9], ['isjointto', (12, 5), 12], ['isjointto', (12, 3), 12]]
+   joint [['joint', (13, 1)], ['joint', (9, 4)], ['joint', (12, 5)], ['joint', (12, 3)], ['joint', (9, 4)], ['joint', (12, 5)], ['joint', (12, 3)]]
+   knob [['knob', (9, 4)], ['knob', (12, 5)], ['knob', (12, 3)]]
+   linkpose [['linkpose', (13, 1)], ['linkpose', (9, 4)], ['linkpose', (12, 5)], ['linkpose', (12, 3)]]
+   meatturkeyleg [['meatturkeyleg', 8]]
+   microwave [['microwave', 6]]
+   milkbottle [['milkbottle', 2]]
+   oven [['oven', 9]]
+   pose [['pose', 14, p0=(0.7, 4.8, 0.838, 0.764)], ['pose', 7, p1=(0.55, 8.181, 0.821, 2.525)], ['pose', 8, p2=(0.7, 8.9, 0.844, 2.9)]]
+   position [['position', (13, 1), pstn0=1.2], ['position', (9, 4), pstn1=0], ['position', (12, 5), pstn2=0], ['position', (12, 3), pstn3=0]]
+   stackable [['stackable', 14, (5, None, 1)], ['stackable', 14, (13, None, 7)], ['stackable', 14, (4, None, 4)], ['stackable', 14, (4, None, 35)], ['stackable', 14, (11, None, 3)], ['stackable', 7, (5, None, 1)], ['stackable', 7, (13, None, 7)], ['stackable', 7, (4, None, 4)], ['stackable', 7, (4, None, 35)], ['stackable', 7, (11, None, 3)], ['stackable', 8, (5, None, 1)], ['stackable', 8, (13, None, 7)], ['stackable', 8, (4, None, 4)], ['stackable', 8, (4, None, 35)], ['stackable', 8, (11, None, 3)]]
+   supported [['supported', 8, p2=(0.7, 8.9, 0.844, 2.9), (4, None, 35)]]
+   surface [['surface', (5, None, 1)], ['surface', (13, None, 7)], ['surface', (4, None, 4)], ['surface', (4, None, 35)], ['surface', (11, None, 3)]]
+   veggiecabbage [['veggiecabbage', 14]]
+   wconf [['WConf', wconf696(0)]]
+----------------
+----------------
+PART I: world objects |
+1      |  pr2    |  Pose: (0, 0, 0, 0)
+2      |  milkbottle#1    |  Pose: (0.7, 4.8, 1.479, 1.815)
+3      |  floor1    |  Pose: (2.3, 4.7, -0.002, 0)
+4      |  counter#1    |  Pose: (0.5, 7.6, 1.394, 0)
+5      |  braiserbody#1    |  Pose: (0.55, 8.181, 0.818, 2.525)
+6      |  microwave#1    |  Pose: (0.4, 6.4, 1.019, -3.141)
+7      |  braiserlid#1    |  Pose: (0.55, 8.181, 0.821, 2.525)
+8      |  meatturkeyleg#1    |  Pose: (0.7, 8.9, 0.844, 2.9)
+9      |  oven#1    |  Pose: (0.6, 8, 0.602, -3.141)
+10      |  dishwasher#1    |  Pose: (0.7, 6.4, 0.366, -3.141)
+11      |  basin#1    |  Pose: (0.5, 5.6, 0.364, -3.141)
+12      |  faucet#1    |  Pose: (0.3, 5.6, 0.985, -3.141)
+13      |  fridge#1    |  Pose: (0.5, 4.8, 1.031, -3.141)
+14      |  veggiecabbage#1    |  Pose: (0.7, 4.8, 0.838, 0.764)
+----------------
+----------------
+PART I: world objects |
+1      |  pr2    |  Pose: (0, 0, 0, 0)
+2      |  milkbottle#1    |  Pose: (0.7, 4.8, 1.479, 1.815)
+3      |  floor1    |  Pose: (2.3, 4.7, -0.002, 0)
+4      |  counter#1    |  Pose: (0.5, 7.6, 1.394, 0)
+5      |  braiserbody#1    |  Pose: (0.55, 8.181, 0.818, 2.525)
+6      |  microwave#1    |  Pose: (0.4, 6.4, 1.019, -3.141)
+7      |  braiserlid#1    |  Pose: (0.55, 8.181, 0.821, 2.525)
+8      |  meatturkeyleg#1    |  Pose: (0.7, 8.9, 0.844, 2.9)
+9      |  oven#1    |  Pose: (0.6, 8, 0.602, -3.141)
+10      |  dishwasher#1    |  Pose: (0.7, 6.4, 0.366, -3.141)
+11      |  basin#1    |  Pose: (0.5, 5.6, 0.364, -3.141)
+12      |  faucet#1    |  Pose: (0.3, 5.6, 0.985, -3.141)
+13      |  fridge#1    |  Pose: (0.5, 4.8, 1.031, -3.141)
+14      |  veggiecabbage#1    |  Pose: (0.7, 4.8, 0.838, 0.764)
+----------------
+----------------
+PART I: world objects |
+1      |  pr2    |  Pose: (0, 0, 0, 0)
+2      |  milkbottle#1    |  Pose: (0.7, 4.8, 1.479, 1.815)
+3      |  floor1    |  Pose: (2.3, 4.7, -0.002, 0)
+4      |  counter#1    |  Pose: (0.5, 7.6, 1.394, 0)
+5      |  braiserbody#1    |  Pose: (0.55, 8.181, 0.818, 2.525)
+6      |  microwave#1    |  Pose: (0.4, 6.4, 1.019, -3.141)
+7      |  braiserlid#1    |  Pose: (0.55, 8.181, 0.821, 2.525)
+8      |  meatturkeyleg#1    |  Pose: (0.7, 8.9, 0.844, 2.9)
+9      |  oven#1    |  Pose: (0.6, 8, 0.602, -3.141)
+10      |  dishwasher#1    |  Pose: (0.7, 6.4, 0.366, -3.141)
+11      |  basin#1    |  Pose: (0.5, 5.6, 0.364, -3.141)
+12      |  faucet#1    |  Pose: (0.3, 5.6, 0.985, -3.141)
+13      |  fridge#1    |  Pose: (0.5, 4.8, 1.031, -3.141)
+14      |  veggiecabbage#1    |  Pose: (0.7, 4.8, 0.838, 0.764)
+----------------
+----------------
+Initial facts (103)
+   = [['=', ('PickCost',), 1], ['=', ('PlaceCost',), 1]]
+   aconf [['aconf', 'left', aq208=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223)], ['aconf', 'right', aq112=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000)]]
+   arm [['arm', 'left'], ['arm', 'right']]
+   ataconf [['ataconf', 'left', aq208=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223)], ['ataconf', 'right', aq112=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000)]]
+   atbconf [['atbconf', q16=(2.5, 6, 3.142)]]
+   atlinkpose [['atlinkpose', (13, 1)], ['atlinkpose', (9, 4)], ['atlinkpose', (12, 5)], ['atlinkpose', (12, 3)]]
+   atpose [['atpose', 14, p0=(0.7, 4.8, 0.838, 0.764)], ['atpose', 7, p1=(0.55, 8.181, 0.821, 2.525)], ['atpose', 8, p2=(0.7, 8.9, 0.844, 2.9)]]
+   atposition [['atposition', (13, 1), pstn0=1.2], ['atposition', (9, 4), pstn1=0], ['atposition', (12, 5), pstn2=0], ['atposition', (12, 3), pstn3=0]]
+   basin [['basin', 11]]
+   bconf [['bconf', q16=(2.5, 6, 3.142)]]
+   braiserbody [['braiserbody', 5]]
+   braiserlid [['braiserlid', 7]]
+   canmove [['canmove']]
+   canpull [['canpull']]
+   cleaningsurface [['cleaningsurface', (11, None, 3)]]
+   controllable [['controllable', 'left']]
+   controlledby [['controlledby', (5, None, 1), (9, 4)], ['controlledby', (11, None, 3), (12, 3)]]
+   counter [['counter', 4]]
+   defaultconf [['defaultconf', 'left', aq208=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223)], ['defaultconf', 'right', aq112=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000)]]
+   dishwasher [['dishwasher', 10]]
+   door [['door', (13, 1)]]
+   edible [['edible', 14], ['edible', 8]]
+   faucet [['faucet', 12]]
+   floor [['floor', 3]]
+   fridge [['fridge', 13]]
+   graspable [['graspable', 14], ['graspable', 7], ['graspable', 8]]
+   handempty [['handempty', 'left'], ['handempty', 'right']]
+   heatingsurface [['heatingsurface', (5, None, 1)]]
+   inwconf [['InWConf', wconf432(0)]]
+   isclosedposition [['isclosedposition', (13, 1), pstn0=1.2], ['isclosedposition', (9, 4), pstn1=0], ['isclosedposition', (12, 5), pstn2=0], ['isclosedposition', (12, 3), pstn3=0]]
+   isjointto [['isjointto', (13, 1), 13], ['isjointto', (9, 4), 9], ['isjointto', (12, 5), 12], ['isjointto', (12, 3), 12]]
+   joint [['joint', (13, 1)], ['joint', (9, 4)], ['joint', (12, 5)], ['joint', (12, 3)], ['joint', (9, 4)], ['joint', (12, 5)], ['joint', (12, 3)]]
+   knob [['knob', (9, 4)], ['knob', (12, 5)], ['knob', (12, 3)]]
+   linkpose [['linkpose', (13, 1)], ['linkpose', (9, 4)], ['linkpose', (12, 5)], ['linkpose', (12, 3)]]
+   meatturkeyleg [['meatturkeyleg', 8]]
+   microwave [['microwave', 6]]
+   milkbottle [['milkbottle', 2]]
+   oven [['oven', 9]]
+   pose [['pose', 14, p0=(0.7, 4.8, 0.838, 0.764)], ['pose', 7, p1=(0.55, 8.181, 0.821, 2.525)], ['pose', 8, p2=(0.7, 8.9, 0.844, 2.9)]]
+   position [['position', (13, 1), pstn0=1.2], ['position', (9, 4), pstn1=0], ['position', (12, 5), pstn2=0], ['position', (12, 3), pstn3=0]]
+   stackable [['stackable', 14, (5, None, 1)], ['stackable', 14, (13, None, 7)], ['stackable', 14, (4, None, 4)], ['stackable', 14, (4, None, 35)], ['stackable', 14, (11, None, 3)], ['stackable', 7, (5, None, 1)], ['stackable', 7, (13, None, 7)], ['stackable', 7, (4, None, 4)], ['stackable', 7, (4, None, 35)], ['stackable', 7, (11, None, 3)], ['stackable', 8, (5, None, 1)], ['stackable', 8, (13, None, 7)], ['stackable', 8, (4, None, 4)], ['stackable', 8, (4, None, 35)], ['stackable', 8, (11, None, 3)]]
+   supported [['supported', 8, p2=(0.7, 8.9, 0.844, 2.9), (4, None, 35)]]
+   surface [['surface', (5, None, 1)], ['surface', (13, None, 7)], ['surface', (4, None, 4)], ['surface', (4, None, 35)], ['surface', (11, None, 3)]]
+   veggiecabbage [['veggiecabbage', 14]]
+   wconf [['WConf', wconf432(0)]]
+----------------
+----------------
+PART I: world objects |
+1      |  pr2    |  Pose: (0, 0, 0, 0)
+2      |  milkbottle#1    |  Pose: (0.7, 4.8, 1.479, 1.815)
+3      |  floor1    |  Pose: (2.3, 4.7, -0.002, 0)
+4      |  counter#1    |  Pose: (0.5, 7.6, 1.394, 0)
+5      |  braiserbody#1    |  Pose: (0.55, 8.181, 0.818, 2.525)
+6      |  microwave#1    |  Pose: (0.4, 6.4, 1.019, -3.141)
+7      |  braiserlid#1    |  Pose: (0.55, 8.181, 0.821, 2.525)
+8      |  meatturkeyleg#1    |  Pose: (0.7, 8.9, 0.844, 2.9)
+9      |  oven#1    |  Pose: (0.6, 8, 0.602, -3.141)
+10      |  dishwasher#1    |  Pose: (0.7, 6.4, 0.366, -3.141)
+11      |  basin#1    |  Pose: (0.5, 5.6, 0.364, -3.141)
+12      |  faucet#1    |  Pose: (0.3, 5.6, 0.985, -3.141)
+13      |  fridge#1    |  Pose: (0.5, 4.8, 1.031, -3.141)
+14      |  veggiecabbage#1    |  Pose: (0.7, 4.8, 0.838, 0.764)
+----------------
+----------------
+Initial facts (103)
+   = [['=', ('PickCost',), 1], ['=', ('PlaceCost',), 1]]
+   aconf [['aconf', 'left', aq208=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223)], ['aconf', 'right', aq112=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000)]]
+   arm [['arm', 'left'], ['arm', 'right']]
+   ataconf [['ataconf', 'left', aq208=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223)], ['ataconf', 'right', aq112=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000)]]
+   atbconf [['atbconf', q16=(2.5, 6, 3.142)]]
+   atlinkpose [['atlinkpose', (13, 1)], ['atlinkpose', (9, 4)], ['atlinkpose', (12, 5)], ['atlinkpose', (12, 3)]]
+   atpose [['atpose', 14, p0=(0.7, 4.8, 0.838, 0.764)], ['atpose', 7, p1=(0.55, 8.181, 0.821, 2.525)], ['atpose', 8, p2=(0.7, 8.9, 0.844, 2.9)]]
+   atposition [['atposition', (13, 1), pstn0=1.2], ['atposition', (9, 4), pstn1=0], ['atposition', (12, 5), pstn2=0], ['atposition', (12, 3), pstn3=0]]
+   basin [['basin', 11]]
+   bconf [['bconf', q16=(2.5, 6, 3.142)]]
+   braiserbody [['braiserbody', 5]]
+   braiserlid [['braiserlid', 7]]
+   canmove [['canmove']]
+   canpull [['canpull']]
+   cleaningsurface [['cleaningsurface', (11, None, 3)]]
+   controllable [['controllable', 'left']]
+   controlledby [['controlledby', (5, None, 1), (9, 4)], ['controlledby', (11, None, 3), (12, 3)]]
+   counter [['counter', 4]]
+   defaultconf [['defaultconf', 'left', aq208=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223)], ['defaultconf', 'right', aq112=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000)]]
+   dishwasher [['dishwasher', 10]]
+   door [['door', (13, 1)]]
+   edible [['edible', 14], ['edible', 8]]
+   faucet [['faucet', 12]]
+   floor [['floor', 3]]
+   fridge [['fridge', 13]]
+   graspable [['graspable', 14], ['graspable', 7], ['graspable', 8]]
+   handempty [['handempty', 'left'], ['handempty', 'right']]
+   heatingsurface [['heatingsurface', (5, None, 1)]]
+   inwconf [['InWConf', wconf256(0)]]
+   isclosedposition [['isclosedposition', (13, 1), pstn0=1.2], ['isclosedposition', (9, 4), pstn1=0], ['isclosedposition', (12, 5), pstn2=0], ['isclosedposition', (12, 3), pstn3=0]]
+   isjointto [['isjointto', (13, 1), 13], ['isjointto', (9, 4), 9], ['isjointto', (12, 5), 12], ['isjointto', (12, 3), 12]]
+   joint [['joint', (13, 1)], ['joint', (9, 4)], ['joint', (12, 5)], ['joint', (12, 3)], ['joint', (9, 4)], ['joint', (12, 5)], ['joint', (12, 3)]]
+   knob [['knob', (9, 4)], ['knob', (12, 5)], ['knob', (12, 3)]]
+   linkpose [['linkpose', (13, 1)], ['linkpose', (9, 4)], ['linkpose', (12, 5)], ['linkpose', (12, 3)]]
+   meatturkeyleg [['meatturkeyleg', 8]]
+   microwave [['microwave', 6]]
+   milkbottle [['milkbottle', 2]]
+   oven [['oven', 9]]
+   pose [['pose', 14, p0=(0.7, 4.8, 0.838, 0.764)], ['pose', 7, p1=(0.55, 8.181, 0.821, 2.525)], ['pose', 8, p2=(0.7, 8.9, 0.844, 2.9)]]
+   position [['position', (13, 1), pstn0=1.2], ['position', (9, 4), pstn1=0], ['position', (12, 5), pstn2=0], ['position', (12, 3), pstn3=0]]
+   stackable [['stackable', 14, (5, None, 1)], ['stackable', 14, (13, None, 7)], ['stackable', 14, (4, None, 4)], ['stackable', 14, (4, None, 35)], ['stackable', 14, (11, None, 3)], ['stackable', 7, (5, None, 1)], ['stackable', 7, (13, None, 7)], ['stackable', 7, (4, None, 4)], ['stackable', 7, (4, None, 35)], ['stackable', 7, (11, None, 3)], ['stackable', 8, (5, None, 1)], ['stackable', 8, (13, None, 7)], ['stackable', 8, (4, None, 4)], ['stackable', 8, (4, None, 35)], ['stackable', 8, (11, None, 3)]]
+   supported [['supported', 8, p2=(0.7, 8.9, 0.844, 2.9), (4, None, 35)]]
+   surface [['surface', (5, None, 1)], ['surface', (13, None, 7)], ['surface', (4, None, 4)], ['surface', (4, None, 35)], ['surface', (11, None, 3)]]
+   veggiecabbage [['veggiecabbage', 14]]
+   wconf [['WConf', wconf256(0)]]
+----------------
+----------------
+PART I: world objects |
+1      |  pr2    |  Pose: (0, 0, 0, 0)
+2      |  milkbottle#1    |  Pose: (0.7, 4.8, 1.479, 1.815)
+3      |  floor1    |  Pose: (2.3, 4.7, -0.002, 0)
+4      |  counter#1    |  Pose: (0.5, 7.6, 1.394, 0)
+5      |  braiserbody#1    |  Pose: (0.55, 8.181, 0.818, 2.525)
+6      |  microwave#1    |  Pose: (0.4, 6.4, 1.019, -3.141)
+7      |  braiserlid#1    |  Pose: (0.55, 8.181, 0.821, 2.525)
+8      |  meatturkeyleg#1    |  Pose: (0.7, 8.9, 0.844, 2.9)
+9      |  oven#1    |  Pose: (0.6, 8, 0.602, -3.141)
+10      |  dishwasher#1    |  Pose: (0.7, 6.4, 0.366, -3.141)
+11      |  basin#1    |  Pose: (0.5, 5.6, 0.364, -3.141)
+12      |  faucet#1    |  Pose: (0.3, 5.6, 0.985, -3.141)
+13      |  fridge#1    |  Pose: (0.5, 4.8, 1.031, -3.141)
+14      |  veggiecabbage#1    |  Pose: (0.7, 4.8, 0.838, 0.764)
+----------------
+----------------
+Initial facts (103)
+   = [['=', ('PickCost',), 1], ['=', ('PlaceCost',), 1]]
+   aconf [['aconf', 'left', aq208=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223)], ['aconf', 'right', aq112=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000)]]
+   arm [['arm', 'left'], ['arm', 'right']]
+   ataconf [['ataconf', 'left', aq208=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223)], ['ataconf', 'right', aq112=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000)]]
+   atbconf [['atbconf', q16=(2.5, 6, 3.142)]]
+   atlinkpose [['atlinkpose', (13, 1)], ['atlinkpose', (9, 4)], ['atlinkpose', (12, 5)], ['atlinkpose', (12, 3)]]
+   atpose [['atpose', 14, p0=(0.7, 4.8, 0.838, 0.764)], ['atpose', 7, p1=(0.55, 8.181, 0.821, 2.525)], ['atpose', 8, p2=(0.7, 8.9, 0.844, 2.9)]]
+   atposition [['atposition', (13, 1), pstn0=1.2], ['atposition', (9, 4), pstn1=0], ['atposition', (12, 5), pstn2=0], ['atposition', (12, 3), pstn3=0]]
+   basin [['basin', 11]]
+   bconf [['bconf', q16=(2.5, 6, 3.142)]]
+   braiserbody [['braiserbody', 5]]
+   braiserlid [['braiserlid', 7]]
+   canmove [['canmove']]
+   canpull [['canpull']]
+   cleaningsurface [['cleaningsurface', (11, None, 3)]]
+   controllable [['controllable', 'left']]
+   controlledby [['controlledby', (5, None, 1), (9, 4)], ['controlledby', (11, None, 3), (12, 3)]]
+   counter [['counter', 4]]
+   defaultconf [['defaultconf', 'left', aq208=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223)], ['defaultconf', 'right', aq112=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000)]]
+   dishwasher [['dishwasher', 10]]
+   door [['door', (13, 1)]]
+   edible [['edible', 14], ['edible', 8]]
+   faucet [['faucet', 12]]
+   floor [['floor', 3]]
+   fridge [['fridge', 13]]
+   graspable [['graspable', 14], ['graspable', 7], ['graspable', 8]]
+   handempty [['handempty', 'left'], ['handempty', 'right']]
+   heatingsurface [['heatingsurface', (5, None, 1)]]
+   inwconf [['InWConf', wconf720(0)]]
+   isclosedposition [['isclosedposition', (13, 1), pstn0=1.2], ['isclosedposition', (9, 4), pstn1=0], ['isclosedposition', (12, 5), pstn2=0], ['isclosedposition', (12, 3), pstn3=0]]
+   isjointto [['isjointto', (13, 1), 13], ['isjointto', (9, 4), 9], ['isjointto', (12, 5), 12], ['isjointto', (12, 3), 12]]
+   joint [['joint', (13, 1)], ['joint', (9, 4)], ['joint', (12, 5)], ['joint', (12, 3)], ['joint', (9, 4)], ['joint', (12, 5)], ['joint', (12, 3)]]
+   knob [['knob', (9, 4)], ['knob', (12, 5)], ['knob', (12, 3)]]
+   linkpose [['linkpose', (13, 1)], ['linkpose', (9, 4)], ['linkpose', (12, 5)], ['linkpose', (12, 3)]]
+   meatturkeyleg [['meatturkeyleg', 8]]
+   microwave [['microwave', 6]]
+   milkbottle [['milkbottle', 2]]
+   oven [['oven', 9]]
+   pose [['pose', 14, p0=(0.7, 4.8, 0.838, 0.764)], ['pose', 7, p1=(0.55, 8.181, 0.821, 2.525)], ['pose', 8, p2=(0.7, 8.9, 0.844, 2.9)]]
+   position [['position', (13, 1), pstn0=1.2], ['position', (9, 4), pstn1=0], ['position', (12, 5), pstn2=0], ['position', (12, 3), pstn3=0]]
+   stackable [['stackable', 14, (5, None, 1)], ['stackable', 14, (13, None, 7)], ['stackable', 14, (4, None, 4)], ['stackable', 14, (4, None, 35)], ['stackable', 14, (11, None, 3)], ['stackable', 7, (5, None, 1)], ['stackable', 7, (13, None, 7)], ['stackable', 7, (4, None, 4)], ['stackable', 7, (4, None, 35)], ['stackable', 7, (11, None, 3)], ['stackable', 8, (5, None, 1)], ['stackable', 8, (13, None, 7)], ['stackable', 8, (4, None, 4)], ['stackable', 8, (4, None, 35)], ['stackable', 8, (11, None, 3)]]
+   supported [['supported', 8, p2=(0.7, 8.9, 0.844, 2.9), (4, None, 35)]]
+   surface [['surface', (5, None, 1)], ['surface', (13, None, 7)], ['surface', (4, None, 4)], ['surface', (4, None, 35)], ['surface', (11, None, 3)]]
+   veggiecabbage [['veggiecabbage', 14]]
+   wconf [['WConf', wconf720(0)]]
+----------------
+----------------
+PART I: world objects |
+1      |  pr2    |  Pose: (0, 0, 0, 0)
+2      |  milkbottle#1    |  Pose: (0.7, 4.8, 1.479, 1.815)
+3      |  floor1    |  Pose: (2.3, 4.7, -0.002, 0)
+4      |  counter#1    |  Pose: (0.5, 7.6, 1.394, 0)
+5      |  braiserbody#1    |  Pose: (0.55, 8.181, 0.818, 2.525)
+6      |  microwave#1    |  Pose: (0.4, 6.4, 1.019, -3.141)
+7      |  braiserlid#1    |  Pose: (0.55, 8.181, 0.821, 2.525)
+8      |  meatturkeyleg#1    |  Pose: (0.7, 8.9, 0.844, 2.9)
+9      |  oven#1    |  Pose: (0.6, 8, 0.602, -3.141)
+10      |  dishwasher#1    |  Pose: (0.7, 6.4, 0.366, -3.141)
+11      |  basin#1    |  Pose: (0.5, 5.6, 0.364, -3.141)
+12      |  faucet#1    |  Pose: (0.3, 5.6, 0.985, -3.141)
+13      |  fridge#1    |  Pose: (0.5, 4.8, 1.031, -3.141)
+14      |  veggiecabbage#1    |  Pose: (0.7, 4.8, 0.838, 0.764)
+----------------
+----------------
+Initial facts (103)
+   = [['=', ('PickCost',), 1], ['=', ('PlaceCost',), 1]]
+   aconf [['aconf', 'left', aq208=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223)], ['aconf', 'right', aq112=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000)]]
+   arm [['arm', 'left'], ['arm', 'right']]
+   ataconf [['ataconf', 'left', aq208=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223)], ['ataconf', 'right', aq112=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000)]]
+   atbconf [['atbconf', q16=(2.5, 6, 3.142)]]
+   atlinkpose [['atlinkpose', (13, 1)], ['atlinkpose', (9, 4)], ['atlinkpose', (12, 5)], ['atlinkpose', (12, 3)]]
+   atpose [['atpose', 14, p0=(0.7, 4.8, 0.838, 0.764)], ['atpose', 7, p1=(0.55, 8.181, 0.821, 2.525)], ['atpose', 8, p2=(0.7, 8.9, 0.844, 2.9)]]
+   atposition [['atposition', (13, 1), pstn0=1.2], ['atposition', (9, 4), pstn1=0], ['atposition', (12, 5), pstn2=0], ['atposition', (12, 3), pstn3=0]]
+   basin [['basin', 11]]
+   bconf [['bconf', q16=(2.5, 6, 3.142)]]
+   braiserbody [['braiserbody', 5]]
+   braiserlid [['braiserlid', 7]]
+   canmove [['canmove']]
+   canpull [['canpull']]
+   cleaningsurface [['cleaningsurface', (11, None, 3)]]
+   controllable [['controllable', 'left']]
+   controlledby [['controlledby', (5, None, 1), (9, 4)], ['controlledby', (11, None, 3), (12, 3)]]
+   counter [['counter', 4]]
+   defaultconf [['defaultconf', 'left', aq208=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223)], ['defaultconf', 'right', aq112=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000)]]
+   dishwasher [['dishwasher', 10]]
+   door [['door', (13, 1)]]
+   edible [['edible', 14], ['edible', 8]]
+   faucet [['faucet', 12]]
+   floor [['floor', 3]]
+   fridge [['fridge', 13]]
+   graspable [['graspable', 14], ['graspable', 7], ['graspable', 8]]
+   handempty [['handempty', 'left'], ['handempty', 'right']]
+   heatingsurface [['heatingsurface', (5, None, 1)]]
+   inwconf [['InWConf', wconf104(0)]]
+   isclosedposition [['isclosedposition', (13, 1), pstn0=1.2], ['isclosedposition', (9, 4), pstn1=0], ['isclosedposition', (12, 5), pstn2=0], ['isclosedposition', (12, 3), pstn3=0]]
+   isjointto [['isjointto', (13, 1), 13], ['isjointto', (9, 4), 9], ['isjointto', (12, 5), 12], ['isjointto', (12, 3), 12]]
+   joint [['joint', (13, 1)], ['joint', (9, 4)], ['joint', (12, 5)], ['joint', (12, 3)], ['joint', (9, 4)], ['joint', (12, 5)], ['joint', (12, 3)]]
+   knob [['knob', (9, 4)], ['knob', (12, 5)], ['knob', (12, 3)]]
+   linkpose [['linkpose', (13, 1)], ['linkpose', (9, 4)], ['linkpose', (12, 5)], ['linkpose', (12, 3)]]
+   meatturkeyleg [['meatturkeyleg', 8]]
+   microwave [['microwave', 6]]
+   milkbottle [['milkbottle', 2]]
+   oven [['oven', 9]]
+   pose [['pose', 14, p0=(0.7, 4.8, 0.838, 0.764)], ['pose', 7, p1=(0.55, 8.181, 0.821, 2.525)], ['pose', 8, p2=(0.7, 8.9, 0.844, 2.9)]]
+   position [['position', (13, 1), pstn0=1.2], ['position', (9, 4), pstn1=0], ['position', (12, 5), pstn2=0], ['position', (12, 3), pstn3=0]]
+   stackable [['stackable', 14, (5, None, 1)], ['stackable', 14, (13, None, 7)], ['stackable', 14, (4, None, 4)], ['stackable', 14, (4, None, 35)], ['stackable', 14, (11, None, 3)], ['stackable', 7, (5, None, 1)], ['stackable', 7, (13, None, 7)], ['stackable', 7, (4, None, 4)], ['stackable', 7, (4, None, 35)], ['stackable', 7, (11, None, 3)], ['stackable', 8, (5, None, 1)], ['stackable', 8, (13, None, 7)], ['stackable', 8, (4, None, 4)], ['stackable', 8, (4, None, 35)], ['stackable', 8, (11, None, 3)]]
+   supported [['supported', 8, p2=(0.7, 8.9, 0.844, 2.9), (4, None, 35)]]
+   surface [['surface', (5, None, 1)], ['surface', (13, None, 7)], ['surface', (4, None, 4)], ['surface', (4, None, 35)], ['surface', (11, None, 3)]]
+   veggiecabbage [['veggiecabbage', 14]]
+   wconf [['WConf', wconf104(0)]]
+----------------
+----------------
+PART I: world objects |
+1      |  pr2    |  Pose: (0, 0, 0, 0)
+2      |  milkbottle#1    |  Pose: (0.7, 4.8, 1.479, 1.815)
+3      |  floor1    |  Pose: (2.3, 4.7, -0.002, 0)
+4      |  counter#1    |  Pose: (0.5, 7.6, 1.394, 0)
+5      |  braiserbody#1    |  Pose: (0.55, 8.181, 0.818, 2.525)
+6      |  microwave#1    |  Pose: (0.4, 6.4, 1.019, -3.141)
+7      |  braiserlid#1    |  Pose: (0.55, 8.181, 0.821, 2.525)
+8      |  meatturkeyleg#1    |  Pose: (0.7, 8.9, 0.844, 2.9)
+9      |  oven#1    |  Pose: (0.6, 8, 0.602, -3.141)
+10      |  dishwasher#1    |  Pose: (0.7, 6.4, 0.366, -3.141)
+11      |  basin#1    |  Pose: (0.5, 5.6, 0.364, -3.141)
+12      |  faucet#1    |  Pose: (0.3, 5.6, 0.985, -3.141)
+13      |  fridge#1    |  Pose: (0.5, 4.8, 1.031, -3.141)
+14      |  veggiecabbage#1    |  Pose: (0.7, 4.8, 0.838, 0.764)
+(11, None, 3)      |  basin#1::basin_bottom    |  Pose: (0.539, 5.6, 0.802, 1.571)
+(5, None, 1)      |  braiserbody#1::braiser_bottom    |  Pose: (0.55, 8.181, 0.818, 0.954)
+(4, None, 4)      |  counter#1::front_left_stove    |  Pose: (0.566, 7.868, 0.783, 0)
+(4, None, 35)      |  counter#1::indigo_tmp    |  Pose: (0.601, 8.438, 0.839, 0)
+(12, 3)      |  faucet#1::joint_faucet_0    |  Pose: 0
+(12, 5)      |  faucet#1::joint_faucet_1    |  Pose: 0
+(13, 1)      |  fridge#1::fridge_door    |  Pose: 1.2
+(13, None, 7)      |  fridge#1::shelf_bottom    |  Pose: (0.5, 4.8, 1.031, 1.571)
+(9, 4)      |  oven#1::knob_joint_2    |  Pose: 0
+----------------
+----------------
+Initial facts (103)
+   = [['=', ('PickCost',), 1], ['=', ('PlaceCost',), 1]]
+   aconf [['aconf', 'left', aq208=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223)], ['aconf', 'right', aq112=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000)]]
+   arm [['arm', 'left'], ['arm', 'right']]
+   ataconf [['ataconf', 'left', aq208=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223)], ['ataconf', 'right', aq112=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000)]]
+   atbconf [['atbconf', q16=(2.5, 6, 3.142)]]
+   atlinkpose [['atlinkpose', (13, 1)], ['atlinkpose', (9, 4)], ['atlinkpose', (12, 5)], ['atlinkpose', (12, 3)]]
+   atpose [['atpose', 14, p0=(0.7, 4.8, 0.838, 0.764)], ['atpose', 7, p1=(0.55, 8.181, 0.821, 2.525)], ['atpose', 8, p2=(0.7, 8.9, 0.844, 2.9)]]
+   atposition [['atposition', (13, 1), pstn0=1.2], ['atposition', (9, 4), pstn1=0], ['atposition', (12, 5), pstn2=0], ['atposition', (12, 3), pstn3=0]]
+   basin [['basin', 11]]
+   bconf [['bconf', q16=(2.5, 6, 3.142)]]
+   braiserbody [['braiserbody', 5]]
+   braiserlid [['braiserlid', 7]]
+   canmove [['canmove']]
+   canpull [['canpull']]
+   cleaningsurface [['cleaningsurface', (11, None, 3)]]
+   controllable [['controllable', 'left']]
+   controlledby [['controlledby', (5, None, 1), (9, 4)], ['controlledby', (11, None, 3), (12, 3)]]
+   counter [['counter', 4]]
+   defaultconf [['defaultconf', 'left', aq208=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223)], ['defaultconf', 'right', aq112=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000)]]
+   dishwasher [['dishwasher', 10]]
+   door [['door', (13, 1)]]
+   edible [['edible', 14], ['edible', 8]]
+   faucet [['faucet', 12]]
+   floor [['floor', 3]]
+   fridge [['fridge', 13]]
+   graspable [['graspable', 14], ['graspable', 7], ['graspable', 8]]
+   handempty [['handempty', 'left'], ['handempty', 'right']]
+   heatingsurface [['heatingsurface', (5, None, 1)]]
+   inwconf [['InWConf', wconf632(0)]]
+   isclosedposition [['isclosedposition', (13, 1), pstn0=1.2], ['isclosedposition', (9, 4), pstn1=0], ['isclosedposition', (12, 5), pstn2=0], ['isclosedposition', (12, 3), pstn3=0]]
+   isjointto [['isjointto', (13, 1), 13], ['isjointto', (9, 4), 9], ['isjointto', (12, 5), 12], ['isjointto', (12, 3), 12]]
+   joint [['joint', (13, 1)], ['joint', (9, 4)], ['joint', (12, 5)], ['joint', (12, 3)], ['joint', (9, 4)], ['joint', (12, 5)], ['joint', (12, 3)]]
+   knob [['knob', (9, 4)], ['knob', (12, 5)], ['knob', (12, 3)]]
+   linkpose [['linkpose', (13, 1)], ['linkpose', (9, 4)], ['linkpose', (12, 5)], ['linkpose', (12, 3)]]
+   meatturkeyleg [['meatturkeyleg', 8]]
+   microwave [['microwave', 6]]
+   milkbottle [['milkbottle', 2]]
+   oven [['oven', 9]]
+   pose [['pose', 14, p0=(0.7, 4.8, 0.838, 0.764)], ['pose', 7, p1=(0.55, 8.181, 0.821, 2.525)], ['pose', 8, p2=(0.7, 8.9, 0.844, 2.9)]]
+   position [['position', (13, 1), pstn0=1.2], ['position', (9, 4), pstn1=0], ['position', (12, 5), pstn2=0], ['position', (12, 3), pstn3=0]]
+   stackable [['stackable', 14, (5, None, 1)], ['stackable', 14, (13, None, 7)], ['stackable', 14, (4, None, 4)], ['stackable', 14, (4, None, 35)], ['stackable', 14, (11, None, 3)], ['stackable', 7, (5, None, 1)], ['stackable', 7, (13, None, 7)], ['stackable', 7, (4, None, 4)], ['stackable', 7, (4, None, 35)], ['stackable', 7, (11, None, 3)], ['stackable', 8, (5, None, 1)], ['stackable', 8, (13, None, 7)], ['stackable', 8, (4, None, 4)], ['stackable', 8, (4, None, 35)], ['stackable', 8, (11, None, 3)]]
+   supported [['supported', 8, p2=(0.7, 8.9, 0.844, 2.9), (4, None, 35)]]
+   surface [['surface', (5, None, 1)], ['surface', (13, None, 7)], ['surface', (4, None, 4)], ['surface', (4, None, 35)], ['surface', (11, None, 3)]]
+   veggiecabbage [['veggiecabbage', 14]]
+   wconf [['WConf', wconf632(0)]]
+----------------
+----------------
+PART I: world objects |
+1      |  pr2    |  Pose: (0, 0, 0, 0)
+2      |  milkbottle#1    |  Pose: (0.7, 4.8, 1.479, 1.815)
+3      |  floor1    |  Pose: (2.3, 4.7, -0.002, 0)
+4      |  counter#1    |  Pose: (0.5, 7.6, 1.394, 0)
+5      |  braiserbody#1    |  Pose: (0.55, 8.181, 0.818, 2.525)
+6      |  microwave#1    |  Pose: (0.4, 6.4, 1.019, -3.141)
+7      |  braiserlid#1    |  Pose: (0.55, 8.181, 0.821, 2.525)
+8      |  meatturkeyleg#1    |  Pose: (0.7, 8.9, 0.844, 2.9)
+9      |  oven#1    |  Pose: (0.6, 8, 0.602, -3.141)
+10      |  dishwasher#1    |  Pose: (0.7, 6.4, 0.366, -3.141)
+11      |  basin#1    |  Pose: (0.5, 5.6, 0.364, -3.141)
+12      |  faucet#1    |  Pose: (0.3, 5.6, 0.985, -3.141)
+13      |  fridge#1    |  Pose: (0.5, 4.8, 1.031, -3.141)
+14      |  veggiecabbage#1    |  Pose: (0.7, 4.8, 0.838, 0.764)
+(11, None, 3)      |  basin#1::basin_bottom    |  Pose: (0.539, 5.6, 0.802, 1.571)
+(5, None, 1)      |  braiserbody#1::braiser_bottom    |  Pose: (0.55, 8.181, 0.818, 0.954)
+(4, None, 4)      |  counter#1::front_left_stove    |  Pose: (0.566, 7.868, 0.783, 0)
+(4, None, 35)      |  counter#1::indigo_tmp    |  Pose: (0.601, 8.438, 0.839, 0)
+(12, 3)      |  faucet#1::joint_faucet_0    |  Pose: 0
+(12, 5)      |  faucet#1::joint_faucet_1    |  Pose: 0
+(13, 1)      |  fridge#1::fridge_door    |  Pose: 1.2
+(13, None, 7)      |  fridge#1::shelf_bottom    |  Pose: (0.5, 4.8, 1.031, 1.571)
+(9, 4)      |  oven#1::knob_joint_2    |  Pose: 0
+----------------
+----------------
+Initial facts (103)
+   = [['=', ('PickCost',), 1], ['=', ('PlaceCost',), 1]]
+   aconf [['aconf', 'left', aq208=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223)], ['aconf', 'right', aq112=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000)]]
+   arm [['arm', 'left'], ['arm', 'right']]
+   ataconf [['ataconf', 'left', aq208=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223)], ['ataconf', 'right', aq112=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000)]]
+   atbconf [['atbconf', q16=(2.5, 6, 3.142)]]
+   atlinkpose [['atlinkpose', (13, 1)], ['atlinkpose', (9, 4)], ['atlinkpose', (12, 5)], ['atlinkpose', (12, 3)]]
+   atpose [['atpose', 14, p0=(0.7, 4.8, 0.838, 0.764)], ['atpose', 7, p1=(0.55, 8.181, 0.821, 2.525)], ['atpose', 8, p2=(0.7, 8.9, 0.844, 2.9)]]
+   atposition [['atposition', (13, 1), pstn0=1.2], ['atposition', (9, 4), pstn1=0], ['atposition', (12, 5), pstn2=0], ['atposition', (12, 3), pstn3=0]]
+   basin [['basin', 11]]
+   bconf [['bconf', q16=(2.5, 6, 3.142)]]
+   braiserbody [['braiserbody', 5]]
+   braiserlid [['braiserlid', 7]]
+   canmove [['canmove']]
+   canpull [['canpull']]
+   cleaningsurface [['cleaningsurface', (11, None, 3)]]
+   controllable [['controllable', 'left']]
+   controlledby [['controlledby', (5, None, 1), (9, 4)], ['controlledby', (11, None, 3), (12, 3)]]
+   counter [['counter', 4]]
+   defaultconf [['defaultconf', 'left', aq208=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223)], ['defaultconf', 'right', aq112=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000)]]
+   dishwasher [['dishwasher', 10]]
+   door [['door', (13, 1)]]
+   edible [['edible', 14], ['edible', 8]]
+   faucet [['faucet', 12]]
+   floor [['floor', 3]]
+   fridge [['fridge', 13]]
+   graspable [['graspable', 14], ['graspable', 7], ['graspable', 8]]
+   handempty [['handempty', 'left'], ['handempty', 'right']]
+   heatingsurface [['heatingsurface', (5, None, 1)]]
+   inwconf [['InWConf', wconf480(0)]]
+   isclosedposition [['isclosedposition', (13, 1), pstn0=1.2], ['isclosedposition', (9, 4), pstn1=0], ['isclosedposition', (12, 5), pstn2=0], ['isclosedposition', (12, 3), pstn3=0]]
+   isjointto [['isjointto', (13, 1), 13], ['isjointto', (9, 4), 9], ['isjointto', (12, 5), 12], ['isjointto', (12, 3), 12]]
+   joint [['joint', (13, 1)], ['joint', (9, 4)], ['joint', (12, 5)], ['joint', (12, 3)], ['joint', (9, 4)], ['joint', (12, 5)], ['joint', (12, 3)]]
+   knob [['knob', (9, 4)], ['knob', (12, 5)], ['knob', (12, 3)]]
+   linkpose [['linkpose', (13, 1)], ['linkpose', (9, 4)], ['linkpose', (12, 5)], ['linkpose', (12, 3)]]
+   meatturkeyleg [['meatturkeyleg', 8]]
+   microwave [['microwave', 6]]
+   milkbottle [['milkbottle', 2]]
+   oven [['oven', 9]]
+   pose [['pose', 14, p0=(0.7, 4.8, 0.838, 0.764)], ['pose', 7, p1=(0.55, 8.181, 0.821, 2.525)], ['pose', 8, p2=(0.7, 8.9, 0.844, 2.9)]]
+   position [['position', (13, 1), pstn0=1.2], ['position', (9, 4), pstn1=0], ['position', (12, 5), pstn2=0], ['position', (12, 3), pstn3=0]]
+   stackable [['stackable', 14, (5, None, 1)], ['stackable', 14, (13, None, 7)], ['stackable', 14, (4, None, 4)], ['stackable', 14, (4, None, 35)], ['stackable', 14, (11, None, 3)], ['stackable', 7, (5, None, 1)], ['stackable', 7, (13, None, 7)], ['stackable', 7, (4, None, 4)], ['stackable', 7, (4, None, 35)], ['stackable', 7, (11, None, 3)], ['stackable', 8, (5, None, 1)], ['stackable', 8, (13, None, 7)], ['stackable', 8, (4, None, 4)], ['stackable', 8, (4, None, 35)], ['stackable', 8, (11, None, 3)]]
+   supported [['supported', 8, p2=(0.7, 8.9, 0.844, 2.9), (4, None, 35)]]
+   surface [['surface', (5, None, 1)], ['surface', (13, None, 7)], ['surface', (4, None, 4)], ['surface', (4, None, 35)], ['surface', (11, None, 3)]]
+   veggiecabbage [['veggiecabbage', 14]]
+   wconf [['WConf', wconf480(0)]]
+----------------
+----------------
+PART I: world objects |
+1      |  pr2    |  Pose: (0, 0, 0, 0)
+2      |  milkbottle#1    |  Pose: (0.7, 4.8, 1.479, 1.815)
+3      |  floor1    |  Pose: (2.3, 4.7, -0.002, 0)
+4      |  counter#1    |  Pose: (0.5, 7.6, 1.394, 0)
+5      |  braiserbody#1    |  Pose: (0.55, 8.181, 0.818, 2.525)
+6      |  microwave#1    |  Pose: (0.4, 6.4, 1.019, -3.141)
+7      |  braiserlid#1    |  Pose: (0.55, 8.181, 0.821, 2.525)
+8      |  meatturkeyleg#1    |  Pose: (0.7, 8.9, 0.844, 2.9)
+9      |  oven#1    |  Pose: (0.6, 8, 0.602, -3.141)
+10      |  dishwasher#1    |  Pose: (0.7, 6.4, 0.366, -3.141)
+11      |  basin#1    |  Pose: (0.5, 5.6, 0.364, -3.141)
+12      |  faucet#1    |  Pose: (0.3, 5.6, 0.985, -3.141)
+13      |  fridge#1    |  Pose: (0.5, 4.8, 1.031, -3.141)
+14      |  veggiecabbage#1    |  Pose: (0.7, 4.8, 0.838, 0.764)
+(11, None, 3)      |  basin#1::basin_bottom    |  Pose: (0.539, 5.6, 0.802, 1.571)
+(5, None, 1)      |  braiserbody#1::braiser_bottom    |  Pose: (0.55, 8.181, 0.818, 0.954)
+(4, None, 4)      |  counter#1::front_left_stove    |  Pose: (0.566, 7.868, 0.783, 0)
+(4, None, 35)      |  counter#1::indigo_tmp    |  Pose: (0.601, 8.438, 0.839, 0)
+(12, 3)      |  faucet#1::joint_faucet_0    |  Pose: 0
+(12, 5)      |  faucet#1::joint_faucet_1    |  Pose: 0
+(13, 1)      |  fridge#1::fridge_door    |  Pose: 1.2
+(13, None, 7)      |  fridge#1::shelf_bottom    |  Pose: (0.5, 4.8, 1.031, 1.571)
+(9, 4)      |  oven#1::knob_joint_2    |  Pose: 0
+----------------
+----------------
+Initial facts (103)
+   = [['=', ('PickCost',), 1], ['=', ('PlaceCost',), 1]]
+   aconf [['aconf', 'left', aq208=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223)], ['aconf', 'right', aq112=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000)]]
+   arm [['arm', 'left'], ['arm', 'right']]
+   ataconf [['ataconf', 'left', aq208=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223)], ['ataconf', 'right', aq112=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000)]]
+   atbconf [['atbconf', q16=(2.5, 6, 3.142)]]
+   atlinkpose [['atlinkpose', (13, 1)], ['atlinkpose', (9, 4)], ['atlinkpose', (12, 5)], ['atlinkpose', (12, 3)]]
+   atpose [['atpose', 14, p0=(0.7, 4.8, 0.838, 0.764)], ['atpose', 7, p1=(0.55, 8.181, 0.821, 2.525)], ['atpose', 8, p2=(0.7, 8.9, 0.844, 2.9)]]
+   atposition [['atposition', (13, 1), pstn0=1.2], ['atposition', (9, 4), pstn1=0], ['atposition', (12, 5), pstn2=0], ['atposition', (12, 3), pstn3=0]]
+   basin [['basin', 11]]
+   bconf [['bconf', q16=(2.5, 6, 3.142)]]
+   braiserbody [['braiserbody', 5]]
+   braiserlid [['braiserlid', 7]]
+   canmove [['canmove']]
+   canpull [['canpull']]
+   cleaningsurface [['cleaningsurface', (11, None, 3)]]
+   controllable [['controllable', 'left']]
+   controlledby [['controlledby', (5, None, 1), (9, 4)], ['controlledby', (11, None, 3), (12, 3)]]
+   counter [['counter', 4]]
+   defaultconf [['defaultconf', 'left', aq208=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223)], ['defaultconf', 'right', aq112=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000)]]
+   dishwasher [['dishwasher', 10]]
+   door [['door', (13, 1)]]
+   edible [['edible', 14], ['edible', 8]]
+   faucet [['faucet', 12]]
+   floor [['floor', 3]]
+   fridge [['fridge', 13]]
+   graspable [['graspable', 14], ['graspable', 7], ['graspable', 8]]
+   handempty [['handempty', 'left'], ['handempty', 'right']]
+   heatingsurface [['heatingsurface', (5, None, 1)]]
+   inwconf [['InWConf', wconf8(0)]]
+   isclosedposition [['isclosedposition', (13, 1), pstn0=1.2], ['isclosedposition', (9, 4), pstn1=0], ['isclosedposition', (12, 5), pstn2=0], ['isclosedposition', (12, 3), pstn3=0]]
+   isjointto [['isjointto', (13, 1), 13], ['isjointto', (9, 4), 9], ['isjointto', (12, 5), 12], ['isjointto', (12, 3), 12]]
+   joint [['joint', (13, 1)], ['joint', (9, 4)], ['joint', (12, 5)], ['joint', (12, 3)], ['joint', (9, 4)], ['joint', (12, 5)], ['joint', (12, 3)]]
+   knob [['knob', (9, 4)], ['knob', (12, 5)], ['knob', (12, 3)]]
+   linkpose [['linkpose', (13, 1)], ['linkpose', (9, 4)], ['linkpose', (12, 5)], ['linkpose', (12, 3)]]
+   meatturkeyleg [['meatturkeyleg', 8]]
+   microwave [['microwave', 6]]
+   milkbottle [['milkbottle', 2]]
+   oven [['oven', 9]]
+   pose [['pose', 14, p0=(0.7, 4.8, 0.838, 0.764)], ['pose', 7, p1=(0.55, 8.181, 0.821, 2.525)], ['pose', 8, p2=(0.7, 8.9, 0.844, 2.9)]]
+   position [['position', (13, 1), pstn0=1.2], ['position', (9, 4), pstn1=0], ['position', (12, 5), pstn2=0], ['position', (12, 3), pstn3=0]]
+   stackable [['stackable', 14, (5, None, 1)], ['stackable', 14, (13, None, 7)], ['stackable', 14, (4, None, 4)], ['stackable', 14, (4, None, 35)], ['stackable', 14, (11, None, 3)], ['stackable', 7, (5, None, 1)], ['stackable', 7, (13, None, 7)], ['stackable', 7, (4, None, 4)], ['stackable', 7, (4, None, 35)], ['stackable', 7, (11, None, 3)], ['stackable', 8, (5, None, 1)], ['stackable', 8, (13, None, 7)], ['stackable', 8, (4, None, 4)], ['stackable', 8, (4, None, 35)], ['stackable', 8, (11, None, 3)]]
+   supported [['supported', 8, p2=(0.7, 8.9, 0.844, 2.9), (4, None, 35)]]
+   surface [['surface', (5, None, 1)], ['surface', (13, None, 7)], ['surface', (4, None, 4)], ['surface', (4, None, 35)], ['surface', (11, None, 3)]]
+   veggiecabbage [['veggiecabbage', 14]]
+   wconf [['WConf', wconf8(0)]]
+----------------
+----------------
+PART I: world objects |
+1      |  pr2    |  Pose: (0, 0, 0, 0)
+2      |  milkbottle#1    |  Pose: (0.7, 4.8, 1.479, 1.815)
+3      |  floor1    |  Pose: (2.3, 4.7, -0.002, 0)
+4      |  counter#1    |  Pose: (0.5, 7.6, 1.394, 0)
+5      |  braiserbody#1    |  Pose: (0.55, 8.181, 0.818, 2.525)
+6      |  microwave#1    |  Pose: (0.4, 6.4, 1.019, -3.141)
+7      |  braiserlid#1    |  Pose: (0.55, 8.181, 0.821, 2.525)
+8      |  meatturkeyleg#1    |  Pose: (0.7, 8.9, 0.844, 2.9)
+9      |  oven#1    |  Pose: (0.6, 8, 0.602, -3.141)
+10      |  dishwasher#1    |  Pose: (0.7, 6.4, 0.366, -3.141)
+11      |  basin#1    |  Pose: (0.5, 5.6, 0.364, -3.141)
+12      |  faucet#1    |  Pose: (0.3, 5.6, 0.985, -3.141)
+13      |  fridge#1    |  Pose: (0.5, 4.8, 1.031, -3.141)
+14      |  veggiecabbage#1    |  Pose: (0.7, 4.8, 0.838, 0.764)
+(11, None, 3)      |  basin#1::basin_bottom    |  Pose: (0.539, 5.6, 0.802, 1.571)
+(5, None, 1)      |  braiserbody#1::braiser_bottom    |  Pose: (0.55, 8.181, 0.818, 0.954)
+(4, None, 4)      |  counter#1::front_left_stove    |  Pose: (0.566, 7.868, 0.783, 0)
+(4, None, 35)      |  counter#1::indigo_tmp    |  Pose: (0.601, 8.438, 0.839, 0)
+(12, 3)      |  faucet#1::joint_faucet_0    |  Pose: 0
+(12, 5)      |  faucet#1::joint_faucet_1    |  Pose: 0
+(13, 1)      |  fridge#1::fridge_door    |  Pose: 1.2
+(13, None, 7)      |  fridge#1::shelf_bottom    |  Pose: (0.5, 4.8, 1.031, 1.571)
+(9, 4)      |  oven#1::knob_joint_2    |  Pose: 0
+----------------
+----------------
+Initial facts (103)
+   = [['=', ('PickCost',), 1], ['=', ('PlaceCost',), 1]]
+   aconf [['aconf', 'left', aq208=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223)], ['aconf', 'right', aq112=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000)]]
+   arm [['arm', 'left'], ['arm', 'right']]
+   ataconf [['ataconf', 'left', aq208=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223)], ['ataconf', 'right', aq112=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000)]]
+   atbconf [['atbconf', q16=(2.5, 6, 3.142)]]
+   atlinkpose [['atlinkpose', (13, 1)], ['atlinkpose', (9, 4)], ['atlinkpose', (12, 5)], ['atlinkpose', (12, 3)]]
+   atpose [['atpose', 14, p0=(0.7, 4.8, 0.838, 0.764)], ['atpose', 7, p1=(0.55, 8.181, 0.821, 2.525)], ['atpose', 8, p2=(0.7, 8.9, 0.844, 2.9)]]
+   atposition [['atposition', (13, 1), pstn0=1.2], ['atposition', (9, 4), pstn1=0], ['atposition', (12, 5), pstn2=0], ['atposition', (12, 3), pstn3=0]]
+   basin [['basin', 11]]
+   bconf [['bconf', q16=(2.5, 6, 3.142)]]
+   braiserbody [['braiserbody', 5]]
+   braiserlid [['braiserlid', 7]]
+   canmove [['canmove']]
+   canpull [['canpull']]
+   cleaningsurface [['cleaningsurface', (11, None, 3)]]
+   controllable [['controllable', 'left']]
+   controlledby [['controlledby', (5, None, 1), (9, 4)], ['controlledby', (11, None, 3), (12, 3)]]
+   counter [['counter', 4]]
+   defaultconf [['defaultconf', 'left', aq208=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223)], ['defaultconf', 'right', aq112=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000)]]
+   dishwasher [['dishwasher', 10]]
+   door [['door', (13, 1)]]
+   edible [['edible', 14], ['edible', 8]]
+   faucet [['faucet', 12]]
+   floor [['floor', 3]]
+   fridge [['fridge', 13]]
+   graspable [['graspable', 14], ['graspable', 7], ['graspable', 8]]
+   handempty [['handempty', 'left'], ['handempty', 'right']]
+   heatingsurface [['heatingsurface', (5, None, 1)]]
+   inwconf [['InWConf', wconf240(0)]]
+   isclosedposition [['isclosedposition', (13, 1), pstn0=1.2], ['isclosedposition', (9, 4), pstn1=0], ['isclosedposition', (12, 5), pstn2=0], ['isclosedposition', (12, 3), pstn3=0]]
+   isjointto [['isjointto', (13, 1), 13], ['isjointto', (9, 4), 9], ['isjointto', (12, 5), 12], ['isjointto', (12, 3), 12]]
+   joint [['joint', (13, 1)], ['joint', (9, 4)], ['joint', (12, 5)], ['joint', (12, 3)], ['joint', (9, 4)], ['joint', (12, 5)], ['joint', (12, 3)]]
+   knob [['knob', (9, 4)], ['knob', (12, 5)], ['knob', (12, 3)]]
+   linkpose [['linkpose', (13, 1)], ['linkpose', (9, 4)], ['linkpose', (12, 5)], ['linkpose', (12, 3)]]
+   meatturkeyleg [['meatturkeyleg', 8]]
+   microwave [['microwave', 6]]
+   milkbottle [['milkbottle', 2]]
+   oven [['oven', 9]]
+   pose [['pose', 14, p0=(0.7, 4.8, 0.838, 0.764)], ['pose', 7, p1=(0.55, 8.181, 0.821, 2.525)], ['pose', 8, p2=(0.7, 8.9, 0.844, 2.9)]]
+   position [['position', (13, 1), pstn0=1.2], ['position', (9, 4), pstn1=0], ['position', (12, 5), pstn2=0], ['position', (12, 3), pstn3=0]]
+   stackable [['stackable', 14, (5, None, 1)], ['stackable', 14, (13, None, 7)], ['stackable', 14, (4, None, 4)], ['stackable', 14, (4, None, 35)], ['stackable', 14, (11, None, 3)], ['stackable', 7, (5, None, 1)], ['stackable', 7, (13, None, 7)], ['stackable', 7, (4, None, 4)], ['stackable', 7, (4, None, 35)], ['stackable', 7, (11, None, 3)], ['stackable', 8, (5, None, 1)], ['stackable', 8, (13, None, 7)], ['stackable', 8, (4, None, 4)], ['stackable', 8, (4, None, 35)], ['stackable', 8, (11, None, 3)]]
+   supported [['supported', 8, p2=(0.7, 8.9, 0.844, 2.9), (4, None, 35)]]
+   surface [['surface', (5, None, 1)], ['surface', (13, None, 7)], ['surface', (4, None, 4)], ['surface', (4, None, 35)], ['surface', (11, None, 3)]]
+   veggiecabbage [['veggiecabbage', 14]]
+   wconf [['WConf', wconf240(0)]]
+----------------
+----------------
+PART I: world objects |
+1      |  pr2    |  Pose: (0, 0, 0, 0)
+2      |  milkbottle#1    |  Pose: (0.7, 4.8, 1.479, 1.815)
+3      |  floor1    |  Pose: (2.3, 4.7, -0.002, 0)
+4      |  counter#1    |  Pose: (0.5, 7.6, 1.394, 0)
+5      |  braiserbody#1    |  Pose: (0.55, 8.181, 0.818, 2.525)
+6      |  microwave#1    |  Pose: (0.4, 6.4, 1.019, -3.141)
+7      |  braiserlid#1    |  Pose: (0.55, 8.181, 0.821, 2.525)
+8      |  meatturkeyleg#1    |  Pose: (0.7, 8.9, 0.844, 2.9)
+9      |  oven#1    |  Pose: (0.6, 8, 0.602, -3.141)
+10      |  dishwasher#1    |  Pose: (0.7, 6.4, 0.366, -3.141)
+11      |  basin#1    |  Pose: (0.5, 5.6, 0.364, -3.141)
+12      |  faucet#1    |  Pose: (0.3, 5.6, 0.985, -3.141)
+13      |  fridge#1    |  Pose: (0.5, 4.8, 1.031, -3.141)
+14      |  veggiecabbage#1    |  Pose: (0.7, 4.8, 0.838, 0.764)
+(11, None, 3)      |  basin#1::basin_bottom    |  Pose: (0.539, 5.6, 0.802, 1.571)
+(5, None, 1)      |  braiserbody#1::braiser_bottom    |  Pose: (0.55, 8.181, 0.818, 0.954)
+(4, None, 4)      |  counter#1::front_left_stove    |  Pose: (0.566, 7.868, 0.783, 0)
+(4, None, 35)      |  counter#1::indigo_tmp    |  Pose: (0.601, 8.438, 0.839, 0)
+(12, 3)      |  faucet#1::joint_faucet_0    |  Pose: 0
+(12, 5)      |  faucet#1::joint_faucet_1    |  Pose: 0
+(13, 1)      |  fridge#1::fridge_door    |  Pose: 1.2
+(13, None, 7)      |  fridge#1::shelf_bottom    |  Pose: (0.5, 4.8, 1.031, 1.571)
+(9, 4)      |  oven#1::knob_joint_2    |  Pose: 0
+----------------
+----------------
+Initial facts (103)
+   = [['=', ('PickCost',), 1], ['=', ('PlaceCost',), 1]]
+   aconf [['aconf', 'left', aq208=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223)], ['aconf', 'right', aq112=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000)]]
+   arm [['arm', 'left'], ['arm', 'right']]
+   ataconf [['ataconf', 'left', aq208=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223)], ['ataconf', 'right', aq112=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000)]]
+   atbconf [['atbconf', q16=(2.5, 6, 3.142)]]
+   atlinkpose [['atlinkpose', (13, 1)], ['atlinkpose', (9, 4)], ['atlinkpose', (12, 5)], ['atlinkpose', (12, 3)]]
+   atpose [['atpose', 14, p0=(0.7, 4.8, 0.838, 0.764)], ['atpose', 7, p1=(0.55, 8.181, 0.821, 2.525)], ['atpose', 8, p2=(0.7, 8.9, 0.844, 2.9)]]
+   atposition [['atposition', (13, 1), pstn0=1.2], ['atposition', (9, 4), pstn1=0], ['atposition', (12, 5), pstn2=0], ['atposition', (12, 3), pstn3=0]]
+   basin [['basin', 11]]
+   bconf [['bconf', q16=(2.5, 6, 3.142)]]
+   braiserbody [['braiserbody', 5]]
+   braiserlid [['braiserlid', 7]]
+   canmove [['canmove']]
+   canpull [['canpull']]
+   cleaningsurface [['cleaningsurface', (11, None, 3)]]
+   controllable [['controllable', 'left']]
+   controlledby [['controlledby', (5, None, 1), (9, 4)], ['controlledby', (11, None, 3), (12, 3)]]
+   counter [['counter', 4]]
+   defaultconf [['defaultconf', 'left', aq208=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223)], ['defaultconf', 'right', aq112=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000)]]
+   dishwasher [['dishwasher', 10]]
+   door [['door', (13, 1)]]
+   edible [['edible', 14], ['edible', 8]]
+   faucet [['faucet', 12]]
+   floor [['floor', 3]]
+   fridge [['fridge', 13]]
+   graspable [['graspable', 14], ['graspable', 7], ['graspable', 8]]
+   handempty [['handempty', 'left'], ['handempty', 'right']]
+   heatingsurface [['heatingsurface', (5, None, 1)]]
+   inwconf [['InWConf', wconf168(0)]]
+   isclosedposition [['isclosedposition', (13, 1), pstn0=1.2], ['isclosedposition', (9, 4), pstn1=0], ['isclosedposition', (12, 5), pstn2=0], ['isclosedposition', (12, 3), pstn3=0]]
+   isjointto [['isjointto', (13, 1), 13], ['isjointto', (9, 4), 9], ['isjointto', (12, 5), 12], ['isjointto', (12, 3), 12]]
+   joint [['joint', (13, 1)], ['joint', (9, 4)], ['joint', (12, 5)], ['joint', (12, 3)], ['joint', (9, 4)], ['joint', (12, 5)], ['joint', (12, 3)]]
+   knob [['knob', (9, 4)], ['knob', (12, 5)], ['knob', (12, 3)]]
+   linkpose [['linkpose', (13, 1)], ['linkpose', (9, 4)], ['linkpose', (12, 5)], ['linkpose', (12, 3)]]
+   meatturkeyleg [['meatturkeyleg', 8]]
+   microwave [['microwave', 6]]
+   milkbottle [['milkbottle', 2]]
+   oven [['oven', 9]]
+   pose [['pose', 14, p0=(0.7, 4.8, 0.838, 0.764)], ['pose', 7, p1=(0.55, 8.181, 0.821, 2.525)], ['pose', 8, p2=(0.7, 8.9, 0.844, 2.9)]]
+   position [['position', (13, 1), pstn0=1.2], ['position', (9, 4), pstn1=0], ['position', (12, 5), pstn2=0], ['position', (12, 3), pstn3=0]]
+   stackable [['stackable', 14, (5, None, 1)], ['stackable', 14, (13, None, 7)], ['stackable', 14, (4, None, 4)], ['stackable', 14, (4, None, 35)], ['stackable', 14, (11, None, 3)], ['stackable', 7, (5, None, 1)], ['stackable', 7, (13, None, 7)], ['stackable', 7, (4, None, 4)], ['stackable', 7, (4, None, 35)], ['stackable', 7, (11, None, 3)], ['stackable', 8, (5, None, 1)], ['stackable', 8, (13, None, 7)], ['stackable', 8, (4, None, 4)], ['stackable', 8, (4, None, 35)], ['stackable', 8, (11, None, 3)]]
+   supported [['supported', 8, p2=(0.7, 8.9, 0.844, 2.9), (4, None, 35)]]
+   surface [['surface', (5, None, 1)], ['surface', (13, None, 7)], ['surface', (4, None, 4)], ['surface', (4, None, 35)], ['surface', (11, None, 3)]]
+   veggiecabbage [['veggiecabbage', 14]]
+   wconf [['WConf', wconf168(0)]]
+----------------

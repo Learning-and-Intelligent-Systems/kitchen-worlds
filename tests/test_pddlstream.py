@@ -148,10 +148,7 @@ def init_experiment(exp_dir):
     if isfile(TXT_FILE):
         os.remove(TXT_FILE)
 
-###################
-# ####################################
-
-def main(exp_name, partial=False, defer=False, verbose=True):
+def get_args(exp_name):
     parser = create_parser()
     parser.add_argument('-test', type=str, default=exp_name, help='Name of the test case')
     parser.add_argument('-cfree', action='store_true', help='Disables collisions during planning')
@@ -160,17 +157,24 @@ def main(exp_name, partial=False, defer=False, verbose=True):
     parser.add_argument('-simulate', action='store_true', help='Simulates the system')
     args = parser.parse_args()
     print('Arguments:', args)
+    return args
+
+#####################################
+
+def main(exp_name, verbose=True):
+
+    args = get_args(exp_name)
 
     exp_dir = join(EXP_PATH, args.test)
     world = load_lisdf_pybullet(join(exp_dir, 'scene.lisdf'))
-    world.summarize_all_objects()
     saver = WorldSaver()
     problem = Problem(world)
 
     pddlstream_problem = pddlstream_from_dir(problem, exp_dir=exp_dir, collisions=not args.cfree,
                                              teleport=args.teleport)
+    world.summarize_all_objects()
 
-    stream_info = get_stream_info(partial, defer)
+    stream_info = get_stream_info(partial=False, defer=False)
     _, _, _, stream_map, init, goal = pddlstream_problem
     summarize_facts(init)
     print_goal(goal)
