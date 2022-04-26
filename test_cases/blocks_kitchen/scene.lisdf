@@ -11,10 +11,10 @@
     </gui>
 
 
-    <include name="pr2">    
+    <include name="pr2">
       <uri>../../assets/models/drake/pr2_description/urdf/pr2_simplified.urdf</uri>
       <pose>0.0 0.0 0.051 0.0 -0.0 0.0</pose>
-    </include>            
+    </include>
 
 
     <model name="fridge">
@@ -146,7 +146,12 @@
 
     <state world_name="blocks_kitchen">
       <model name="pr2">
+        <joint name="x"><angle>0.0</angle></joint>
+        <joint name="y"><angle>0.0</angle></joint>
+        <joint name="theta"><angle>0.0</angle></joint>
         <joint name="torso_lift_joint"><angle>0.2</angle></joint>
+        <joint name="head_pan_joint"><angle>0.0</angle></joint>
+        <joint name="head_tilt_joint"><angle>0.0</angle></joint>
         <joint name="l_shoulder_pan_joint"><angle>0.677</angle></joint>
         <joint name="l_shoulder_lift_joint"><angle>-0.343</angle></joint>
         <joint name="l_upper_arm_roll_joint"><angle>1.2</angle></joint>
@@ -161,6 +166,14 @@
         <joint name="r_forearm_roll_joint"><angle>-10000.0</angle></joint>
         <joint name="r_wrist_flex_joint"><angle>-0.1</angle></joint>
         <joint name="r_wrist_roll_joint"><angle>-10000.0</angle></joint>
+        <joint name="l_gripper_l_finger_joint"><angle>0.548</angle></joint>
+        <joint name="l_gripper_r_finger_joint"><angle>0.548</angle></joint>
+        <joint name="l_gripper_l_finger_tip_joint"><angle>0.548</angle></joint>
+        <joint name="l_gripper_r_finger_tip_joint"><angle>0.548</angle></joint>
+        <joint name="r_gripper_l_finger_joint"><angle>0.0</angle></joint>
+        <joint name="r_gripper_r_finger_joint"><angle>0.0</angle></joint>
+        <joint name="r_gripper_l_finger_tip_joint"><angle>0.0</angle></joint>
+        <joint name="r_gripper_r_finger_tip_joint"><angle>0.0</angle></joint>
       </model>
     </state>
 

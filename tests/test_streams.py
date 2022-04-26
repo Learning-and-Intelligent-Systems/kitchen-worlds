@@ -51,6 +51,7 @@ def test_handle_grasp_gen(p, init, visualize=True):
     joints = [f[1] for f in init if f[0] == 'joint']
     funk = get_handle_grasp_gen(p, visualize=False)
     for j in joints:
+        if 'knob' not in p.world.body_to_name[j]: continue
         outputs = funk(j)
         if visualize:
             body_pose = get_handle_pose(j)

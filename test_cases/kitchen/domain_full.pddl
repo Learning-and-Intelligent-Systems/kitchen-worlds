@@ -249,7 +249,7 @@
 
     ;; from fully closed position ?p1 pull to the fully open position ?p2
     (:action pull_door_handle
-      :parameters (?a ?o1 ?o2 ?p1 ?p2 ?g ?q1 ?q2 ?bt ?aq1 ?aq2 ?at ?w1 ?w2)
+      :parameters (?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?bt ?aq1 ?aq2 ?at ?w1 ?w2)
       :precondition (and (Door ?o) (not (= ?p1 ?p2)) (CanPull)
                          (AtPosition ?o ?p1) (Position ?o ?p2) (AtHandleGrasp ?a ?o ?g)
                          (KinPullDoorHandle ?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?bt ?aq1 ?aq2 ?at)

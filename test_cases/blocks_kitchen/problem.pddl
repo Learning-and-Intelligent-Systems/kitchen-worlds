@@ -52,7 +52,7 @@
 
 	(controllable left)
 
-	(bconf q104=(0, 0, 0))
+	(bconf q640=(0, 0, 0))
 	(stackable egg fridge)
 	(stackable egg sink)
 	(stackable egg stove)
@@ -74,7 +74,7 @@
 	(stackable plate counter)
 	(stackable plate table)
 
-	(atbconf q104=(0, 0, 0))
+	(atbconf q640=(0, 0, 0))
 
 	(pose egg p1=(2, -0.18, 0.95, 0))
 	(pose cabbage p2=(2, 0, 0.95, 0))
@@ -91,14 +91,14 @@
 	(supported salter p3=(2, 0.18, 0.95, 0) fridge)
 	(supported plate p4=(2.18, 0, 0.95, 0) fridge)
 
-	(aconf left aq296=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223))
-	(aconf right aq200=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000))
+	(aconf left aq832=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223))
+	(aconf right aq736=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000))
 
-	(ataconf left aq296=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223))
-	(ataconf right aq200=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000))
+	(ataconf left aq832=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223))
+	(ataconf right aq736=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000))
 
-	(defaultconf left aq296=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223))
-	(defaultconf right aq200=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000))
+	(defaultconf left aq832=(0.677, -0.343, 1.2, -1.467, 1.242, -1.954, 2.223))
+	(defaultconf right aq736=(-2.135, 1.296, -3.75, -0.15, -10000, -0.1, -10000))
 
   )
 

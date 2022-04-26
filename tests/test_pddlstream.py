@@ -176,7 +176,7 @@ def main(exp_name, verbose=True):
 
     stream_info = get_stream_info(partial=False, defer=False)
     _, _, _, stream_map, init, goal = pddlstream_problem
-    summarize_facts(init)
+    summarize_facts(init, world=world)
     print_goal(goal)
     print(SEPARATOR)
     init_experiment(exp_dir)

@@ -11,17 +11,17 @@
     </gui>
 
 
-    <include name="pr2">    
+    <include name="pr2">
       <uri>../../assets/models/drake/pr2_description/urdf/pr2_simplified.urdf</uri>
       <pose>2.5 6.0 0.051 0.0 -0.0 3.142</pose>
-    </include>            
+    </include>
 
 
     <include name="milkbottle#1">
       <uri>../../assets/models/milkbottle/4043/mobility.urdf</uri>
       <static>true</static>
       <scale>0.13999999999999999</scale>
-      <pose>0.7 4.8 1.479 0.0 -0.0 1.815</pose>
+      <pose>0.7 4.8 1.479 0.0 -0.0 0.402</pose>
     </include>
 
     <model name="floor1">
@@ -49,7 +49,7 @@
       <uri>../../assets/models/braiserbody/100693/mobility.urdf</uri>
       <static>true</static>
       <scale>0.259</scale>
-      <pose>0.55 8.181 0.818 0.0 -0.0 2.525</pose>
+      <pose>0.55 8.227 0.818 0.0 -0.0 1.458</pose>
     </include>
 
     <include name="microwave#1">
@@ -63,14 +63,14 @@
       <uri>../../assets/models/braiserlid/100693/mobility.urdf</uri>
       <static>false</static>
       <scale>0.259</scale>
-      <pose>0.55 8.181 0.821 0.0 -0.0 2.525</pose>
+      <pose>0.55 8.227 0.821 0.0 -0.0 1.458</pose>
     </include>
 
     <include name="meatturkeyleg#1">
       <uri>../../assets/models/meatturkeyleg/00001/mobility.urdf</uri>
       <static>true</static>
       <scale>0.00049</scale>
-      <pose>0.7 8.9 0.844 0.0 -0.0 2.9</pose>
+      <pose>0.7 8.865 0.844 0.0 -0.0 0.045</pose>
     </include>
 
     <include name="oven#1">
@@ -112,13 +112,18 @@
       <uri>../../assets/models/veggiecabbage/00001/mobility.urdf</uri>
       <static>true</static>
       <scale>0.0034999999999999996</scale>
-      <pose>0.7 4.8 0.838 0.0 -0.0 0.764</pose>
+      <pose>0.7 4.8 0.838 0.0 -0.0 2.259</pose>
     </include>
 
 
     <state world_name="kitchen">
       <model name="pr2">
+        <joint name="x"><angle>2.5</angle></joint>
+        <joint name="y"><angle>6.0</angle></joint>
+        <joint name="theta"><angle>3.142</angle></joint>
         <joint name="torso_lift_joint"><angle>0.2</angle></joint>
+        <joint name="head_pan_joint"><angle>0.0</angle></joint>
+        <joint name="head_tilt_joint"><angle>0.0</angle></joint>
         <joint name="l_shoulder_pan_joint"><angle>0.677</angle></joint>
         <joint name="l_shoulder_lift_joint"><angle>-0.343</angle></joint>
         <joint name="l_upper_arm_roll_joint"><angle>1.2</angle></joint>
@@ -133,6 +138,14 @@
         <joint name="r_forearm_roll_joint"><angle>-10000.0</angle></joint>
         <joint name="r_wrist_flex_joint"><angle>-0.1</angle></joint>
         <joint name="r_wrist_roll_joint"><angle>-10000.0</angle></joint>
+        <joint name="l_gripper_l_finger_joint"><angle>0.548</angle></joint>
+        <joint name="l_gripper_r_finger_joint"><angle>0.548</angle></joint>
+        <joint name="l_gripper_l_finger_tip_joint"><angle>0.548</angle></joint>
+        <joint name="l_gripper_r_finger_tip_joint"><angle>0.548</angle></joint>
+        <joint name="r_gripper_l_finger_joint"><angle>0.0</angle></joint>
+        <joint name="r_gripper_r_finger_joint"><angle>0.0</angle></joint>
+        <joint name="r_gripper_l_finger_tip_joint"><angle>0.0</angle></joint>
+        <joint name="r_gripper_r_finger_tip_joint"><angle>0.0</angle></joint>
       </model>
       <model name="fridge#1">
         <joint name="fridge_door"><angle>1.2</angle></joint>
