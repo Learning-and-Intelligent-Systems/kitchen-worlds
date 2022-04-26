@@ -56,17 +56,23 @@
                   </li>
                   <li class="toctree-l1 current"><a class="reference internal current" href="./">II) Operators</a>
     <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#general-skills">General skills</a>
+    <li class="toctree-l2"><a class="reference internal" href="#operators-for-general-purpose-skills">Operators for General-Purpose Skills</a>
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#pick">Pick</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#place">Place</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#grasphandle">GraspHandle</a>
+    <li class="toctree-l3"><a class="reference internal" href="#grasp-handle">Grasp Handle</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#pull-handle">Pull Handle</a>
     </li>
         </ul>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#high-level-operators">High-level operators</a>
+    <li class="toctree-l2"><a class="reference internal" href="#operators-for-symbolic-goals">Operators for Symbolic Goals</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#references">References</a>
+    </li>
+        </ul>
     </li>
     </ul>
                   </li>
@@ -127,7 +133,8 @@
               
                 <h1 id="ii-operators">II) Operators<a class="headerlink" href="#ii-operators" title="Permanent link">#</a></h1>
 <p>The skills and corresponding constraints with the world are included in the domain via PDDL operators.</p>
-<h2 id="general-skills">General skills<a class="headerlink" href="#general-skills" title="Permanent link">#</a></h2>
+<h2 id="operators-for-general-purpose-skills">Operators for General-Purpose Skills<a class="headerlink" href="#operators-for-general-purpose-skills" title="Permanent link">#</a></h2>
+<p>The parameters for these operators include continuous variables produced by generators, which can be a uniform sampler, learned sampler, a sampling-based algorithm or an optimization algorithm. Please refer to the PDDLStream paper <a href="#references">[1]</a> for the format of those generators <code>(:stream</code>.</p>
 <h3 id="pick"><strong>Pick</strong><a class="headerlink" href="#pick" title="Permanent link">#</a></h3>
 <pre><code>(:action pick
   :parameters (?a ?o ?p ?g ?q ?t ?w)
@@ -190,7 +197,15 @@
   :certified (and (Pose ?o ?p) (Supported ?o ?p ?r))
 )
 </code></pre>
-<h3 id="grasphandle"><strong>GraspHandle</strong><a class="headerlink" href="#grasphandle" title="Permanent link">#</a></h3>
+<h3 id="grasp-handle"><strong>Grasp Handle</strong><a class="headerlink" href="#grasp-handle" title="Permanent link">#</a></h3>
+<p>Handles are body links to grasp for changing joint positions or body poses. The Grasp Handle operator is similar to a pick. But the motion after a handle grasp is constraint by the category of object</p>
+<ul>
+<li>for <code>door</code> links (<em>one revolute joint</em>), the end-effector motion needs to be along a circular trajectory</li>
+<li>for <code>drawer</code> links (<em>one prismatic joint</em>), the end-effector motion needs to be along a straight line</li>
+<li>for <code>knob</code> links (<em>one revolute joint where the articulated link is the handle itself</em>), only the arm wrist link can move</li>
+<li>for <code>cart</code> objects (<em>an array of prismatic joints</em>), the end-effector motion needs to be along a straight line</li>
+<li>for <code>chair</code> objects (<em>an array of prismatic and revolute joints</em>), the end-effector motion needs to move on a plane parallel to the floor</li>
+</ul>
 <pre><code>(:action grasp_handle
   :parameters (?a ?o ?p ?g ?q ?aq1 ?aq2 ?t)
   :precondition (and (Joint ?o)
@@ -205,8 +220,99 @@
           )
 )
 </code></pre>
-<p>Grasp the handle to a door, a drawer, a knob, or a movable, is similar to pick,</p>
-<h2 id="high-level-operators">High-level operators<a class="headerlink" href="#high-level-operators" title="Permanent link">#</a></h2>
+<p>Handle grasps and grasping arm trajectories are sampled by the streams:</p>
+<pre><code>(:stream sample-handle-grasp
+  :inputs (?o)
+  :domain (Joint ?o)
+  :outputs (?g)
+  :certified (HandleGrasp ?o ?g)
+)
+(:stream inverse-kinematics-grasp-handle
+  :inputs (?a ?o ?p ?g)
+  :domain (and (Controllable ?a) (Position ?o ?p) (HandleGrasp ?o ?g) (IsClosedPosition ?o ?p))
+  :outputs (?q ?aq ?t)
+  :certified (and (BConf ?q) (AConf ?a ?aq) (ATraj ?t) (KinGraspHandle ?a ?o ?p ?g ?q ?aq ?t))
+)
+</code></pre>
+<p>For each of the first four types of articulated objects <code>?o</code>, we have a corresponding pull handle operator described in the next subsection.</p>
+<p>Note that those four operators take the joint as input object instead of handle likes. That's because the handle link may just be one of many large links whose poses are changed with the joint position change, e.g. handle of fridge is a small part of the door links that's easy to grasp stably.</p>
+<h3 id="pull-handle">Pull Handle<a class="headerlink" href="#pull-handle" title="Permanent link">#</a></h3>
+<p><strong>Pull Drawer Handle</strong></p>
+<pre><code>(:action pull_drawer_handle
+  :parameters (?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?bt)
+  :precondition (and (Drawer ?o) (not (= ?p1 ?p2)) (CanPull)
+                     (AtPosition ?o ?p1) (Position ?o ?p2)
+                     (KinPullDrawerHandle ?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?bt)
+                     (AtHandleGrasp ?a ?o ?g) (AtBConf ?q1)
+                     ;(not (UnsafeBTraj ?bt))
+                )
+  :effect (and (not (CanPull)) (CanUngrasp)
+              (AtPosition ?o ?p2) (not (AtPosition ?o ?p1))
+              (AtBConf ?q2) (not (AtBConf ?q1))
+          )
+)
+</code></pre>
+<p><strong>Pull Door Handle</strong></p>
+<pre><code>(:action pull_door_handle
+  :parameters (?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?bt ?aq1 ?aq2 ?at ?w1 ?w2)
+  :precondition (and (Door ?o) (not (= ?p1 ?p2)) (CanPull)
+                     (AtPosition ?o ?p1) (Position ?o ?p2) (AtHandleGrasp ?a ?o ?g)
+                     (KinPullDoorHandle ?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?bt ?aq1 ?aq2 ?at)
+                     (AtBConf ?q1) (AtAConf ?a ?aq1)
+                     (InWConf ?w1) (WConf ?w2)
+                     (NewWConfPst ?w1 ?o ?p2 ?w2)
+                     ;(not (UnsafeApproach ?o ?p2 ?g))
+                     ;(not (UnsafeATraj ?at))
+                     ;(not (UnsafeBTraj ?bt))
+                )
+  :effect (and (not (CanPull)) (CanUngrasp)
+              (AtPosition ?o ?p2) (not (AtPosition ?o ?p1))
+              (AtBConf ?q2) (not (AtBConf ?q1))
+              (AtAConf ?a ?aq2) (not (AtAConf ?a ?aq1))
+              (InWConf ?w2) (not (InWConf ?w1))
+          )
+)
+</code></pre>
+<p><strong>Turn Knob</strong></p>
+<pre><code>(:action turn_knob
+  :parameters (?a ?o ?p1 ?p2 ?g ?q ?aq1 ?aq2 ?at)
+  :precondition (and (Knob ?o) (not (= ?p1 ?p2)) (CanPull)
+                     (AtPosition ?o ?p1) (Position ?o ?p2) (AtHandleGrasp ?a ?o ?g)
+                     (KinTurnKnob ?a ?o ?p1 ?p2 ?g ?q ?aq1 ?aq2 ?at)
+                     (AtBConf ?q) (AtAConf ?a ?aq1)
+                     ;(not (UnsafeApproach ?o ?p2 ?g))
+                     ;(not (UnsafeATraj ?at))
+                     ;(not (UnsafeBTraj ?bt))
+                )
+  :effect (and (not (CanPull)) (CanUngrasp) (KnobTurned ?a ?o)
+              (AtPosition ?o ?p2) (not (AtPosition ?o ?p1))
+              (UngraspBConf ?q)
+              (AtAConf ?a ?aq2) (not (AtAConf ?a ?aq1))
+          )
+)
+</code></pre>
+<p>The corresponding <strong>Ungrasp</strong> action is needed to break from this mode of motion planning:</p>
+<pre><code>(:action ungrasp_handle
+  :parameters (?a ?o ?p ?g ?q ?aq1 ?aq2 ?t)
+  :precondition (and (Joint ?o) (AConf ?aq1) (AConf ?aq2) (AtPosition ?o ?p)
+                     (KinUngraspHandle ?a ?o ?p ?g ?q ?aq1 ?aq2 ?t)
+                     (AtHandleGrasp ?a ?o ?g) (CanUngrasp)
+                     (AtBConf ?q) (UngraspBConf ?q) (AtAConf ?a ?aq1)
+                )
+  :effect (and (GraspedHandle ?o) (HandEmpty ?a) (CanMove)
+               (not (AtHandleGrasp ?a ?o ?g))
+               (not (AtAConf ?a ?aq1)) (AtAConf ?a ?aq2)
+               (increase (total-cost) (PlaceCost))
+          )
+)
+</code></pre>
+<hr />
+<h2 id="operators-for-symbolic-goals">Operators for Symbolic Goals<a class="headerlink" href="#operators-for-symbolic-goals" title="Permanent link">#</a></h2>
+<hr />
+<h3 id="references">References<a class="headerlink" href="#references" title="Permanent link">#</a></h3>
+<ol>
+<li>Garrett, Caelan Reed, Tomás Lozano-Pérez, and Leslie Pack Kaelbling. "PDDLStream: Integrating symbolic planners and blackbox samplers via optimistic adaptive planning." Proceedings of the International Conference on Automated Planning and Scheduling. Vol. 30. 2020.</li>
+</ol>
               
             </div>
           </div><footer>
