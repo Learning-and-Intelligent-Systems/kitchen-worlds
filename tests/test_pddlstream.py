@@ -6,16 +6,15 @@ import json
 from os.path import join, abspath, dirname, isdir, isfile
 from config import EXP_PATH
 
-from pybullet_planning.pybullet_tools.pr2_utils import get_group_conf
-from pybullet_planning.pybullet_tools.pr2_primitives import get_base_custom_limits, control_commands, apply_commands, State
-from pybullet_planning.pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, wait_if_gui, \
-    SEPARATOR, get_aabb
-from pybullet_planning.pybullet_tools.bullet_utils import summarize_facts, print_goal, nice
-from pybullet_planning.pybullet_tools.pr2_agent import get_stream_info, post_process, move_cost_fn ## , get_stream_map
-from pybullet_planning.pybullet_tools.logging import TXT_FILE
+from pybullet_tools.pr2_utils import get_group_conf
+from pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, wait_if_gui, \
+    SEPARATOR, get_aabb, wait_for_duration
+from pybullet_tools.bullet_utils import summarize_facts, print_goal, nice
+from pybullet_tools.pr2_agent import get_stream_info, post_process, move_cost_fn ## , get_stream_map
+from pybullet_tools.logging import TXT_FILE
 
 ## custom stream_map
-from pybullet_planning.pybullet_tools.pr2_streams import get_stable_gen, get_contain_gen, get_position_gen, \
+from pybullet_tools.pr2_streams import get_stable_gen, get_contain_gen, get_position_gen, \
     Position, get_handle_grasp_gen, LinkPose, get_ik_ir_grasp_handle_gen, get_pull_drawer_handle_motion_gen, \
     get_joint_position_test, get_marker_grasp_gen, get_bconf_in_region_test, get_pull_door_handle_motion_gen, \
     get_bconf_in_region_gen, get_pose_in_region_gen, visualize_grasp, get_motion_wconf_gen, get_update_wconf_p_two_gen, \
@@ -24,13 +23,12 @@ from pybullet_planning.pybullet_tools.pr2_streams import get_stable_gen, get_con
     get_cfree_btraj_pose_test, get_joint_position_open_gen, get_ik_ungrasp_mark_gen, \
     sample_joint_position_open_list_gen, get_update_wconf_pst_gen, get_ik_ir_wconf_gen, \
     get_update_wconf_p_gen, get_ik_ir_wconf_gen, get_pose_in_space_test, get_turn_knob_handle_motion_gen
-from pybullet_planning.pybullet_tools.pr2_primitives import get_group_joints, Conf, get_base_custom_limits, Pose, Conf, \
+from pybullet_tools.pr2_primitives import get_group_joints, Conf, get_base_custom_limits, Pose, Conf, \
     get_ik_ir_gen, get_motion_gen, get_cfree_approach_pose_test, get_cfree_pose_pose_test, get_cfree_traj_pose_test, \
-    get_grasp_gen, Attach, Detach, Clean, Cook, control_commands, \
-    get_gripper_joints, GripperCommand, apply_commands, State
+    get_grasp_gen, Attach, Detach, Clean, Cook, control_commands, Command, \
+    get_gripper_joints, GripperCommand, State
+
 from pddlstream.language.generator import from_gen_fn, from_list_fn, from_fn, fn_from_constant, empty_gen, from_test
-
-
 from pddlstream.language.constants import Equal, AND, print_solution, PDDLProblem
 from pddlstream.utils import read, INF, get_file_path, find_unique, Profiler, str_from_object
 from pddlstream.algorithms.meta import solve, create_parser
@@ -38,7 +36,9 @@ from pddlstream.algorithms.meta import solve, create_parser
 from pybullet_planning.lisdf_tools.lisdf_loader import load_lisdf_pybullet
 from pybullet_planning.lisdf_tools.lisdf_planning import pddl_to_init_goal, Problem
 
-DEFAULT_TEST = 'kitchen' ## 'blocks_pick'
+from world_builder.actions import Action
+
+DEFAULT_TEST = 'blocks_pick' ## 'kitchen' ##
 
 def get_stream_map(p, c, l, t):
     # p = problem
@@ -199,15 +199,29 @@ def main(exp_name, verbose=True):
         problem.remove_gripper()
         saver.restore()
 
-    #restore_state(state_id)
     saver.restore()
     wait_if_gui('Execute?')
-    if args.simulate:
+    if args.simulate:  ## real physics
         control_commands(commands)
     else:
-        apply_commands(State(), commands, time_step=0.01)
+        # apply_commands(State(), commands, time_step=0.01)
+        apply_hybrid_commands(problem, commands, time_step=0.01)
     wait_if_gui('Finish?')
     disconnect()
+
+def apply_hybrid_commands(problem, commands, time_step=0.01, **kwargs):
+    from world_builder.world import State as StateEvent
+    state = State()
+    state_event = StateEvent(problem.world)
+    for i, command in enumerate(commands):
+        print(i, command)
+        if isinstance(command, Command):
+            for j, _ in enumerate(command.apply(state, **kwargs)):
+                state.assign()
+        elif isinstance(command, Action):
+            state_event = command.transition(state_event.copy())
+
+        wait_for_duration(time_step)
 
 if __name__ == '__main__':
     main(exp_name=DEFAULT_TEST)
