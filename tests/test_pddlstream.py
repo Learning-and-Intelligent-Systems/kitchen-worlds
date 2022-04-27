@@ -36,9 +36,10 @@ from pddlstream.algorithms.meta import solve, create_parser
 from pybullet_planning.lisdf_tools.lisdf_loader import load_lisdf_pybullet
 from pybullet_planning.lisdf_tools.lisdf_planning import pddl_to_init_goal, Problem
 
-from world_builder.actions import Action
+from world_builder.actions import apply_actions
 
-DEFAULT_TEST = 'blocks_pick' ## 'kitchen' ##
+
+DEFAULT_TEST = 'kitchen' ## 'blocks_pick' ##
 
 def get_stream_map(p, c, l, t):
     # p = problem
@@ -205,23 +206,11 @@ def main(exp_name, verbose=True):
         control_commands(commands)
     else:
         # apply_commands(State(), commands, time_step=0.01)
-        apply_hybrid_commands(problem, commands, time_step=0.01)
+        apply_actions(problem, commands, time_step=0.01)
     wait_if_gui('Finish?')
     disconnect()
 
-def apply_hybrid_commands(problem, commands, time_step=0.01, **kwargs):
-    from world_builder.world import State as StateEvent
-    state = State()
-    state_event = StateEvent(problem.world)
-    for i, command in enumerate(commands):
-        print(i, command)
-        if isinstance(command, Command):
-            for j, _ in enumerate(command.apply(state, **kwargs)):
-                state.assign()
-        elif isinstance(command, Action):
-            state_event = command.transition(state_event.copy())
 
-        wait_for_duration(time_step)
 
 if __name__ == '__main__':
     main(exp_name=DEFAULT_TEST)
