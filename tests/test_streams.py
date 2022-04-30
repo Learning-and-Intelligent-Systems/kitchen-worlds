@@ -10,7 +10,7 @@ from pybullet_planning.pybullet_tools.pr2_utils import get_group_conf
 from pybullet_planning.pybullet_tools.pr2_primitives import get_base_custom_limits, control_commands, apply_commands, State
 from pybullet_planning.pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, wait_if_gui, \
     SEPARATOR, get_aabb
-from pybullet_planning.pybullet_tools.bullet_utils import summarize_facts, print_goal, nice
+from pybullet_planning.pybullet_tools.bullet_utils import summarize_facts, print_goal, nice, set_camera_target_body
 from pybullet_planning.pybullet_tools.pr2_agent import get_stream_info, post_process, move_cost_fn, \
     visualize_grasps_by_quat, visualize_grasps
 from pybullet_planning.pybullet_tools.logging import TXT_FILE
@@ -43,7 +43,7 @@ from test_pddlstream import get_args
 DEFAULT_TEST = 'kitchen' ## 'blocks_pick'
 
 def run_tests(p, init, l, c=True, t=True):
-    test_handle_grasp_gen(p, init)
+     test_handle_grasp_gen(p, init)
 
 
 def test_handle_grasp_gen(p, init, visualize=True):
@@ -51,11 +51,14 @@ def test_handle_grasp_gen(p, init, visualize=True):
     joints = [f[1] for f in init if f[0] == 'joint']
     funk = get_handle_grasp_gen(p, visualize=False)
     for j in joints:
-        if 'knob' not in p.world.body_to_name[j]: continue
+        if 'faucet' not in p.world.body_to_name[j]: continue
         outputs = funk(j)
         if visualize:
             body_pose = get_handle_pose(j)
+            set_camera_target_body(j[0], dx=0.5, dy=0.5, dz=0.8)
             visualize_grasps(p, outputs, body_pose, RETAIN_ALL=True)
+            set_camera_target_body(j[0], dx=0.5, dy=0.5, dz=0.8)
+
     wait_if_gui('Finish?')
 
 # ####################################

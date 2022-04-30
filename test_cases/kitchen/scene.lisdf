@@ -5,8 +5,8 @@
 
     <gui>
       <camera name="default_camera" definition_type="lookat">
-        <xyz>4.0 5.0 4.0</xyz>
-        <point_to>0.0 5.0 0.5</point_to>
+        <xyz>0.963 8.524 1.253</xyz>
+        <point_to>0.463 8.024 0.453</point_to>
       </camera>
     </gui>
 
@@ -21,7 +21,7 @@
       <uri>../../assets/models/milkbottle/4043/mobility.urdf</uri>
       <static>true</static>
       <scale>0.13999999999999999</scale>
-      <pose>0.7 4.8 1.479 0.0 -0.0 0.402</pose>
+      <pose>0.7 4.8 1.479 0.0 -0.0 1.486</pose>
     </include>
 
     <model name="floor1">
@@ -41,7 +41,7 @@
     <include name="counter#1">
       <uri>../../assets/models/counter/urdf/kitchen_part_right_gen_convex.urdf</uri>
       <static>true</static>
-      <scale>1.0096553359875846</scale>
+      <scale>1.0267332606417023</scale>
       <pose>0.5 7.6 1.394 0.0 -0.0 0.0</pose>
     </include>
 
@@ -49,7 +49,7 @@
       <uri>../../assets/models/braiserbody/100693/mobility.urdf</uri>
       <static>true</static>
       <scale>0.259</scale>
-      <pose>0.55 8.227 0.818 0.0 -0.0 1.458</pose>
+      <pose>0.55 8.165 0.818 0.0 -0.0 2.146</pose>
     </include>
 
     <include name="microwave#1">
@@ -63,34 +63,34 @@
       <uri>../../assets/models/braiserlid/100693/mobility.urdf</uri>
       <static>false</static>
       <scale>0.259</scale>
-      <pose>0.55 8.227 0.821 0.0 -0.0 1.458</pose>
+      <pose>0.55 8.165 0.821 0.0 -0.0 2.146</pose>
     </include>
 
     <include name="meatturkeyleg#1">
       <uri>../../assets/models/meatturkeyleg/00001/mobility.urdf</uri>
       <static>true</static>
       <scale>0.00049</scale>
-      <pose>0.7 8.865 0.844 0.0 -0.0 0.045</pose>
+      <pose>0.7 8.861 0.844 0.0 -0.0 2.873</pose>
     </include>
 
     <include name="oven#1">
       <uri>../../assets/models/Oven/01909/mobility.urdf</uri>
       <static>true</static>
-      <scale>0.8815298531369634</scale>
+      <scale>0.8271591725054792</scale>
       <pose>0.6 8.0 0.602 0.0 -0.0 3.142</pose>
     </include>
 
     <include name="dishwasher#1">
       <uri>../../assets/models/DishWasher/2085/mobility.urdf</uri>
       <static>true</static>
-      <scale>0.6992448779636837</scale>
+      <scale>0.6882863087278288</scale>
       <pose>0.7 6.4 0.366 0.0 -0.0 3.142</pose>
     </include>
 
     <include name="basin#1">
       <uri>../../assets/models/Basin/102379/mobility.urdf</uri>
       <static>true</static>
-      <scale>0.5544167618800581</scale>
+      <scale>0.5329707285452492</scale>
       <pose>0.5 5.6 0.364 0.0 -0.0 3.142</pose>
     </include>
 
@@ -104,7 +104,7 @@
     <include name="fridge#1">
       <uri>../../assets/models/Fridge/10144/mobility.urdf</uri>
       <static>true</static>
-      <scale>1.1126107052197658</scale>
+      <scale>1.0927426569122698</scale>
       <pose>0.5 4.8 1.031 0.0 -0.0 3.142</pose>
     </include>
 
@@ -112,7 +112,7 @@
       <uri>../../assets/models/veggiecabbage/00001/mobility.urdf</uri>
       <static>true</static>
       <scale>0.0034999999999999996</scale>
-      <pose>0.7 4.8 0.838 0.0 -0.0 2.259</pose>
+      <pose>0.7 4.8 0.838 0.0 -0.0 2.07</pose>
     </include>
 
 
