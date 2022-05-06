@@ -17,7 +17,7 @@ from pybullet_tools.logging import TXT_FILE
 from pybullet_tools.pr2_streams import get_stable_gen, get_contain_gen, get_position_gen, \
     Position, get_handle_grasp_gen, LinkPose, get_ik_ir_grasp_handle_gen, get_pull_drawer_handle_motion_gen, \
     get_joint_position_test, get_marker_grasp_gen, get_bconf_in_region_test, get_pull_door_handle_motion_gen, \
-    get_bconf_in_region_gen, get_pose_in_region_gen, visualize_grasp, get_motion_wconf_gen, get_update_wconf_p_two_gen, \
+    get_bconf_in_region_gen, get_pose_in_region_gen, get_motion_wconf_gen, get_update_wconf_p_two_gen, \
     get_marker_pose_gen, get_pull_marker_to_pose_motion_gen, get_pull_marker_to_bconf_motion_gen,  \
     get_pull_marker_random_motion_gen, get_ik_ungrasp_handle_gen, get_pose_in_region_test, \
     get_cfree_btraj_pose_test, get_joint_position_open_gen, get_ik_ungrasp_mark_gen, \
