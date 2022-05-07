@@ -11,9 +11,10 @@ from config import EXP_PATH
 from pybullet_planning.pybullet_tools.pr2_utils import get_group_conf
 from pybullet_planning.pybullet_tools.pr2_primitives import get_base_custom_limits, control_commands, apply_commands
 from pybullet_planning.pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, wait_if_gui, \
-    SEPARATOR, get_aabb, get_pose, approximate_as_prism, draw_aabb, multiply, unit_quat, remove_body, invert
+    SEPARATOR, get_aabb, get_pose, approximate_as_prism, draw_aabb, multiply, unit_quat, remove_body, invert, \
+    Pose
 from pybullet_planning.pybullet_tools.bullet_utils import summarize_facts, print_goal, nice, set_camera_target_body, \
-    draw_bounding_lines, fit_dimensions, draw_fitted_box, draw_face_vectors
+    draw_bounding_lines, fit_dimensions, draw_fitted_box, get_hand_grasps
 from pybullet_planning.pybullet_tools.pr2_agent import get_stream_info, post_process, move_cost_fn, \
     visualize_grasps_by_quat, visualize_grasps
 from pybullet_planning.pybullet_tools.logging import TXT_FILE
@@ -28,11 +29,12 @@ from pybullet_planning.pybullet_tools.pr2_streams import get_stable_gen, get_con
     get_cfree_btraj_pose_test, get_joint_position_open_gen, get_ik_ungrasp_mark_gen, get_handle_pose, \
     sample_joint_position_open_list_gen, get_update_wconf_pst_gen, get_ik_ir_wconf_gen, \
     get_update_wconf_p_gen, get_ik_ir_wconf_gen, get_pose_in_space_test, get_turn_knob_handle_motion_gen
-from pybullet_planning.pybullet_tools.pr2_primitives import get_group_joints, Conf, get_base_custom_limits, Pose, Conf, \
+from pybullet_planning.pybullet_tools.pr2_primitives import get_group_joints, Conf, get_base_custom_limits, Conf, \
     get_ik_ir_gen, get_motion_gen, get_cfree_approach_pose_test, get_cfree_pose_pose_test, get_cfree_traj_pose_test, \
     get_grasp_gen, Attach, Detach, Clean, Cook, control_commands, \
     get_gripper_joints, GripperCommand, apply_commands
-from pybullet_planning.pybullet_tools.flying_gripper_utils import se3_from_pose, set_cloned_se3_conf
+from pybullet_planning.pybullet_tools.flying_gripper_utils import se3_from_pose, \
+    pose_from_se3
 
 from pddlstream.language.generator import from_gen_fn, from_list_fn, from_fn, fn_from_constant, empty_gen, from_test
 
@@ -88,7 +90,7 @@ TEST_MODELS = {
         '3763': 0.16,
         '3933': 0.16,
         '4043': 0.18,
-        '4403': 0.15,
+        '4403': 0.1,
         '6771': 0.2,
         '8736': 0.15,
         '8848': 0.13
@@ -124,29 +126,33 @@ def pose_from_2d(body, xy, random_yaw=False):
     return ((xy[0], xy[1], z), quat_from_euler((0, 0, yaw)))
 
 def test_spatial_algebra(body, robot):
-    # gripper = robot.create_gripper(color=RED)
-    # set_cloned_se3_conf(robot, gripper, se3_from_pose(((0, 0, 0), quat_from_euler((0, 0, 0)))))
-    # set_camera_target_body(gripper, dx=0.5, dy=0.5, dz=0.5)
-    #
-    # object_pose = ((0, 0, 0), quat_from_euler((0, 0, math.pi / 2)))
-    # T = ((0, 0.3, 0), unit_quat())
-    # R = ((0, 0, 0), quat_from_euler((math.pi / 2, 0, math.pi / 2)))
-    # gripper_pose = multiply(object_pose, T)
 
+    ## transformations
+    O_T_G = ((0.5, 0, 0), unit_quat())
+    O_R_G = ((0, 0, 0), quat_from_euler((0, -math.pi / 2, 0)))
+    G = multiply(O_T_G, O_R_G)
+    gripper = robot.create_gripper(color=RED)
+
+    ## original object pose
     set_pose(body, unit_pose())
     set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.5)
-
-    O_T_G = ((0.5, 0, 0), unit_quat())
-    O_R_G = ((0, 0, 0), quat_from_euler((0, math.pi / 2, 0)))
-    W_X_G = multiply(get_pose(body), O_T_G, O_R_G)
-    gripper = robot.create_gripper(color=RED)
-    set_cloned_se3_conf(robot, gripper, se3_from_pose(W_X_G))
+    W_X_G = multiply(get_pose(body), G)
+    set_pose(gripper, W_X_G)
     set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.5)
+
+    ## new object pose given rotation
+    # object_pose = ((0.4, 0.3, 0), quat_from_euler((-1.2, 0.3, 0)))
+    object_pose = ((0, 0, 0), quat_from_euler((-1.2, 0, 0)))
+    set_pose(body, object_pose)
+    W_X_G = multiply(get_pose(body), G)
+    draw_pose(W_X_G, length=0.3)
+    set_pose(gripper, W_X_G)
+    set_camera_target_body(gripper, dx=0.5, dy=0, dz=0.5)
 
 
 def test_grasps(world, categories=[]):
-    problem = State(world, grasp_types=['side']) ## , 'side'
-    funk = get_grasp_gen(problem)
+    problem = State(world, grasp_types=['hand']) ## , 'side' , 'top'
+    funk = get_grasp_gen(problem, collisions=True)
 
     i = 0
     for cat in categories:
@@ -159,13 +165,13 @@ def test_grasps(world, categories=[]):
             world.add_body(body, f'{cat.lower()}#{id}')
             set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.5)
 
-            test_spatial_algebra(body, world.robot)
+            # test_spatial_algebra(body, world.robot)
+            # draw_fitted_box(body, draw_centroid=True)
+            # grasps = get_hand_grasps(problem, body)
 
-            draw_fitted_box(body)
-
-            body_pose = get_pose(body)
+            body_pose = get_pose(body)  ## multiply(get_pose(body), Pose(euler=Euler(math.pi/2, 0, -math.pi/2)))
             outputs = funk(body)
-            print(outputs)
+            print(f'grasps on body {body}:', outputs)
             # set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.8)
             visualize_grasps(problem, outputs, body_pose, RETAIN_ALL=True)
 
@@ -218,6 +224,10 @@ def test_fridges(world, custom_limits):
 
     ## execute traj
 
+def test_gripper(robot):
+    set_se3_conf(robot, (0,0,0,0,0,0))
+    set_camera_target_body(robot, dx=0.5, dy=0.5, dz=0.5)
+
 def main(exp_name, robot='feg', verbose=True):
     args = get_args(exp_name)
 
@@ -231,12 +241,14 @@ def main(exp_name, robot='feg', verbose=True):
         from world_builder.loaders import BASE_LIMITS as custom_limits
         base_q = [3, 1, 0]
         robot = create_pr2_robot(world, custom_limits=custom_limits, base_q=base_q)
+
     elif robot == 'feg':
         custom_limits = {0: (-5, 5), 1: (-5, 5), 2: (0, 3)}
         init_q = [3, 1, 1, 0, 0, 0]
         # robot = create_fe_gripper(init_q=init_q)
         # world.add_robot(robot, 'feg')
         robot = create_gripper_robot(world, custom_limits=custom_limits, initial_q=init_q)
+        # test_gripper(robot)
 
     # test_fridges(world, custom_limits)
     test_grasps(world, ['Bottle'])
