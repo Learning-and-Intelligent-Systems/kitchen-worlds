@@ -93,7 +93,7 @@ TEST_MODELS = {
         '4403': 0.1,
         '6771': 0.2,
         '8736': 0.15,
-        '8848': 0.13
+        '8848': 0.11
     }
 }
 
@@ -172,7 +172,7 @@ def test_grasps(world, categories=[]):
             world.add_body(body, f'{cat.lower()}#{id}')
             set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.5)
 
-            test_robot_rotation(body, world.robot)
+            # test_robot_rotation(body, world.robot)
             # test_spatial_algebra(body, world.robot)
             # draw_fitted_box(body, draw_centroid=True)
             # grasps = get_hand_grasps(problem, body)
