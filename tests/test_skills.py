@@ -12,7 +12,7 @@ from pybullet_planning.pybullet_tools.pr2_utils import get_group_conf
 from pybullet_planning.pybullet_tools.pr2_primitives import get_base_custom_limits, control_commands, apply_commands
 from pybullet_planning.pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, wait_if_gui, \
     SEPARATOR, get_aabb, get_pose, approximate_as_prism, draw_aabb, multiply, unit_quat, remove_body, invert, \
-    Pose
+    Pose, get_link_pose
 from pybullet_planning.pybullet_tools.bullet_utils import summarize_facts, print_goal, nice, set_camera_target_body, \
     draw_bounding_lines, fit_dimensions, draw_fitted_box, get_hand_grasps
 from pybullet_planning.pybullet_tools.pr2_agent import get_stream_info, post_process, move_cost_fn, \
@@ -34,7 +34,7 @@ from pybullet_planning.pybullet_tools.pr2_primitives import get_group_joints, Co
     get_grasp_gen, Attach, Detach, Clean, Cook, control_commands, \
     get_gripper_joints, GripperCommand, apply_commands
 from pybullet_planning.pybullet_tools.flying_gripper_utils import se3_from_pose, \
-    pose_from_se3
+    pose_from_se3, se3_ik
 
 from pddlstream.language.generator import from_gen_fn, from_list_fn, from_fn, fn_from_constant, empty_gen, from_test
 
@@ -125,6 +125,13 @@ def pose_from_2d(body, xy, random_yaw=False):
         yaw = random.uniform(-math.pi, math.pi)
     return ((xy[0], xy[1], z), quat_from_euler((0, 0, yaw)))
 
+def test_robot_rotation(body, robot):
+    pose = ((0.2,0.3,0), quat_from_euler((math.pi/4, math.pi/2, 1.2)))
+    set_pose(body, pose)
+    conf = se3_ik(robot, pose)
+    set_se3_conf(robot, conf)
+    set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.5)
+
 def test_spatial_algebra(body, robot):
 
     ## transformations
@@ -165,6 +172,7 @@ def test_grasps(world, categories=[]):
             world.add_body(body, f'{cat.lower()}#{id}')
             set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.5)
 
+            test_robot_rotation(body, world.robot)
             # test_spatial_algebra(body, world.robot)
             # draw_fitted_box(body, draw_centroid=True)
             # grasps = get_hand_grasps(problem, body)
@@ -244,7 +252,8 @@ def main(exp_name, robot='feg', verbose=True):
 
     elif robot == 'feg':
         custom_limits = {0: (-5, 5), 1: (-5, 5), 2: (0, 3)}
-        init_q = [3, 1, 1, 0, 0, 0]
+        # init_q = [3, 1, 1, 0, 0, 0]
+        init_q = [0, 0, 0, 0, 0, 0]
         # robot = create_fe_gripper(init_q=init_q)
         # world.add_robot(robot, 'feg')
         robot = create_gripper_robot(world, custom_limits=custom_limits, initial_q=init_q)
