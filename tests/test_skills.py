@@ -2,6 +2,7 @@
 
 from __future__ import print_function
 import os
+import sys
 import random
 import json
 import shutil
@@ -156,7 +157,6 @@ def test_spatial_algebra(body, robot):
     set_pose(gripper, W_X_G)
     set_camera_target_body(gripper, dx=0.5, dy=0, dz=0.5)
 
-
 def test_grasps(world, categories=[]):
     problem = State(world, grasp_types=['hand']) ## , 'side' , 'top'
     funk = get_grasp_gen(problem, collisions=True)
@@ -236,15 +236,34 @@ def test_gripper(robot):
     set_se3_conf(robot, (0,0,0,0,0,0))
     set_camera_target_body(robot, dx=0.5, dy=0.5, dz=0.5)
 
-def main(exp_name, robot='feg', verbose=True):
-    args = get_args(exp_name)
-
+def test_handle_grasps(args, robot):
+    # lisdf_path = join(ASSET_PATH, 'scenes', f'kitchen_lunch.lisdf')
+    # world = load_lisdf_pybullet(lisdf_path, verbose=True)
+    from world_builder.loaders import load_floor_plan
+    from world_builder.world import World
     connect(use_gui=True, shadows=False, width=1980, height=1238)
     draw_pose(unit_pose(), length=2.)
-    # create_floor()
-
     world = World(args)
+    floor = load_floor_plan(world, plan_name='counter.svg')
+    robot = add_robot(world, robot)
 
+    world.summarize_all_objects()
+    state = State(world, grasp_types=robot.grasp_types)
+    joints = world.cat_to_bodies('door')
+    joints = [(6, 1)]
+
+    for body_joint in joints:
+        obj = world.BODY_TO_OBJECT[body_joint]
+        link = obj.handle_link
+        body, joint = body_joint
+        set_camera_target_body(body, link=link, dx=0.5, dy=0.5, dz=0.5)
+        draw_fitted_box(body, link=link, draw_centroid=True)
+        grasps = get_hand_grasps(state, body, link=link, visualize=False,
+                                 RETAIN_ALL=True, HANDLE_FILTER=True, LENGTH_VARIANTS=True)
+        set_camera_target_body(body, link=link, dx=0.5, dy=0.5, dz=0.5)
+    sys.exit()
+
+def add_robot(world, robot):
     if robot == 'pr2':
         from world_builder.loaders import BASE_LIMITS as custom_limits
         base_q = [3, 1, 0]
@@ -258,9 +277,25 @@ def main(exp_name, robot='feg', verbose=True):
         # world.add_robot(robot, 'feg')
         robot = create_gripper_robot(world, custom_limits=custom_limits, initial_q=init_q)
         # test_gripper(robot)
+    return robot
+
+def init_world(args):
+    connect(use_gui=True, shadows=False, width=1980, height=1238)
+    draw_pose(unit_pose(), length=2.)
+    # create_floor()
+    world = World(args)
+    return world
+
+def main(exp_name, robot='feg', verbose=True):
+    args = get_args(exp_name)
+
+    test_handle_grasps(args, robot)
+
+    world = init_world(args)
+    robot = add_robot(world, robot)
 
     # test_fridges(world, custom_limits)
-    test_grasps(world, ['Bottle'])
+    # test_grasps(world, ['Bottle'])
 
     wait_if_gui('Finish?')
     disconnect()

@@ -27,3 +27,85 @@ PART I: world objects |
 feg1      |  robot    |  Pose: ((0, 0, 0), (0, 0, 0))
 2      |  bottle#3517    |  Pose: ((0, 0, 0.173), (0, 0, 3.142))
 ----------------
+----------------
+PART I: pybullet bodies | obstacles = [2, 3, 4, 5, 6]
+----------------
+0  |  Name: floor1, Pose: ((2.3, 4.7, -0.002), (0, 0, 0))
+1  |  Name: floor1, Pose: ((2.3, 4.7, -0.002), (0, 0, 0))
+2  |  Name: counter#1, Pose: ((0.5, 7.6, 1.394), (0, 0, 0))  |  Doors: ['chewie_door_right_joint', 'chewie_door_left_joint', 'dagger_door_left_joint', 'dagger_door_right_joint', 'indigo_door_right_joint', 'indigo_door_left_joint']  |  Drawers: ['hitman_drawer_top_joint', 'hitman_drawer_bottom_joint', 'indigo_drawer_top_joint', 'indigo_drawer_bottom_joint']
+3  |  Name: braiserbody#1, Pose: ((0.55, 8.185, 0.818), (0, 0, 1.006))
+4  |  Name: microwave#1, Pose: ((0.4, 6.4, 1.019), (0, 0, 3.142))  |  Doors: ['joint_0']  |  Drawers: ['joint_1']
+5  |  Name: braiserlid#1, Pose: ((0.7, 8.901, 0.813), (0, 0, 2.235))
+6  |  Name: oven#1, Pose: ((0.6, 8, 0.602), (0, 0, 3.142))  |  Doors: ['joint_0', 'knob_joint_1', 'knob_joint_2', 'knob_joint_3']
+7  |  Name: feg7, Pose: ((0, 0, 0), (0, 0, 0))
+----------------
+PART II: world objects | surface(4), door(11), drawer(5), 
+0      |  Floor: floor1    |  Pose: ((2.3, 4.7, -0.002), (0, 0, 0))
+1      |  Floor: floor1    |  Pose: ((2.3, 4.7, -0.002), (0, 0, 0))
+2      |  Object: counter#1    |  Pose: ((0.5, 7.6, 1.394), (0, 0, 0))
+(2, 10)      |  Door: counter#1::chewie_door_right_joint    |  Handle: chewie_door_right_handle    |  Pose: 0
+(2, 14)      |  Door: counter#1::chewie_door_left_joint    |  Handle: chewie_door_left_handle    |  Pose: 0
+(2, 19)      |  Door: counter#1::dagger_door_left_joint    |  Handle: dagger_door_left_handle    |  Pose: 0
+(2, 23)      |  Door: counter#1::dagger_door_right_joint    |  Handle: dagger_door_right_handle    |  Pose: 0
+(2, 29)      |  Drawer: counter#1::hitman_drawer_top_joint    |  Handle: hitman_drawer_handle_top    |  Pose: 0
+(2, 32)      |  Drawer: counter#1::hitman_drawer_bottom_joint    |  Handle: hitman_drawer_handle_bottom    |  Pose: 0
+(2, 40)      |  Door: counter#1::indigo_door_right_joint    |  Handle: indigo_door_right_link    |  Pose: 0
+(2, 45)      |  Door: counter#1::indigo_door_left_joint    |  Handle: indigo_door_left_link    |  Pose: 0
+(2, 48)      |  Drawer: counter#1::indigo_drawer_top_joint    |  Handle: indigo_drawer_handle_top    |  Pose: 0
+(2, 50)      |  Drawer: counter#1::indigo_drawer_bottom_joint    |  Handle: indigo_drawer_handle_bottom    |  Pose: 0
+(2, None, 4)      |  Surface: counter#1::front_left_stove    |  Pose: ((0.567, 7.872, 0.773), (0, 0, 0))
+(2, None, 5)      |  Surface: counter#1::front_right_stove    |  Pose: ((0.567, 8.18, 0.773), (0, 0, 0))
+3      |  Object: braiserbody#1    |  Pose: ((0.55, 8.185, 0.818), (0, 0, 1.006))
+(2, None, 26)      |  Surface: counter#1::hitman_tmp    |  Pose: ((0.5, 7.6, 0.829), (0, 0, 0))
+4      |  Object: microwave#1    |  Pose: ((0.4, 6.4, 1.019), (0, 0, 3.142))
+(4, 1)      |  Door: microwave#1::joint_0    |  Handle: link_0    |  Pose: 0
+(4, 2)      |  Drawer: microwave#1::joint_1    |  Handle: link_1    |  Pose: 0.002
+(2, None, 35)      |  Surface: counter#1::indigo_tmp    |  Pose: ((0.603, 8.452, 0.829), (0, 0, 0))
+5      |  Object: braiserlid#1    |  Pose: ((0.7, 8.901, 0.813), (0, 0, 2.235))
+6      |  Object: oven#1    |  Pose: ((0.6, 8, 0.602), (0, 0, 3.142))
+(6, 1)      |  Door: oven#1::joint_0    |  Handle: link_0    |  Pose: 0
+(6, 2)      |  Door: oven#1::knob_joint_1    |  Handle: link_1    |  Pose: 0
+(6, 4)      |  Door: oven#1::knob_joint_2    |  Handle: knob_link_2    |  Pose: 0
+(6, 5)      |  Door: oven#1::knob_joint_3    |  Handle: link_3    |  Pose: 0
+----------------
+----------------
+PART I: pybullet bodies | obstacles = [2, 3, 4, 5, 6]
+----------------
+0  |  Name: floor1, Pose: ((2.3, 4.7, -0.002), (0, 0, 0))
+1  |  Name: floor1, Pose: ((2.3, 4.7, -0.002), (0, 0, 0))
+2  |  Name: counter#1, Pose: ((0.5, 7.6, 1.394), (0, 0, 0))  |  Doors: ['chewie_door_right_joint', 'chewie_door_left_joint', 'dagger_door_left_joint', 'dagger_door_right_joint', 'indigo_door_right_joint', 'indigo_door_left_joint']  |  Drawers: ['hitman_drawer_top_joint', 'hitman_drawer_bottom_joint', 'indigo_drawer_top_joint', 'indigo_drawer_bottom_joint']
+3  |  Name: braiserbody#1, Pose: ((0.55, 8.21, 0.818), (0, 0, 1.694))
+4  |  Name: microwave#1, Pose: ((0.4, 6.4, 1.019), (0, 0, 3.142))  |  Doors: ['joint_0']  |  Drawers: ['joint_1']
+5  |  Name: braiserlid#1, Pose: ((0.7, 8.9, 0.813), (0, 0, 1.585))
+6  |  Name: oven#1, Pose: ((0.6, 8, 0.602), (0, 0, 3.142))  |  Doors: ['joint_0', 'knob_joint_1', 'knob_joint_2', 'knob_joint_3']
+7  |  Name: feg7, Pose: ((0, 0, 0), (0, 0, 0))
+----------------
+PART II: world objects | surface(4), door(11), drawer(5), 
+0      |  Floor: floor1    |  Pose: ((2.3, 4.7, -0.002), (0, 0, 0))
+1      |  Floor: floor1    |  Pose: ((2.3, 4.7, -0.002), (0, 0, 0))
+2      |  Object: counter#1    |  Pose: ((0.5, 7.6, 1.394), (0, 0, 0))
+(2, 10)      |  Door: counter#1::chewie_door_right_joint    |  Handle: chewie_door_right_handle    |  Pose: 0
+(2, 14)      |  Door: counter#1::chewie_door_left_joint    |  Handle: chewie_door_left_handle    |  Pose: 0
+(2, 19)      |  Door: counter#1::dagger_door_left_joint    |  Handle: dagger_door_left_handle    |  Pose: 0
+(2, 23)      |  Door: counter#1::dagger_door_right_joint    |  Handle: dagger_door_right_handle    |  Pose: 0
+(2, 29)      |  Drawer: counter#1::hitman_drawer_top_joint    |  Handle: hitman_drawer_handle_top    |  Pose: 0
+(2, 32)      |  Drawer: counter#1::hitman_drawer_bottom_joint    |  Handle: hitman_drawer_handle_bottom    |  Pose: 0
+(2, 40)      |  Door: counter#1::indigo_door_right_joint    |  Handle: indigo_door_right_nob_link    |  Pose: 0
+(2, 45)      |  Door: counter#1::indigo_door_left_joint    |  Handle: indigo_door_left_nob_link    |  Pose: 0
+(2, 48)      |  Drawer: counter#1::indigo_drawer_top_joint    |  Handle: indigo_drawer_handle_top    |  Pose: 0
+(2, 50)      |  Drawer: counter#1::indigo_drawer_bottom_joint    |  Handle: indigo_drawer_handle_bottom    |  Pose: 0
+(2, None, 4)      |  Surface: counter#1::front_left_stove    |  Pose: ((0.567, 7.872, 0.773), (0, 0, 0))
+(2, None, 5)      |  Surface: counter#1::front_right_stove    |  Pose: ((0.567, 8.18, 0.773), (0, 0, 0))
+3      |  Object: braiserbody#1    |  Pose: ((0.55, 8.21, 0.818), (0, 0, 1.694))
+(2, None, 26)      |  Surface: counter#1::hitman_tmp    |  Pose: ((0.5, 7.6, 0.829), (0, 0, 0))
+4      |  Object: microwave#1    |  Pose: ((0.4, 6.4, 1.019), (0, 0, 3.142))
+(4, 1)      |  Door: microwave#1::joint_0    |  Handle: link_0    |  Pose: 0
+(4, 2)      |  Drawer: microwave#1::joint_1    |  Handle: link_1    |  Pose: 0.002
+(2, None, 35)      |  Surface: counter#1::indigo_tmp    |  Pose: ((0.603, 8.452, 0.829), (0, 0, 0))
+5      |  Object: braiserlid#1    |  Pose: ((0.7, 8.9, 0.813), (0, 0, 1.585))
+6      |  Object: oven#1    |  Pose: ((0.6, 8, 0.602), (0, 0, 3.142))
+(6, 1)      |  Door: oven#1::joint_0    |  Handle: link_0    |  Pose: 0
+(6, 2)      |  Door: oven#1::knob_joint_1    |  Handle: link_1    |  Pose: 0
+(6, 4)      |  Door: oven#1::knob_joint_2    |  Handle: knob_link_2    |  Pose: 0
+(6, 5)      |  Door: oven#1::knob_joint_3    |  Handle: link_3    |  Pose: 0
+----------------
