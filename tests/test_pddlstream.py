@@ -167,7 +167,7 @@ def main(exp_name, verbose=True):
     args = get_args(exp_name)
 
     exp_dir = join(EXP_PATH, args.test)
-    world = load_lisdf_pybullet(join(exp_dir, 'scene.lisdf'))
+    world = load_lisdf_pybullet(exp_dir) ## join(exp_dir, 'scene.lisdf'))
     saver = WorldSaver()
     problem = Problem(world)
 

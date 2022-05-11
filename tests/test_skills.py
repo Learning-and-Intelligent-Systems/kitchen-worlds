@@ -28,11 +28,11 @@ from pybullet_planning.pybullet_tools.pr2_streams import get_stable_gen, get_con
     get_marker_pose_gen, get_pull_marker_to_pose_motion_gen, get_pull_marker_to_bconf_motion_gen,  \
     get_pull_marker_random_motion_gen, get_ik_ungrasp_handle_gen, get_pose_in_region_test, \
     get_cfree_btraj_pose_test, get_joint_position_open_gen, get_ik_ungrasp_mark_gen, get_handle_pose, \
-    sample_joint_position_open_list_gen, get_update_wconf_pst_gen, get_ik_ir_wconf_gen, \
+    sample_joint_position_open_list_gen, get_update_wconf_pst_gen, get_ik_ir_wconf_gen, get_grasp_gen, \
     get_update_wconf_p_gen, get_ik_ir_wconf_gen, get_pose_in_space_test, get_turn_knob_handle_motion_gen
 from pybullet_planning.pybullet_tools.pr2_primitives import get_group_joints, Conf, get_base_custom_limits, Conf, \
     get_ik_ir_gen, get_motion_gen, get_cfree_approach_pose_test, get_cfree_pose_pose_test, get_cfree_traj_pose_test, \
-    get_grasp_gen, Attach, Detach, Clean, Cook, control_commands, \
+    Attach, Detach, Clean, Cook, control_commands, \
     get_gripper_joints, GripperCommand, apply_commands
 from pybullet_planning.pybullet_tools.flying_gripper_utils import se3_from_pose, \
     pose_from_se3, se3_ik
@@ -95,6 +95,27 @@ TEST_MODELS = {
         '6771': 0.2,
         '8736': 0.15,
         '8848': 0.11
+    },
+    'Camera': {
+        '101352': 0.08,
+        '102411': 0.1,
+        '102472': 0.1,
+        '102434': 0.1,
+        '102873': 0.1,
+    },
+    'Glasses': {
+        '101284': 0.15,
+        '101287': 0.16,
+        '101326': 0.16,
+        '101293': 0.18,
+        '101328': 0.1,
+    },
+    'Stapler': {
+        '103100': 0.15,
+        '103104': 0.16,
+        '103283': 0.16,
+        '103299': 0.18,
+        '103307': 0.1,
     }
 }
 
@@ -289,13 +310,17 @@ def init_world(args):
 def main(exp_name, robot='feg', verbose=True):
     args = get_args(exp_name)
 
-    test_handle_grasps(args, robot)
+    ## --- DEMO 3: grasp handles in counter ---
+    # test_handle_grasps(args, robot)
 
     world = init_world(args)
     robot = add_robot(world, robot)
 
+    ## --- DEMO 1: grasp object meshes ---
+    test_grasps(world, ['Bottle']) ## 'Bottle'
+
+    ## --- DEMO 2: grasp handles on fridges ---
     # test_fridges(world, custom_limits)
-    # test_grasps(world, ['Bottle'])
 
     wait_if_gui('Finish?')
     disconnect()
@@ -315,5 +340,8 @@ def get_data(category):
                 print(f'copying {old_path} to {new_path}')
 
 if __name__ == '__main__':
+    ## --- DEMO ---
     main(exp_name=DEFAULT_TEST, robot='feg')
-    # get_data(category='Bottles')
+
+    ## --- MODELS  ---
+    # get_data(category='Stapler')
