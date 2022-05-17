@@ -6,6 +6,9 @@ import sys
 import random
 import json
 import shutil
+import time
+
+import numpy as np
 from os.path import join, abspath, dirname, isdir, isfile
 from config import EXP_PATH
 
@@ -13,7 +16,7 @@ from pybullet_planning.pybullet_tools.pr2_utils import get_group_conf
 from pybullet_planning.pybullet_tools.pr2_primitives import get_base_custom_limits, control_commands, apply_commands
 from pybullet_planning.pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, wait_if_gui, \
     SEPARATOR, get_aabb, get_pose, approximate_as_prism, draw_aabb, multiply, unit_quat, remove_body, invert, \
-    Pose, get_link_pose
+    Pose, get_link_pose, get_joint_limits, WHITE, RGBA, set_all_color, RED, GREEN
 from pybullet_planning.pybullet_tools.bullet_utils import summarize_facts, print_goal, nice, set_camera_target_body, \
     draw_bounding_lines, fit_dimensions, draw_fitted_box, get_hand_grasps
 from pybullet_planning.pybullet_tools.pr2_agent import get_stream_info, post_process, move_cost_fn, \
@@ -35,7 +38,7 @@ from pybullet_planning.pybullet_tools.pr2_primitives import get_group_joints, Co
     Attach, Detach, Clean, Cook, control_commands, \
     get_gripper_joints, GripperCommand, apply_commands
 from pybullet_planning.pybullet_tools.flying_gripper_utils import se3_from_pose, \
-    pose_from_se3, se3_ik
+    pose_from_se3, se3_ik, set_cloned_se3_conf
 
 from pddlstream.language.generator import from_gen_fn, from_list_fn, from_fn, fn_from_constant, empty_gen, from_test
 
@@ -48,7 +51,7 @@ from pybullet_planning.lisdf_tools.lisdf_planning import pddl_to_init_goal, Prob
 
 from world_builder.world import State
 from world_builder.loaders import create_gripper_robot, create_pr2_robot
-from pybullet_planning.world_builder.colors import *
+# from pybullet_planning.world_builder.colors import *
 
 from test_pddlstream import get_args
 
@@ -253,8 +256,65 @@ def test_fridges(world, custom_limits):
 
     ## execute traj
 
-def test_gripper(robot):
-    set_se3_conf(robot, (0,0,0,0,0,0))
+def test_gripper_joints(robot):
+    """ visualize ee link pose as conf changes """
+    set_se3_conf(robot, (0, 0, 0, 0, 0, 0))
+    set_camera_target_body(robot, dx=0.5, dy=0.5, dz=0.5)
+    for j in range(3, 6):
+        limits = get_joint_limits(robot, j)
+        values = np.linspace(limits[0], limits[1], num=36)
+        for v in values:
+            conf = [0, 0, 0, 0, math.pi/2, 0]
+            conf[j] = v
+            set_se3_conf(robot, conf)
+            set_camera_target_body(robot, dx=0.5, dy=0.5, dz=0.5)
+            time.sleep(0.1)
+    sys.exit()
+
+def test_gripper_range(robot, IK=False):
+    """ visualize all possible gripper orientation """
+    set_se3_conf(robot, (0, 0, 0, 0, 0, 0))
+    set_camera_target_body(robot, dx=0.5, dy=0.5, dz=0.5)
+    choices = np.linspace(-math.pi, math.pi, num=9)[:-1]
+    bad = [choices[1], choices[3]]
+    mi, ma = min(choices), max(choices)
+    ra = ma - mi
+    def get_color(i, j, k):
+        color = RGBA((i-mi)/ra, (j-mi)/ra, (k-mi)/ra, 1)
+        return color
+    def mynice(tup):
+        tup = nice(tup)
+        if len(tup) == 2:
+            return tup[-1]
+        return tuple(list(tup)[-3:])
+    for i in choices:
+        for j in choices:
+            for k in choices:
+                if IK:
+                    gripper = create_fe_gripper(init_q=[0, 0, 0, 0, 0, 0], POINTER=True)
+                    pose = ((0,0,0), quat_from_euler((i,j,k)))
+                    conf = se3_ik(robot, pose)
+                    if conf == None:
+                        remove_body(gripper)
+                        print('failed IK at', nice(pose))
+                        continue
+                    else:
+                        print('pose =', mynice(pose), '-->\t conf =', mynice(conf))
+                        set_se3_conf(gripper, conf)
+                        set_all_color(gripper, WHITE)
+                        # if j in bad:
+                        #     set_all_color(gripper, RED)
+                        # else:
+                        #     set_all_color(gripper, GREEN)
+                else:
+                    conf = [0, 0, 0, i, j, k]
+                    gripper = create_fe_gripper(init_q=conf, POINTER=True)
+                    set_all_color(gripper, WHITE)
+                    pose = get_link_pose(gripper, link_from_name(gripper, 'panda_hand'))
+                    print('conf =', mynice(conf), '-->\t pose =', mynice(pose))
+
+                    # set_all_color(gripper, get_color(i,j,k))
+            set_camera_target_body(robot, dx=0.5, dy=0.5, dz=0.5)
     set_camera_target_body(robot, dx=0.5, dy=0.5, dz=0.5)
 
 def test_handle_grasps(args, robot):
@@ -297,7 +357,7 @@ def add_robot(world, robot):
         # robot = create_fe_gripper(init_q=init_q)
         # world.add_robot(robot, 'feg')
         robot = create_gripper_robot(world, custom_limits=custom_limits, initial_q=init_q)
-        # test_gripper(robot)
+
     return robot
 
 def init_world(args):
@@ -310,16 +370,20 @@ def init_world(args):
 def main(exp_name, robot='feg', verbose=True):
     args = get_args(exp_name)
 
-    ## --- DEMO 3: grasp handles in counter ---
+    ## --- DEMO: grasp handles in counter ---
     # test_handle_grasps(args, robot)
 
     world = init_world(args)
     robot = add_robot(world, robot)
 
-    ## --- DEMO 1: grasp object meshes ---
+    ## --- DEMO: test robot ---
+    # test_gripper_joints(robot)
+    test_gripper_range(robot)
+
+    ## --- DEMO: grasp object meshes ---
     test_grasps(world, ['Bottle']) ## 'Bottle'
 
-    ## --- DEMO 2: grasp handles on fridges ---
+    ## --- DEMO: grasp handles on fridges ---
     # test_fridges(world, custom_limits)
 
     wait_if_gui('Finish?')
