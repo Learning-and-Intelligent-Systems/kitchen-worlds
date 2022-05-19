@@ -9,3 +9,11 @@ documentation/
 !documentation/docs/index.md
 !documentation/docs/css/gif_looper_update.py
 !documentation/docs/css/extra.css
+
+
+test_cases/
+!test_cases/test_blocks_pick
+!test_cases/test_blocks_kitchen
+!test_cases/test_pr2_kitchen
+!test_cases/test_feg_pick
+!test_cases/test_feg_cabinets

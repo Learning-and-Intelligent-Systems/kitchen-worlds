@@ -25,7 +25,6 @@ from world_builder.entities import Object, Region, Environment, Robot, Camera, F
     Surface, Moveable, Supporter, Steerable, Door
 from world_builder.world_generator import to_lisdf
 from world_builder.builders import test_pick, test_exist_omelette, test_kitchen_oven
-from world_builder.loaders import create_robot
 
 import argparse
 
