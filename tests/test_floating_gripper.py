@@ -40,7 +40,7 @@ from pybullet_planning.lisdf_tools.lisdf_planning import pddl_to_init_goal, Prob
 from world_builder.actions import apply_actions
 
 
-DEFAULT_TEST = 'floating_pick' ## 'blocks_pick' ##
+DEFAULT_TEST = 'test_feg_pick' ## 'test_feg_cabinets' ## 'floating_pick' ## 'blocks_pick' ##
 
 def pddlstream_from_dir(problem, exp_dir, collisions=True, teleport=False):
 

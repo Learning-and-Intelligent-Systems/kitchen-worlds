@@ -13,8 +13,6 @@
     (Pose ?o ?p)
     (LinkPose ?o ?p)
     (Position ?o ?p)  ;; joint position of a body
-    (IsOpenedPosition ?o ?p)  ;;
-    (IsClosedPosition ?o ?p)  ;; assume things start out closed
     (Grasp ?o ?g)
     (HandleGrasp ?o ?g)
 
@@ -24,10 +22,9 @@
     (Containable ?o ?r)  ;;
 
     (Kin ?a ?o ?p ?g ?q ?t)
-    (KinGraspHandle ?a ?o ?p ?g ?q ?aq ?t)  ;; grasp a handle
-    (KinUngraspHandle ?a ?o ?p ?g ?q ?aq1 ?aq2 ?t)  ;; ungrasp a handle
-    (KinPullDrawerHandle ?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?t)  ;; pull the handle
-    (KinPullDoorHandle ?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?bt ?aq1 ?aq2 ?at)  ;; pull the handle
+    (KinGraspHandle ?a ?o ?p ?g ?q ?t)  ;; grasp a handle
+    (KinPullHandle ?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?t)  ;; pull the handle
+    (KinPullHandleOpen ?a ?o ?g ?q1 ?q2 ?t)  ;; pull the handle
     (BaseMotion ?q1 ?t ?q2)
     (ArmMotion ?a ?q1 ?t ?q2)
     (Supported ?o ?p ?r)
@@ -55,15 +52,14 @@
     (HandEmpty ?a)
     (AtBConf ?q)
     (AtAConf ?a ?q)
-
     (CanMove)
-    (CanPull)
-    (CanUngrasp)
     (Cleaned ?o)
     (Cooked ?o)
+    (OpenedDrawer ?o) ;;
+    (OpenedDoor ?o) ;;
+    (Opened ?o) ;;
     (OpenedJoint ?o) ;;
     (ClosedJoint ?o) ;;
-    (GraspedHandle ?o) ;;
 
     (On ?o ?r)
     (In ?o ?r) ;;
@@ -101,20 +97,21 @@
   ;               (not (AtAConf ?a ?q1)))
   ;)
 
-  (:action pick
+  (:action pick--no-atbconf
     :parameters (?a ?o ?p ?g ?q ?t)
     :precondition (and (Kin ?a ?o ?p ?g ?q ?t)
-                       (AtPose ?o ?p) (HandEmpty ?a) (AtBConf ?q)
+                       (AtPose ?o ?p) (HandEmpty ?a) ;(AtBConf ?q)
                        (not (UnsafeApproach ?o ?p ?g))
                        (not (UnsafeATraj ?t)))
     :effect (and (AtGrasp ?a ?o ?g) (CanMove)
+                 ;(forall (?r) (when (Supported ?o ?p ?r) (not (On ?o ?r))))
                  (not (AtPose ?o ?p)) (not (HandEmpty ?a))
                  (increase (total-cost) (PickCost)))
   )
-  (:action place
+  (:action place--no-atbconf
     :parameters (?a ?o ?p ?g ?q ?t)
     :precondition (and (Kin ?a ?o ?p ?g ?q ?t)
-                       (AtGrasp ?a ?o ?g) (AtBConf ?q)
+                       (AtGrasp ?a ?o ?g) ;(AtBConf ?q)
                        (not (UnsafePose ?o ?p))
                        (not (UnsafeApproach ?o ?p ?g))
                        (not (UnsafeATraj ?t))
@@ -140,61 +137,29 @@
   )
 
     (:action grasp_handle
-      :parameters (?a ?o ?p ?g ?q ?aq1 ?aq2 ?t)
+      :parameters (?a ?o ?p ?g ?q ?t)
       :precondition (and (Joint ?o)
-                         (KinGraspHandle ?a ?o ?p ?g ?q ?aq2 ?t)
-                         (AtPosition ?o ?p) (HandEmpty ?a)
-                         (AtBConf ?q) (AtAConf ?a ?aq1)
+                         (KinGraspHandle ?a ?o ?p ?g ?q ?t)
+                         (AtLinkPose ?o ?p) (HandEmpty ?a) (AtBConf ?q)
                     )
-      :effect (and (AtHandleGrasp ?a ?o ?g) (not (HandEmpty ?a))
-                   (not (CanMove)) (CanPull) (not (CanUngrasp))
-                   (not (AtAConf ?a ?aq1)) (AtAConf ?a ?aq2)
+      :effect (and (AtHandleGrasp ?a ?o ?g) (CanMove)
+                   (not (HandEmpty ?a))
                    (increase (total-cost) (PickCost))
-              )
-    )
-    (:action ungrasp_handle
-      :parameters (?a ?o ?p ?g ?q ?aq1 ?aq2 ?t)
-      :precondition (and (Joint ?o) (AtPosition ?o ?p)
-                         (KinUngraspHandle ?a ?o ?p ?g ?q ?aq1 ?aq2 ?t)
-                         (AtHandleGrasp ?a ?o ?g) (CanUngrasp)
-                         (AtBConf ?q) (AtAConf ?a ?aq1)
-                    )
-      :effect (and (GraspedHandle ?o) (HandEmpty ?a) (CanMove)
-                   (not (AtHandleGrasp ?a ?o ?g))
-                   (not (AtAConf ?a ?aq1)) (AtAConf ?a ?aq2)
-                   (increase (total-cost) (PlaceCost))
-              )
-    )
-    ;; from fully closed position ?p1 pull to the fully open position ?p2
-    (:action pull_drawer_handle
-      :parameters (?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?bt)
-      :precondition (and (Drawer ?o) (not (= ?p1 ?p2)) (CanPull)
-                         (AtPosition ?o ?p1) (Position ?o ?p2)
-                         (KinPullDrawerHandle ?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?bt)
-                         (AtHandleGrasp ?a ?o ?g) (AtBConf ?q1)
-                         ;(not (UnsafeBTraj ?bt))
-                    )
-      :effect (and (not (CanPull)) (CanUngrasp)
-                  (AtPosition ?o ?p2) (not (AtPosition ?o ?p1))
-                  (AtBConf ?q2) (not (AtBConf ?q1))
               )
     )
 
     ;; from fully closed position ?p1 pull to the fully open position ?p2
-    (:action pull_door_handle
-      :parameters (?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?bt ?aq1 ?aq2 ?at)
-      :precondition (and (Door ?o) (not (= ?p1 ?p2)) (CanPull)
-                         (AtPosition ?o ?p1) (Position ?o ?p2)
-                         (KinPullDoorHandle ?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?bt ?aq1 ?aq2 ?at)
-                         (AtHandleGrasp ?a ?o ?g) (AtBConf ?q1) (AtAConf ?a ?aq1)
-                         ;(not (UnsafeApproach ?o ?p2 ?g))
-                         ;(not (UnsafeATraj ?at))
-                         ;(not (UnsafeBTraj ?bt))
+    (:action pull_handle
+      :parameters (?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?t)
+      :precondition (and (Joint ?o) (AtPosition ?o ?p1) (Position ?o ?p2)
+                         (KinPullHandle ?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?t)
+                         (AtHandleGrasp ?a ?o ?g) (AtBConf ?q1)
+                         ;(not (UnsafeApproach ?o ?p ?g))
+                         ;(not (UnsafeATraj ?t))
                     )
-      :effect (and (not (CanPull)) (CanUngrasp)
+      :effect (and (Opened ?o)
                   (AtPosition ?o ?p2) (not (AtPosition ?o ?p1))
                   (AtBConf ?q2) (not (AtBConf ?q1))
-                  (AtAConf ?a ?aq2) (not (AtAConf ?a ?aq1))
               )
     )
 
@@ -213,11 +178,11 @@
 
   (:derived (OpenedJoint ?o)
     (exists (?p) (and (Joint ?o) (Position ?o ?p) (AtPosition ?o ?p)
-                      (IsOpenedPosition ?o ?p)))
+                      (OpenPosition ?o ?p)))
   )
   (:derived (ClosedJoint ?o)
     (exists (?p) (and (Joint ?o) (Position ?o ?p) (AtPosition ?o ?p)
-                      (IsClosedPosition ?o ?p)))
+                      (ClosedPosition ?o ?p)))
   )
 
     (:derived (HandleGrasped ?a ?o)

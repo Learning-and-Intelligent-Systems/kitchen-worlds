@@ -1,0 +1,95 @@
+<?xml version="1.0" ?>
+<!-- sdf file created by Yang's kitchen scene generator -->
+<sdf version="1.9">
+  <world name="test_feg_cabinets">
+
+    <gui>
+      <camera name="default_camera" definition_type="lookat">
+        <xyz>2.55 8.154 1.368</xyz>
+        <point_to>0.55 8.154 0.868</point_to>
+      </camera>
+    </gui>
+
+
+    <include name="feg">
+      <uri>../../assets/models/franka_description/robots/hand_se3.urdf</uri>
+      <pose>0.0 0.0 0.0 0.0 -0.0 0.0</pose>
+    </include>
+
+
+    <include name="oven#1">
+      <uri>../../assets/models/Oven/01909/mobility.urdf</uri>
+      <static>true</static>
+      <scale>0.8271591725054792</scale>
+      <pose>0.6 8.0 0.602 0.0 -0.0 3.142</pose>
+    </include>
+
+    <model name="floor1">
+      <static>true</static>
+      <pose>2.3 4.7 -0.002 0.0 -0.0 0.0</pose>
+      <link name="box">
+        <collision name="box_collision">
+          <geometry>
+            <box>
+              <size>4.7 9.4 0.001</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+    </model>
+
+    <include name="counter#1">
+      <uri>../../assets/models/counter/urdf/kitchen_part_right_gen_convex.urdf</uri>
+      <static>true</static>
+      <scale>1.0267332606417023</scale>
+      <pose>0.5 7.6 1.394 0.0 -0.0 0.0</pose>
+    </include>
+
+    <include name="oilbottle#1">
+      <uri>../../assets/models/oilbottle/3616/mobility.urdf</uri>
+      <static>false</static>
+      <scale>0.175</scale>
+      <pose>0.663 7.164 1.245 0.0 -0.0 1.925</pose>
+    </include>
+
+    <include name="braiserbody#1">
+      <uri>../../assets/models/braiserbody/100693/mobility.urdf</uri>
+      <static>true</static>
+      <scale>0.259</scale>
+      <pose>0.55 8.153 0.818 0.0 -0.0 0.681</pose>
+    </include>
+
+    <include name="braiserlid#1">
+      <uri>../../assets/models/braiserlid/100693/mobility.urdf</uri>
+      <static>false</static>
+      <scale>0.259</scale>
+      <pose>0.55 8.153 0.821 0.0 -0.0 0.681</pose>
+    </include>
+
+    <include name="meatturkeyleg#1">
+      <uri>../../assets/models/meatturkeyleg/00001/mobility.urdf</uri>
+      <static>true</static>
+      <scale>0.00049</scale>
+      <pose>0.7 8.552 0.844 0.0 -0.0 0.875</pose>
+    </include>
+
+
+    <state world_name="test_feg_cabinets">
+      <model name="pr2">
+        <joint name="x"><angle>0.9</angle></joint>
+        <joint name="y"><angle>8.0</angle></joint>
+        <joint name="z"><angle>0.7</angle></joint>
+        <joint name="roll"><angle>0.0</angle></joint>
+        <joint name="pitch"><angle>-1.571</angle></joint>
+        <joint name="yaw"><angle>0.0</angle></joint>
+        <joint name="panda_finger_joint1"><angle>0.04</angle></joint>
+        <joint name="panda_finger_joint2"><angle>0.04</angle></joint>
+      </model>
+      <model name="counter#1">
+        <joint name="chewie_door_left_joint"><angle>0.0</angle></joint>
+        <joint name="chewie_door_right_joint"><angle>0.0</angle></joint>
+      </model>
+    </state>
+
+  </world>
+</sdf>

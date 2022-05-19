@@ -13,8 +13,6 @@
     (pose ?o ?p)
     (linkpose ?o ?p)
     (position ?o ?p)  ;; joint position of a body
-    (isopenedposition ?o ?p)  ;;
-    (isclosedposition ?o ?p)  ;; assume things start out closed
     (grasp ?o ?g)
     (handlegrasp ?o ?g)
 
@@ -24,10 +22,9 @@
     (containable ?o ?r)  ;;
 
     (kin ?a ?o ?p ?g ?q ?t)
-    (kingrasphandle ?a ?o ?p ?g ?q ?aq ?t)  ;; grasp a handle
-    (kinungrasphandle ?a ?o ?p ?g ?q ?aq1 ?aq2 ?t)  ;; ungrasp a handle
-    (kinpulldrawerhandle ?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?t)  ;; pull the handle
-    (kinpulldoorhandle ?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?bt ?aq1 ?aq2 ?at)  ;; pull the handle
+    (kingrasphandle ?a ?o ?p ?g ?q ?t)  ;; grasp a handle
+    (kinpullhandle ?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?t)  ;; pull the handle
+    (kinpullhandleopen ?a ?o ?g ?q1 ?q2 ?t)  ;; pull the handle
     (basemotion ?q1 ?t ?q2)
     (armmotion ?a ?q1 ?t ?q2)
     (supported ?o ?p ?r)
@@ -55,15 +52,14 @@
     (handempty ?a)
     (atbconf ?q)
     (ataconf ?a ?q)
-
     (canmove)
-    (canpull)
-    (canungrasp)
     (cleaned ?o)
     (cooked ?o)
+    (openeddrawer ?o) ;;
+    (openeddoor ?o) ;;
+    (opened ?o) ;;
     (openedjoint ?o) ;;
     (closedjoint ?o) ;;
-    (graspedhandle ?o) ;;
 
     (on ?o ?r)
     (in ?o ?r) ;;
@@ -78,7 +74,8 @@
     (approachobstacle ?o ?p ?g ?o2)
     (atrajobstacle ?t ?o)
   
-    (defaultconf ?x ?y)
     (supporter ?x)
+    (defaultconf ?x ?y)
+    (canpull)
   )
 )
