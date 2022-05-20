@@ -23,13 +23,16 @@ from pybullet_tools.pr2_primitives import get_group_joints, Conf
 from world_builder.world import World, State
 from world_builder.entities import Object, Region, Environment, Robot, Camera, Floor, Stove,\
     Surface, Moveable, Supporter, Steerable, Door
-from world_builder.world_generator import to_lisdf
-from world_builder.builders import test_pick, test_exist_omelette, test_kitchen_oven
+from world_builder.world_generator import to_lisdf, save_to_test_cases
+
+from world_builder.builders import test_pick, test_exist_omelette, test_kitchen_oven, test_feg_pick
 
 import argparse
+from datetime import datetime
 
 def get_parser():
     parser = argparse.ArgumentParser()
+
     ## -------- simulation related
     parser.add_argument('-v', '--viewer', action='store_true', help='')
     parser.add_argument('-d', '--drive', action='store_true', help='')
@@ -44,39 +47,51 @@ def get_parser():
     set_random_seed(args.seed)
     return args
 
-def create_pybullet_world(builder, SAVE_LISDF=False, world_name='test_scene'):
+def create_pybullet_world(builder, SAVE_LISDF=False, world_name='test_scene', EXIT=True,
+                          SAVE_TESTCASE=False, template_name=None, out_dir=None):
     args = get_parser()
+    if template_name is None:
+        template_name = builder.__name__
 
+    """ ============== initiate simulator ==================== """
+
+    ## for viewing, not the size of depth image
     connect(use_gui=True, shadows=False, width=1980, height=1238)
 
     # set_camera_pose(camera_point=[2.5, 0., 3.5], target_point=[1., 0, 1.])
     if args.camera:
         enable_preview()
-    if not args.segment:
         p.configureDebugVisualizer(p.COV_ENABLE_SEGMENTATION_MARK_PREVIEW, False)
-        # p.configureDebugVisualizer(p.COV_ENABLE_DEPTH_BUFFER_PREVIEW, False)
-    # p.configureDebugVisualizer(p.COV_ENABLE_MOUSE_PICKING, True)
-    # parameter = add_parameter(name='facts')
-    # button = add_button(name='TBD')
-    draw_pose(unit_pose(), length=1.)  # TODO: draw grid
+    draw_pose(unit_pose(), length=1.)
+
+    """ ============== sample world configuration ==================== """
 
     world = World(args, time_step=args.time_step)
-
-    floorplan = builder(world)
+    floorplan, goal = builder(world)
 
     ## no gravity once simulation starts
     set_all_static()
     world.summarize_all_objects()
 
+    """ ============== save world configuration ==================== """
+
     state = State(world)
     file = None
     if SAVE_LISDF:
         file = to_lisdf(state.world, state.get_facts(), floorplan=floorplan, world_name=world_name)
-
-    wait_if_gui('exit?')
+    if SAVE_TESTCASE and out_dir is not None:
+        file = save_to_test_cases(state, goal, template_name, floorplan, out_dir)
+    if EXIT:
+        wait_if_gui('exit?')
     disconnect()
     return file
 
+
 if __name__ == '__main__':
-    builder = test_kitchen_oven  ## test_pick  ## test_exist_omelette ##
-    create_pybullet_world(builder, SAVE_LISDF=False)
+    builder = test_feg_pick  ## test_kitchen_oven  ## test_pick  ## test_exist_omelette ##
+    num_cases = 10
+    out_dir = test_feg_pick.__name__.replace('test', '')
+    out_dir += f'_{datetime.now().strftime("%m%d_%H:%M")}'
+
+    for i in range(10):
+        create_pybullet_world(builder, SAVE_TESTCASE=True, out_dir=out_dir, EXIT=False)
