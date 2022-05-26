@@ -16,7 +16,7 @@ from pybullet_planning.pybullet_tools.pr2_utils import get_group_conf
 from pybullet_planning.pybullet_tools.pr2_primitives import get_base_custom_limits, control_commands, apply_commands
 from pybullet_planning.pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, wait_if_gui, \
     SEPARATOR, get_aabb, get_pose, approximate_as_prism, draw_aabb, multiply, unit_quat, remove_body, invert, \
-    Pose, get_link_pose, get_joint_limits, WHITE, RGBA, set_all_color, RED, GREEN
+    Pose, get_link_pose, get_joint_limits, WHITE, RGBA, set_all_color, RED, GREEN, set_renderer
 from pybullet_planning.pybullet_tools.bullet_utils import summarize_facts, print_goal, nice, set_camera_target_body, \
     draw_bounding_lines, fit_dimensions, draw_fitted_box, get_hand_grasps
 from pybullet_planning.pybullet_tools.pr2_agent import get_stream_info, post_process, move_cost_fn, \
@@ -31,12 +31,12 @@ from pybullet_planning.pybullet_tools.pr2_streams import get_stable_gen, get_con
     get_marker_pose_gen, get_pull_marker_to_pose_motion_gen, get_pull_marker_to_bconf_motion_gen,  \
     get_pull_marker_random_motion_gen, get_ik_ungrasp_handle_gen, get_pose_in_region_test, \
     get_cfree_btraj_pose_test, get_joint_position_open_gen, get_ik_ungrasp_mark_gen, get_handle_pose, \
-    sample_joint_position_open_list_gen, get_update_wconf_pst_gen, get_ik_ir_wconf_gen, get_grasp_gen, \
+    sample_joint_position_open_list_gen, get_update_wconf_pst_gen, get_ik_ir_wconf_gen, \
     get_update_wconf_p_gen, get_ik_ir_wconf_gen, get_pose_in_space_test, get_turn_knob_handle_motion_gen
 from pybullet_planning.pybullet_tools.pr2_primitives import get_group_joints, Conf, get_base_custom_limits, Conf, \
     get_ik_ir_gen, get_motion_gen, get_cfree_approach_pose_test, get_cfree_pose_pose_test, get_cfree_traj_pose_test, \
     Attach, Detach, Clean, Cook, control_commands, \
-    get_gripper_joints, GripperCommand, apply_commands
+    get_gripper_joints, GripperCommand, apply_commands, get_grasp_gen
 from pybullet_planning.pybullet_tools.flying_gripper_utils import se3_from_pose, \
     pose_from_se3, se3_ik, set_cloned_se3_conf
 
@@ -88,7 +88,7 @@ TEST_MODELS = {
         '12036': 1,
         '12248': 1
     },
-    'Bottle': {
+    'BottleTest': {
         # '3380': 0.2,
         '3517': 0.15,
         '3763': 0.16,
@@ -98,6 +98,15 @@ TEST_MODELS = {
         '6771': 0.2,
         '8736': 0.15,
         '8848': 0.11
+    },
+    'Bottle': {
+        # '3380': 0.2,
+        '3558': 0.15,
+        '3574': 0.16,
+        '3614': 0.16,
+        '3615': 0.18,
+        '3616': 0.1,
+        '3822': 0.2,
     },
     'Camera': {
         '101352': 0.08,
@@ -206,12 +215,12 @@ def test_grasps(world, categories=[]):
             print(f'grasps on body {body}:', outputs)
             # set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.8)
             visualize_grasps(problem, outputs, body_pose, RETAIN_ALL=True)
-
+            set_renderer(True)
             j += 1
         i += 1
     set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.5)
 
-def load_body(path, scale, pose_2d, random_yaw=False):
+def load_body(path, scale, pose_2d=(0,0), random_yaw=False):
     file = join(path, 'mobility.urdf')
     print('loading', file)
     with HideOutput(True):
@@ -378,7 +387,7 @@ def main(exp_name, robot='feg', verbose=True):
 
     ## --- DEMO: test robot ---
     # test_gripper_joints(robot)
-    test_gripper_range(robot)
+    # test_gripper_range(robot)
 
     ## --- DEMO: grasp object meshes ---
     test_grasps(world, ['Bottle']) ## 'Bottle'
@@ -403,9 +412,27 @@ def get_data(category):
                 shutil.copytree(old_path, new_path)
                 print(f'copying {old_path} to {new_path}')
 
+def test_texture(category, id):
+    import untangle
+    connect(use_gui=True, shadows=False, width=1980, height=1238)
+    path = join(ASSET_PATH, 'models', category, id) ## , 'mobility.urdf'
+
+    body = load_body(path, 0.2)
+    set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.5)
+    set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.5)
+
+    # content = untangle.parse(path).robot
+    #
+    # import xml.etree.ElementTree as gfg
+    # root = gfg.Element("robot")
+    # tree = gfg.ElementTree(content)
+    # with open(path.replace('mobility', 'mobility_2'), "wb") as files:
+    #     tree.write(files)
+
 if __name__ == '__main__':
     ## --- DEMO ---
     main(exp_name=DEFAULT_TEST, robot='feg')
 
     ## --- MODELS  ---
-    # get_data(category='Stapler')
+    # get_data(category='Bottle')
+    # test_texture(category='CoffeeMachine', id='103127')
