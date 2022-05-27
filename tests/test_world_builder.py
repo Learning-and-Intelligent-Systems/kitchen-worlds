@@ -88,9 +88,9 @@ def create_pybullet_world(builder, SAVE_LISDF=False, world_name='test_scene', EX
 
 
 if __name__ == '__main__':
-    builder = test_feg_pick  ## test_kitchen_oven  ## test_pick  ## test_exist_omelette ##
+    builder = test_feg_pick  ## test_kitchen_oven  ## test_exist_omelette ##
     num_cases = 10
-    out_dir = test_feg_pick.__name__.replace('test', '')
+    out_dir = test_feg_pick.__name__  ##.replace('test', '')
     out_dir += f'_{datetime.now().strftime("%m%d_%H:%M")}'
 
     for i in range(10):
