@@ -218,26 +218,6 @@
 		<limit lower="0" upper="0.008000000000000007"/>
 	</joint>
 
-	<link name="link_4_original-5">
-		<visual name="base_body-5">
-			<origin xyz="0 0 0"/>
-			<geometry>
-				<mesh filename="textured_objs/original-5.obj"/>
-			</geometry>
-		</visual>
-		<collision>
-			<origin xyz="0 0 0"/>
-			<geometry>
-				<mesh filename="textured_objs/original-5.obj"/>
-			</geometry>
-		</collision>
-	</link>
-	<joint name="joint_4_original-5" type="fixed">
-		<origin rpy="0 0 0" xyz="0 0 0"/>
-		<child link="link_4_original-5"/>
-		<parent link="link_4"/>
-	</joint>
-
 	<link name="link_4">
 		<visual name="base_body-8">
 			<origin xyz="0 0 0"/>
@@ -846,5 +826,25 @@
 		<origin rpy="1.570796326794897 0 -1.570796326794897" xyz="0 0 0"/>
 		<child link="link_4"/>
 		<parent link="base"/>
+	</joint>
+
+	<link name="link_4_original-5">
+		<visual name="base_body-5">
+			<origin xyz="0 0 0"/>
+			<geometry>
+				<mesh filename="textured_objs/original-5.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0"/>
+			<geometry>
+				<mesh filename="textured_objs/original-5.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_4_original-5" type="fixed">
+		<origin rpy="0 0 0" xyz="0 0 0"/>
+		<child link="link_4_original-5"/>
+		<parent link="link_4"/>
 	</joint>
 </robot>

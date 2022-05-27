@@ -24,6 +24,7 @@ from pybullet_planning.pybullet_tools.pr2_agent import get_stream_info, post_pro
 from pybullet_planning.pybullet_tools.logging import TXT_FILE
 
 ## custom stream_map
+from pybullet_planning.pybullet_tools.general_streams import get_grasp_list_gen
 from pybullet_planning.pybullet_tools.pr2_streams import get_stable_gen, get_contain_gen, get_position_gen, \
     Position, get_handle_grasp_gen, LinkPose, get_ik_ir_grasp_handle_gen, get_pull_drawer_handle_motion_gen, \
     get_joint_position_test, get_marker_grasp_gen, get_bconf_in_region_test, get_pull_door_handle_motion_gen, \
@@ -36,7 +37,7 @@ from pybullet_planning.pybullet_tools.pr2_streams import get_stable_gen, get_con
 from pybullet_planning.pybullet_tools.pr2_primitives import get_group_joints, Conf, get_base_custom_limits, Conf, \
     get_ik_ir_gen, get_motion_gen, get_cfree_approach_pose_test, get_cfree_pose_pose_test, get_cfree_traj_pose_test, \
     Attach, Detach, Clean, Cook, control_commands, \
-    get_gripper_joints, GripperCommand, apply_commands, get_grasp_gen
+    get_gripper_joints, GripperCommand, apply_commands
 from pybullet_planning.pybullet_tools.flying_gripper_utils import se3_from_pose, \
     pose_from_se3, se3_ik, set_cloned_se3_conf
 
@@ -192,7 +193,7 @@ def test_spatial_algebra(body, robot):
 
 def test_grasps(world, categories=[]):
     problem = State(world, grasp_types=['hand']) ## , 'side' , 'top'
-    funk = get_grasp_gen(problem, collisions=True)
+    funk = get_grasp_list_gen(problem, collisions=True)
 
     i = 0
     for cat in categories:
