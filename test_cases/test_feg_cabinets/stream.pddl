@@ -1,6 +1,6 @@
 (define (stream fe-gripper-tamp)
 
-  (:stream sample-pose
+  (:stream sample-pose-on
     :inputs (?o ?r)
     :domain (Stackable ?o ?r)
     :outputs (?p)
@@ -71,13 +71,6 @@
     :domain (and (Pose ?o ?p) (Grasp ?o ?g) (SEConf ?q) (WConf ?w))
     :certified (ReachableMovable ?o ?p ?g ?q ?w)
   )
-    (:stream sample-wconf-obj
-      :inputs (?o ?w1)
-      :domain (and (Graspable ?o) (WConf ?w1))
-      :outputs (?pst ?w2)
-      :certified (and (Position ?o ?pst) (IsOpenedPosition ?o ?pst) (WConf ?w2) (NewWConfPst ?w1 ?o ?pst ?w2))
-    )
-
   (:function (MoveCost ?t)
     (and (Traj ?t))
   )

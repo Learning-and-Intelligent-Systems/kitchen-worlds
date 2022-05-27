@@ -1,91 +1,91 @@
-(define (domain pr2-tamp)
+(define (domain fe-gripper-tamp)
   (:requirements :strips :equality)
   (:predicates
-    (Arm ?a)
-    (Stackable ?o ?r)
 
-    (Sink ?r)
-    (Stove ?r)
-    (Counter ?r)
-    (Table ?r)
-    (Salter ?o)
-    (Egg ?o)
-    (Veggie ?o)
-    (Plate ?o)
-    (Supporter ?o)
-    (Environment ?o)
-    (Cart ?o)
-    (Marker ?o)
-    (Marked ?o ?o2)
+    (Drawer ?o) ;;
+    (Door ?o) ;;
+    (Knob ?o) ;;
+    (Joint ?o)
 
-    (AConf ?a ?q)
-    (BConf ?q)
-    (BConfInRegion ?q ?r)
-    (PoseInRegion ?o ?p ?r)
-    (InRoom ?o ?r)
-    (RobInRoom ?r)
+    (Edible ?o)
+    (CleaningSurface ?s)
+    (HeatingSurface ?s)
+    (ControlledBy ?s ?n)
 
+    (HandEmpty ?a)
+    (SEConf ?q)
     (Pose ?o ?p)
+    (Position ?o ?p)  ;; joint position of a body
+    (IsOpenedPosition ?o ?p)  ;;
+    (IsClosedPosition ?o ?p)  ;; assume things start out closed
     (Grasp ?o ?g)
-    (MarkerGrasp ?o ?g)
-    (Kin ?a ?o ?p ?g ?q ?t)
-    (KinGraspMarker ?a ?o ?p ?g ?q ?t) ;;
-    (KinUngraspMarker ?a ?o ?p ?g ?q ?t) ;;
-    (KinPullMarkerRandom ?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?o2 ?p3 ?p4 ?t) ;;
-    (KinPullMarkerToPose ?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?o2 ?p3 ?p4 ?t) ;;
-    (KinPullMarkerToBConf ?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?o2 ?p3 ?p4 ?t) ;;
+    (HandleGrasp ?o ?g)
 
-    (BaseMotion ?q1 ?t ?q2)
-    (ArmMotion ?a ?q1 ?t ?q2)
-    (Supported ?o ?p ?r)
-    (BTraj ?t)
-    (ATraj ?t)
+    (WConf ?w)
+    (InWConf ?w)
+    (NewWConfP ?w1 ?o ?p ?w2)
+    (NewWConfPst ?w1 ?o ?pst ?w2)
 
-    (Controllable ?o)
     (Graspable ?o)
     (Stackable ?o ?r)
+    (Containable ?o ?r)  ;;
+
+    (ReachableMovable ?o ?p ?g ?q ?w)
+    (ReachablePose ?o ?p ?w)
+    (AtReachablePose ?o ?p)
+    (Toggled ?o)
+    (OriginalSEConf ?q)
+
+    (Kin ?a ?o ?p ?g ?q ?t)
+    (KinWConf ?a ?o ?p ?g ?q1 ?q2 ?t ?w)
+    (KinGraspHandle ?a ?o ?p ?g ?q1 ?q2 ?t ?w)
+    (KinPullDoorHandle ?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?t ?w1)
+
+    (FreeMotionWConf ?p1 ?t ?p2 ?w)
+    (FreeMotion ?p1 ?t ?p2)
+    (Supported ?o ?p ?r)
+    (Contained ?o ?p ?s) ;; aabb contains
+    (Traj ?t)
 
     (TrajPoseCollision ?t ?o ?p)
-    (TrajArmCollision ?t ?a ?q)
-    (TrajGraspCollision ?t ?a ?o ?g)
     (CFreePosePose ?o ?p ?o2 ?p2)
     (CFreeApproachPose ?o ?p ?g ?o2 ?p2)
-    (CFreeTrajPose ?t ?o2 ?p2)
-    (CFreeBTrajPose ?t ?o2 ?p2)
-    ;;(CFreeBTrajWithAttachmentPose ?t ?o ?o2 ?p2) ;;
 
+    (AtSEConf ?q)
     (AtPose ?o ?p)
-    (AtGrasp ?a ?o ?g)
-    (AtMarkerGrasp ?a ?o ?g) ;;
-    (HandEmpty ?a)
-    (AtBConf ?q)
-    (AtAConf ?a ?q)
-    (CanMove)
-    (CanPull) ;;
-    (CanUngrasp) ;;
+    (AtPosition ?o ?p)  ;; joint position of a body
+    (OpenPosition ?o ?p)  ;; joint position of a body
+    (ClosedPosition ?o ?p)  ;; joint position of a body
 
+    (AtGrasp ?a ?o ?g)
+    (AtHandleGrasp ?a ?o ?g)  ;; holding the handle
+    (HandleGrasped ?a ?o)  ;; holding the handle
+    (KnobTurned ?o)  ;; holding the knob
+
+    (CanMove)
+    (CanPull)
+    (CanUngrasp)
     (Cleaned ?o)
     (Cooked ?o)
-    (Seasoned ?o)
-    (Served ?o ?o2)
-    (EnableOmelette ?egg1 ?veggie1 ?plate1)
-    (ExistOmelette ?env1)
+    (OpenedJoint ?o) ;;
+    (ClosedJoint ?o) ;;
+    (GraspedHandle ?o) ;;
 
     (On ?o ?r)
+    (In ?o ?r) ;;
     (Holding ?a ?o)
-    (HoldingMarker ?a ?o) ;;
-    (PulledMarker ?o) ;;
-    (GraspedMarker ?o) ;;
-    (SavedMarker ?o) ;;
 
     (UnsafePose ?o ?p)
     (UnsafeApproach ?o ?p ?g)
-    (UnsafeATraj ?t)
-    (UnsafeBTraj ?t)
+    (UnsafeTraj ?t)
+
     (PoseObstacle ?o ?p ?o2)
     (ApproachObstacle ?o ?p ?g ?o2)
-    (ATrajObstacle ?t ?o)
-    ;; (UnsafeBTrajWithAttachment ?t ?o) ;;
+
+    (Debug1)
+    (Debug2)
+    (Debug3)
+
   )
   (:functions
     (MoveCost ?t)
@@ -93,185 +93,125 @@
     (PlaceCost)
   )
 
-  (:action move_base
-    :parameters (?q1 ?q2 ?t)
-    :precondition (and (BaseMotion ?q1 ?t ?q2)
-                       (AtBConf ?q1) (CanMove)
-                       ;; (not (UnsafeBTraj ?t))
-                       )
-    :effect (and (AtBConf ?q2)
-                 (not (AtBConf ?q1)) (not (CanMove))
+  (:action move_cartesian
+    :parameters (?q1 ?q2 ?t ?w)
+    :precondition (and (CanMove) (AtSEConf ?q1) (InWConf ?w)
+                       (FreeMotionWConf ?q1 ?t ?q2 ?w)
+                       (not (UnsafeTraj ?t))
+                   )
+    :effect (and (AtSEConf ?q2) (not (AtSEConf ?q1)) (not (CanMove))
                  (increase (total-cost) (MoveCost ?t)))
   )
 
-  ;(:action move_arm
-  ;  :parameters (?q1 ?q2 ?t)
-  ;  :precondition (and (ArmMotion ?a ?q1 ?t ?q2)
-  ;                     (AtAConf ?a ?q1))
-  ;  :effect (and (AtAConf ?a ?q2)
-  ;               (not (AtAConf ?a ?q1)))
-  ;)
-
-  (:action pick
-    :parameters (?a ?o ?p ?g ?q ?t)
-    :precondition (and (Kin ?a ?o ?p ?g ?q ?t) (not (Marker ?o))
-                       (AtPose ?o ?p) (HandEmpty ?a) (AtBConf ?q)
+  (:action pick_hand
+    :parameters (?a ?o ?p ?g ?q1 ?q2 ?t ?w)
+    :precondition (and (KinWConf ?a ?o ?p ?g ?q1 ?q2 ?t ?w) (HandEmpty ?a)
+                       (AtPose ?o ?p) (AtSEConf ?q1)
+                       (ReachablePose ?o ?p ?w) (InWConf ?w)
                        (not (UnsafeApproach ?o ?p ?g))
-                       (not (UnsafeATraj ?t)))
+                       )
     :effect (and (AtGrasp ?a ?o ?g) (CanMove)
-                 ;(forall (?r) (when (Supported ?o ?p ?r) (not (On ?o ?r))))
                  (not (AtPose ?o ?p)) (not (HandEmpty ?a))
                  (increase (total-cost) (PickCost)))
   )
-  (:action place
-    :parameters (?a ?o ?p ?g ?q ?t)
-    :precondition (and (Kin ?a ?o ?p ?g ?q ?t)
-                       (AtGrasp ?a ?o ?g) (AtBConf ?q)
+
+  (:action place_hand
+    :parameters (?a ?o ?p ?g ?q1 ?q2 ?t ?w)
+    :precondition (and (KinWConf ?a ?o ?p ?g ?q1 ?q2 ?t ?w)
+                       (AtGrasp ?a ?o ?g) (AtSEConf ?q1)
+                       (ReachablePose ?o ?p ?w) (InWConf ?w)
                        (not (UnsafePose ?o ?p))
                        (not (UnsafeApproach ?o ?p ?g))
-                       (not (UnsafeATraj ?t)))
-    :effect (and (AtPose ?o ?p) (HandEmpty ?a) (CanMove)
+                       )
+    :effect (and (AtPose ?o ?p) (CanMove) (HandEmpty ?a)
                  (not (AtGrasp ?a ?o ?g))
-                 ;(forall (?r) (when (Supported ?o ?p ?r) (On ?o ?r)))
                  (increase (total-cost) (PlaceCost)))
   )
 
-  (:action clean
-    :parameters (?o ?r)
-    :precondition (and (Stackable ?o ?r) (Sink ?r)
-                       (On ?o ?r))
-    :effect (and (Cleaned ?o))
-  )
-  (:action cook
-    :parameters (?o ?r)
-    :precondition (and (Stackable ?o ?r) (Stove ?r)
-                       (On ?o ?r) (Cleaned ?o))
-    :effect (and (Cooked ?o))
-  )
-  (:action season
-    :parameters (?o ?r ?o2)
-    :precondition (and (Stackable ?o ?r) (Counter ?r)
-                       (On ?o ?r) (Cooked ?o)
-                       (Stackable ?o2 ?r) (Salter ?o2)
-                       (On ?o2 ?r))
-    :effect (and (Seasoned ?o))
-  )
-  (:action serve
-    :parameters (?o ?r ?o2)
-    :precondition (and (Stackable ?o ?r) (Table ?r)
-                       (On ?o ?r) (Seasoned ?o)
-                       (Stackable ?o2 ?r) (Plate ?o2)
-                       (On ?o2 ?r))
-    :effect (and (Served ?o ?o2))
-  )
-
-    (:action grasp_marker
-      :parameters (?a ?o ?o2 ?p ?g ?q ?t)
-      :precondition (and (Cart ?o) (Marker ?o2) (Marked ?o ?o2)
-                         (KinGraspMarker ?a ?o2 ?p ?g ?q ?t)
-                         (AtPose ?o2 ?p) (HandEmpty ?a) (AtBConf ?q)
+    (:action grasp_handle_hand
+      :parameters (?a ?o ?pstn ?g ?q1 ?q2 ?t ?w)
+      :precondition (and (Joint ?o) (HandEmpty ?a) (AtSEConf ?q1)
+                         (KinGraspHandle ?a ?o ?pstn ?g ?q1 ?q2 ?t ?w)
+                         (AtPosition ?o ?pstn) (AtSEConf ?q1) (InWConf ?w)
                     )
-      :effect (and (AtMarkerGrasp ?a ?o ?g)
-                   (AtMarkerGrasp ?a ?o2 ?g)
-                   (not (HandEmpty ?a)) (not (CanMove))
-                   (not (CanUngrasp)) ;;
+      :effect (and (AtHandleGrasp ?a ?o ?g) (not (HandEmpty ?a)) (Debug1)
+                   (not (AtSEConf ?q1))
+                   (not (CanMove)) (CanPull) (not (CanUngrasp))
                    (increase (total-cost) (PickCost))
               )
     )
-  (:action ungrasp_marker
-    :parameters (?a ?o ?o2 ?p ?g ?q ?t)
-    :precondition (and (Cart ?o) (Marker ?o2) (Marked ?o ?o2) (AtPose ?o2 ?p)
-                       (CanUngrasp) ;;
-                       (KinUngraspMarker ?a ?o2 ?p ?g ?q ?t)
-                       (AtMarkerGrasp ?a ?o ?g)
-                       (AtMarkerGrasp ?a ?o2 ?g) (AtBConf ?q))
-    :effect (and (HandEmpty ?a) (CanMove)
-                 (not (AtMarkerGrasp ?a ?o ?g))
-                 (not (AtMarkerGrasp ?a ?o2 ?g))
-                 (GraspedMarker ?o2) ;;
-                 (increase (total-cost) (PlaceCost)))
-  )
-
-    ;; marker from p1 to a random base position p2, cart moves from p3 to p4
-    (:action pull_marker_random
-      :parameters (?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?o2 ?p3 ?p4 ?t)
-      :precondition (and (not (CanMove)) (CanPull)
-                         (Marker ?o) (Cart ?o2) (Marked ?o2 ?o)
-                         (KinPullMarkerRandom ?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?o2 ?p3 ?p4 ?t)
-                         (AtPose ?o ?p1) (AtPose ?o2 ?p3) (AtBConf ?q1)
-                                             (AtMarkerGrasp ?a ?o ?g)
-                         ;(not (UnsafeBTrajWithMarker ?t ?o))
+    (:action ungrasp_handle_hand
+      :parameters (?a ?o ?pstn ?g ?q1 ?q2 ?t ?w)
+      :precondition (and (Joint ?o) (CanUngrasp)
+                         (KinGraspHandle ?a ?o ?pstn ?g ?q1 ?q2 ?t ?w)
+                         (AtHandleGrasp ?a ?o ?g) (AtPosition ?o ?pstn) (InWConf ?w)
                     )
-      :effect (and (not (AtPose ?o ?p1)) (AtPose ?o ?p2) (PulledMarker ?o)
-                   (not (AtPose ?o2 ?p3)) (AtPose ?o2 ?p4)
-                   (AtBConf ?q2) (not (AtBConf ?q1))
-                   (not (CanPull)) (CanUngrasp) ;;
-                   (increase (total-cost) (MoveCost ?t))
+      :effect (and (GraspedHandle ?o) (HandEmpty ?a) (CanMove) (Debug3)
+                   (AtSEConf ?q1) (not (AtHandleGrasp ?a ?o ?g))
+                   (increase (total-cost) (PlaceCost))
               )
     )
 
-    ;; to a sampled base position
-    (:action pull_marker_to_pose
-      :parameters (?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?o2 ?p3 ?p4 ?t)
-      :precondition (and (not (CanMove)) (CanPull) (not (= ?p1 ?p2))
-                         (Marker ?o) (Cart ?o2) (Marked ?o2 ?o)
-                         (KinPullMarkerToPose ?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?o2 ?p3 ?p4 ?t)
-                         (AtPose ?o ?p1) (AtPose ?o2 ?p3) (AtBConf ?q1)
-                                             (AtMarkerGrasp ?a ?o ?g)
-                         ;(not (UnsafeBTrajWithMarker ?t ?o))
+    ;; from fully closed position ?p1 pull to the fully open position ?p2
+    (:action pull_door_handle_wconf
+      :parameters (?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?t ?w1 ?w2)
+      :precondition (and (Door ?o) (not (= ?p1 ?p2)) (CanPull)
+                         (AtPosition ?o ?p1) (Position ?o ?p2) (AtHandleGrasp ?a ?o ?g)
+                         (KinPullDoorHandle ?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?t ?w1)
+                         ; (AtSEConf ?q1)
+                         (InWConf ?w1) (WConf ?w2)
+                         (NewWConfPst ?w1 ?o ?p2 ?w2)
+                         ;(not (UnsafeApproach ?o ?p2 ?g))
+                         ;(not (UnsafeATraj ?at))
+                         ;(not (UnsafeBTraj ?bt))
                     )
-      :effect (and (not (AtPose ?o ?p1)) (AtPose ?o ?p2) (PulledMarker ?o)
-                   (not (AtPose ?o2 ?p3)) (AtPose ?o2 ?p4)
-                   (AtBConf ?q2) (not (AtBConf ?q1))
-                   (not (CanPull)) (CanUngrasp) ;;
-                   (increase (total-cost) (MoveCost ?t))
+      :effect (and (not (CanPull)) (CanUngrasp) (Debug2)
+                  (AtPosition ?o ?p2) (not (AtPosition ?o ?p1))
+                  ; (AtSEConf ?q2) (not (AtSEConf ?q1))
+                  (InWConf ?w2) (not (InWConf ?w1))
               )
     )
 
-    ;; to a sampled object pose
-    (:action pull_marker_to_bconf
-      :parameters (?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?o2 ?p3 ?p4 ?t)
-      :precondition (and (not (CanMove)) (CanPull) (not (= ?q1 ?q2))
-                         (Marker ?o) (Cart ?o2) (Marked ?o2 ?o)
-                         (KinPullMarkerToBConf ?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?o2 ?p3 ?p4 ?t)
-                         (AtPose ?o ?p1) (AtPose ?o2 ?p3) (AtBConf ?q1)
-                                             (AtMarkerGrasp ?a ?o ?g)
-                         ;(not (UnsafeBTrajWithMarker ?t ?o))
-                    )
-      :effect (and (not (AtPose ?o ?p1)) (AtPose ?o ?p2) (PulledMarker ?o)
-                   (not (AtPose ?o2 ?p3)) (AtPose ?o2 ?p4)
-                   (AtBConf ?q2) (not (AtBConf ?q1))
-                   (not (CanPull)) (CanUngrasp) ;;
-                   (increase (total-cost) (MoveCost ?t))
-              )
-    )
+  ;(:action toggle
+  ;  :parameters (?o ?p1 ?p2 ?w1 ?w2)
+  ;  :precondition (and (Joint ?o) (not (= ?p1 ?p2))
+  ;                     (AtPosition ?o ?p1) (Position ?o ?p2)
+  ;                     (InWConf ?w1) (NewWConfPst ?w1 ?o ?p2 ?w2)
+  ;                )
+  ;  :effect (and (InWConf ?w2) (not (InWConf ?w1)) (Toggled ?o)
+  ;               (AtPosition ?o ?p2) (not (AtPosition ?o ?p1))
+  ;          )
+  ;)
 
-
-  (:action magic
-    :parameters (?o ?o2 ?p1 ?p3)
-    :precondition (and (Marker ?o) (Cart ?o2) (Marked ?o2 ?o)
-                       (AtPose ?o ?p1) (AtPose ?o2 ?p3))
-    :effect (and (not (AtPose ?o ?p1)) (not (AtPose ?o2 ?p3)))
-  )
-
-  (:derived (RobInRoom ?r)
-    (exists (?q) (and (BConfInRegion ?q ?r) (AtBConf ?q)))
-  )
-  (:derived (InRoom ?o ?r)
-    (exists (?p) (and (PoseInRegion ?o ?p ?r) (AtPose ?o ?p)))
-  )
   (:derived (On ?o ?r)
-    (exists (?p) (and (Supported ?o ?p ?r)
-                      (AtPose ?o ?p)))
+    (exists (?p) (and (Supported ?o ?p ?r) (AtPose ?o ?p)))
+  )
+  (:derived (In ?o ?r)
+    (exists (?p) (and (Contained ?o ?p ?r) (AtPose ?o ?p)))
   )
   (:derived (Holding ?a ?o)
-    (exists (?g) (and (Arm ?a) (Grasp ?o ?g)
-                      (AtGrasp ?a ?o ?g)))
+    (exists (?g) (and (Grasp ?o ?g) (AtGrasp ?a ?o ?g)))
   )
-  (:derived (HoldingMarker ?a ?o)
-    (exists (?g) (and (Arm ?a) (Marker ?o) (MarkerGrasp ?o ?g)
-                      (AtMarkerGrasp ?a ?o ?g)))
+  (:derived (ReachablePose ?o ?p ?w)
+    (exists (?q ?g) (and (Pose ?o ?p) (OriginalSEConf ?q) (Grasp ?o ?g) (WConf ?w) (ReachableMovable ?o ?p ?g ?q ?w)))
   )
+  (:derived (AtReachablePose ?o ?p)
+    (exists (?w) (and (InWConf ?w) (ReachablePose ?o ?p ?w)))
+  )
+
+  (:derived (OpenedJoint ?o)
+    (exists (?pstn) (and (Joint ?o) (Position ?o ?pstn) (AtPosition ?o ?pstn)
+                      (IsOpenedPosition ?o ?pstn)))
+  )
+  (:derived (ClosedJoint ?o)
+    (exists (?pstn) (and (Joint ?o) (Position ?o ?pstn) (AtPosition ?o ?pstn)
+                      (IsClosedPosition ?o ?pstn)))
+  )
+
+    (:derived (HandleGrasped ?a ?o)
+      (exists (?hg) (and (Joint ?o) (HandleGrasp ?o ?hg)
+                        (AtHandleGrasp ?a ?o ?hg)))
+    )
 
   (:derived (UnsafePose ?o ?p)
     (exists (?o2 ?p2) (and (Pose ?o ?p) (Pose ?o2 ?p2) (not (= ?o ?o2))
@@ -283,72 +223,4 @@
                            (not (CFreeApproachPose ?o ?p ?g ?o2 ?p2))
                            (AtPose ?o2 ?p2)))
   )
-  (:derived (UnsafeATraj ?t)
-    (exists (?o2 ?p2) (and (ATraj ?t) (Pose ?o2 ?p2) (AtPose ?o2 ?p2)
-                           (not (CFreeTrajPose ?t ?o2 ?p2))))
-  )
-  (:derived (UnsafeBTraj ?t)
-    (exists (?o2 ?p2) (and (BTraj ?t) (Pose ?o2 ?p2) (AtPose ?o2 ?p2)
-                           (not (CFreeBTrajPose ?t ?o2 ?p2))))
-  )
-
-  ;(:derived (UnsafeBTrajWithAttachment ?t ?o)
-  ;  (exists (?o2 ?p2) (and (BTraj ?t) (Marker ?o) (Pose ?o2 ?p2)
-  ;                         (not (CFreeBTrajWithAttachmentPose ?t ?o ?o2 ?p2))
-  ;                         (AtPose ?o2 ?p2)))
-  ;)
-
-    (:derived (PoseObstacle ?o ?p ?o2)
-      (exists (?p2)
-         (and (Pose ?o ?p) (Pose ?o2 ?p2) (not (= ?o ?o2))
-               (not (CFreePosePose ?o ?p ?o2 ?p2))
-               (AtPose ?o2 ?p2)))
-    )
-    (:derived (ApproachObstacle ?o ?p ?g ?o2)
-      (exists (?p2)
-         (and (Pose ?o ?p) (Grasp ?o ?g) (Pose ?o2 ?p2) (not (= ?o ?o2))
-              (not (CFreeApproachPose ?o ?p ?g ?o2 ?p2))
-              (AtPose ?o2 ?p2)))
-    )
-    (:derived (ATrajObstacle ?t ?o2)
-      (exists (?p2)
-         (and (ATraj ?t) (Pose ?o2 ?p2)
-              (not (CFreeTrajPose ?t ?o2 ?p2))
-              (AtPose ?o2 ?p2)))
-    )
-
-  ;(:derived (UnsafeBTraj ?t) (or
-  ;  (exists (?o2 ?p2) (and (TrajPoseCollision ?t ?o2 ?p2)
-  ;                         (AtPose ?o2 ?p2)))
-  ;  (exists (?a ?q) (and (TrajArmCollision ?t ?a ?q)
-  ;                       (AtAConf ?a ?q)))
-  ;  (exists (?a ?o ?g) (and (TrajGraspCollision ?t ?a ?o ?g)
-  ;                          (AtGrasp ?a ?o ?g)))
-  ;))
-
-  ( :derived ( EnableOmelette ?egg1 ?veggie1 ?plate1 )
-    ( and
-        ( Egg ?egg1 )
-        ( Veggie ?veggie1 )
-        ( Plate ?plate1 )
-
-        ( Cleaned ?veggie1 )
-        ( Cooked ?egg1 )
-        ( Cooked ?veggie1 )
-        ( Seasoned ?egg1 )
-        ( Seasoned ?veggie1 )
-        ( Served ?egg1 ?plate1 )
-        ( Served ?veggie1 ?plate1 )
-    )
-  )
-
-    ( :derived ( ExistOmelette ?table1 )
-        ( exists ( ?egg1 ?veggie1 ?plate1 )
-            ( and
-                ( Egg ?egg1 ) ( Veggie ?veggie1 ) ( Plate ?plate1 ) ( Table ?table1 )
-                ( EnableOmelette ?egg1 ?veggie1 ?plate1 ) ( On ?plate1 ?table1 )
-            )
-        )
-    )
-
 )
