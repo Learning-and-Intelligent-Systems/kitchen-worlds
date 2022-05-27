@@ -39,7 +39,7 @@ from pybullet_planning.lisdf_tools.lisdf_planning import pddl_to_init_goal, Prob
 from world_builder.actions import apply_actions
 
 
-DEFAULT_TEST = 'test_pr2_kitchen' ## 'blocks_pick' ##
+DEFAULT_TEST = 'test_blocks_kitchen' ## 'test_pr2_kitchen' ##
 
 def get_stream_map(p, c, l, t):
     # p = problem
