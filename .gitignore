@@ -10,7 +10,6 @@ documentation/
 !documentation/docs/css/gif_looper_update.py
 !documentation/docs/css/extra.css
 
-
 test_cases/
 !test_cases/test_blocks_pick
 !test_cases/test_blocks_kitchen
