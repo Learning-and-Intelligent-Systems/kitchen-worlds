@@ -1,0 +1,250 @@
+----------------
+PART I: pybullet bodies | obstacles = [2, 3, 9]
+----------------
+9  |  Name: oven#1, Pose: (0.6, 8, 0.602, 0, 0, 3.142)
+1  |  Name: floor1, Pose: (2.3, 4.7, -0.002, 0, 0, 0)
+2  |  Name: counter#1, Pose: (0.5, 7.6, 1.394, 0, 0, 0)
+3  |  Name: braiserbody#1, Pose: (0.567, 8.18, 0.818, 0, 0, 1.523)
+4  |  Name: vinegarbottle#1, Pose: (0.304, 8.773, 1.53, 0, 0, 1.835)
+5  |  Name: oilbottle#1, Pose: (0.203, 8.985, 1.553, 0, 0, 0.213)
+6  |  Name: braiserlid#1, Pose: (0.566, 8.18, 0.821, 0, 0, 0.515)
+7  |  Name: meatturkeyleg#1, Pose: (0.884, 8.697, 0.844, 0, 0, 0.43)
+8  |  Name: veggiecabbage#1, Pose: (0.333, 8.707, 0.87, 0, 0, 3.121)
+0  |  Name: feg0, Pose: (0, 0, 0, 0, 0, 0)
+----------------
+PART II: world objects | moveable(5), surface(4), door(4), 
+1      |  Floor: floor1    |  Pose: (2.3, 4.7, -0.002, 0, 0, 0)
+2      |  Object: counter#1    |  Pose: (0.5, 7.6, 1.394, 0, 0, 0)
+(2, None, 0)      |  Space: counter#1::sektion    |  Pose: (0.5, 7.6, 1.394, 0, 0, 0)
+(2, None, 4)      |  Surface: counter#1::front_left_stove    |  Pose: (0.567, 7.872, 0.773, 0, 0, 0)
+3      |  Object: braiserbody#1    |  Pose: (0.567, 8.18, 0.818, 0, 0, 1.523)
+(2, None, 17)      |  Space: counter#1::dagger    |  Pose: (0.5, 8.452, 1.394, 0, 0, 0)
+4      |  Object: vinegarbottle#1    |  Pose: (0.304, 8.773, 1.53, 0, 0, 1.835)
+5      |  Object: oilbottle#1    |  Pose: (0.203, 8.985, 1.553, 0, 0, 0.213)
+(2, None, 26)      |  Surface: counter#1::hitman_tmp    |  Pose: (0.5, 7.6, 0.829, 0, 0, 0)
+(2, None, 29)      |  Space: counter#1::hitman_drawer_top    |  Pose: (0.479, 7.209, 0.484, 0, 0, 0)
+(2, None, 35)      |  Surface: counter#1::indigo_tmp    |  Pose: (0.603, 8.452, 0.829, 0, 0, 0)
+6      |  Object: braiserlid#1    |  Pose: (0.566, 8.18, 0.821, 0, 0, 0.515)
+7      |  Object: meatturkeyleg#1    |  Pose: (0.884, 8.697, 0.844, 0, 0, 0.43)
+8      |  Object: veggiecabbage#1    |  Pose: (0.333, 8.707, 0.87, 0, 0, 3.121)
+9      |  Object: oven#1    |  Pose: (0.6, 8, 0.602, 0, 0, 3.142)
+(3, None, 1)      |  Surface: braiserbody#1::braiser_bottom    |  Pose: (0.567, 8.18, 0.818, 1.571, 0, -0.048)
+(2, 10)      |  Door: counter#1::chewie_door_right_joint    |  Handle: chewie_door_right_handle    |  Pose: 0
+(2, 14)      |  Door: counter#1::chewie_door_left_joint    |  Handle: chewie_door_left_handle    |  Pose: 0
+(2, 19)      |  Door: counter#1::dagger_door_left_joint    |  Handle: dagger_door_left_handle    |  Pose: 0
+(2, 23)      |  Door: counter#1::dagger_door_right_joint    |  Handle: dagger_door_right_handle    |  Pose: 0
+----------------
+pr2_agent.pddlstream_from_state_goal(
+    domain = feg_kitchen.pddl, 
+    stream = feg_stream_kitchen.pddl, custom_limits = {0: (0, 4), 1: (5, 12), 2: (0, 2)}
+----------------
+Facts extracted from observation (129)
+   = [['=', ('PickCost',), 1], ['=', ('PlaceCost',), 1]]
+   arm [['Arm', 'hand']]
+   atpose [['AtPose', 'vinegarbottle#1|4', p0=(0.304, 8.773, 1.53, 0, 0, 1.835)], ['AtPose', 'oilbottle#1|5', p1=(0.203, 8.985, 1.553, 0, 0, 0.213)], ['AtPose', 'braiserlid#1|6', p2=(0.566, 8.18, 0.821, 0, 0, 0.515)], ['AtPose', 'meatturkeyleg#1|7', p3=(0.884, 8.697, 0.844, 0, 0, 0.43)], ['AtPose', 'veggiecabbage#1|8', p4=(0.333, 8.707, 0.87, 0, 0, 3.121)]]
+   atposition [['AtPosition', 'counter#1::chewie_door_left_joint|2', pstn0=0], ['AtPosition', 'counter#1::chewie_door_right_joint|2', pstn1=0], ['AtPosition', 'counter#1::dagger_door_right_joint|2', pstn2=0], ['AtPosition', 'counter#1::dagger_door_left_joint|2', pstn3=0]]
+   atseconf [['AtSEConf', q856=(0.9, 8, 0.7, 0, -1.571, 0)]]
+   bottle [['bottle', 'vinegarbottle#1|4'], ['bottle', 'oilbottle#1|5']]
+   braiserbody [['braiserbody', 'braiserbody#1|3']]
+   braiserlid [['braiserlid', 'braiserlid#1|6']]
+   canmove [['CanMove']]
+   canpull [['CanPull']]
+   containable [['Containable', 'vinegarbottle#1|4', 'counter#1::hitman_drawer_top|2'], ['Containable', 'vinegarbottle#1|4', 'counter#1::dagger|2'], ['Containable', 'vinegarbottle#1|4', 'counter#1::sektion|2'], ['Containable', 'oilbottle#1|5', 'counter#1::hitman_drawer_top|2'], ['Containable', 'oilbottle#1|5', 'counter#1::dagger|2'], ['Containable', 'oilbottle#1|5', 'counter#1::sektion|2'], ['Containable', 'braiserlid#1|6', 'counter#1::hitman_drawer_top|2'], ['Containable', 'braiserlid#1|6', 'counter#1::dagger|2'], ['Containable', 'braiserlid#1|6', 'counter#1::sektion|2'], ['Containable', 'meatturkeyleg#1|7', 'counter#1::hitman_drawer_top|2'], ['Containable', 'meatturkeyleg#1|7', 'counter#1::dagger|2'], ['Containable', 'meatturkeyleg#1|7', 'counter#1::sektion|2'], ['Containable', 'veggiecabbage#1|8', 'counter#1::hitman_drawer_top|2'], ['Containable', 'veggiecabbage#1|8', 'counter#1::dagger|2'], ['Containable', 'veggiecabbage#1|8', 'counter#1::sektion|2']]
+   contained [['Contained', 'vinegarbottle#1|4', p0=(0.304, 8.773, 1.53, 0, 0, 1.835), 'counter#1::dagger|2'], ['Contained', 'oilbottle#1|5', p1=(0.203, 8.985, 1.553, 0, 0, 0.213), 'counter#1::dagger|2']]
+   controllable [['Controllable', 'hand']]
+   counter [['counter', 'counter#1|2']]
+   door [['door', 'counter#1::chewie_door_left_joint|2'], ['door', 'counter#1::chewie_door_right_joint|2'], ['door', 'counter#1::dagger_door_right_joint|2'], ['door', 'counter#1::dagger_door_left_joint|2']]
+   edible [['edible', 'veggiecabbage#1|8'], ['edible', 'meatturkeyleg#1|7']]
+   floor [['floor', 'floor1|1']]
+   graspable [['Graspable', 'vinegarbottle#1|4'], ['Graspable', 'oilbottle#1|5'], ['Graspable', 'braiserlid#1|6'], ['Graspable', 'meatturkeyleg#1|7'], ['Graspable', 'veggiecabbage#1|8']]
+   handempty [['HandEmpty', 'hand']]
+   inwconf [['InWConf', wconf192(4)]]
+   isclosedposition [['IsClosedPosition', 'counter#1::chewie_door_left_joint|2', pstn0=0], ['IsClosedPosition', 'counter#1::chewie_door_right_joint|2', pstn1=0], ['IsClosedPosition', 'counter#1::dagger_door_right_joint|2', pstn2=0], ['IsClosedPosition', 'counter#1::dagger_door_left_joint|2', pstn3=0]]
+   isjointto [['IsJointTo', 'counter#1::chewie_door_left_joint|2', 'counter#1|2'], ['IsJointTo', 'counter#1::chewie_door_right_joint|2', 'counter#1|2'], ['IsJointTo', 'counter#1::dagger_door_right_joint|2', 'counter#1|2'], ['IsJointTo', 'counter#1::dagger_door_left_joint|2', 'counter#1|2']]
+   isopenedposition [['IsOpenedPosition', 'counter#1::chewie_door_left_joint|2', pstn4=-1.57], ['IsOpenedPosition', 'counter#1::chewie_door_right_joint|2', pstn5=1.57], ['IsOpenedPosition', 'counter#1::dagger_door_right_joint|2', pstn6=1.57], ['IsOpenedPosition', 'counter#1::dagger_door_left_joint|2', pstn7=-1.57]]
+   joint [['Joint', 'counter#1::chewie_door_left_joint|2'], ['Joint', 'counter#1::chewie_door_right_joint|2'], ['Joint', 'counter#1::dagger_door_right_joint|2'], ['Joint', 'counter#1::dagger_door_left_joint|2']]
+   meatturkeyleg [['meatturkeyleg', 'meatturkeyleg#1|7']]
+   newwconfpst [['NewWConfPst', wconf192(4), 'counter#1::chewie_door_left_joint|2', pstn4=-1.57, wconf392(4)], ['NewWConfPst', wconf192(4), 'counter#1::chewie_door_right_joint|2', pstn5=1.57, wconf256(4)], ['NewWConfPst', wconf192(4), 'counter#1::dagger_door_right_joint|2', pstn6=1.57, wconf72(4)], ['NewWConfPst', wconf192(4), 'counter#1::dagger_door_left_joint|2', pstn7=-1.57, wconf840(4)]]
+   oftype [['OfType', 'vinegarbottle#1|4', 'bottle'], ['OfType', 'oilbottle#1|5', 'bottle'], ['OfType', 'veggiecabbage#1|8', 'edible'], ['OfType', 'meatturkeyleg#1|7', 'edible']]
+   oilbottle [['oilbottle', 'oilbottle#1|5']]
+   originalseconf [['OriginalSEConf', q856=(0.9, 8, 0.7, 0, -1.571, 0)]]
+   oven [['oven', 'oven#1|9']]
+   pose [['Pose', 'vinegarbottle#1|4', p0=(0.304, 8.773, 1.53, 0, 0, 1.835)], ['Pose', 'oilbottle#1|5', p1=(0.203, 8.985, 1.553, 0, 0, 0.213)], ['Pose', 'braiserlid#1|6', p2=(0.566, 8.18, 0.821, 0, 0, 0.515)], ['Pose', 'meatturkeyleg#1|7', p3=(0.884, 8.697, 0.844, 0, 0, 0.43)], ['Pose', 'veggiecabbage#1|8', p4=(0.333, 8.707, 0.87, 0, 0, 3.121)]]
+   position [['Position', 'counter#1::chewie_door_left_joint|2', pstn0=0], ['Position', 'counter#1::chewie_door_right_joint|2', pstn1=0], ['Position', 'counter#1::dagger_door_right_joint|2', pstn2=0], ['Position', 'counter#1::dagger_door_left_joint|2', pstn3=0], ['Position', 'counter#1::chewie_door_left_joint|2', pstn4=-1.57], ['Position', 'counter#1::chewie_door_right_joint|2', pstn5=1.57], ['Position', 'counter#1::dagger_door_right_joint|2', pstn6=1.57], ['Position', 'counter#1::dagger_door_left_joint|2', pstn7=-1.57]]
+   seconf [['SEConf', q856=(0.9, 8, 0.7, 0, -1.571, 0)]]
+   space [['space', 'counter#1::hitman_drawer_top|2'], ['space', 'counter#1::dagger|2'], ['space', 'counter#1::sektion|2']]
+   stackable [['Stackable', 'vinegarbottle#1|4', 'counter#1::indigo_tmp|2'], ['Stackable', 'vinegarbottle#1|4', 'counter#1::hitman_tmp|2'], ['Stackable', 'vinegarbottle#1|4', 'counter#1::front_left_stove|2'], ['Stackable', 'vinegarbottle#1|4', 'braiserbody#1::braiser_bottom|3'], ['Stackable', 'oilbottle#1|5', 'counter#1::indigo_tmp|2'], ['Stackable', 'oilbottle#1|5', 'counter#1::hitman_tmp|2'], ['Stackable', 'oilbottle#1|5', 'counter#1::front_left_stove|2'], ['Stackable', 'oilbottle#1|5', 'braiserbody#1::braiser_bottom|3'], ['Stackable', 'braiserlid#1|6', 'counter#1::indigo_tmp|2'], ['Stackable', 'braiserlid#1|6', 'counter#1::hitman_tmp|2'], ['Stackable', 'braiserlid#1|6', 'counter#1::front_left_stove|2'], ['Stackable', 'braiserlid#1|6', 'braiserbody#1::braiser_bottom|3'], ['Stackable', 'meatturkeyleg#1|7', 'counter#1::indigo_tmp|2'], ['Stackable', 'meatturkeyleg#1|7', 'counter#1::hitman_tmp|2'], ['Stackable', 'meatturkeyleg#1|7', 'counter#1::front_left_stove|2'], ['Stackable', 'meatturkeyleg#1|7', 'braiserbody#1::braiser_bottom|3'], ['Stackable', 'veggiecabbage#1|8', 'counter#1::indigo_tmp|2'], ['Stackable', 'veggiecabbage#1|8', 'counter#1::hitman_tmp|2'], ['Stackable', 'veggiecabbage#1|8', 'counter#1::front_left_stove|2'], ['Stackable', 'veggiecabbage#1|8', 'braiserbody#1::braiser_bottom|3']]
+   supported [['Supported', 'veggiecabbage#1|8', p4=(0.333, 8.707, 0.87, 0, 0, 3.121), 'counter#1::indigo_tmp|2']]
+   surface [['surface', 'counter#1::indigo_tmp|2'], ['surface', 'counter#1::hitman_tmp|2'], ['surface', 'counter#1::front_left_stove|2'], ['surface', 'braiserbody#1::braiser_bottom|3']]
+   veggiecabbage [['veggiecabbage', 'veggiecabbage#1|8']]
+   vinegarbottle [['vinegarbottle', 'vinegarbottle#1|4']]
+   wconf [['WConf', wconf192(4)], ['WConf', wconf392(4)], ['WConf', wconf256(4)], ['WConf', wconf72(4)], ['WConf', wconf840(4)]]
+----------------
+Goal (3): (and
+   ('StoredInSpace', 'bottle', (2, None, 0)),
+   ('GraspedHandle', (2, 19)),
+   ('GraspedHandle', (2, 14)),
+)
+
+--------------------------------------------------
+
+
+Local External Statistics
+External: sample-pose-in | n: 2 | p_success: 1.000 | mean overhead: 6.756 | overhead: 13.512
+External: sample-grasp | n: 2 | p_success: 1.000 | mean overhead: 7.230 | overhead: 14.461
+External: inverse-kinematics-hand | n: 28 | p_success: 0.607 | mean overhead: 0.229 | overhead: 6.424
+External: plan-free-motion-hand | n: 36 | p_success: 0.889 | mean overhead: 1.018 | overhead: 36.661
+External: test-cfree-pose-pose | n: 21 | p_success: 1.000 | mean overhead: 0.000 | overhead: 0.002
+External: test-cfree-approach-pose | n: 40 | p_success: 1.000 | mean overhead: 0.002 | overhead: 0.083
+External: test-cfree-traj-pose | n: 149 | p_success: 0.940 | mean overhead: 0.004 | overhead: 0.573
+External: sample-handle-grasp | n: 2 | p_success: 1.000 | mean overhead: 6.113 | overhead: 12.227
+External: inverse-kinematics-grasp-handle | n: 16 | p_success: 1.000 | mean overhead: 0.151 | overhead: 2.413
+External: plan-base-pull-door-handle | n: 4 | p_success: 0.500 | mean overhead: 0.702 | overhead: 2.810
+External: update-wconf-pst | n: 1 | p_success: 1.000 | mean overhead: 0.000 | overhead: 0.000
+External: test-reachable-pose | n: 9 | p_success: 1.000 | mean overhead: 1.334 | overhead: 12.004
+Overall calls: 310 | Overall overhead: 101.169
+Wrote: statistics/py3/fe-gripper-tamp.pkl
+Solved: True
+Cost: 17.000
+Plan:
+ 1) move_cartesian q856=(0.9, 8, 0.7, 0, -1.571, 0) q152=(1.02, 7.156, 1.219, -1.571, -1.571, 1.571) c128=t(6, 48) wconf192(4)
+ 2) grasp_handle_hand hand counter#1::chewie_door_left_joint|2 pstn0=0 hg496=(-0.108, 0, 0, 0, 1.571, -0.0) q152=(1.02, 7.156, 1.219, -1.571, -1.571, 1.571) q552=(0.976, 7.156, 1.219, -1.571, -1.571, 1.571) c56=t(6, 47) wconf192(4)
+ 3) pull_articulated_handle_wconf hand counter#1::chewie_door_left_joint|2 pstn0=0 pstn4=-1.57 hg496=(-0.108, 0, 0, 0, 1.571, -0.0) q856=(0.9, 8, 0.7, 0, -1.571, 0) q952=(1.147, 6.65, 1.219, -1.571, -0.001, 1.571) c64=t(6, 12) wconf192(4) wconf392(4)
+ 4) ungrasp_handle_hand hand counter#1::chewie_door_left_joint|2 pstn4=-1.57 hg496=(-0.108, 0, 0, 0, 1.571, -0.0) q872=(1.147, 6.606, 1.219, -1.571, -0.001, 1.571) q232=(1.147, 6.65, 1.219, -1.571, -0.001, 1.571) c376=t(6, 2) wconf392(4)
+ 5) move_cartesian q872=(1.147, 6.606, 1.219, -1.571, -0.001, 1.571) q512=(0.712, 8.791, 1.611, -1.571, -1.571, 1.571) c128=t(6, 71) wconf392(4)
+ 6) grasp_handle_hand hand counter#1::dagger_door_left_joint|2 pstn3=0 hg360=(-0.108, -0.0, 0.084, 0, 1.571, -0.0) q512=(0.712, 8.791, 1.611, -1.571, -1.571, 1.571) q392=(0.668, 8.791, 1.611, -1.571, -1.571, 1.571) c912=t(6, 47) wconf392(4)
+ 7) pull_articulated_handle_wconf hand counter#1::dagger_door_left_joint|2 pstn3=0 pstn7=-1.57 hg360=(-0.108, -0.0, 0.084, 0, 1.571, -0.0) q856=(0.9, 8, 0.7, 0, -1.571, 0) q256=(0.839, 8.284, 1.611, -1.571, -0.001, 1.571) c752=t(6, 12) wconf392(4) wconf152(4)
+ 8) ungrasp_handle_hand hand counter#1::dagger_door_left_joint|2 pstn7=-1.57 hg360=(-0.108, -0.0, 0.084, 0, 1.571, -0.0) q440=(0.839, 8.241, 1.611, -1.571, 6.282, 1.571) q872=(0.839, 8.284, 1.611, -1.571, 6.282, 1.571) c288=t(6, 2) wconf152(4)
+ 9) move_cartesian q440=(0.839, 8.241, 1.611, -1.571, 6.282, 1.571) q920=(0.203, 8.985, 1.871, -9.425, 6.283, -6.496) c904=t(6, 61) wconf152(4)
+10) pick_hand hand oilbottle#1|5 p1=(0.203, 8.985, 1.553, 0, 0, 0.213) g240=(-0.0, 0.274, -0.0, 0, 1.571, -1.571) q920=(0.203, 8.985, 1.871, -9.425, 6.283, -6.496) q656=(0.203, 8.985, 1.827, -9.425, 6.283, -6.496) c88=t(6, 2) wconf152(4)
+11) move_cartesian q920=(0.203, 8.985, 1.871, -9.425, 6.283, -6.496) q816=(0.526, 7.054, 1.562, -9.425, 6.283, -7.869) c480=t(6, 67) wconf152(4)
+12) place_hand hand oilbottle#1|5 p56=(0.526, 7.053, 1.245, 0, 0, 1.585) g240=(-0.0, 0.274, -0.0, 0, 1.571, -1.571) q816=(0.526, 7.054, 1.562, -9.425, 6.283, -7.869) q584=(0.526, 7.054, 1.519, -9.425, 6.283, -7.869) c200=t(6, 2) wconf152(4)
+13) move_cartesian q816=(0.526, 7.054, 1.562, -9.425, 6.283, -7.869) q816=(0.351, 8.6, 1.557, 1.571, -2.877, -1.571) c328=t(6, 96) wconf152(4)
+14) pick_hand hand vinegarbottle#1|4 p0=(0.304, 8.773, 1.53, 0, 0, 1.835) g984=(-0.0, 0.027, 0.137, 3.142, 0, -1.571) q816=(0.351, 8.6, 1.557, 1.571, -2.877, -1.571) q456=(0.34, 8.641, 1.557, 1.571, -2.877, -1.571) c40=t(6, 2) wconf152(4)
+15) move_cartesian q816=(0.351, 8.6, 1.557, 1.571, -2.877, -1.571) q888=(0.326, 7.248, 1.255, -4.712, 3.052, -1.571) c864=t(6, 73) wconf152(4)
+16) place_hand hand vinegarbottle#1|4 p140=(0.342, 7.428, 1.228, 0, 0, 1.482) g984=(-0.0, 0.027, 0.137, 3.142, 0, -1.571) q888=(0.326, 7.248, 1.255, -4.712, 3.052, -1.571) q248=(0.33, 7.291, 1.255, -4.712, 3.052, -1.571) c424=t(6, 2) wconf152(4)
+17) declare_store_in_space bottle counter#1::sektion|2
+
+----------------
+Preimage generated by PDDLStream (150)
+   atpose [['atpose', 'vinegarbottle#1|4', p0=(0.304, 8.773, 1.53, 0, 0, 1.835)], ['atpose', 'oilbottle#1|5', p1=(0.203, 8.985, 1.553, 0, 0, 0.213)]]
+   atposition [['atposition', 'counter#1::dagger_door_left_joint|2', pstn3=0], ['atposition', 'counter#1::chewie_door_left_joint|2', pstn0=0]]
+   atseconf [['atseconf', q856=(0.9, 8, 0.7, 0, -1.571, 0)]]
+   canmove [['canmove']]
+   cfreeapproachpose [['cfreeapproachpose', 'oilbottle#1|5', p1=(0.203, 8.985, 1.553, 0, 0, 0.213), g240=(-0.0, 0.274, -0.0, 0, 1.571, -1.571), 'vinegarbottle#1|4', p0=(0.304, 8.773, 1.53, 0, 0, 1.835)], ['cfreeapproachpose', 'vinegarbottle#1|4', p140=(0.342, 7.428, 1.228, 0, 0, 1.482), g984=(-0.0, 0.027, 0.137, 3.142, 0, -1.571), 'oilbottle#1|5', p56=(0.526, 7.053, 1.245, 0, 0, 1.585)], ['cfreeapproachpose', 'vinegarbottle#1|4', p0=(0.304, 8.773, 1.53, 0, 0, 1.835), g984=(-0.0, 0.027, 0.137, 3.142, 0, -1.571), 'braiserlid#1|6', p2=(0.566, 8.18, 0.821, 0, 0, 0.515)], ['cfreeapproachpose', 'vinegarbottle#1|4', p140=(0.342, 7.428, 1.228, 0, 0, 1.482), g984=(-0.0, 0.027, 0.137, 3.142, 0, -1.571), 'meatturkeyleg#1|7', p3=(0.884, 8.697, 0.844, 0, 0, 0.43)], ['cfreeapproachpose', 'oilbottle#1|5', p1=(0.203, 8.985, 1.553, 0, 0, 0.213), g240=(-0.0, 0.274, -0.0, 0, 1.571, -1.571), 'meatturkeyleg#1|7', p3=(0.884, 8.697, 0.844, 0, 0, 0.43)], ['cfreeapproachpose', 'oilbottle#1|5', p56=(0.526, 7.053, 1.245, 0, 0, 1.585), g240=(-0.0, 0.274, -0.0, 0, 1.571, -1.571), 'meatturkeyleg#1|7', p3=(0.884, 8.697, 0.844, 0, 0, 0.43)], ['cfreeapproachpose', 'oilbottle#1|5', p56=(0.526, 7.053, 1.245, 0, 0, 1.585), g240=(-0.0, 0.274, -0.0, 0, 1.571, -1.571), 'vinegarbottle#1|4', p0=(0.304, 8.773, 1.53, 0, 0, 1.835)], ['cfreeapproachpose', 'vinegarbottle#1|4', p0=(0.304, 8.773, 1.53, 0, 0, 1.835), g984=(-0.0, 0.027, 0.137, 3.142, 0, -1.571), 'veggiecabbage#1|8', p4=(0.333, 8.707, 0.87, 0, 0, 3.121)], ['cfreeapproachpose', 'vinegarbottle#1|4', p0=(0.304, 8.773, 1.53, 0, 0, 1.835), g984=(-0.0, 0.027, 0.137, 3.142, 0, -1.571), 'oilbottle#1|5', p56=(0.526, 7.053, 1.245, 0, 0, 1.585)], ['cfreeapproachpose', 'vinegarbottle#1|4', p140=(0.342, 7.428, 1.228, 0, 0, 1.482), g984=(-0.0, 0.027, 0.137, 3.142, 0, -1.571), 'veggiecabbage#1|8', p4=(0.333, 8.707, 0.87, 0, 0, 3.121)], ['cfreeapproachpose', 'vinegarbottle#1|4', p140=(0.342, 7.428, 1.228, 0, 0, 1.482), g984=(-0.0, 0.027, 0.137, 3.142, 0, -1.571), 'braiserlid#1|6', p2=(0.566, 8.18, 0.821, 0, 0, 0.515)], ['cfreeapproachpose', 'oilbottle#1|5', p56=(0.526, 7.053, 1.245, 0, 0, 1.585), g240=(-0.0, 0.274, -0.0, 0, 1.571, -1.571), 'veggiecabbage#1|8', p4=(0.333, 8.707, 0.87, 0, 0, 3.121)], ['cfreeapproachpose', 'vinegarbottle#1|4', p0=(0.304, 8.773, 1.53, 0, 0, 1.835), g984=(-0.0, 0.027, 0.137, 3.142, 0, -1.571), 'meatturkeyleg#1|7', p3=(0.884, 8.697, 0.844, 0, 0, 0.43)], ['cfreeapproachpose', 'oilbottle#1|5', p1=(0.203, 8.985, 1.553, 0, 0, 0.213), g240=(-0.0, 0.274, -0.0, 0, 1.571, -1.571), 'veggiecabbage#1|8', p4=(0.333, 8.707, 0.87, 0, 0, 3.121)], ['cfreeapproachpose', 'oilbottle#1|5', p56=(0.526, 7.053, 1.245, 0, 0, 1.585), g240=(-0.0, 0.274, -0.0, 0, 1.571, -1.571), 'braiserlid#1|6', p2=(0.566, 8.18, 0.821, 0, 0, 0.515)], ['cfreeapproachpose', 'oilbottle#1|5', p1=(0.203, 8.985, 1.553, 0, 0, 0.213), g240=(-0.0, 0.274, -0.0, 0, 1.571, -1.571), 'braiserlid#1|6', p2=(0.566, 8.18, 0.821, 0, 0, 0.515)]]
+   cfreeposepose [['cfreeposepose', 'oilbottle#1|5', p56=(0.526, 7.053, 1.245, 0, 0, 1.585), 'braiserlid#1|6', p2=(0.566, 8.18, 0.821, 0, 0, 0.515)], ['cfreeposepose', 'vinegarbottle#1|4', p140=(0.342, 7.428, 1.228, 0, 0, 1.482), 'meatturkeyleg#1|7', p3=(0.884, 8.697, 0.844, 0, 0, 0.43)], ['cfreeposepose', 'vinegarbottle#1|4', p140=(0.342, 7.428, 1.228, 0, 0, 1.482), 'veggiecabbage#1|8', p4=(0.333, 8.707, 0.87, 0, 0, 3.121)], ['cfreeposepose', 'vinegarbottle#1|4', p140=(0.342, 7.428, 1.228, 0, 0, 1.482), 'braiserlid#1|6', p2=(0.566, 8.18, 0.821, 0, 0, 0.515)], ['cfreeposepose', 'oilbottle#1|5', p56=(0.526, 7.053, 1.245, 0, 0, 1.585), 'vinegarbottle#1|4', p0=(0.304, 8.773, 1.53, 0, 0, 1.835)], ['cfreeposepose', 'oilbottle#1|5', p56=(0.526, 7.053, 1.245, 0, 0, 1.585), 'meatturkeyleg#1|7', p3=(0.884, 8.697, 0.844, 0, 0, 0.43)], ['cfreeposepose', 'vinegarbottle#1|4', p140=(0.342, 7.428, 1.228, 0, 0, 1.482), 'oilbottle#1|5', p56=(0.526, 7.053, 1.245, 0, 0, 1.585)], ['cfreeposepose', 'oilbottle#1|5', p56=(0.526, 7.053, 1.245, 0, 0, 1.585), 'veggiecabbage#1|8', p4=(0.333, 8.707, 0.87, 0, 0, 3.121)]]
+   cfreetrajpose [['cfreetrajpose', c128=t(6, 71), 'veggiecabbage#1|8', p4=(0.333, 8.707, 0.87, 0, 0, 3.121)], ['cfreetrajpose', c904=t(6, 61), 'meatturkeyleg#1|7', p3=(0.884, 8.697, 0.844, 0, 0, 0.43)], ['cfreetrajpose', c128=t(6, 71), 'oilbottle#1|5', p1=(0.203, 8.985, 1.553, 0, 0, 0.213)], ['cfreetrajpose', c904=t(6, 61), 'veggiecabbage#1|8', p4=(0.333, 8.707, 0.87, 0, 0, 3.121)], ['cfreetrajpose', c864=t(6, 73), 'meatturkeyleg#1|7', p3=(0.884, 8.697, 0.844, 0, 0, 0.43)], ['cfreetrajpose', c480=t(6, 67), 'veggiecabbage#1|8', p4=(0.333, 8.707, 0.87, 0, 0, 3.121)], ['cfreetrajpose', c128=t(6, 71), 'vinegarbottle#1|4', p0=(0.304, 8.773, 1.53, 0, 0, 1.835)], ['cfreetrajpose', c328=t(6, 96), 'braiserlid#1|6', p2=(0.566, 8.18, 0.821, 0, 0, 0.515)], ['cfreetrajpose', c128=t(6, 48), 'vinegarbottle#1|4', p0=(0.304, 8.773, 1.53, 0, 0, 1.835)], ['cfreetrajpose', c328=t(6, 96), 'oilbottle#1|5', p56=(0.526, 7.053, 1.245, 0, 0, 1.585)], ['cfreetrajpose', c480=t(6, 67), 'meatturkeyleg#1|7', p3=(0.884, 8.697, 0.844, 0, 0, 0.43)], ['cfreetrajpose', c128=t(6, 71), 'meatturkeyleg#1|7', p3=(0.884, 8.697, 0.844, 0, 0, 0.43)], ['cfreetrajpose', c904=t(6, 61), 'oilbottle#1|5', p1=(0.203, 8.985, 1.553, 0, 0, 0.213)], ['cfreetrajpose', c128=t(6, 48), 'veggiecabbage#1|8', p4=(0.333, 8.707, 0.87, 0, 0, 3.121)], ['cfreetrajpose', c128=t(6, 48), 'braiserlid#1|6', p2=(0.566, 8.18, 0.821, 0, 0, 0.515)], ['cfreetrajpose', c128=t(6, 48), 'oilbottle#1|5', p1=(0.203, 8.985, 1.553, 0, 0, 0.213)], ['cfreetrajpose', c864=t(6, 73), 'braiserlid#1|6', p2=(0.566, 8.18, 0.821, 0, 0, 0.515)], ['cfreetrajpose', c328=t(6, 96), 'meatturkeyleg#1|7', p3=(0.884, 8.697, 0.844, 0, 0, 0.43)], ['cfreetrajpose', c328=t(6, 96), 'vinegarbottle#1|4', p0=(0.304, 8.773, 1.53, 0, 0, 1.835)], ['cfreetrajpose', c480=t(6, 67), 'braiserlid#1|6', p2=(0.566, 8.18, 0.821, 0, 0, 0.515)], ['cfreetrajpose', c480=t(6, 67), 'vinegarbottle#1|4', p0=(0.304, 8.773, 1.53, 0, 0, 1.835)], ['cfreetrajpose', c128=t(6, 71), 'braiserlid#1|6', p2=(0.566, 8.18, 0.821, 0, 0, 0.515)], ['cfreetrajpose', c904=t(6, 61), 'vinegarbottle#1|4', p0=(0.304, 8.773, 1.53, 0, 0, 1.835)], ['cfreetrajpose', c864=t(6, 73), 'veggiecabbage#1|8', p4=(0.333, 8.707, 0.87, 0, 0, 3.121)], ['cfreetrajpose', c904=t(6, 61), 'braiserlid#1|6', p2=(0.566, 8.18, 0.821, 0, 0, 0.515)], ['cfreetrajpose', c864=t(6, 73), 'oilbottle#1|5', p56=(0.526, 7.053, 1.245, 0, 0, 1.585)], ['cfreetrajpose', c128=t(6, 48), 'meatturkeyleg#1|7', p3=(0.884, 8.697, 0.844, 0, 0, 0.43)], ['cfreetrajpose', c328=t(6, 96), 'veggiecabbage#1|8', p4=(0.333, 8.707, 0.87, 0, 0, 3.121)]]
+   containable [['containable', 'oilbottle#1|5', 'counter#1::sektion|2'], ['containable', 'vinegarbottle#1|4', 'counter#1::sektion|2']]
+   contained [['contained', 'vinegarbottle#1|4', p140=(0.342, 7.428, 1.228, 0, 0, 1.482), 'counter#1::sektion|2'], ['contained', 'oilbottle#1|5', p56=(0.526, 7.053, 1.245, 0, 0, 1.585), 'counter#1::sektion|2']]
+   controllable [['controllable', 'hand']]
+   freemotionwconf [['freemotionwconf', q816=(0.351, 8.6, 1.557, 1.571, -2.877, -1.571), c864=t(6, 73), q888=(0.326, 7.248, 1.255, -4.712, 3.052, -1.571), wconf152(4)], ['freemotionwconf', q872=(1.147, 6.606, 1.219, -1.571, -0.001, 1.571), c128=t(6, 71), q512=(0.712, 8.791, 1.611, -1.571, -1.571, 1.571), wconf392(4)], ['freemotionwconf', q856=(0.9, 8, 0.7, 0, -1.571, 0), c128=t(6, 48), q152=(1.02, 7.156, 1.219, -1.571, -1.571, 1.571), wconf192(4)], ['freemotionwconf', q816=(0.526, 7.054, 1.562, -9.425, 6.283, -7.869), c328=t(6, 96), q816=(0.351, 8.6, 1.557, 1.571, -2.877, -1.571), wconf152(4)], ['freemotionwconf', q440=(0.839, 8.241, 1.611, -1.571, 6.282, 1.571), c904=t(6, 61), q920=(0.203, 8.985, 1.871, -9.425, 6.283, -6.496), wconf152(4)], ['freemotionwconf', q920=(0.203, 8.985, 1.871, -9.425, 6.283, -6.496), c480=t(6, 67), q816=(0.526, 7.054, 1.562, -9.425, 6.283, -7.869), wconf152(4)]]
+   grasp [['grasp', 'oilbottle#1|5', g240=(-0.0, 0.274, -0.0, 0, 1.571, -1.571)], ['grasp', 'vinegarbottle#1|4', g984=(-0.0, 0.027, 0.137, 3.142, 0, -1.571)]]
+   graspable [['graspable', 'oilbottle#1|5'], ['graspable', 'vinegarbottle#1|4']]
+   handempty [['handempty', 'hand']]
+   handlegrasp [['handlegrasp', 'counter#1::chewie_door_left_joint|2', hg496=(-0.108, 0, 0, 0, 1.571, -0.0)], ['handlegrasp', 'counter#1::dagger_door_left_joint|2', hg360=(-0.108, -0.0, 0.084, 0, 1.571, -0.0)]]
+   inwconf [['inwconf', wconf192(4)]]
+   isclosedposition [['isclosedposition', 'counter#1::chewie_door_left_joint|2', pstn0=0], ['isclosedposition', 'counter#1::dagger_door_left_joint|2', pstn3=0]]
+   isopenedposition [['isopenedposition', 'counter#1::chewie_door_left_joint|2', pstn4=-1.57], ['isopenedposition', 'counter#1::dagger_door_left_joint|2', pstn7=-1.57]]
+   joint [['joint', 'counter#1::chewie_door_left_joint|2'], ['joint', 'counter#1::dagger_door_left_joint|2']]
+   kingrasphandle [['kingrasphandle', 'hand', 'counter#1::dagger_door_left_joint|2', pstn3=0, hg360=(-0.108, -0.0, 0.084, 0, 1.571, -0.0), q512=(0.712, 8.791, 1.611, -1.571, -1.571, 1.571), q392=(0.668, 8.791, 1.611, -1.571, -1.571, 1.571), c912=t(6, 47), wconf392(4)], ['kingrasphandle', 'hand', 'counter#1::chewie_door_left_joint|2', pstn0=0, hg496=(-0.108, 0, 0, 0, 1.571, -0.0), q152=(1.02, 7.156, 1.219, -1.571, -1.571, 1.571), q552=(0.976, 7.156, 1.219, -1.571, -1.571, 1.571), c56=t(6, 47), wconf192(4)], ['kingrasphandle', 'hand', 'counter#1::dagger_door_left_joint|2', pstn7=-1.57, hg360=(-0.108, -0.0, 0.084, 0, 1.571, -0.0), q440=(0.839, 8.241, 1.611, -1.571, 6.282, 1.571), q872=(0.839, 8.284, 1.611, -1.571, 6.282, 1.571), c288=t(6, 2), wconf152(4)], ['kingrasphandle', 'hand', 'counter#1::chewie_door_left_joint|2', pstn4=-1.57, hg496=(-0.108, 0, 0, 0, 1.571, -0.0), q872=(1.147, 6.606, 1.219, -1.571, -0.001, 1.571), q232=(1.147, 6.65, 1.219, -1.571, -0.001, 1.571), c376=t(6, 2), wconf392(4)]]
+   kinpulldoorhandle [['kinpulldoorhandle', 'hand', 'counter#1::chewie_door_left_joint|2', pstn0=0, pstn4=-1.57, hg496=(-0.108, 0, 0, 0, 1.571, -0.0), q856=(0.9, 8, 0.7, 0, -1.571, 0), q952=(1.147, 6.65, 1.219, -1.571, -0.001, 1.571), c64=t(6, 12), wconf192(4)], ['kinpulldoorhandle', 'hand', 'counter#1::dagger_door_left_joint|2', pstn3=0, pstn7=-1.57, hg360=(-0.108, -0.0, 0.084, 0, 1.571, -0.0), q856=(0.9, 8, 0.7, 0, -1.571, 0), q256=(0.839, 8.284, 1.611, -1.571, -0.001, 1.571), c752=t(6, 12), wconf392(4)]]
+   kinwconf [['kinwconf', 'hand', 'vinegarbottle#1|4', p0=(0.304, 8.773, 1.53, 0, 0, 1.835), g984=(-0.0, 0.027, 0.137, 3.142, 0, -1.571), q816=(0.351, 8.6, 1.557, 1.571, -2.877, -1.571), q456=(0.34, 8.641, 1.557, 1.571, -2.877, -1.571), c40=t(6, 2), wconf152(4)], ['kinwconf', 'hand', 'oilbottle#1|5', p1=(0.203, 8.985, 1.553, 0, 0, 0.213), g240=(-0.0, 0.274, -0.0, 0, 1.571, -1.571), q920=(0.203, 8.985, 1.871, -9.425, 6.283, -6.496), q656=(0.203, 8.985, 1.827, -9.425, 6.283, -6.496), c88=t(6, 2), wconf152(4)], ['kinwconf', 'hand', 'vinegarbottle#1|4', p140=(0.342, 7.428, 1.228, 0, 0, 1.482), g984=(-0.0, 0.027, 0.137, 3.142, 0, -1.571), q888=(0.326, 7.248, 1.255, -4.712, 3.052, -1.571), q248=(0.33, 7.291, 1.255, -4.712, 3.052, -1.571), c424=t(6, 2), wconf152(4)], ['kinwconf', 'hand', 'oilbottle#1|5', p56=(0.526, 7.053, 1.245, 0, 0, 1.585), g240=(-0.0, 0.274, -0.0, 0, 1.571, -1.571), q816=(0.526, 7.054, 1.562, -9.425, 6.283, -7.869), q584=(0.526, 7.054, 1.519, -9.425, 6.283, -7.869), c200=t(6, 2), wconf152(4)]]
+   newwconfpst [['newwconfpst', wconf392(4), 'counter#1::dagger_door_left_joint|2', pstn7=-1.57, wconf152(4)], ['newwconfpst', wconf192(4), 'counter#1::chewie_door_left_joint|2', pstn4=-1.57, wconf392(4)]]
+   originalseconf [['originalseconf', q856=(0.9, 8, 0.7, 0, -1.571, 0)]]
+   pose [['pose', 'braiserlid#1|6', p2=(0.566, 8.18, 0.821, 0, 0, 0.515)], ['pose', 'vinegarbottle#1|4', p140=(0.342, 7.428, 1.228, 0, 0, 1.482)], ['pose', 'veggiecabbage#1|8', p4=(0.333, 8.707, 0.87, 0, 0, 3.121)], ['pose', 'oilbottle#1|5', p1=(0.203, 8.985, 1.553, 0, 0, 0.213)], ['pose', 'oilbottle#1|5', p56=(0.526, 7.053, 1.245, 0, 0, 1.585)], ['pose', 'meatturkeyleg#1|7', p3=(0.884, 8.697, 0.844, 0, 0, 0.43)], ['pose', 'vinegarbottle#1|4', p0=(0.304, 8.773, 1.53, 0, 0, 1.835)]]
+   position [['position', 'counter#1::dagger_door_left_joint|2', pstn3=0], ['position', 'counter#1::chewie_door_left_joint|2', pstn4=-1.57], ['position', 'counter#1::chewie_door_left_joint|2', pstn0=0], ['position', 'counter#1::dagger_door_left_joint|2', pstn7=-1.57]]
+   reachablemovable [['reachablemovable', 'vinegarbottle#1|4', p0=(0.304, 8.773, 1.53, 0, 0, 1.835), g984=(-0.0, 0.027, 0.137, 3.142, 0, -1.571), q856=(0.9, 8, 0.7, 0, -1.571, 0), wconf152(4)], ['reachablemovable', 'vinegarbottle#1|4', p140=(0.342, 7.428, 1.228, 0, 0, 1.482), g984=(-0.0, 0.027, 0.137, 3.142, 0, -1.571), q856=(0.9, 8, 0.7, 0, -1.571, 0), wconf152(4)], ['reachablemovable', 'oilbottle#1|5', p56=(0.526, 7.053, 1.245, 0, 0, 1.585), g240=(-0.0, 0.274, -0.0, 0, 1.571, -1.571), q856=(0.9, 8, 0.7, 0, -1.571, 0), wconf152(4)], ['reachablemovable', 'oilbottle#1|5', p1=(0.203, 8.985, 1.553, 0, 0, 0.213), g240=(-0.0, 0.274, -0.0, 0, 1.571, -1.571), q856=(0.9, 8, 0.7, 0, -1.571, 0), wconf152(4)]]
+   seconf [['seconf', q952=(1.147, 6.65, 1.219, -1.571, -0.001, 1.571)], ['seconf', q248=(0.33, 7.291, 1.255, -4.712, 3.052, -1.571)], ['seconf', q456=(0.34, 8.641, 1.557, 1.571, -2.877, -1.571)], ['seconf', q872=(1.147, 6.606, 1.219, -1.571, -0.001, 1.571)], ['seconf', q656=(0.203, 8.985, 1.827, -9.425, 6.283, -6.496)], ['seconf', q816=(0.351, 8.6, 1.557, 1.571, -2.877, -1.571)], ['seconf', q552=(0.976, 7.156, 1.219, -1.571, -1.571, 1.571)], ['seconf', q856=(0.9, 8, 0.7, 0, -1.571, 0)], ['seconf', q256=(0.839, 8.284, 1.611, -1.571, -0.001, 1.571)], ['seconf', q512=(0.712, 8.791, 1.611, -1.571, -1.571, 1.571)], ['seconf', q440=(0.839, 8.241, 1.611, -1.571, 6.282, 1.571)], ['seconf', q152=(1.02, 7.156, 1.219, -1.571, -1.571, 1.571)], ['seconf', q232=(1.147, 6.65, 1.219, -1.571, -0.001, 1.571)], ['seconf', q920=(0.203, 8.985, 1.871, -9.425, 6.283, -6.496)], ['seconf', q392=(0.668, 8.791, 1.611, -1.571, -1.571, 1.571)], ['seconf', q872=(0.839, 8.284, 1.611, -1.571, 6.282, 1.571)], ['seconf', q816=(0.526, 7.054, 1.562, -9.425, 6.283, -7.869)], ['seconf', q888=(0.326, 7.248, 1.255, -4.712, 3.052, -1.571)], ['seconf', q584=(0.526, 7.054, 1.519, -9.425, 6.283, -7.869)]]
+   space [['space', 'counter#1::sektion|2']]
+   traj [['traj', c128=t(6, 71)], ['traj', c288=t(6, 2)], ['traj', c64=t(6, 12)], ['traj', c904=t(6, 61)], ['traj', c424=t(6, 2)], ['traj', c40=t(6, 2)], ['traj', c912=t(6, 47)], ['traj', c128=t(6, 48)], ['traj', c88=t(6, 2)], ['traj', c752=t(6, 12)], ['traj', c200=t(6, 2)], ['traj', c56=t(6, 47)], ['traj', c328=t(6, 96)], ['traj', c864=t(6, 73)], ['traj', c480=t(6, 67)], ['traj', c376=t(6, 2)]]
+   wconf [['wconf', wconf192(4)], ['wconf', wconf152(4)], ['wconf', wconf392(4)]]
+----------------
+0 Action(name='move_cartesian', args=[q856=(0.9, 8, 0.7, 0, -1.571, 0), q152=(1.02, 7.156, 1.219, -1.571, -1.571, 1.571), c128=t(6, 48), wconf192(4)])
+    added: [('not', ('unsafetraj', c128=t(6, 48))), ('atseconf', q152=(1.02, 7.156, 1.219, -1.571, -1.571, 1.571))]
+    deled: [('=', ('PickCost',), 1), ('atseconf', q856=(0.9, 8, 0.7, 0, -1.571, 0)), ('=', ('PlaceCost',), 1), ('canmove',)]
+1 MoveArmAction{conf: q680=(0.9, 8, 0.7, 0, -1.571, 0)}
+1 Action(name='grasp_handle_hand', args=('hand', (2, 14), pstn0=0, hg496=(-0.108, 0, 0, 0, 1.571, -0.0), q152=(1.02, 7.156, 1.219, -1.571, -1.571, 1.571), q552=(0.976, 7.156, 1.219, -1.571, -1.571, 1.571), c56=t(6, 47), wconf192(4)))
+    added: [('athandlegrasp', 'hand', (2, 14), hg496=(-0.108, 0, 0, 0, 1.571, -0.0)), ('debug1',)]
+    deled: [('atseconf', q152=(1.02, 7.156, 1.219, -1.571, -1.571, 1.571)), ('handempty', 'hand')]
+2 MoveArmAction{conf: q152=(1.02, 7.156, 1.219, -1.571, -1.571, 1.571)}
+2 GripperAction{arm: hand, extent: None, position: 0.0, teleport: False}
+2 AttachObjectAction{arm: hand, grasp: hg496=(-0.108, 0, 0, 0, 1.571, -0.0), object: (2, 14)}
+2 Action(name='pull_articulated_handle_wconf', args=('hand', (2, 14), pstn0=0, pstn4=-1.57, hg496=(-0.108, 0, 0, 0, 1.571, -0.0), q856=(0.9, 8, 0.7, 0, -1.571, 0), q952=(1.147, 6.65, 1.219, -1.571, -0.001, 1.571), c64=t(6, 12), wconf192(4), wconf392(4)))
+    added: [('inwconf', wconf392(4)), ('atposition', (2, 14), pstn4=-1.57), ('canungrasp',), ('debug2',)]
+    deled: [('atposition', (2, 14), pstn0=0), ('inwconf', wconf192(4)), ('canpull',)]
+3 MoveArmAction{conf: q688=(1.019, 7.132, 1.219, -1.571, -1.44, 1.571)}
+3 Action(name='ungrasp_handle_hand', args=('hand', (2, 14), pstn4=-1.57, hg496=(-0.108, 0, 0, 0, 1.571, -0.0), q872=(1.147, 6.606, 1.219, -1.571, -0.001, 1.571), q232=(1.147, 6.65, 1.219, -1.571, -0.001, 1.571), c376=t(6, 2), wconf392(4)))
+    added: [('canmove',), ('handempty', 'hand'), ('debug3',), ('graspedhandle', (2, 14)), ('atseconf', q872=(1.147, 6.606, 1.219, -1.571, -0.001, 1.571))]
+    deled: [('athandlegrasp', 'hand', (2, 14), hg496=(-0.108, 0, 0, 0, 1.571, -0.0))]
+4 DetachObjectAction{arm: hand, object: (2, 14)}
+4 GripperAction{arm: hand, extent: 1, position: None, teleport: False}
+4 MoveArmAction{conf: q232=(1.147, 6.65, 1.219, -1.571, -0.001, 1.571)}
+4 Action(name='move_cartesian', args=[q872=(1.147, 6.606, 1.219, -1.571, -0.001, 1.571), q512=(0.712, 8.791, 1.611, -1.571, -1.571, 1.571), c128=t(6, 71), wconf392(4)])
+    added: [('not', ('unsafetraj', c128=t(6, 71))), ('atseconf', q512=(0.712, 8.791, 1.611, -1.571, -1.571, 1.571))]
+    deled: [('canmove',), ('atseconf', q872=(1.147, 6.606, 1.219, -1.571, -0.001, 1.571))]
+5 MoveArmAction{conf: q768=(1.136, 6.567, 1.216, -1.559, -0.008, 1.543)}
+5 Action(name='grasp_handle_hand', args=('hand', (2, 19), pstn3=0, hg360=(-0.108, -0.0, 0.084, 0, 1.571, -0.0), q512=(0.712, 8.791, 1.611, -1.571, -1.571, 1.571), q392=(0.668, 8.791, 1.611, -1.571, -1.571, 1.571), c912=t(6, 47), wconf392(4)))
+    added: [('athandlegrasp', 'hand', (2, 19), hg360=(-0.108, -0.0, 0.084, 0, 1.571, -0.0)), ('canpull',)]
+    deled: [('canungrasp',), ('atseconf', q512=(0.712, 8.791, 1.611, -1.571, -1.571, 1.571)), ('handempty', 'hand')]
+6 MoveArmAction{conf: q512=(0.712, 8.791, 1.611, -1.571, -1.571, 1.571)}
+6 GripperAction{arm: hand, extent: None, position: 0.0, teleport: False}
+6 AttachObjectAction{arm: hand, grasp: hg360=(-0.108, -0.0, 0.084, 0, 1.571, -0.0), object: (2, 19)}
+6 Action(name='pull_articulated_handle_wconf', args=('hand', (2, 19), pstn3=0, pstn7=-1.57, hg360=(-0.108, -0.0, 0.084, 0, 1.571, -0.0), q856=(0.9, 8, 0.7, 0, -1.571, 0), q256=(0.839, 8.284, 1.611, -1.571, -0.001, 1.571), c752=t(6, 12), wconf392(4), wconf152(4)))
+    added: [('atposition', (2, 19), pstn7=-1.57), ('inwconf', wconf152(4)), ('canungrasp',)]
+    deled: [('inwconf', wconf392(4)), ('atposition', (2, 19), pstn3=0), ('canpull',)]
+7 MoveArmAction{conf: q888=(0.711, 8.766, 1.611, -1.571, -1.44, 1.571)}
+7 Action(name='ungrasp_handle_hand', args=('hand', (2, 19), pstn7=-1.57, hg360=(-0.108, -0.0, 0.084, 0, 1.571, -0.0), q440=(0.839, 8.241, 1.611, -1.571, 6.282, 1.571), q872=(0.839, 8.284, 1.611, -1.571, 6.282, 1.571), c288=t(6, 2), wconf152(4)))
+    added: [('graspedhandle', (2, 19)), ('canmove',), ('atseconf', q440=(0.839, 8.241, 1.611, -1.571, 6.282, 1.571)), ('handempty', 'hand')]
+    deled: [('athandlegrasp', 'hand', (2, 19), hg360=(-0.108, -0.0, 0.084, 0, 1.571, -0.0))]
+8 DetachObjectAction{arm: hand, object: (2, 19)}
+8 GripperAction{arm: hand, extent: 1, position: None, teleport: False}
+8 MoveArmAction{conf: q872=(0.839, 8.284, 1.611, -1.571, 6.282, 1.571)}
+8 Action(name='move_cartesian', args=[q440=(0.839, 8.241, 1.611, -1.571, 6.282, 1.571), q920=(0.203, 8.985, 1.871, -9.425, 6.283, -6.496), c904=t(6, 61), wconf152(4)])
+    added: [('atseconf', q920=(0.203, 8.985, 1.871, -9.425, 6.283, -6.496)), ('not', ('unsafetraj', c904=t(6, 61)))]
+    deled: [('atseconf', q440=(0.839, 8.241, 1.611, -1.571, 6.282, 1.571)), ('canmove',)]
+9 MoveArmAction{conf: q120=(0.866, 8.22, 1.607, -1.602, 6.305, 1.573)}
+9 Action(name='pick_hand', args=('hand', 5, p1=(0.203, 8.985, 1.553, 0, 0, 0.213), g240=(-0.0, 0.274, -0.0, 0, 1.571, -1.571), q920=(0.203, 8.985, 1.871, -9.425, 6.283, -6.496), q656=(0.203, 8.985, 1.827, -9.425, 6.283, -6.496), c88=t(6, 2), wconf152(4)))
+    added: [('not', ('unsafeapproach', 5, p1=(0.203, 8.985, 1.553, 0, 0, 0.213), g240=(-0.0, 0.274, -0.0, 0, 1.571, -1.571))), ('atgrasp', 'hand', 5, g240=(-0.0, 0.274, -0.0, 0, 1.571, -1.571)), ('reachablepose', 5, p1=(0.203, 8.985, 1.553, 0, 0, 0.213), wconf152(4)), ('canmove',)]
+    deled: [('atpose', 5, p1=(0.203, 8.985, 1.553, 0, 0, 0.213)), ('handempty', 'hand')]
+10 MoveArmAction{conf: q920=(0.203, 8.985, 1.871, -9.425, 6.283, -6.496)}
+10 GripperAction{arm: hand, extent: None, position: 0.0, teleport: False}
+10 AttachObjectAction{arm: hand, grasp: g240=(-0.0, 0.274, -0.0, 0, 1.571, -1.571), object: 5}
+10 MoveArmAction{conf: q656=(0.203, 8.985, 1.827, -9.425, 6.283, -6.496)}
+10 Action(name='move_cartesian', args=[q920=(0.203, 8.985, 1.871, -9.425, 6.283, -6.496), q816=(0.526, 7.054, 1.562, -9.425, 6.283, -7.869), c480=t(6, 67), wconf152(4)])
+    added: [('not', ('unsafetraj', c480=t(6, 67))), ('atseconf', q816=(0.526, 7.054, 1.562, -9.425, 6.283, -7.869))]
+    deled: [('atseconf', q920=(0.203, 8.985, 1.871, -9.425, 6.283, -6.496)), ('canmove',)]
+11 MoveArmAction{conf: q376=(0.212, 8.945, 1.865, -9.424, 6.284, -6.527)}
+11 Action(name='place_hand', args=('hand', 5, p56=(0.526, 7.053, 1.245, 0, 0, 1.585), g240=(-0.0, 0.274, -0.0, 0, 1.571, -1.571), q816=(0.526, 7.054, 1.562, -9.425, 6.283, -7.869), q584=(0.526, 7.054, 1.519, -9.425, 6.283, -7.869), c200=t(6, 2), wconf152(4)))
+    added: [('not', ('unsafeapproach', 5, p56=(0.526, 7.053, 1.245, 0, 0, 1.585), g240=(-0.0, 0.274, -0.0, 0, 1.571, -1.571))), ('handempty', 'hand'), ('atpose', 5, p56=(0.526, 7.053, 1.245, 0, 0, 1.585)), ('reachablepose', 5, p56=(0.526, 7.053, 1.245, 0, 0, 1.585), wconf152(4)), ('not', ('unsafepose', 5, p56=(0.526, 7.053, 1.245, 0, 0, 1.585))), ('canmove',)]
+    deled: [('atgrasp', 'hand', 5, g240=(-0.0, 0.274, -0.0, 0, 1.571, -1.571))]
+12 MoveArmAction{conf: q816=(0.526, 7.054, 1.562, -9.425, 6.283, -7.869)}
+12 DetachObjectAction{arm: hand, object: 5}
+12 GripperAction{arm: hand, extent: 1, position: None, teleport: False}
+12 MoveArmAction{conf: q584=(0.526, 7.054, 1.519, -9.425, 6.283, -7.869)}
+12 Action(name='move_cartesian', args=[q816=(0.526, 7.054, 1.562, -9.425, 6.283, -7.869), q816=(0.351, 8.6, 1.557, 1.571, -2.877, -1.571), c328=t(6, 96), wconf152(4)])
+    added: [('atseconf', q816=(0.351, 8.6, 1.557, 1.571, -2.877, -1.571)), ('not', ('unsafetraj', c328=t(6, 96)))]
+    deled: [('atseconf', q816=(0.526, 7.054, 1.562, -9.425, 6.283, -7.869)), ('canmove',)]
+13 MoveArmAction{conf: q984=(0.566, 7.046, 1.542, -9.402, 6.293, -7.87)}
+13 Action(name='pick_hand', args=('hand', 4, p0=(0.304, 8.773, 1.53, 0, 0, 1.835), g984=(-0.0, 0.027, 0.137, 3.142, 0, -1.571), q816=(0.351, 8.6, 1.557, 1.571, -2.877, -1.571), q456=(0.34, 8.641, 1.557, 1.571, -2.877, -1.571), c40=t(6, 2), wconf152(4)))
+    added: [('atgrasp', 'hand', 4, g984=(-0.0, 0.027, 0.137, 3.142, 0, -1.571)), ('not', ('unsafeapproach', 4, p0=(0.304, 8.773, 1.53, 0, 0, 1.835), g984=(-0.0, 0.027, 0.137, 3.142, 0, -1.571))), ('reachablepose', 4, p0=(0.304, 8.773, 1.53, 0, 0, 1.835), wconf152(4)), ('canmove',)]
+    deled: [('atpose', 4, p0=(0.304, 8.773, 1.53, 0, 0, 1.835)), ('handempty', 'hand')]
+14 MoveArmAction{conf: q816=(0.351, 8.6, 1.557, 1.571, -2.877, -1.571)}
+14 GripperAction{arm: hand, extent: None, position: 0.034444444444444444, teleport: False}
+14 AttachObjectAction{arm: hand, grasp: g984=(-0.0, 0.027, 0.137, 3.142, 0, -1.571), object: 4}
+14 MoveArmAction{conf: q456=(0.34, 8.641, 1.557, 1.571, -2.877, -1.571)}
+14 Action(name='move_cartesian', args=[q816=(0.351, 8.6, 1.557, 1.571, -2.877, -1.571), q888=(0.326, 7.248, 1.255, -4.712, 3.052, -1.571), c864=t(6, 73), wconf152(4)])
+    added: [('not', ('unsafetraj', c864=t(6, 73))), ('atseconf', q888=(0.326, 7.248, 1.255, -4.712, 3.052, -1.571))]
+    deled: [('atseconf', q816=(0.351, 8.6, 1.557, 1.571, -2.877, -1.571)), ('canmove',)]
+15 MoveArmAction{conf: q768=(0.367, 8.612, 1.559, 1.528, -2.861, -1.584)}
+15 Action(name='place_hand', args=('hand', 4, p140=(0.342, 7.428, 1.228, 0, 0, 1.482), g984=(-0.0, 0.027, 0.137, 3.142, 0, -1.571), q888=(0.326, 7.248, 1.255, -4.712, 3.052, -1.571), q248=(0.33, 7.291, 1.255, -4.712, 3.052, -1.571), c424=t(6, 2), wconf152(4)))
+    added: [('reachablepose', 4, p140=(0.342, 7.428, 1.228, 0, 0, 1.482), wconf152(4)), ('atpose', 4, p140=(0.342, 7.428, 1.228, 0, 0, 1.482)), ('handempty', 'hand'), ('not', ('unsafepose', 4, p140=(0.342, 7.428, 1.228, 0, 0, 1.482))), ('not', ('unsafeapproach', 4, p140=(0.342, 7.428, 1.228, 0, 0, 1.482), g984=(-0.0, 0.027, 0.137, 3.142, 0, -1.571))), ('canmove',)]
+    deled: [('atgrasp', 'hand', 4, g984=(-0.0, 0.027, 0.137, 3.142, 0, -1.571))]
+16 MoveArmAction{conf: q888=(0.326, 7.248, 1.255, -4.712, 3.052, -1.571)}
+16 DetachObjectAction{arm: hand, object: 4}
+16 GripperAction{arm: hand, extent: 1, position: None, teleport: False}
+16 MoveArmAction{conf: q248=(0.33, 7.291, 1.255, -4.712, 3.052, -1.571)}
+16 Action(name='declare_store_in_space', args=('bottle', (2, None, 0)))
+
+
+finished executing plan
+
