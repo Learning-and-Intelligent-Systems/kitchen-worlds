@@ -153,10 +153,17 @@
 </table>
 
 <h2 id="setup">Setup<a class="headerlink" href="#setup" title="Permanent link">#</a></h2>
-<p>Grab the <a href="https://github.com/Learning-and-Intelligent-Systems/lisdf">lisdf</a> package:</p>
+<p>Grab the submodules, may take a while</p>
 <pre><code class="language-shell">cd kitchen-worlds
 git submodule update --init --recursive
+</code></pre>
+<p>Install the dependencies, in a virtual environment if you'd like</p>
+<pre><code class="language-shell">## pip install virtualenv  ## if you haven't install
+python3 -m virtualenv venv/kitchen
+source venv/kitchen/bin/activate
+
 pip install -r requirements.txt
+pip install scipy untangle
 </code></pre>
 <h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">#</a></h2>
 <p>To run all tests before git push, do</p>
@@ -174,7 +181,7 @@ python test_pybullet_lisdf.py
 python test_parse_pddl.py
 </code></pre>
 <p>To solve some test problems wih PDDLStream, <code>-test</code> takes the name of subdirectory inside <code>test_cases</code> folder, e.g. <code>blocks_pick</code>, <code>blocks_kitchen</code>, <code>kitchen</code>:</p>
-<pre><code class="language-commandline">python test_pddlstream.py -test blocks_pick
+<pre><code class="language-commandline">python test_pddlstream.py -test test_pr2_kitchen
 </code></pre>
 <p>To build some scenes</p>
 <pre><code class="language-commandline">python test_world_builder.py
