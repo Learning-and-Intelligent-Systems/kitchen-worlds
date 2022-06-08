@@ -53,21 +53,21 @@
     </include>
 
     <include name="braiserbody#1">
-      <uri>../models/braiserbody/100693/mobility.urdf</uri>
+      <uri>../models/BraiserBody/100693/mobility.urdf</uri>
       <static>true</static>
       <scale>0.259</scale>
       <pose>0.55 8.185 0.818 0.0 -0.0 1.421</pose>
     </include>
 
     <include name="microwave#1">
-      <uri>../models/microwave/7128/mobility.urdf</uri>
+      <uri>../models/Microwave/7128/mobility.urdf</uri>
       <static>true</static>
       <scale>0.48999999999999994</scale>
       <pose>0.4 6.4 1.019 0.0 -0.0 3.142</pose>
     </include>
 
     <include name="braiserlid#1">
-      <uri>../models/braiserlid/100693/mobility.urdf</uri>
+      <uri>../models/BraiserLid/100693/mobility.urdf</uri>
       <static>true</static>
       <scale>0.259</scale>
       <pose>0.7 9.056 0.813 0.0 -0.0 0.715</pose>
