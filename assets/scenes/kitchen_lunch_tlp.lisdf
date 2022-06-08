@@ -18,7 +18,7 @@
 
 
     <include name="milkbottle#1">
-      <uri>../models/milkbottle/4043/mobility.urdf</uri>
+      <uri>../models/MilkBottle/4043/mobility.urdf</uri>
       <static>true</static>
       <scale>0.13999999999999999</scale>
       <pose>0.7 4.8 1.479 0.0 -0.0 1.685</pose>
@@ -46,28 +46,28 @@
     </include>
 
     <include name="braiserbody#1">
-      <uri>../models/braiserbody/100693/mobility.urdf</uri>
+      <uri>../models/BraiserBody/100693/mobility.urdf</uri>
       <static>true</static>
       <scale>0.259</scale>
       <pose>0.55 8.186 0.818 0.0 -0.0 1.382</pose>
     </include>
 
     <include name="microwave#1">
-      <uri>../models/microwave/7128/mobility.urdf</uri>
+      <uri>../models/Microwave/7128/mobility.urdf</uri>
       <static>true</static>
       <scale>0.48999999999999994</scale>
       <pose>0.4 6.4 1.019 0.0 -0.0 3.142</pose>
     </include>
 
     <include name="braiserlid#1">
-      <uri>../models/braiserlid/100693/mobility.urdf</uri>
+      <uri>../models/BraiserLid/100693/mobility.urdf</uri>
       <static>false</static>
       <scale>0.259</scale>
       <pose>0.55 8.186 0.821 0.0 -0.0 1.382</pose>
     </include>
 
     <include name="meatturkeyleg#1">
-      <uri>../models/meatturkeyleg/00001/mobility.urdf</uri>
+      <uri>../models/MeatTurkeyLeg/00001/mobility.urdf</uri>
       <static>true</static>
       <scale>0.00049</scale>
       <pose>0.7 8.673 0.844 0.0 -0.0 1.801</pose>
@@ -81,7 +81,7 @@
     </include>
 
     <include name="dishwasher#1">
-      <uri>../models/DishWasher/2085/mobility.urdf</uri>
+      <uri>../models/Dishwasher/2085/mobility.urdf</uri>
       <static>true</static>
       <scale>0.6992448779636837</scale>
       <pose>0.7 6.4 0.366 0.0 -0.0 3.142</pose>
@@ -95,7 +95,7 @@
     </include>
 
     <include name="faucet#1">
-      <uri>../models/faucet/14/mobility.urdf</uri>
+      <uri>../models/Faucet/14/mobility.urdf</uri>
       <static>true</static>
       <scale>0.24499999999999997</scale>
       <pose>0.3 5.6 0.985 0.0 -0.0 3.142</pose>
@@ -109,7 +109,7 @@
     </include>
 
     <include name="veggiecabbage#1">
-      <uri>../models/veggiecabbage/00001/mobility.urdf</uri>
+      <uri>../models/VeggieCabbage/00001/mobility.urdf</uri>
       <static>true</static>
       <scale>0.0034999999999999996</scale>
       <pose>0.7 4.8 0.838 0.0 -0.0 1.443</pose>

@@ -8,8 +8,8 @@ lisdf_paths = []
 # scene_names = ['test_scene', 'kitchen_lunch'] ## 'm0m_joint_test', 'kitchen_basics', 'kitchen_counter',
 # lisdf_paths.extend([join(ASSET_PATH, 'scenes', f'{n}.lisdf') for n in scene_names])
 
-exp_names = ['kitchen']
-lisdf_paths.extend([join(EXP_PATH, n, 'scene.lisdf') for n in exp_names])
+exp_names = ['test_pr2_kitchen', 'test_feg_pick']  ##
+lisdf_paths.extend([join(EXP_PATH, n) for n in exp_names])
 
 if __name__ == "__main__":
 

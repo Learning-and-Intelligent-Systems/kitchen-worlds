@@ -46,28 +46,28 @@
     </include>
 
     <include name="braiserbody#1">
-      <uri>../../assets/models/braiserbody/100693/mobility.urdf</uri>
+      <uri>../../assets/models/BraiserBody/100693/mobility.urdf</uri>
       <static>true</static>
       <scale>0.259</scale>
       <pose>0.567 8.18 0.818 0.0 -0.0 1.275</pose>
     </include>
 
     <include name="braiserlid#1">
-      <uri>../../assets/models/braiserlid/100693/mobility.urdf</uri>
+      <uri>../../assets/models/BraiserLid/100693/mobility.urdf</uri>
       <static>false</static>
       <scale>0.259</scale>
       <pose>0.589 8.18 0.821 0.0 -0.0 0.068</pose>
     </include>
 
     <include name="meatturkeyleg#1">
-      <uri>../../assets/models/meatturkeyleg/00001/mobility.urdf</uri>
+      <uri>../../assets/models/MeatTurkeyLeg/00001/mobility.urdf</uri>
       <static>false</static>
       <scale>0.00049</scale>
       <pose>0.544 9.033 0.844 0.0 -0.0 3.111</pose>
     </include>
 
     <include name="veggiecabbage#1">
-      <uri>../../assets/models/veggiecabbage/00001/mobility.urdf</uri>
+      <uri>../../assets/models/VeggieCabbage/00001/mobility.urdf</uri>
       <static>false</static>
       <scale>0.0034999999999999996</scale>
       <pose>0.407 4.749 0.838 0.0 -0.0 0.681</pose>
