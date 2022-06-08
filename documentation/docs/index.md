@@ -32,13 +32,24 @@ A library of long-horizon Task-and-Motion-Planning (TAMP) problems in kitchen an
 
 ## Setup
 
-Grab the [lisdf](https://github.com/Learning-and-Intelligent-Systems/lisdf) package:
+Grab the submodules, may take a while
 
 ```shell
 cd kitchen-worlds
 git submodule update --init --recursive
-pip install -r requirements.txt
 ```
+
+Install the dependencies, in a virtual environment if you'd like
+
+```shell
+## pip install virtualenv  ## if you haven't install
+python3 -m virtualenv venv/kitchen
+source venv/kitchen/bin/activate
+
+pip install -r requirements.txt
+pip install scipy untangle
+```
+
 
 ## Examples
 
@@ -63,7 +74,7 @@ python test_parse_pddl.py
 To solve some test problems wih PDDLStream, `-test` takes the name of subdirectory inside `test_cases` folder, e.g. `blocks_pick`, `blocks_kitchen`, `kitchen`:
 
 ```commandline
-python test_pddlstream.py -test blocks_pick
+python test_pddlstream.py -test test_pr2_kitchen
 ```
 
 To build some scenes
