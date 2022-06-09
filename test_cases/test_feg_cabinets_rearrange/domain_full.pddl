@@ -2,7 +2,7 @@
   (:requirements :strips :equality)
 
   (:constants
-    movable bottle edible
+    @movable @bottle @edible
   )
 
   (:predicates

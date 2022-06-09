@@ -1,6 +1,12 @@
 (define (domain fe-gripper-tamp)
   (:requirements :strips :equality)
 
+  (:constants
+    @movable
+    @bottle
+    @edible
+  )
+
   (:predicates
 
     (drawer ?o) ;;

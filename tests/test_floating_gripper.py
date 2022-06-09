@@ -10,19 +10,9 @@ from pybullet_tools.pr2_utils import get_group_conf
 from pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, wait_if_gui, \
     SEPARATOR, get_aabb, wait_for_duration
 from pybullet_tools.bullet_utils import summarize_facts, print_goal, nice
-from pybullet_tools.pr2_agent import get_stream_info, post_process, move_cost_fn ## , get_stream_map
+from pybullet_tools.pr2_agent import get_stream_info, post_process, move_cost_fn
 from pybullet_tools.logging import TXT_FILE
 
-## custom stream_map
-from pybullet_tools.pr2_streams import get_stable_gen, get_contain_gen, get_position_gen, \
-    Position, get_handle_grasp_gen, LinkPose, get_ik_ir_grasp_handle_gen, get_pull_drawer_handle_motion_gen, \
-    get_joint_position_test, get_marker_grasp_gen, get_bconf_in_region_test, get_pull_door_handle_motion_gen, \
-    get_bconf_in_region_gen, get_pose_in_region_gen, get_motion_wconf_gen, get_update_wconf_p_two_gen, \
-    get_marker_pose_gen, get_pull_marker_to_pose_motion_gen, get_pull_marker_to_bconf_motion_gen,  \
-    get_pull_marker_random_motion_gen, get_ik_ungrasp_handle_gen, get_pose_in_region_test, \
-    get_cfree_btraj_pose_test, get_joint_position_open_gen, get_ik_ungrasp_mark_gen, \
-    sample_joint_position_open_list_gen, get_update_wconf_pst_gen, get_ik_ir_wconf_gen, \
-    get_update_wconf_p_gen, get_ik_ir_wconf_gen, get_pose_in_space_test, get_turn_knob_handle_motion_gen
 from pybullet_tools.pr2_primitives import get_group_joints, Conf, get_base_custom_limits, Pose, Conf, \
     get_ik_ir_gen, get_motion_gen, get_cfree_approach_pose_test, get_cfree_pose_pose_test, get_cfree_traj_pose_test, \
     get_grasp_gen, Attach, Detach, Clean, Cook, control_commands, Command, \
@@ -49,9 +39,8 @@ def pddlstream_from_dir(problem, exp_dir, collisions=True, teleport=False):
     domain_pddl = read(join(exp_dir, 'domain_full.pddl'))
     stream_pddl = read(join(exp_dir, 'stream.pddl'))
     planning_config = json.load(open(join(exp_dir, 'planning_config.json')))
-    constant_map = {}
 
-    init, goal = pddl_to_init_goal(exp_dir, world)
+    init, goal, constant_map = pddl_to_init_goal(exp_dir, world)
     goal = [AND] + goal
     problem.add_init(init)
 
@@ -83,7 +72,7 @@ def main(exp_name, verbose=True):
     args = get_args(exp_name)
 
     exp_dir = join(EXP_PATH, args.test)
-    world = load_lisdf_pybullet(exp_dir) ##join(exp_dir, 'scene.lisdf'))
+    world = load_lisdf_pybullet(exp_dir, width=720, height=560)
     saver = WorldSaver()
     problem = Problem(world)
 

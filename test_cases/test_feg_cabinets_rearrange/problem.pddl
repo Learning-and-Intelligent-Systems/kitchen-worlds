@@ -25,6 +25,13 @@
 	oven#1
 	veggiecabbage#1
 	vinegarbottle#1
+
+	;; the following will be reconstructed and will be ignored by pddlstream
+	wconf168
+    wconf136
+    wconf816
+    wconf584
+    wconf0
   )
 
   (:init
@@ -61,10 +68,10 @@
 	(braiserbody braiserbody#1)
 
 	(meatturkeyleg meatturkeyleg#1)
-	(oftype vinegarbottle#1 bottle)
-	(oftype meatturkeyleg#1 edible)
-	(oftype veggiecabbage#1 edible)
-	(oftype oilbottle#1 bottle)
+	(oftype vinegarbottle#1 @bottle)
+	(oftype meatturkeyleg#1 @edible)
+	(oftype veggiecabbage#1 @edible)
+	(oftype oilbottle#1 @bottle)
 	(surface counter#1::indigo_tmp)
 	(surface counter#1::front_left_stove)
 	(surface braiserbody#1::braiser_bottom)
@@ -170,10 +177,16 @@
 	(contained oilbottle#1 p1=(0.407, 8.642, 1.553, 0, 0, 1.09) counter#1::dagger)
 	(contained vinegarbottle#1 p0=(0.343, 8.698, 1.532, 0, 0, 2.222) counter#1::dagger)
 
-	(newwconfpst wconf168(4) counter#1::chewie_door_left_joint pstn4=-1.57 wconf136(4))
-	(newwconfpst wconf168(4) counter#1::dagger_door_right_joint pstn6=1.57 wconf816(4))
-	(newwconfpst wconf168(4) counter#1::dagger_door_left_joint pstn7=-1.57 wconf584(4))
-	(newwconfpst wconf168(4) counter#1::chewie_door_right_joint pstn5=1.57 wconf0(4))
+	(wconf wconf168)
+	(inwconf wconf168)
+	(wconf wconf136)
+	(wconf wconf816)
+	(wconf wconf584)
+	(wconf wconf0)
+	(newwconfpst wconf168 counter#1::chewie_door_left_joint pstn4=-1.57 wconf136)
+	(newwconfpst wconf168 counter#1::dagger_door_right_joint pstn6=1.57 wconf816)
+	(newwconfpst wconf168 counter#1::dagger_door_left_joint pstn7=-1.57 wconf584)
+	(newwconfpst wconf168 counter#1::chewie_door_right_joint pstn5=1.57 wconf0)
 
 	(supported meatturkeyleg#1 p3=(0.849, 8.837, 0.844, 0, 0, 2.786) counter#1::indigo_tmp)
 	(supported veggiecabbage#1 p4=(0.642, 8.531, 0.87, 0, 0, 1.651) counter#1::indigo_tmp)
@@ -181,9 +194,10 @@
   )
 
   (:goal (and
-    (graspedhandle counter#1::chewie_door_left_joint)
-	(graspedhandle counter#1::dagger_door_left_joint)
-	(storedinspace bottle counter#1::sektion)
+    (handlegrasped hand counter#1::chewie_door_left_joint)
+    (debug2)
+    ; (graspedhandle counter#1::chewie_door_left_joint)
+	; (graspedhandle counter#1::dagger_door_left_joint)
+	; (storedinspace @bottle counter#1::sektion)
   ))
 )
-        

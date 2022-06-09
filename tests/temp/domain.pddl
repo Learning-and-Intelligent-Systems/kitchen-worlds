@@ -1,5 +1,10 @@
 (define (domain fe-gripper-tamp)
   (:requirements :strips :equality)
+
+  (:constants
+    @movable @bottle @edible
+  )
+
   (:predicates
 
     (Drawer ?o) ;;
@@ -31,7 +36,9 @@
     (Containable ?o ?r)  ;;
 
     (ReachableMovable ?o ?p ?g ?q ?w)
+    (ReachableWConf ?o ?p ?w)
     (ReachablePose ?o ?p ?w)
+    (ReachableObject ?o ?p ?w)
     (AtReachablePose ?o ?p)
     (Toggled ?o)
     (OriginalSEConf ?q)
@@ -50,6 +57,7 @@
     (TrajPoseCollision ?t ?o ?p)
     (CFreePosePose ?o ?p ?o2 ?p2)
     (CFreeApproachPose ?o ?p ?g ?o2 ?p2)
+    (CFreeTrajPose ?t ?o2 ?p2)
 
     (AtSEConf ?q)
     (AtPose ?o ?p)
@@ -85,8 +93,19 @@
     (Debug1)
     (Debug2)
     (Debug3)
+    (Debug4)
 
+    (OfType ?o ?t)
+    (StoredInSpace ?t ?r)
+    (Space ?r)
+    (ContainObj ?o)
+    (AtAttachment ?o ?j)
+    (NewPoseFromAttachment ?o ?p ?w)
+
+    (Cleaned ?o)
+    (Cooked ?o)
   )
+
   (:functions
     (MoveCost ?t)
     (PickCost)
@@ -106,8 +125,8 @@
   (:action pick_hand
     :parameters (?a ?o ?p ?g ?q1 ?q2 ?t ?w)
     :precondition (and (KinWConf ?a ?o ?p ?g ?q1 ?q2 ?t ?w) (HandEmpty ?a)
-                       (AtPose ?o ?p) (AtSEConf ?q1)
-                       (ReachablePose ?o ?p ?w) (InWConf ?w)
+                       (ReachablePose ?o ?p ?w) (AtSEConf ?q1)
+                       (InWConf ?w) (AtPose ?o ?p)
                        (not (UnsafeApproach ?o ?p ?g))
                        )
     :effect (and (AtGrasp ?a ?o ?g) (CanMove)
@@ -118,8 +137,8 @@
   (:action place_hand
     :parameters (?a ?o ?p ?g ?q1 ?q2 ?t ?w)
     :precondition (and (KinWConf ?a ?o ?p ?g ?q1 ?q2 ?t ?w)
-                       (AtGrasp ?a ?o ?g) (AtSEConf ?q1)
-                       (ReachablePose ?o ?p ?w) (InWConf ?w)
+                       (ReachablePose ?o ?p ?w) (AtSEConf ?q1)
+                       (AtGrasp ?a ?o ?g) (InWConf ?w)
                        (not (UnsafePose ?o ?p))
                        (not (UnsafeApproach ?o ?p ?g))
                        )
@@ -146,16 +165,16 @@
                          (KinGraspHandle ?a ?o ?pstn ?g ?q1 ?q2 ?t ?w)
                          (AtHandleGrasp ?a ?o ?g) (AtPosition ?o ?pstn) (InWConf ?w)
                     )
-      :effect (and (GraspedHandle ?o) (HandEmpty ?a) (CanMove) (Debug3)
+      :effect (and (GraspedHandle ?o) (HandEmpty ?a) (CanMove)
                    (AtSEConf ?q1) (not (AtHandleGrasp ?a ?o ?g))
                    (increase (total-cost) (PlaceCost))
               )
     )
 
     ;; from fully closed position ?p1 pull to the fully open position ?p2
-    (:action pull_door_handle_wconf
+    (:action pull_articulated_handle_wconf
       :parameters (?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?t ?w1 ?w2)
-      :precondition (and (Door ?o) (not (= ?p1 ?p2)) (CanPull)
+      :precondition (and (Joint ?o) (not (= ?p1 ?p2)) (CanPull)
                          (AtPosition ?o ?p1) (Position ?o ?p2) (AtHandleGrasp ?a ?o ?g)
                          (KinPullDoorHandle ?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?t ?w1)
                          ; (AtSEConf ?q1)
@@ -169,8 +188,57 @@
                   (AtPosition ?o ?p2) (not (AtPosition ?o ?p1))
                   ; (AtSEConf ?q2) (not (AtSEConf ?q1))
                   (InWConf ?w2) (not (InWConf ?w1))
+
+                  ;(forall (?o3 ?p3 ?p4) (when
+                  ;  (and (ContainObj ?o3) (AtPose ?o3 ?p3) (Pose ?o3 ?p4) (AtAttachment ?o3 ?o) (NewPoseFromAttachment ?o3 ?p4 ?w2))
+                  ;  (and (not (AtPose ?o3 ?p3)) (AtPose ?o3 ?p4) (Debug4))
+                  ;))
               )
     )
+
+    ;; with attachment
+    (:action pull_articulated_handle_wconf_attachment
+      :parameters (?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?t ?w1 ?w2 ?o3 ?p3 ?p4)
+      :precondition (and (Joint ?o) (not (= ?p1 ?p2)) (CanPull)
+                         (AtPosition ?o ?p1) (Position ?o ?p2) (AtHandleGrasp ?a ?o ?g)
+                         (KinPullDoorHandle ?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?t ?w1)
+                         (InWConf ?w1) (WConf ?w2)
+                         (NewWConfPst ?w1 ?o ?p2 ?w2)
+
+                         (ContainObj ?o3) (AtPose ?o3 ?p3) (Pose ?o3 ?p4)
+                         (AtAttachment ?o3 ?o) (NewPoseFromAttachment ?o3 ?p4 ?w2)
+                    )
+      :effect (and (not (CanPull)) (CanUngrasp) (Debug2)
+                  (AtPosition ?o ?p2) (not (AtPosition ?o ?p1))
+                  (InWConf ?w2) (not (InWConf ?w1))
+                  (not (AtPose ?o3 ?p3)) (AtPose ?o3 ?p4) (Debug4)
+              )
+    )
+
+    (:action declare_store_in_space
+      :parameters (?t ?r)
+      :precondition (and (Space ?r)
+                         (forall (?o) (imply (OfType ?o ?t) (In ?o ?r)))
+                    )
+      :effect (and (StoredInSpace ?t ?r))
+    )
+
+  (:action wait-clean
+    :parameters (?o ?s ?n)
+    :precondition (and (Edible ?o) (CleaningSurface ?s) (ControlledBy ?s ?n)
+                       (On ?o ?s) (GraspedHandle ?n)
+                       )
+    :effect (and (Cleaned ?o))
+  )
+  (:action wait-cook
+    :parameters (?o ?s ?n)
+    :precondition (and (Edible ?o) (HeatingSurface ?s) (ControlledBy ?s ?n)
+                       (On ?o ?s) (GraspedHandle ?n)
+                       (Cleaned ?o)
+                       )
+    :effect (and (Cooked ?o)
+                 (not (Cleaned ?o)))
+  )
 
   ;(:action toggle
   ;  :parameters (?o ?p1 ?p2 ?w1 ?w2)
@@ -192,6 +260,9 @@
   (:derived (Holding ?a ?o)
     (exists (?g) (and (Grasp ?o ?g) (AtGrasp ?a ?o ?g)))
   )
+  ;(:derived (ReachableObject ?o ?p ?w)
+  ;  (or (ReachablePose ?o ?p ?w) (ReachableWConf ?o ?p ?w))
+  ;)
   (:derived (ReachablePose ?o ?p ?w)
     (exists (?q ?g) (and (Pose ?o ?p) (OriginalSEConf ?q) (Grasp ?o ?g) (WConf ?w) (ReachableMovable ?o ?p ?g ?q ?w)))
   )
@@ -222,5 +293,9 @@
     (exists (?o2 ?p2) (and (Pose ?o ?p) (Grasp ?o ?g) (Pose ?o2 ?p2) (not (= ?o ?o2))
                            (not (CFreeApproachPose ?o ?p ?g ?o2 ?p2))
                            (AtPose ?o2 ?p2)))
+  )
+  (:derived (UnsafeTraj ?t)
+    (exists (?o2 ?p2) (and (Traj ?t) (Pose ?o2 ?p2) (AtPose ?o2 ?p2)
+                           (not (CFreeTrajPose ?t ?o2 ?p2))))
   )
 )
