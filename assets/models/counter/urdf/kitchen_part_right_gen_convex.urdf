@@ -532,13 +532,13 @@
     <visual name="dagger_visual">
       <origin rpy="0  0  0" xyz="0  0  0"/>
       <geometry>
-        <mesh filename="package://counter/meshes/obj/sektion_top_two_glass.obj" scale="1.0 1.0 1.0"/>
+        <mesh filename="package://counter/meshes/obj/sektion_top_two_glass_new.obj" scale="1.0 1.0 1.0"/>
       </geometry>
       <material name="White"/>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="package://counter/meshes/obj/sektion_top_two_glass.obj" scale="1.0 1.0 1.0"/>
+        <mesh filename="package://counter/meshes/obj/sektion_top_two_glass_new.obj" scale="1.0 1.0 1.0"/>
       </geometry>
     </collision>
   </link>

@@ -32,17 +32,32 @@ A library of long-horizon Task-and-Motion-Planning (TAMP) problems in kitchen an
 
 ## Setup
 
-Grab the submodules, may take a while
+1. Grab the submodules, may take a while
 
 ```shell
 cd kitchen-worlds
 git submodule update --init --recursive
 ```
 
-Install the dependencies, in a virtual environment if you'd like
+2. Build FastDownward, used by PDDLStream planner
 
 ```shell
-## pip install virtualenv  ## if you haven't install
+cd pddlstream
+./downward/build.py
+```
+
+3. Checkout the right branch of lisdf paerse
+
+```shell
+cd ../lisdf
+git checkout main
+git checkout pddl-constant-support
+```
+
+4. Install the other dependencies, in a virtual environment if you'd like. Have been tested on Python 3.7 and 3.8, on MacOS and on Ubuntu.
+
+```shell
+pip install virtualenv  ## if you haven't install
 python3 -m virtualenv venv/kitchen
 source venv/kitchen/bin/activate
 

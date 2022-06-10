@@ -54,7 +54,7 @@ def init_experiment(exp_dir):
     if isfile(TXT_FILE):
         os.remove(TXT_FILE)
 
-def get_args(exp_name):
+def get_args(exp_name=DEFAULT_TEST):
     parser = create_parser()
     parser.add_argument('-test', type=str, default=exp_name, help='Name of the test case')
     parser.add_argument('-cfree', action='store_true', help='Disables collisions during planning')

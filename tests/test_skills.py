@@ -24,16 +24,9 @@ from pybullet_planning.pybullet_tools.pr2_agent import get_stream_info, post_pro
 from pybullet_planning.pybullet_tools.logging import TXT_FILE
 
 ## custom stream_map
-from pybullet_planning.pybullet_tools.general_streams import get_grasp_list_gen
-from pybullet_planning.pybullet_tools.pr2_streams import get_stable_gen, get_contain_gen, get_position_gen, \
-    Position, get_handle_grasp_gen, LinkPose, get_ik_ir_grasp_handle_gen, get_pull_drawer_handle_motion_gen, \
-    get_joint_position_test, get_marker_grasp_gen, get_bconf_in_region_test, get_pull_door_handle_motion_gen, \
-    get_bconf_in_region_gen, get_pose_in_region_gen, get_motion_wconf_gen, get_update_wconf_p_two_gen, \
-    get_marker_pose_gen, get_pull_marker_to_pose_motion_gen, get_pull_marker_to_bconf_motion_gen,  \
-    get_pull_marker_random_motion_gen, get_ik_ungrasp_handle_gen, get_pose_in_region_test, \
-    get_cfree_btraj_pose_test, get_joint_position_open_gen, get_ik_ungrasp_mark_gen, get_handle_pose, \
-    sample_joint_position_open_list_gen, get_update_wconf_pst_gen, get_ik_ir_wconf_gen, \
-    get_update_wconf_p_gen, get_ik_ir_wconf_gen, get_pose_in_space_test, get_turn_knob_handle_motion_gen
+from pybullet_planning.pybullet_tools.general_streams import get_grasp_list_gen, get_contain_list_gen
+from pybullet_planning.pybullet_tools.pr2_streams import get_stable_gen, get_position_gen, \
+    Position, get_handle_grasp_gen
 from pybullet_planning.pybullet_tools.pr2_primitives import get_group_joints, Conf, get_base_custom_limits, Conf, \
     get_ik_ir_gen, get_motion_gen, get_cfree_approach_pose_test, get_cfree_pose_pose_test, get_cfree_traj_pose_test, \
     Attach, Detach, Clean, Cook, control_commands, \
@@ -42,7 +35,6 @@ from pybullet_planning.pybullet_tools.flying_gripper_utils import se3_from_pose,
     pose_from_se3, se3_ik, set_cloned_se3_conf
 
 from pddlstream.language.generator import from_gen_fn, from_list_fn, from_fn, fn_from_constant, empty_gen, from_test
-
 from pddlstream.language.constants import Equal, AND, print_solution, PDDLProblem
 from pddlstream.utils import read, INF, get_file_path, find_unique, Profiler, str_from_object
 from pddlstream.algorithms.meta import solve, create_parser
@@ -56,29 +48,18 @@ from world_builder.loaders import create_gripper_robot, create_pr2_robot
 
 from test_pddlstream import get_args
 
+
+from pybullet_tools.pr2_problems import create_floor
+from pybullet_tools.utils import connect, draw_pose, unit_pose, link_from_name, load_pybullet, load_model, \
+    sample_aabb, AABB, set_pose, get_aabb, get_aabb_center, quat_from_euler, Euler, HideOutput, get_aabb_extent, \
+    set_camera_pose
+from pybullet_tools.flying_gripper_utils import create_fe_gripper, set_se3_conf
+from lisdf_tools.lisdf_loader import World
+import math
+
+
 DEFAULT_TEST = 'kitchen' ## 'blocks_pick'
 ASSET_PATH = join('..', 'assets')
-
-def run_tests(p, init, l, c=True, t=True):
-     test_handle_grasp_gen(p, init)
-
-
-def test_handle_grasp_gen(p, init, visualize=True):
-    from pybullet_tools.pr2_streams import get_handle_pose
-    joints = [f[1] for f in init if f[0] == 'joint']
-    funk = get_handle_grasp_gen(p, visualize=False)
-    for j in joints:
-        if 'faucet' not in p.world.body_to_name[j]: continue
-        outputs = funk(j)
-        if visualize:
-            body_pose = get_handle_pose(j)
-            set_camera_target_body(j[0], dx=0.5, dy=0.5, dz=0.8)
-            visualize_grasps(p, outputs, body_pose, RETAIN_ALL=True)
-            set_camera_target_body(j[0], dx=0.5, dy=0.5, dz=0.8)
-
-    wait_if_gui('Finish?')
-
-# ####################################
 
 TEST_MODELS = {
     'Fridge': {
@@ -131,14 +112,32 @@ TEST_MODELS = {
         '103307': 0.1,
     }
 }
+# ####################################
 
-from pybullet_tools.pr2_problems import create_floor
-from pybullet_tools.utils import connect, draw_pose, unit_pose, link_from_name, load_pybullet, load_model, \
-    sample_aabb, AABB, set_pose, get_aabb, get_aabb_center, quat_from_euler, Euler, HideOutput, get_aabb_extent, \
-    set_camera_pose
-from pybullet_tools.flying_gripper_utils import create_fe_gripper, set_se3_conf
-from lisdf_tools.lisdf_loader import World
-import math
+def get_feg_world(exp_name=DEFAULT_TEST):
+    args = get_args() ## exp_name
+    connect(use_gui=True, shadows=False, width=360, height=270)  ## , width=1980, height=1238
+    draw_pose(unit_pose(), length=2.)
+    # create_floor()
+    world = World(args)
+    add_robot(world, 'feg')
+    return world
+
+def add_robot(world, robot):
+    if robot == 'pr2':
+        from world_builder.loaders import BASE_LIMITS as custom_limits
+        base_q = [3, 1, 0]
+        robot = create_pr2_robot(world, custom_limits=custom_limits, base_q=base_q)
+
+    elif robot == 'feg':
+        custom_limits = {0: (-5, 5), 1: (-5, 5), 2: (0, 3)}
+        # init_q = [3, 1, 1, 0, 0, 0]
+        init_q = [0, 0, 0, 0, 0, 0]
+        # robot = create_fe_gripper(init_q=init_q)
+        # world.add_robot(robot, 'feg')
+        robot = create_gripper_robot(world, custom_limits=custom_limits, initial_q=init_q)
+
+    return robot
 
 def get_z_on_floor(body):
     return get_aabb_extent(get_aabb(body))[-1]/2
@@ -159,6 +158,8 @@ def pose_from_2d(body, xy, random_yaw=False):
     if random_yaw:
         yaw = random.uniform(-math.pi, math.pi)
     return ((xy[0], xy[1], z), quat_from_euler((0, 0, yaw)))
+
+# ####################################
 
 def test_robot_rotation(body, robot):
     pose = ((0.2,0.3,0), quat_from_euler((math.pi/4, math.pi/2, 1.2)))
@@ -191,9 +192,10 @@ def test_spatial_algebra(body, robot):
     set_pose(gripper, W_X_G)
     set_camera_target_body(gripper, dx=0.5, dy=0, dz=0.5)
 
-def test_grasps(world, categories=[]):
+def test_grasps(categories=[]):
+    world = get_feg_world()
     problem = State(world, grasp_types=['hand']) ## , 'side' , 'top'
-    funk = get_grasp_list_gen(problem, collisions=True)
+    funk = get_grasp_list_gen(problem, collisions=True, visualize=False, RETAIN_ALL=False)
 
     i = 0
     for cat in categories:
@@ -221,6 +223,9 @@ def test_grasps(world, categories=[]):
         i += 1
     set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.5)
 
+    wait_if_gui('Finish?')
+    disconnect()
+
 def load_body(path, scale, pose_2d=(0,0), random_yaw=False):
     file = join(path, 'mobility.urdf')
     print('loading', file)
@@ -231,7 +236,10 @@ def load_body(path, scale, pose_2d=(0,0), random_yaw=False):
     set_pose(body, pose)
     return body
 
-def test_fridges(world, custom_limits):
+def test_handle_grasps_fridges(custom_limits):
+    from pybullet_tools.pr2_streams import get_handle_pose
+
+    world = get_feg_world()
     problem = State(world)
     funk = get_handle_grasp_gen(problem, visualize=False)
 
@@ -266,8 +274,14 @@ def test_fridges(world, custom_limits):
 
     ## execute traj
 
-def test_gripper_joints(robot):
+    wait_if_gui('Finish?')
+    disconnect()
+
+def test_gripper_joints():
     """ visualize ee link pose as conf changes """
+    world = get_feg_world()
+    robot = world.robot
+
     set_se3_conf(robot, (0, 0, 0, 0, 0, 0))
     set_camera_target_body(robot, dx=0.5, dy=0.5, dz=0.5)
     for j in range(3, 6):
@@ -279,10 +293,15 @@ def test_gripper_joints(robot):
             set_se3_conf(robot, conf)
             set_camera_target_body(robot, dx=0.5, dy=0.5, dz=0.5)
             time.sleep(0.1)
-    sys.exit()
 
-def test_gripper_range(robot, IK=False):
+    wait_if_gui('Finish?')
+    disconnect()
+
+def test_gripper_range(IK=False):
     """ visualize all possible gripper orientation """
+    world = get_feg_world()
+    robot = world.robot
+
     set_se3_conf(robot, (0, 0, 0, 0, 0, 0))
     set_camera_target_body(robot, dx=0.5, dy=0.5, dz=0.5)
     choices = np.linspace(-math.pi, math.pi, num=9)[:-1]
@@ -327,16 +346,23 @@ def test_gripper_range(robot, IK=False):
             set_camera_target_body(robot, dx=0.5, dy=0.5, dz=0.5)
     set_camera_target_body(robot, dx=0.5, dy=0.5, dz=0.5)
 
-def test_handle_grasps(args, robot):
-    # lisdf_path = join(ASSET_PATH, 'scenes', f'kitchen_lunch.lisdf')
-    # world = load_lisdf_pybullet(lisdf_path, verbose=True)
+    wait_if_gui('Finish?')
+    disconnect()
+
+def test_handle_grasps_counter():
     from world_builder.loaders import load_floor_plan
     from world_builder.world import World
+
+    args = get_args()
     connect(use_gui=True, shadows=False, width=1980, height=1238)
     draw_pose(unit_pose(), length=2.)
+
+    # lisdf_path = join(ASSET_PATH, 'scenes', f'kitchen_lunch.lisdf')
+    # world = load_lisdf_pybullet(lisdf_path, verbose=True)
+
     world = World(args)
     floor = load_floor_plan(world, plan_name='counter.svg')
-    robot = add_robot(world, robot)
+    robot = add_robot(world, 'feg')
 
     world.summarize_all_objects()
     state = State(world, grasp_types=robot.grasp_types)
@@ -352,52 +378,83 @@ def test_handle_grasps(args, robot):
         grasps = get_hand_grasps(state, body, link=link, visualize=False,
                                  RETAIN_ALL=True, HANDLE_FILTER=True, LENGTH_VARIANTS=True)
         set_camera_target_body(body, link=link, dx=0.5, dy=0.5, dz=0.5)
-    sys.exit()
-
-def add_robot(world, robot):
-    if robot == 'pr2':
-        from world_builder.loaders import BASE_LIMITS as custom_limits
-        base_q = [3, 1, 0]
-        robot = create_pr2_robot(world, custom_limits=custom_limits, base_q=base_q)
-
-    elif robot == 'feg':
-        custom_limits = {0: (-5, 5), 1: (-5, 5), 2: (0, 3)}
-        # init_q = [3, 1, 1, 0, 0, 0]
-        init_q = [0, 0, 0, 0, 0, 0]
-        # robot = create_fe_gripper(init_q=init_q)
-        # world.add_robot(robot, 'feg')
-        robot = create_gripper_robot(world, custom_limits=custom_limits, initial_q=init_q)
-
-    return robot
-
-def init_world(args):
-    connect(use_gui=True, shadows=False, width=1980, height=1238)
-    draw_pose(unit_pose(), length=2.)
-    # create_floor()
-    world = World(args)
-    return world
-
-def main(exp_name, robot='feg', verbose=True):
-    args = get_args(exp_name)
-
-    ## --- DEMO: grasp handles in counter ---
-    # test_handle_grasps(args, robot)
-
-    world = init_world(args)
-    robot = add_robot(world, robot)
-
-    ## --- DEMO: test robot ---
-    # test_gripper_joints(robot)
-    # test_gripper_range(robot)
-
-    ## --- DEMO: grasp object meshes ---
-    test_grasps(world, ['Bottle']) ## 'Bottle'
-
-    ## --- DEMO: grasp handles on fridges ---
-    # test_fridges(world, custom_limits)
 
     wait_if_gui('Finish?')
     disconnect()
+
+
+def test_placement_counter():
+    from world_builder.loaders import load_floor_plan
+    from world_builder.world import World
+
+    args = get_args()
+    connect(use_gui=True, shadows=False, width=1980, height=1238)
+    draw_pose(unit_pose(), length=2.)
+
+    surfaces = {
+        'counter': {
+            'back_left_stove': [],
+            'back_right_stove': [],
+            'front_left_stove': [],
+            'front_right_stove': [],
+            'hitman_tmp': [],
+            'indigo_tmp': [],
+        }
+    }
+    spaces = {
+        'counter': {
+            'sektion': [],
+            'dagger': [],
+            'hitman_drawer_top': [],
+            # 'hitman_drawer_bottom': [],
+            'indigo_drawer_top': [],
+            # 'indigo_drawer_bottom': [],
+            'indigo_tmp': []
+        },
+    }
+
+    world = World(args)
+    floor = load_floor_plan(world, plan_name='counter.svg', surfaces=surfaces, spaces=spaces)
+    robot = add_robot(world, 'feg')
+
+    world.open_all_doors_drawers()
+    world.summarize_all_objects()
+    state = State(world, grasp_types=robot.grasp_types)
+    funk = get_grasp_list_gen(state, collisions=True, visualize=False, RETAIN_ALL=False)
+
+    surfaces = world.cat_to_bodies('surface')
+    spaces = world.cat_to_bodies('space')
+    regions = spaces
+    opened_poses = {}
+
+    for rg in regions:
+        r = world.BODY_TO_OBJECT[rg]
+        draw_aabb(get_aabb(r.body, link=r.link))
+        opened_poses[rg] = get_link_pose(r.body, r.link)
+
+        # if rg in surfaces:
+        #     body = r.place_new_obj('OilBottle')
+        #     draw_fitted_box(body, draw_centroid=False)
+        #     set_camera_target_body(body, dx=0.5, dy=0, dz=0)
+        #     set_camera_target_body(body, dx=0.5, dy=0, dz=0)
+        #     grasps = get_hand_grasps(state, body, visualize=True, RETAIN_ALL=True)
+
+        if rg in spaces:
+            body = r.place_new_obj('MeatTurkeyLeg')
+            draw_fitted_box(body, draw_centroid=False)
+            set_camera_target_body(body, dx=0.1, dy=0, dz=0.5)
+            set_camera_target_body(body, dx=0.1, dy=0, dz=0.5)
+            # grasps = get_hand_grasps(state, body, visualize=False, RETAIN_ALL=False)
+
+            outputs = funk(body)
+            print(f'grasps on body {body}:', outputs)
+            visualize_grasps(state, outputs, get_pose(body), RETAIN_ALL=True)
+
+        set_renderer(True)
+        print(f'test_placement_counter | placed {body} on {r}')
+    wait_if_gui('Finish?')
+    disconnect()
+
 
 def get_data(category):
     partnet_full_dataset_path = join('..', '..', 'dataset')
@@ -430,10 +487,24 @@ def test_texture(category, id):
     # with open(path.replace('mobility', 'mobility_2'), "wb") as files:
     #     tree.write(files)
 
+
 if __name__ == '__main__':
-    ## --- DEMO ---
-    main(exp_name=DEFAULT_TEST, robot='feg')
 
     ## --- MODELS  ---
     # get_data(category='Bottle')
     # test_texture(category='CoffeeMachine', id='103127')
+
+
+    ## --- robot related  ---
+    # test_gripper_joints()
+    # test_gripper_range()
+
+
+    ## --- grasps related ---
+    # test_grasps(['Bottle'])  ## 'Bottle'
+    # test_handle_grasps_counter()
+    # test_handle_grasps_fridges()
+
+
+    ## --- placement related  ---
+    test_placement_counter()
