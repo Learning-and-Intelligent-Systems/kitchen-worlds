@@ -2,9 +2,7 @@
   (:requirements :strips :equality)
 
   (:constants
-    @movable
-    @bottle
-    @edible
+    @movable @bottle @edible
   )
 
   (:predicates
@@ -107,19 +105,19 @@
     (cleaned ?o)
     (cooked ?o)
   
-    (isjointto ?x ?y)
-    (oven ?x)
-    (veggiecabbage ?x)
     (surface ?x)
-    (counter ?x)
-    (braiserlid ?x)
-    (floor ?x)
-    (meatturkeyleg ?x)
-    (oilbottle ?x)
-    (bottle ?x)
-    (arm ?x)
-    (controllable ?x)
+    (isjointto ?x ?y)
     (vinegarbottle ?x)
+    (braiserlid ?x)
     (braiserbody ?x)
+    (bottle ?x)
+    (floor ?x)
+    (arm ?x)
+    (oven ?x)
+    (counter ?x)
+    (veggiecabbage ?x)
+    (oilbottle ?x)
+    (meatturkeyleg ?x)
+    (controllable ?x)
   )
 )

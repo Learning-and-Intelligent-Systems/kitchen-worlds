@@ -2,7 +2,7 @@
   (:requirements :strips :equality)
 
   (:constants
-    movable bottle edible
+    @movable @bottle @edible
   )
 
   (:predicates
@@ -106,19 +106,19 @@
     (cooked ?o)
   
     (surface ?x)
-    (oven ?x)
-    (isjointto ?x ?y)
-    (braiserlid ?x)
-    (meatturkeyleg ?x)
-    (braiserbody ?x)
-    (faucet ?x)
     (dishwasher ?x)
-    (arm ?x)
-    (controllable ?x)
-    (floor ?x)
-    (basin ?x)
-    (veggiecabbage ?x)
-    (counter ?x)
     (fridge ?x)
+    (basin ?x)
+    (isjointto ?x ?y)
+    (counter ?x)
+    (floor ?x)
+    (braiserbody ?x)
+    (oven ?x)
+    (braiserlid ?x)
+    (arm ?x)
+    (veggiecabbage ?x)
+    (meatturkeyleg ?x)
+    (controllable ?x)
+    (faucet ?x)
   )
 )

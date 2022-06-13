@@ -10,7 +10,7 @@ from pybullet_tools.pr2_utils import get_group_conf
 from pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, wait_if_gui, \
     SEPARATOR, get_aabb, wait_for_duration
 from pybullet_tools.bullet_utils import summarize_facts, print_goal, nice
-from pybullet_tools.pr2_agent import get_stream_info, post_process, move_cost_fn
+from pybullet_tools.pr2_agent import get_stream_info, post_process, move_cost_fn, stream_info
 from pybullet_tools.logging import TXT_FILE
 
 from pybullet_tools.pr2_primitives import get_group_joints, Conf, get_base_custom_limits, Pose, Conf, \
@@ -23,6 +23,7 @@ from pddlstream.language.generator import from_gen_fn, from_list_fn, from_fn, fn
 from pddlstream.language.constants import Equal, AND, print_solution, PDDLProblem
 from pddlstream.utils import read, INF, get_file_path, find_unique, Profiler, str_from_object
 from pddlstream.algorithms.meta import solve, create_parser
+from pddlstream.algorithms.focused import solve_focused
 
 from pybullet_planning.lisdf_tools.lisdf_loader import load_lisdf_pybullet
 from pybullet_planning.lisdf_tools.lisdf_planning import pddl_to_init_goal, Problem
@@ -30,7 +31,7 @@ from pybullet_planning.lisdf_tools.lisdf_planning import pddl_to_init_goal, Prob
 from world_builder.actions import apply_actions
 
 
-DEFAULT_TEST = 'test_feg_cabinets_rearrange' ## 'test_feg_pick' ## 'test_feg_cabinets'  ##
+DEFAULT_TEST = 'test_feg_cabinets_rearrange' ## 'test_feg_pick' ## 'test_feg_cabinets'  ## 'test_feg_cook_only'  ##
 
 def pddlstream_from_dir(problem, exp_dir, collisions=True, teleport=False):
 
@@ -44,8 +45,7 @@ def pddlstream_from_dir(problem, exp_dir, collisions=True, teleport=False):
     goal = [AND] + goal
     problem.add_init(init)
 
-    base_limits = planning_config['base_limits']
-    custom_limits = get_base_custom_limits(world.robot, base_limits)
+    custom_limits = planning_config['base_limits']
     stream_map = get_stream_map(problem, collisions, custom_limits, teleport)
 
     return PDDLProblem(domain_pddl, constant_map, stream_pddl, stream_map, init, goal)
@@ -72,16 +72,16 @@ def main(exp_name, verbose=True):
     args = get_args(exp_name)
 
     exp_dir = join(EXP_PATH, args.test)
-    world = load_lisdf_pybullet(exp_dir, width=720, height=560)
+    world = load_lisdf_pybullet(exp_dir, width=960, height=1280) ## , width=720, height=560)
     saver = WorldSaver()
     problem = Problem(world)
 
     pddlstream_problem = pddlstream_from_dir(problem, exp_dir=exp_dir, collisions=not args.cfree,
                                              teleport=args.teleport)
-    world.summarize_all_objects()
-
-    stream_info = get_stream_info(partial=False, defer=False)
     _, _, _, stream_map, init, goal = pddlstream_problem
+    world.summarize_all_objects(init)
+
+    # stream_info = get_stream_info(partial=False, defer=False)  ## problem
     summarize_facts(init, world=world)
     print_goal(goal)
     print(SEPARATOR)
@@ -89,8 +89,15 @@ def main(exp_name, verbose=True):
 
     with Profiler():
         with LockRenderer(lock=not args.enable):
-            solution = solve(pddlstream_problem, algorithm=args.algorithm, unit_costs=args.unit,
-                             stream_info=stream_info, success_cost=INF, verbose=True, debug=False)
+            solution = solve_focused(pddlstream_problem, stream_info=stream_info,
+                                     planner='ff-astar1', max_planner_time=10, debug=False,
+                                     unit_costs=True, success_cost=INF,
+                                     max_time=INF, verbose=True, visualize=False,
+                                     unit_efforts=True, effort_weight=1,
+                                     bind=True, max_skeletons=INF,
+                                     search_sample_ratio=0)
+            # solution = solve(pddlstream_problem, algorithm=args.algorithm, unit_costs=args.unit,
+            #                  stream_info=stream_info, success_cost=INF, verbose=True, debug=False)
             saver.restore()
 
     print_solution(solution)

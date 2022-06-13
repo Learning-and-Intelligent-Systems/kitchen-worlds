@@ -1,4 +1,7 @@
-newmtl material_0_0
+# Blender MTL File: 'None'
+# Material Count: 1
+
+newmtl material_0_0.001
 illum 3
 d 1
 Ns 30

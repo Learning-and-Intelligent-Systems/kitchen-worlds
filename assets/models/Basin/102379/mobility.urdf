@@ -3,34 +3,120 @@
 	<link name="base"/>
 
 	<joint name="faucet_transform" type="fixed">
-    <parent link="basin"/>
-    <child link="faucet_platform"/>
-    <origin rpy="0 0 0" xyz="-0.014 -0.1 -0.3"/>
-  </joint>
-  <link name="faucet_platform">
+	    <parent link="basin"/>
+	    <child link="faucet_platform"/>
+	    <origin rpy="0 0 0" xyz="-0.014 -0.1 -0.3"/>
+  	</joint>
+
+	<link name="faucet_platform">
 		<visual name="platform">
 			<geometry>
-        <box size="1.3 .001 .24"/>
-      </geometry>
+		    	<box size="1.3 .001 .24"/>
+		  	</geometry>
 		</visual>
-  </link>
+	</link>
 
 	<joint name="bottom_transform" type="fixed">
-    <parent link="basin"/>
-    <child link="basin_bottom"/>
-    <origin rpy="0 0 0" xyz="0 -0.24 0.21"/>
-  </joint>
-  <link name="basin_bottom">
+		<parent link="basin"/>
+		<child link="basin_bottom"/>
+		<origin rpy="0 0 0" xyz="0 -0.24 0.21"/>
+	</joint>
+	<link name="basin_bottom">
 		<origin rpy="0 0 0" xyz="0 -0.4 0.21"/>
 		<visual name="water">
 			<geometry>
-        <box size="1.26 .001 .84"/>
+      	<box size="1.26 .001 .84"/>
       </geometry>
 			<material name="Blue">
 				<color rgba="0.537254902 0.811764706 0.941176471 1.0"/>
 			</material>
 		</visual>
-  </link>
+		<collision name="water_col">
+			<geometry>
+	        	<box size="1.26 .001 .84"/>
+	        </geometry>
+		</collision>
+	</link>
+
+	<link name="link_collision_1">
+		<visual>
+			<origin xyz="0 0 0"/>
+			<geometry>
+				<mesh filename="textured_objs/basin-minus-y.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0"/>
+			<geometry>
+				<mesh filename="textured_objs/basin-minus-y.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_collision_1" type="fixed">
+		<origin rpy="0 0 0" xyz="0 0 0"/>
+		<child link="link_collision_1"/>
+		<parent link="basin"/>
+	</joint>
+
+	<link name="link_collision_2">
+		<visual>
+			<origin xyz="0 0 0"/>
+			<geometry>
+				<mesh filename="textured_objs/basin-minus-x.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0"/>
+			<geometry>
+				<mesh filename="textured_objs/basin-minus-x.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_collision_2" type="fixed">
+		<origin rpy="0 0 0" xyz="0 0 0"/>
+		<child link="link_collision_2"/>
+		<parent link="basin"/>
+	</joint>
+
+	<link name="link_collision_3">
+		<visual>
+			<origin xyz="0 0 0"/>
+			<geometry>
+				<mesh filename="textured_objs/basin-plus-y.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0"/>
+			<geometry>
+				<mesh filename="textured_objs/basin-plus-y.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_collision_3" type="fixed">
+		<origin rpy="0 0 0" xyz="0 0 0"/>
+		<child link="link_collision_3"/>
+		<parent link="basin"/>
+	</joint>
+
+	<link name="link_collision_4">
+		<visual>
+			<origin xyz="0 0 0"/>
+			<geometry>
+				<mesh filename="textured_objs/basin-plus-x.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0"/>
+			<geometry>
+				<mesh filename="textured_objs/basin-plus-x.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_collision_4" type="fixed">
+		<origin rpy="0 0 0" xyz="0 0 0"/>
+		<child link="link_collision_4"/>
+		<parent link="basin"/>
+	</joint>
 
 	<link name="basin">
 		<visual name="base_body-2">
@@ -87,13 +173,15 @@
 				<mesh filename="textured_objs/original-46.obj"/>
 			</geometry>
 		</visual> -->
-		<visual name="base_body-2--10">
+
+		<visual name="base_body-2-10">
 			<origin xyz="0 0 0"/>
 			<geometry>
 				<mesh filename="textured_objs/original-57-new.obj"/>
 			</geometry>
 		</visual>
-		<collision>
+
+		<!-- <collision>
 			<origin xyz="0 0 0"/>
 			<geometry>
 				<mesh filename="textured_objs/original-64.obj"/>
@@ -111,12 +199,6 @@
 				<mesh filename="textured_objs/original-54.obj"/>
 			</geometry>
 		</collision>
-		<!-- <collision>
-			<origin xyz="0 0 0"/>
-			<geometry>
-				<mesh filename="textured_objs/original-63.obj"/>
-			</geometry>
-		</collision> -->
 		<collision>
 			<origin xyz="0 0 0"/>
 			<geometry>
@@ -135,24 +217,12 @@
 				<mesh filename="textured_objs/original-47.obj"/>
 			</geometry>
 		</collision>
-		<!-- <collision>
-			<origin xyz="0 0 0"/>
-			<geometry>
-				<mesh filename="textured_objs/original-53.obj"/>
-			</geometry>
-		</collision>
-		<collision>
-			<origin xyz="0 0 0"/>
-			<geometry>
-				<mesh filename="textured_objs/original-46.obj"/>
-			</geometry>
-		</collision> -->
 		<collision>
 			<origin xyz="0 0 0"/>
 			<geometry>
 				<mesh filename="textured_objs/original-57-new.obj"/>
 			</geometry>
-		</collision>
+		</collision> -->
 	</link>
 	<joint name="joint_2" type="fixed">
 		<origin rpy="0 0 0" xyz="0 1.03 -0.14"/>

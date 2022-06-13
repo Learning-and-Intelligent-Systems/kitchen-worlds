@@ -72,12 +72,12 @@
     )
 
     ;; -------- already put those possible w2 in init -----------
-    ;(:stream update-wconf-pst
-    ;  :inputs (?w1 ?o ?pst)
-    ;  :domain (and (WConf ?w1) (Position ?o ?pst))
-    ;  :outputs (?w2)
-    ;  :certified (and (WConf ?w2) (NewWConfPst ?w1 ?o ?pst ?w2))
-    ;)
+    (:stream update-wconf-pst
+      :inputs (?w1 ?o ?pst)
+      :domain (and (WConf ?w1) (Position ?o ?pst))
+      :outputs (?w2)
+      :certified (and (WConf ?w2) (NewWConfPst ?w1 ?o ?pst ?w2))
+    )
     ;; ----------------------------------------------------------
 
   (:stream test-reachable-pose
