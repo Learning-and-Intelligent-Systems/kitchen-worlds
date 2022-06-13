@@ -12,7 +12,6 @@ A library of long-horizon Task-and-Motion-Planning (TAMP) problems in kitchen an
 <video autoplay loop muted playsinline width=100%>
   <source src="mp4/demo-cabbage.mp4" type="video/mp4">
 </video>
--->
 
 <table class="multicol tightframes">
 <tr>
@@ -33,6 +32,7 @@ A library of long-horizon Task-and-Motion-Planning (TAMP) problems in kitchen an
 </td>
 </tr>
 </table>
+-->
 
 ## Setup
 
