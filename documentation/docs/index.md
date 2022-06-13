@@ -103,12 +103,12 @@ Some test cases (verified that they can run on Ubuntu with Python 3.7/3.8):
 <tr>
 <td width="50%">
 
-<img src="../gifs/220613-clean-only.gif"></img>
+<img src="gifs/220613-clean-only.gif"></img>
 
 </td>
 <td width="50%">
 
-<img src="../gifs/220613-rearraneg-only.gif"></img>
+<img src="gifs/220613-rearraneg-only.gif"></img>
 
 </td>
 </tr>
@@ -135,12 +135,12 @@ Other test cases (to be uploaded soon):
 <tr>
 <td width="50%">
 
-<img src="../gifs/220602-serve-plate.gif"></img>
+<img src="gifs/220602-serve-plate.gif"></img>
 
 </td>
 <td width="50%">
 
-<img src="../gifs/220531-cook-only.gif"></img>
+<img src="gifs/220531-cook-only.gif"></img>
 
 </td>
 </tr>
