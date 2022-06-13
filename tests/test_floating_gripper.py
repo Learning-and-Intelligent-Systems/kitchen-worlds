@@ -31,7 +31,10 @@ from pybullet_planning.lisdf_tools.lisdf_planning import pddl_to_init_goal, Prob
 from world_builder.actions import apply_actions
 
 
-DEFAULT_TEST = 'test_feg_cabinets_rearrange' ## 'test_feg_pick' ## 'test_feg_cabinets'  ## 'test_feg_cook_only'  ##
+DEFAULT_TEST = 'test_feg_cabinets_rearrange'  ## success
+# DEFAULT_TEST = 'test_feg_clean_only'  ## success
+# DEFAULT_TEST = 'test_feg_clean_after_open'  ## fail
+
 
 def pddlstream_from_dir(problem, exp_dir, collisions=True, teleport=False):
 
@@ -72,7 +75,7 @@ def main(exp_name, verbose=True):
     args = get_args(exp_name)
 
     exp_dir = join(EXP_PATH, args.test)
-    world = load_lisdf_pybullet(exp_dir, width=960, height=1280) ## , width=720, height=560)
+    world = load_lisdf_pybullet(exp_dir, width=1280, height=960) ## , width=720, height=560)
     saver = WorldSaver()
     problem = Problem(world)
 
@@ -118,7 +121,7 @@ def main(exp_name, verbose=True):
         control_commands(commands)
     else:
         # apply_commands(State(), commands, time_step=0.01)
-        apply_actions(problem, commands, time_step=0.01)
+        apply_actions(problem, commands, time_step=0.1)
     wait_if_gui('Finish?')
     disconnect()
 
