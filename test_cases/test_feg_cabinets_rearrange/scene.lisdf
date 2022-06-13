@@ -1,12 +1,12 @@
 <?xml version="1.0" ?>
 <!-- sdf file created by Yang's kitchen scene generator -->
 <sdf version="1.9">
-  <world name="test_feg_cabinets_rearrange_1">
+  <world name="test_feg_cabinets_rearrange">
 
     <gui>
       <camera name="default_camera" definition_type="lookat">
-        <xyz>3.559 8.205 1.368</xyz>
-        <point_to>0.559 8.205 0.868</point_to>
+        <xyz>3.569 8.186 1.368</xyz>
+        <point_to>0.569 8.186 0.868</point_to>
       </camera>
     </gui>
 
@@ -49,45 +49,45 @@
     </include>
 
     <include name="braiserbody#1">
-      <uri>../../assets/models/braiserbody/100693/mobility.urdf</uri>
+      <uri>../../assets/models/BraiserBody/100693/mobility.urdf</uri>
       <static>true</static>
       <scale>0.259</scale>
-      <pose>0.567 8.18 0.818 0.0 -0.0 0.744</pose>
+      <pose>0.567 8.18 0.818 0.0 -0.0 1.795</pose>
     </include>
 
     <include name="vinegarbottle#1">
-      <uri>../../assets/models/vinegarbottle/3615/mobility.urdf</uri>
+      <uri>../../assets/models/VinegarBottle/3615/mobility.urdf</uri>
       <static>false</static>
       <scale>0.175</scale>
-      <pose>0.377 9.107 1.532 0.0 -0.0 2.325</pose>
+      <pose>0.322 8.631 1.526 0.0 -0.0 2.383</pose>
     </include>
 
     <include name="oilbottle#1">
-      <uri>../../assets/models/oilbottle/3616/mobility.urdf</uri>
+      <uri>../../assets/models/OilBottle/3616/mobility.urdf</uri>
       <static>false</static>
       <scale>0.175</scale>
-      <pose>0.263 8.814 1.55 0.0 -0.0 1.1</pose>
+      <pose>0.324 8.944 1.555 0.0 -0.0 1.615</pose>
     </include>
 
     <include name="braiserlid#1">
-      <uri>../../assets/models/braiserlid/100693/mobility.urdf</uri>
+      <uri>../../assets/models/BraiserLid/100693/mobility.urdf</uri>
       <static>false</static>
       <scale>0.259</scale>
-      <pose>0.559 8.205 0.821 0.0 -0.0 0.918</pose>
+      <pose>0.57 8.186 0.821 0.0 -0.0 1.582</pose>
     </include>
 
     <include name="meatturkeyleg#1">
-      <uri>../../assets/models/meatturkeyleg/00001/mobility.urdf</uri>
+      <uri>../../assets/models/MeatTurkeyLeg/00001/mobility.urdf</uri>
       <static>false</static>
       <scale>0.00049</scale>
-      <pose>0.355 8.905 0.844 0.0 -0.0 1.233</pose>
+      <pose>0.633 8.702 0.844 0.0 -0.0 2.914</pose>
     </include>
 
     <include name="veggiecabbage#1">
-      <uri>../../assets/models/veggiecabbage/00001/mobility.urdf</uri>
+      <uri>../../assets/models/VeggieCabbage/00001/mobility.urdf</uri>
       <static>false</static>
       <scale>0.0034999999999999996</scale>
-      <pose>0.742 9.066 0.87 0.0 -0.0 2.575</pose>
+      <pose>0.436 8.82 0.87 0.0 -0.0 0.891</pose>
     </include>
 
     <include name="oven#1">
@@ -98,7 +98,7 @@
     </include>
 
 
-    <state world_name="test_feg_cabinets_rearrange_1">
+    <state world_name="test_feg_cabinets_rearrange">
       <model name="feg0">
         <joint name="x"><angle>0.9</angle></joint>
         <joint name="y"><angle>8.0</angle></joint>

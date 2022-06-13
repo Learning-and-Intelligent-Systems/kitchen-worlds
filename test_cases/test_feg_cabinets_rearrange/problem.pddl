@@ -1,6 +1,6 @@
 
 (define
-  (problem test_feg_cabinets_rearrange_1)
+  (problem test_feg_cabinets_rearrange)
   (:domain domain)
 
   (:objects
@@ -25,11 +25,11 @@
 	oven#1
 	veggiecabbage#1
 	vinegarbottle#1
-	wconf176
-	wconf312
-	wconf352
-	wconf512
-	wconf992
+	wconf344
+	wconf600
+	wconf736
+	wconf776
+	wconf936
   )
 
   (:init
@@ -44,41 +44,36 @@
 	(floor floor1)
 
 	(handempty hand)
-	(wconf wconf176)
-	(wconf wconf512)
-	(wconf wconf352)
-	(wconf wconf312)
-	(wconf wconf992)
+	(wconf wconf600)
+	(wconf wconf936)
+	(wconf wconf344)
+	(wconf wconf776)
+	(wconf wconf736)
 
-	(inwconf wconf352)
+	(inwconf wconf776)
 
 	(controllable hand)
 	(counter counter#1)
 
-	(bottle oilbottle#1)
-	(bottle vinegarbottle#1)
+	(oilbottle oilbottle#1)
 
+	(bottle vinegarbottle#1)
+	(bottle oilbottle#1)
+	(edible meatturkeyleg#1)
+	(edible veggiecabbage#1)
+	(graspable braiserlid#1)
+	(graspable veggiecabbage#1)
 	(graspable oilbottle#1)
 	(graspable meatturkeyleg#1)
 	(graspable vinegarbottle#1)
-	(graspable braiserlid#1)
-	(graspable veggiecabbage#1)
-	(oilbottle oilbottle#1)
-
-	(edible meatturkeyleg#1)
-	(edible veggiecabbage#1)
 
 	(braiserlid braiserlid#1)
-	(space counter#1::dagger)
+
 	(space counter#1::sektion)
 	(space counter#1::hitman_drawer_top)
+	(space counter#1::dagger)
 
 	(braiserbody braiserbody#1)
-
-	(oftype oilbottle#1 @bottle)
-	(oftype veggiecabbage#1 @edible)
-	(oftype meatturkeyleg#1 @edible)
-	(oftype vinegarbottle#1 @bottle)
 
 	(meatturkeyleg meatturkeyleg#1)
 	(surface counter#1::indigo_tmp)
@@ -88,109 +83,112 @@
 	(veggiecabbage veggiecabbage#1)
 	(vinegarbottle vinegarbottle#1)
 
-	(seconf q16=(0.9, 8, 0.7, 0, -1.571, 0))
+	(oftype veggiecabbage#1 @edible)
+	(oftype oilbottle#1 @bottle)
+	(oftype meatturkeyleg#1 @edible)
+	(oftype vinegarbottle#1 @bottle)
 
-	(door counter#1::dagger_door_right_joint)
-	(door counter#1::chewie_door_right_joint)
 	(door counter#1::dagger_door_left_joint)
 	(door counter#1::chewie_door_left_joint)
+	(door counter#1::dagger_door_right_joint)
+	(door counter#1::chewie_door_right_joint)
 
-	(atseconf q16=(0.9, 8, 0.7, 0, -1.571, 0))
+	(seconf q440=(0.9, 8, 0.7, 0, -1.571, 0))
 
-	(containable vinegarbottle#1 counter#1::sektion)
-	(containable braiserlid#1 counter#1::sektion)
-	(containable oilbottle#1 counter#1::hitman_drawer_top)
-	(containable veggiecabbage#1 counter#1::sektion)
-	(containable meatturkeyleg#1 counter#1::hitman_drawer_top)
-	(containable oilbottle#1 counter#1::dagger)
-	(containable meatturkeyleg#1 counter#1::dagger)
-	(containable vinegarbottle#1 counter#1::hitman_drawer_top)
-	(containable braiserlid#1 counter#1::hitman_drawer_top)
-	(containable veggiecabbage#1 counter#1::hitman_drawer_top)
-	(containable vinegarbottle#1 counter#1::dagger)
-	(containable braiserlid#1 counter#1::dagger)
-	(containable oilbottle#1 counter#1::sektion)
-	(containable veggiecabbage#1 counter#1::dagger)
-	(containable meatturkeyleg#1 counter#1::sektion)
-	(originalseconf q16=(0.9, 8, 0.7, 0, -1.571, 0))
+	(atseconf q440=(0.9, 8, 0.7, 0, -1.571, 0))
 
+	(originalseconf q440=(0.9, 8, 0.7, 0, -1.571, 0))
 	(stackable veggiecabbage#1 counter#1::hitman_tmp)
-	(stackable vinegarbottle#1 counter#1::front_left_stove)
-	(stackable meatturkeyleg#1 braiserbody#1::braiser_bottom)
-	(stackable braiserlid#1 counter#1::front_left_stove)
-	(stackable vinegarbottle#1 counter#1::hitman_tmp)
-	(stackable veggiecabbage#1 braiserbody#1::braiser_bottom)
-	(stackable braiserlid#1 counter#1::hitman_tmp)
 	(stackable oilbottle#1 counter#1::indigo_tmp)
 	(stackable meatturkeyleg#1 counter#1::indigo_tmp)
+	(stackable vinegarbottle#1 counter#1::front_left_stove)
 	(stackable vinegarbottle#1 braiserbody#1::braiser_bottom)
-	(stackable braiserlid#1 braiserbody#1::braiser_bottom)
-	(stackable oilbottle#1 counter#1::hitman_tmp)
-	(stackable veggiecabbage#1 counter#1::indigo_tmp)
+	(stackable veggiecabbage#1 braiserbody#1::braiser_bottom)
+	(stackable vinegarbottle#1 counter#1::hitman_tmp)
 	(stackable oilbottle#1 counter#1::front_left_stove)
-	(stackable oilbottle#1 braiserbody#1::braiser_bottom)
 	(stackable meatturkeyleg#1 counter#1::front_left_stove)
-	(stackable vinegarbottle#1 counter#1::indigo_tmp)
+	(stackable oilbottle#1 counter#1::hitman_tmp)
 	(stackable meatturkeyleg#1 counter#1::hitman_tmp)
 	(stackable braiserlid#1 counter#1::indigo_tmp)
+	(stackable oilbottle#1 braiserbody#1::braiser_bottom)
+	(stackable meatturkeyleg#1 braiserbody#1::braiser_bottom)
+	(stackable vinegarbottle#1 counter#1::indigo_tmp)
+	(stackable braiserlid#1 counter#1::front_left_stove)
+	(stackable veggiecabbage#1 counter#1::indigo_tmp)
+	(stackable braiserlid#1 counter#1::hitman_tmp)
 	(stackable veggiecabbage#1 counter#1::front_left_stove)
+	(stackable braiserlid#1 braiserbody#1::braiser_bottom)
 
-	(isjointto counter#1::dagger_door_left_joint counter#1)
-	(isjointto counter#1::chewie_door_left_joint counter#1)
-	(isjointto counter#1::chewie_door_right_joint counter#1)
-	(isjointto counter#1::dagger_door_right_joint counter#1)
-
-	(position counter#1::dagger_door_left_joint pstn3=-1.57)
-	(position counter#1::chewie_door_right_joint pstn1=1.57)
-	(position counter#1::chewie_door_left_joint pstn4=0)
-	(position counter#1::dagger_door_right_joint pstn2=1.57)
-	(position counter#1::dagger_door_left_joint pstn7=0)
 	(position counter#1::chewie_door_right_joint pstn5=0)
+	(position counter#1::dagger_door_left_joint pstn7=0)
+	(position counter#1::dagger_door_right_joint pstn2=1.57)
 	(position counter#1::chewie_door_left_joint pstn0=-1.57)
 	(position counter#1::dagger_door_right_joint pstn6=0)
+	(position counter#1::dagger_door_left_joint pstn3=-1.57)
+	(position counter#1::chewie_door_left_joint pstn4=0)
+	(position counter#1::chewie_door_right_joint pstn1=1.57)
 
-	(pose braiserlid#1 p2=(0.559, 8.205, 0.821, 0, 0, 0.918))
-	(pose oilbottle#1 p1=(0.263, 8.814, 1.55, 0, 0, 1.1))
-	(pose meatturkeyleg#1 p3=(0.355, 8.905, 0.844, 0, 0, 1.233))
-	(pose vinegarbottle#1 p0=(0.377, 9.107, 1.532, 0, 0, 2.325))
-	(pose veggiecabbage#1 p4=(0.742, 9.066, 0.87, 0, 0, 2.575))
+	(containable braiserlid#1 counter#1::hitman_drawer_top)
+	(containable oilbottle#1 counter#1::dagger)
+	(containable veggiecabbage#1 counter#1::hitman_drawer_top)
+	(containable braiserlid#1 counter#1::sektion)
+	(containable braiserlid#1 counter#1::dagger)
+	(containable veggiecabbage#1 counter#1::dagger)
+	(containable vinegarbottle#1 counter#1::hitman_drawer_top)
+	(containable vinegarbottle#1 counter#1::sektion)
+	(containable veggiecabbage#1 counter#1::sektion)
+	(containable vinegarbottle#1 counter#1::dagger)
+	(containable meatturkeyleg#1 counter#1::hitman_drawer_top)
+	(containable meatturkeyleg#1 counter#1::sektion)
+	(containable meatturkeyleg#1 counter#1::dagger)
+	(containable oilbottle#1 counter#1::hitman_drawer_top)
+	(containable oilbottle#1 counter#1::sektion)
 
-	(atposition counter#1::chewie_door_right_joint pstn1=1.57)
-	(atposition counter#1::dagger_door_left_joint pstn3=-1.57)
-	(atposition counter#1::dagger_door_right_joint pstn2=1.57)
+	(isjointto counter#1::dagger_door_right_joint counter#1)
+	(isjointto counter#1::chewie_door_right_joint counter#1)
+	(isjointto counter#1::dagger_door_left_joint counter#1)
+	(isjointto counter#1::chewie_door_left_joint counter#1)
+	(pose oilbottle#1 p1=(0.324, 8.944, 1.555, 0, 0, 1.615))
+	(pose braiserlid#1 p2=(0.57, 8.186, 0.821, 0, 0, 1.582))
+	(pose vinegarbottle#1 p0=(0.322, 8.631, 1.526, 0, 0, 2.383))
+	(pose veggiecabbage#1 p4=(0.436, 8.82, 0.87, 0, 0, 0.891))
+	(pose meatturkeyleg#1 p3=(0.633, 8.702, 0.844, 0, 0, 2.914))
+
+	(atpose oilbottle#1 p1=(0.324, 8.944, 1.555, 0, 0, 1.615))
+	(atpose veggiecabbage#1 p4=(0.436, 8.82, 0.87, 0, 0, 0.891))
+	(atpose meatturkeyleg#1 p3=(0.633, 8.702, 0.844, 0, 0, 2.914))
+	(atpose vinegarbottle#1 p0=(0.322, 8.631, 1.526, 0, 0, 2.383))
+	(atpose braiserlid#1 p2=(0.57, 8.186, 0.821, 0, 0, 1.582))
 	(atposition counter#1::chewie_door_left_joint pstn0=-1.57)
+	(atposition counter#1::dagger_door_left_joint pstn3=-1.57)
+	(atposition counter#1::chewie_door_right_joint pstn1=1.57)
+	(atposition counter#1::dagger_door_right_joint pstn2=1.57)
 
-	(isopenedposition counter#1::chewie_door_right_joint pstn5=0)
-	(isopenedposition counter#1::dagger_door_left_joint pstn7=0)
 	(isopenedposition counter#1::chewie_door_left_joint pstn4=0)
+	(isopenedposition counter#1::dagger_door_left_joint pstn7=0)
 	(isopenedposition counter#1::dagger_door_right_joint pstn6=0)
+	(isopenedposition counter#1::chewie_door_right_joint pstn5=0)
 
-	(atpose vinegarbottle#1 p0=(0.377, 9.107, 1.532, 0, 0, 2.325))
-	(atpose braiserlid#1 p2=(0.559, 8.205, 0.821, 0, 0, 0.918))
-	(atpose oilbottle#1 p1=(0.263, 8.814, 1.55, 0, 0, 1.1))
-	(atpose veggiecabbage#1 p4=(0.742, 9.066, 0.87, 0, 0, 2.575))
-	(atpose meatturkeyleg#1 p3=(0.355, 8.905, 0.844, 0, 0, 1.233))
-
+	(isclosedposition counter#1::dagger_door_right_joint pstn2=1.57)
 	(isclosedposition counter#1::chewie_door_left_joint pstn0=-1.57)
 	(isclosedposition counter#1::dagger_door_left_joint pstn3=-1.57)
 	(isclosedposition counter#1::chewie_door_right_joint pstn1=1.57)
-	(isclosedposition counter#1::dagger_door_right_joint pstn2=1.57)
 
-	(newwconfpst wconf352 counter#1::dagger_door_right_joint pstn6=0 wconf992)
-	(newwconfpst wconf352 counter#1::chewie_door_right_joint pstn5=0 wconf176)
-	(newwconfpst wconf352 counter#1::chewie_door_left_joint pstn4=0 wconf312)
-	(newwconfpst wconf352 counter#1::dagger_door_left_joint pstn7=0 wconf512)
+	(newwconfpst wconf776 counter#1::dagger_door_right_joint pstn6=0 wconf936)
+	(newwconfpst wconf776 counter#1::chewie_door_right_joint pstn5=0 wconf600)
+	(newwconfpst wconf776 counter#1::chewie_door_left_joint pstn4=0 wconf736)
+	(newwconfpst wconf776 counter#1::dagger_door_left_joint pstn7=0 wconf344)
 
-	(contained oilbottle#1 p1=(0.263, 8.814, 1.55, 0, 0, 1.1) counter#1::dagger)
-	(contained vinegarbottle#1 p0=(0.377, 9.107, 1.532, 0, 0, 2.325) counter#1::dagger)
+	(contained vinegarbottle#1 p0=(0.322, 8.631, 1.526, 0, 0, 2.383) counter#1::dagger)
+	(contained oilbottle#1 p1=(0.324, 8.944, 1.555, 0, 0, 1.615) counter#1::dagger)
 
-	(supported meatturkeyleg#1 p3=(0.355, 8.905, 0.844, 0, 0, 1.233) counter#1::indigo_tmp)
-	(supported veggiecabbage#1 p4=(0.742, 9.066, 0.87, 0, 0, 2.575) counter#1::indigo_tmp)
+	(supported meatturkeyleg#1 p3=(0.633, 8.702, 0.844, 0, 0, 2.914) counter#1::indigo_tmp)
+	(supported veggiecabbage#1 p4=(0.436, 8.82, 0.87, 0, 0, 0.891) counter#1::indigo_tmp)
 
   )
 
   (:goal (and
-    (in oilbottle#1 counter#1::sektion)
+    (storedinspace @bottle counter#1::sektion)
   ))
 )
         
