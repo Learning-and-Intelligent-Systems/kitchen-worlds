@@ -48,6 +48,14 @@
     <li class="toctree-l2"><a class="reference internal" href="#setup">Setup</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#lisdf-parser-testing">LISDF parser testing</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#planning">Planning</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#scene-generation">Scene generation</a>
+    </li>
+        </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#acknowledgements">Acknowledgements</a>
     </li>
@@ -153,12 +161,29 @@
 </table>
 
 <h2 id="setup">Setup<a class="headerlink" href="#setup" title="Permanent link">#</a></h2>
-<p>Grab the submodules, may take a while</p>
+<ol>
+<li>Grab the submodules, may take a while</li>
+</ol>
 <pre><code class="language-shell">cd kitchen-worlds
 git submodule update --init --recursive
 </code></pre>
-<p>Install the dependencies, in a virtual environment if you'd like</p>
-<pre><code class="language-shell">## pip install virtualenv  ## if you haven't install
+<ol>
+<li>Build FastDownward, used by PDDLStream planner</li>
+</ol>
+<pre><code class="language-shell">cd pddlstream
+./downward/build.py
+</code></pre>
+<ol>
+<li>Checkout the right branch of lisdf paerse</li>
+</ol>
+<pre><code class="language-shell">cd ../lisdf
+git checkout main
+git checkout pddl-constant-support
+</code></pre>
+<ol>
+<li>Install the other dependencies, in a virtual environment if you'd like. Have been tested on Python 3.7 and 3.8, on MacOS and on Ubuntu.</li>
+</ol>
+<pre><code class="language-shell">pip install virtualenv  ## if you haven't install
 python3 -m virtualenv venv/kitchen
 source venv/kitchen/bin/activate
 
@@ -166,6 +191,7 @@ pip install -r requirements.txt
 pip install scipy untangle
 </code></pre>
 <h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">#</a></h2>
+<h3 id="lisdf-parser-testing">LISDF parser testing<a class="headerlink" href="#lisdf-parser-testing" title="Permanent link">#</a></h3>
 <p>To run all tests before git push, do</p>
 <pre><code class="language-commandline">cd tests
 sh run_tests.sh
@@ -180,12 +206,73 @@ python test_pybullet_lisdf.py
 ##  Test parse problem.pddl
 python test_parse_pddl.py
 </code></pre>
-<p>To solve some test problems wih PDDLStream, <code>-test</code> takes the name of subdirectory inside <code>test_cases</code> folder, e.g. <code>blocks_pick</code>, <code>blocks_kitchen</code>, <code>kitchen</code>:</p>
+<h3 id="planning">Planning<a class="headerlink" href="#planning" title="Permanent link">#</a></h3>
+<p>To solve some test problems wih PDDLStream, <code>-test</code> takes the name of subdirectory inside <code>test_cases</code> folder.</p>
 <pre><code class="language-commandline">python test_pddlstream.py -test test_pr2_kitchen
 </code></pre>
-<p>To build some scenes</p>
+<p>Some test cases (verified that they can run on Ubuntu with Python 3.7/3.8):</p>
+<table class="multicol">
+<tr>
+<td width="50%">
+
+<img src="../gifs/220613-clean-only.gif"></img>
+
+</td>
+<td width="50%">
+
+<img src="../gifs/220613-rearraneg-only.gif"></img>
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+`test_feg_clean_only`
+
+</td>
+<td width="50%">
+
+`test_feg_cabinets_rearrange`
+
+</td>
+</tr>
+</table>
+
+<p>Note: There may be weird bounding boxes drawn during planning and pybullet throwing errors. if that happens and planning doesn't return a solution. Stop the script and run again. It may be a pybullet problem (happens only in Ubutun with python 3.8 but not MacOS with python 3.7)</p>
+<p>Other test cases (to be uploaded soon):</p>
+<table class="multicol">
+
+<tr>
+<td width="50%">
+
+<img src="../gifs/220602-serve-plate.gif"></img>
+
+</td>
+<td width="50%">
+
+<img src="../gifs/220531-cook-only.gif"></img>
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+`test_feg_dishwasher` (currently unavailable)
+
+</td>
+<td width="50%">
+
+`test_feg_cook_only` (currently unavailable)
+
+</td>
+</tr>
+</table>
+
+<h3 id="scene-generation">Scene generation<a class="headerlink" href="#scene-generation" title="Permanent link">#</a></h3>
+<p>To build some scenes.</p>
 <pre><code class="language-commandline">python test_world_builder.py
 </code></pre>
+<p>The default script creates 10 scenes with variations on the following properties of movable objects: (1) mesh model instances, (2) poses on their assigned surface or space.</p>
 <h2 id="acknowledgements">Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permanent link">#</a></h2>
 <p>This repo works thanks for the tools provided by LIS lab members and alum:</p>
 <ul>
