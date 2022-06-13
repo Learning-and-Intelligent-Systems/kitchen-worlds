@@ -6,9 +6,13 @@ A library of long-horizon Task-and-Motion-Planning (TAMP) problems in kitchen an
 - solve a TAMP problem using PDDLStream defined with a scene.lisdf, problem.pddl, domain.pddl, stream.pddl
 - procedurally generate scenes with rigid and articulated objects
 
+<img src="gifs/demo-cabbage.gif"></img>
+
+<!--
 <video autoplay loop muted playsinline width=100%>
   <source src="mp4/demo-cabbage.mp4" type="video/mp4">
 </video>
+-->
 
 <table class="multicol tightframes">
 <tr>
