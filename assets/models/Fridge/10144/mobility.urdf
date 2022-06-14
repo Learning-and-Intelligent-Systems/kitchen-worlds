@@ -11,7 +11,7 @@
 		<visual name="handle-14">
 			<origin xyz="-0.29319931760430357 0 -0.24443491768836934"/>
 			<geometry>
-				<mesh filename="textured_objs/handle.obj"/>
+				<mesh filename="textured_objs/handle-new.obj"/>
 			</geometry>
 		</visual>
 		<visual name="glass-15">
@@ -38,13 +38,13 @@
 		<visual name="handle">
 			<origin xyz="-0.29319931760430357 0 -0.24443491768836934"/>
 			<geometry>
-				<mesh filename="textured_objs/handle_grasp.obj"/>
+				<mesh filename="textured_objs/handle_grasp-new.obj"/>
 			</geometry>
 		</visual>
 		<collision>
 			<origin xyz="-0.29319931760430357 0 -0.24443491768836934"/>
 			<geometry>
-				<mesh filename="textured_objs/handle_grasp.obj"/>
+				<mesh filename="textured_objs/handle_grasp-new.obj"/>
 			</geometry>
 		</collision>
 	</link>
@@ -145,6 +145,28 @@
 			</geometry>
 		</collision>
 	</link>
+
+	<joint name="fridge_collision_back" type="fixed">
+		<origin xyz="0 0 0"/>
+		<child link="fridge_collision_back_link"/>
+		<parent link="fridge_body"/>
+	</joint>
+	<link name="fridge_collision_back_link">
+		<visual>
+			<origin xyz="0 0 0"/>
+			<geometry>
+				<mesh filename="textured_objs/fridge_body_back.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0"/>
+			<geometry>
+				<mesh filename="textured_objs/fridge_body_back.obj"/>
+			</geometry>
+		</collision>
+	</link>
+
+
 	<link name="fridge_body">
 		<visual name="frame-10">
 			<origin xyz="0 0 0"/>
