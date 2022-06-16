@@ -3,3 +3,5 @@
 assets/tmp/*
 *.lisdf~
 *.pyc
+*.pddl~
+*.obj~
