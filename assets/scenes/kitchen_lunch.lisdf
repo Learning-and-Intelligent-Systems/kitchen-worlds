@@ -96,12 +96,12 @@
       <pose>0.7 8.673 0.844 0.0 -0.0 1.801</pose>
     </include>
     -->    
-    
+
     <include name="oven#1">
       <uri>../models/Oven/01909/mobility.urdf</uri>
       <static>true</static>
       <scale>0.8815298531369634</scale>
-      <pose>0.6 0.4 0.727 0.0 -0.0 3.142</pose>
+      <pose>0.6 0.4 0.6 0.0 -0.0 3.142</pose>
     </include>
 
     <include name="dishwasher#1">

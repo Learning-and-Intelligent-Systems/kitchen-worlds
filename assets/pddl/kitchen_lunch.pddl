@@ -159,7 +159,7 @@
 )
 
   (:goal (and
-  	 (on meatblock#1 fridge#1::shelf_bottom)
-	 (on veggieblock#1 counter#1::indigo_tmp)))
+  	 ;(on meatblock#1 fridge#1::shelf_bottom)
+	 (on veggieblock#1 counter#1::front_left_stove)))
 )
 
