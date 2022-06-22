@@ -6,6 +6,9 @@ A library of long-horizon Task-and-Motion-Planning (TAMP) problems in kitchen an
 - solve a TAMP problem using PDDLStream defined with a scene.lisdf, problem.pddl, domain.pddl, stream.pddl
 - procedurally generate scenes with rigid and articulated objects
 
+<img src="gifs/demo-cabbage.gif"></img>
+
+<!--
 <video autoplay loop muted playsinline width=100%>
   <source src="mp4/demo-cabbage.mp4" type="video/mp4">
 </video>
@@ -29,6 +32,7 @@ A library of long-horizon Task-and-Motion-Planning (TAMP) problems in kitchen an
 </td>
 </tr>
 </table>
+-->
 
 ## Setup
 
@@ -68,6 +72,8 @@ pip install scipy untangle
 
 ## Examples
 
+### LISDF parser testing
+
 To run all tests before git push, do
 ```commandline
 cd tests
@@ -86,16 +92,85 @@ python test_pybullet_lisdf.py
 python test_parse_pddl.py
 ```
 
-To solve some test problems wih PDDLStream, `-test` takes the name of subdirectory inside `test_cases` folder, e.g. `blocks_pick`, `blocks_kitchen`, `kitchen`:
+### Planning
+
+To solve some test problems wih PDDLStream, `-test` takes the name of subdirectory inside `test_cases` folder.
 
 ```commandline
 python test_pddlstream.py -test test_pr2_kitchen
+python test_floating_gripper.py -test test_feg_clean_only
 ```
 
-To build some scenes
+Some test cases (verified that they can run on Ubuntu with Python 3.7/3.8):
+
+<table class="multicol">
+<tr>
+<td width="50%">
+
+<img src="gifs/220613-clean-only.gif"></img>
+
+</td>
+<td width="50%">
+
+<img src="gifs/220613-rearraneg-only.gif"></img>
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+`test_feg_clean_only`
+
+</td>
+<td width="50%">
+
+`test_feg_cabinets_rearrange`
+
+</td>
+</tr>
+</table>
+
+Note: There may be weird bounding boxes drawn during planning and pybullet throwing errors. if that happens and planning doesn't return a solution. Stop the script and run again. It may be a pybullet problem (happens only in Ubutun with python 3.8 but not MacOS with python 3.7)
+
+Other test cases (to be uploaded soon):
+
+<table class="multicol">
+
+<tr>
+<td width="50%">
+
+<img src="gifs/220602-serve-plate.gif"></img>
+
+</td>
+<td width="50%">
+
+<img src="gifs/220531-cook-only.gif"></img>
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+`test_feg_dishwasher` (currently unavailable)
+
+</td>
+<td width="50%">
+
+`test_feg_cook_only` (currently unavailable)
+
+</td>
+</tr>
+</table>
+
+### Scene generation
+
+To build some scenes.
+
 ```commandline
 python test_world_builder.py
 ```
+
+The default script creates 10 scenes with variations on the following properties of movable objects: (1) mesh model instances, (2) poses on their assigned surface or space.
 
 ## Acknowledgements
 
