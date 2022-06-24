@@ -60,9 +60,6 @@
 				  <geometry> <box><size>0.6 1.2 0.03</size></box></geometry>
 					<material>
 						<ambient>0.6 0.4 0.2 1</ambient>
-						<diffuse>0.6 0.4 0.2 1</diffuse>
-						<specular>0.6 0.4 0.2 1</specular>
-						<emissive>0.6 0.4 0.2 1</emissive>
 					</material>
 				</visual>				
 			</link>
@@ -126,9 +123,6 @@
 					</geometry>
 					<material>
 						<ambient>1 0.1 0.1 1</ambient>
-						<diffuse>1 0.1 0.1 1</diffuse>
-						<specular>1 0.1 0.1 1</specular>
-						<emissive>1 0.1 0.1 1</emissive>
 					</material>
 				</visual>
 
@@ -143,30 +137,20 @@
 				<collision name="pillar#3_collision">
 					<geometry>
 					  <box>
-					    <!--
-							<size>0.2 0.2 0.001</size>
-					    -->
-					    		<size>0.15 0.15 0.001</size>
-						</box>
+					    <size>0.15 0.15 0.001</size>
+					  </box>
 					</geometry>
 				</collision>
 				<visual name="pillar#3_visual">
 					<geometry>
 					  <box>
-					    <!--
-							<size>0.2 0.2 0.001</size>
-					    -->
-					                <size>0.15 0.15 0.001</size>
-						</box>
+					    <size>0.15 0.15 0.001</size>
+					  </box>
 					</geometry>
 					<material>
 						<ambient>0.1 1 0.1 1</ambient>
-						<diffuse>0.1 1 0.1 1</diffuse>
-						<specular>0.1 1 0.1 1</specular>
-						<emissive>0.1 1 0.1 1</emissive>
 					</material>
 				</visual>
-
 			</link>
 		</model>
 		<model name="banana#12_1">
@@ -188,14 +172,6 @@
 					    <scale>1.0 1.0 1.0</scale>
 					  </mesh>
 					</geometry>
-
-					<material>
-						<ambient>1 1 1 1</ambient>
-						<diffuse>1 1 1 1</diffuse>
-						<specular>1 1 1 1</specular>
-						<emissive>1 1 1 1</emissive>
-					</material>
- 					
 				</visual>
 			</link>
 		</model>
@@ -221,14 +197,6 @@
 					    <scale>1.0 1.0 1.0</scale>
 					  </mesh>
 					</geometry>
-					<material>
-						<ambient>1 1 1 1</ambient>
-						<diffuse>1 1 1 1</diffuse>
-						<specular>1 1 1 1</specular>
-						<emissive>1 1 1 1</emissive>
-					</material>
-
-		
 				</visual>
 			</link>
 		</model>
