@@ -31,7 +31,8 @@ from pybullet_planning.lisdf_tools.lisdf_planning import pddl_to_init_goal, Prob
 from world_builder.actions import apply_actions
 
 
-DEFAULT_TEST = 'test_feg_cabinets_rearrange'  ## success
+# DEFAULT_TEST = 'test_feg_cabinets_rearrange'  ## success
+DEFAULT_TEST = 'test_feg_pick_1'  ## success
 # DEFAULT_TEST = 'test_feg_clean_only'  ## success
 # DEFAULT_TEST = 'test_feg_clean_after_open'  ## fail
 
