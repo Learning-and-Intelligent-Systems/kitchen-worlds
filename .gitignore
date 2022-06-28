@@ -24,3 +24,6 @@ tests/visualizations/
 tests/statistics/
 
 outputs/
+!outputs/data_demo.html
+!outputs/style.css
+!outputs/test_feg_pick_1/220627-16:25/
