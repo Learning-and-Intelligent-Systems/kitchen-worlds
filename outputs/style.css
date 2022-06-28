@@ -1,0 +1,28 @@
+* {box-sizing: border-box;}
+.row {overflow: auto; height: 800px; background-color: #EEEEEE}
+.col {width: 12.5%; float: left;}
+.col img {position: block; width: 97%; margin: 5px;}
+.white {background-color: #ffffff !important}
+.infeasible {color: #e74c3c !important}
+.feasible {color: #27ae60 !important}
+
+@media (max-width: 400px) {.col {width: 100%;}}
+
+div.scroll {
+    height: 800px;
+    overflow: scroll;
+    text-align: justify;
+    padding: 5px;
+}
+
+::-webkit-scrollbar {
+    width: 15px;
+    height: 15px;
+}
+::-webkit-scrollbar-track-piece  {
+    background-color: #DDDDDD;
+}
+::-webkit-scrollbar-thumb:vertical {
+    height: 30px;
+    background-color: #CCCCCC;
+}
