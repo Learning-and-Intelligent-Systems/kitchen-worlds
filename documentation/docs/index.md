@@ -58,7 +58,14 @@ git checkout main
 git checkout pddl-constant-support
 ```
 
-4. Install the other dependencies, in a virtual environment if you'd like. Have been tested on Python 3.7 and 3.8, on MacOS and on Ubuntu.
+4. Install [graphviz](https://pygraphviz.github.io/documentation/latest/install.html)
+
+```commandline
+pip install pydot
+sudo apt-get install graphviz graphviz-dev
+```
+
+5. Install the other dependencies, in a virtual environment if you'd like. Have been tested on Python 3.7 and 3.8, on MacOS and on Ubuntu.
 
 ```shell
 pip install virtualenv  ## if you haven't install

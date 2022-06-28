@@ -5,10 +5,11 @@ import os
 import json
 from os.path import join, abspath, dirname, isdir, isfile
 from config import EXP_PATH
+import pybullet as p
 
 from pybullet_tools.pr2_utils import get_group_conf
 from pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, wait_if_gui, \
-    SEPARATOR, get_aabb, wait_for_duration
+    SEPARATOR, get_aabb, wait_for_duration, get_bodies, remove_body, get_links
 from pybullet_tools.bullet_utils import summarize_facts, print_goal, nice
 from pybullet_tools.pr2_agent import get_stream_info, post_process, move_cost_fn, stream_info
 from pybullet_tools.logging import TXT_FILE
@@ -32,7 +33,7 @@ from world_builder.actions import apply_actions
 
 
 # DEFAULT_TEST = 'test_feg_cabinets_rearrange'  ## success
-DEFAULT_TEST = 'test_feg_pick_1'  ## success
+DEFAULT_TEST = 'test_feg_pick_1'  ## 'test_feg_pick_1_opened'  ## success
 # DEFAULT_TEST = 'test_feg_clean_only'  ## success
 # DEFAULT_TEST = 'test_feg_clean_after_open'  ## fail
 
@@ -71,6 +72,45 @@ def get_args(exp_name):
 
 #####################################
 
+
+def get_depth_images(exp_name, width=1280, height=960):  ## , width=720, height=560)
+    camera_pose = ((3.7, 8, 1.3), (0.5, 0.5, -0.5, -0.5))
+    args = get_args(exp_name)
+    exp_dir = join(EXP_PATH, args.test)
+    world = load_lisdf_pybullet(exp_dir, width=width, height=height)
+    init = pddl_to_init_goal(exp_dir, world)[0]
+
+    world.add_camera(camera_pose)
+    world.visualize_image(index='scene')
+
+    b2n = world.body_to_name
+    c2b = world.cat_to_bodies
+    bodies = c2b('graspable', init) + [world.robot.body]
+    body_links = c2b('surface', init) + c2b('space', init)
+    body_joints = c2b('door', init) + c2b('drawer', init)
+
+    links_to_remove = {}
+    for body_link in body_links:
+        body, _, link = body_link
+        links_to_remove[body_link] = [l for l in get_links(body) if l != link]
+
+    for body in body_links:
+        for b in get_bodies():
+            if b != body and b != body[0]:
+                remove_body(b)
+            else:
+                ## remove links
+                links = links_to_remove[body]
+                if len(links) > 0:
+                    print(body, link)
+
+        world.visualize_image(index=b2n[body])
+        disconnect()
+        world = load_lisdf_pybullet(exp_dir, width=width, height=height)
+        world.add_camera(camera_pose)
+
+    print()
+
 def main(exp_name, verbose=True):
 
     args = get_args(exp_name)
@@ -96,7 +136,7 @@ def main(exp_name, verbose=True):
             solution = solve_focused(pddlstream_problem, stream_info=stream_info,
                                      planner='ff-astar1', max_planner_time=10, debug=False,
                                      unit_costs=True, success_cost=INF,
-                                     max_time=INF, verbose=True, visualize=False,
+                                     max_time=INF, verbose=True, visualize=True,
                                      unit_efforts=True, effort_weight=1,
                                      bind=True, max_skeletons=INF,
                                      search_sample_ratio=0)
@@ -129,4 +169,5 @@ def main(exp_name, verbose=True):
 
 
 if __name__ == '__main__':
-    main(exp_name=DEFAULT_TEST)
+    # main(exp_name=DEFAULT_TEST)
+    get_depth_images(exp_name=DEFAULT_TEST)

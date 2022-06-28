@@ -20,3 +20,7 @@ test_cases/
 */statistics/
 */temp/
 tests/txt_file.txt
+tests/visualizations/
+tests/statistics/
+
+outputs/
