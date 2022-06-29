@@ -29,7 +29,7 @@ from pybullet_planning.lisdf_tools.lisdf_planning import pddl_to_init_goal, Prob
 from world_builder.actions import apply_actions
 
 
-DEFAULT_TEST = 'test_blocks_kitchen' ## 'test_pr2_kitchen' ##
+DEFAULT_TEST = 'test_pr2_kitchen' ##  'test_blocks_kitchen' ##
 
 def pddlstream_from_dir(problem, exp_dir, collisions=True, teleport=False):
 
@@ -38,9 +38,8 @@ def pddlstream_from_dir(problem, exp_dir, collisions=True, teleport=False):
     domain_pddl = read(join(exp_dir, 'domain_full.pddl'))
     stream_pddl = read(join(exp_dir, 'stream.pddl'))
     planning_config = json.load(open(join(exp_dir, 'planning_config.json')))
-    constant_map = {}
 
-    init, goal = pddl_to_init_goal(exp_dir, world)
+    init, goal, constant_map = pddl_to_init_goal(exp_dir, world)
     goal = [AND] + goal
     problem.add_init(init)
 

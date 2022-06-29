@@ -130,10 +130,10 @@ def main(exp_name, verbose=True):
 
 
 if __name__ == '__main__':
-    # main(exp_name=DEFAULT_TEST)
+    main(exp_name=DEFAULT_TEST)
 
-    from lisdf_tools.lisdf_loader import get_depth_images
-    exp_name = DEFAULT_TEST
-    args = get_args(exp_name)
-    exp_dir = join(EXP_PATH, args.test)
-    get_depth_images(exp_dir=exp_dir)
+    # from lisdf_tools.lisdf_loader import get_depth_images
+    # exp_name = DEFAULT_TEST
+    # args = get_args(exp_name)
+    # exp_dir = join(EXP_PATH, args.test)
+    # get_depth_images(exp_dir=exp_dir)
