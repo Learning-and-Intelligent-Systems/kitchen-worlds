@@ -3,6 +3,7 @@ from os.path import join, isfile
 import sys
 from config import ASSET_PATH, EXP_PATH
 import time
+import tqdm
 import pybullet as p
 import random
 import numpy as np
@@ -50,7 +51,7 @@ def get_parser():
     return args
 
 def create_pybullet_world(builder, world_name='test_scene', SAVE_LISDF=False, EXIT=True,
-                          SAVE_TESTCASE=False, template_name=None, out_dir=None):
+                          SAVE_TESTCASE=False, template_name=None, out_dir=None, verbose=False):
     args = get_parser()
     if template_name is None:
         template_name = builder.__name__
@@ -58,7 +59,7 @@ def create_pybullet_world(builder, world_name='test_scene', SAVE_LISDF=False, EX
     """ ============== initiate simulator ==================== """
 
     ## for viewing, not the size of depth image
-    connect(use_gui=True, shadows=False, width=1980, height=1238)
+    connect(use_gui=False, shadows=False, width=1980, height=1238)
 
     # set_camera_pose(camera_point=[2.5, 0., 3.5], target_point=[1., 0, 1.])
     if args.camera:
@@ -69,20 +70,21 @@ def create_pybullet_world(builder, world_name='test_scene', SAVE_LISDF=False, EX
     """ ============== sample world configuration ==================== """
 
     world = World(args, time_step=args.time_step)
-    floorplan, goal = builder(world)
+    floorplan, goal = builder(world, verbose=verbose)
 
     ## no gravity once simulation starts
     set_all_static()
-    world.summarize_all_objects()
+    if verbose: world.summarize_all_objects()
 
     """ ============== save world configuration ==================== """
 
     state = State(world)
     file = None
-    if SAVE_LISDF:
-        file = to_lisdf(state.world, state.get_facts(), floorplan=floorplan, world_name=world_name)
+    if SAVE_LISDF:   ## only lisdf files
+        init = state.get_facts(verbose=verbose)
+        file = to_lisdf(state.world, init, floorplan=floorplan, world_name=world_name, verbose=verbose)
     if SAVE_TESTCASE and out_dir is not None:
-        file = save_to_test_cases(state, goal, template_name, floorplan, out_dir)
+        file = save_to_test_cases(state, goal, template_name, floorplan, out_dir, verbose=verbose)
     if EXIT:
         wait_if_gui('exit?')
     disconnect()
@@ -91,28 +93,30 @@ def create_pybullet_world(builder, world_name='test_scene', SAVE_LISDF=False, EX
 
 if __name__ == '__main__':
     parallel = True
+    num_cases = 10
     builder = test_feg_pick  ## test_kitchen_oven  ## test_exist_omelette ##
-    num_cases = 2
     out_dir = test_feg_pick.__name__  ##.replace('test', '')
     out_dir += f'_{datetime.now().strftime("%m%d_%H:%M")}'
 
+    def process(index):
+        np.random.seed(index)
+        random.seed(index)
+        return create_pybullet_world(builder, out_dir=out_dir, SAVE_TESTCASE=True, EXIT=False, verbose=False)
+
     start_time = time.time()
     if parallel:
-        import multiprocess
-        from multiprocess import Pool
-
-        def process(index):
-            np.random.seed(index)
-            random.seed(index)
-            return create_pybullet_world(builder, out_dir=out_dir, SAVE_TESTCASE=True, EXIT=False)
-
-        num_cpus = multiprocess.cpu_count()
+        import multiprocessing
+        from multiprocessing import Pool
+        max_cpus = 24
+        num_cpus = min(multiprocessing.cpu_count(), max_cpus)
         print(f'using {num_cpus} cpus')
         with Pool(processes=num_cpus) as pool:
-            pool.map(process, range(num_cases))
+            for result in tqdm.tqdm(pool.imap_unordered(process, range(num_cases)), total=num_cases):
+                pass
+            # pool.map(process, range(num_cases))
 
     else:
         for i in range(num_cases):
-            create_pybullet_world(builder, out_dir=out_dir, SAVE_TESTCASE=True, EXIT=False)
+            process(i)
 
     print(f'generated {num_cases} problems (parallel={parallel}) in {round(time.time()-start_time, 3)} sec')
