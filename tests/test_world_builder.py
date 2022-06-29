@@ -4,6 +4,8 @@ import sys
 from config import ASSET_PATH, EXP_PATH
 import time
 import pybullet as p
+import random
+import numpy as np
 from pybullet_tools.utils import set_random_seed, connect, enable_preview, \
     disconnect, draw_pose, set_all_static, wait_if_gui, remove_handles, unit_pose, get_sample_fn, pairwise_collision, \
     set_camera_pose, add_line, get_point, BLACK, get_name, CLIENTS, get_client, link_from_name, \
@@ -96,13 +98,15 @@ if __name__ == '__main__':
 
     start_time = time.time()
     if parallel:
-        import multiprocessing
-        from multiprocessing import Pool
+        import multiprocess
+        from multiprocess import Pool
 
         def process(index):
+            np.random.seed(index)
+            random.seed(index)
             return create_pybullet_world(builder, out_dir=out_dir, SAVE_TESTCASE=True, EXIT=False)
 
-        num_cpus = multiprocessing.cpu_count()
+        num_cpus = multiprocess.cpu_count()
         print(f'using {num_cpus} cpus')
         with Pool(processes=num_cpus) as pool:
             pool.map(process, range(num_cases))
