@@ -2,7 +2,7 @@ import os
 from os.path import join, isfile
 import sys
 from config import ASSET_PATH, EXP_PATH
-
+import time
 import pybullet as p
 from pybullet_tools.utils import set_random_seed, connect, enable_preview, \
     disconnect, draw_pose, set_all_static, wait_if_gui, remove_handles, unit_pose, get_sample_fn, pairwise_collision, \
@@ -47,7 +47,7 @@ def get_parser():
     set_random_seed(args.seed)
     return args
 
-def create_pybullet_world(builder, SAVE_LISDF=False, world_name='test_scene', EXIT=True,
+def create_pybullet_world(builder, world_name='test_scene', SAVE_LISDF=False, EXIT=True,
                           SAVE_TESTCASE=False, template_name=None, out_dir=None):
     args = get_parser()
     if template_name is None:
@@ -88,10 +88,27 @@ def create_pybullet_world(builder, SAVE_LISDF=False, world_name='test_scene', EX
 
 
 if __name__ == '__main__':
+    parallel = True
     builder = test_feg_pick  ## test_kitchen_oven  ## test_exist_omelette ##
-    num_cases = 10
+    num_cases = 2
     out_dir = test_feg_pick.__name__  ##.replace('test', '')
     out_dir += f'_{datetime.now().strftime("%m%d_%H:%M")}'
 
-    for i in range(10):
-        create_pybullet_world(builder, SAVE_TESTCASE=True, out_dir=out_dir, EXIT=False)
+    start_time = time.time()
+    if parallel:
+        import multiprocessing
+        from multiprocessing import Pool
+
+        def process(index):
+            return create_pybullet_world(builder, out_dir=out_dir, SAVE_TESTCASE=True, EXIT=False)
+
+        num_cpus = multiprocessing.cpu_count()
+        print(f'using {num_cpus} cpus')
+        with Pool(processes=num_cpus) as pool:
+            pool.map(process, range(num_cases))
+
+    else:
+        for i in range(num_cases):
+            create_pybullet_world(builder, out_dir=out_dir, SAVE_TESTCASE=True, EXIT=False)
+
+    print(f'generated {num_cases} problems (parallel={parallel}) in {round(time.time()-start_time, 3)} sec')
