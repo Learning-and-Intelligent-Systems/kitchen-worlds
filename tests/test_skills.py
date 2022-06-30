@@ -114,13 +114,13 @@ TEST_MODELS = {
 }
 # ####################################
 
-def get_feg_world(exp_name=DEFAULT_TEST):
+def get_test_world(robot='feg'):
     args = get_args() ## exp_name
     connect(use_gui=True, shadows=False, width=360, height=270)  ## , width=1980, height=1238
     draw_pose(unit_pose(), length=2.)
     # create_floor()
     world = World(args)
-    add_robot(world, 'feg')
+    add_robot(world, robot)
     return world
 
 def add_robot(world, robot):
@@ -192,17 +192,21 @@ def test_spatial_algebra(body, robot):
     set_pose(gripper, W_X_G)
     set_camera_target_body(gripper, dx=0.5, dy=0, dz=0.5)
 
-def test_grasps(categories=[]):
-    world = get_feg_world()
-    problem = State(world, grasp_types=['hand']) ## , 'side' , 'top'
+def test_grasps(categories=[], robot='feg'):
+    world = get_test_world(robot)
+    robot = world.robot
+
+    problem = State(world, grasp_types=robot.grasp_types) ## , 'side' , 'top'
     funk = get_grasp_list_gen(problem, collisions=True, visualize=False, RETAIN_ALL=False)
 
-    i = 0
+    i = -1
     for cat in categories:
+        i += 1
         n = len(TEST_MODELS[cat])
-        locations = [(i, 0.5 * n) for n in range(1, n+1)]
-        j = 0
+        locations = [(i, 0.15 * n) for n in range(1, n+1)]
+        j = -1
         for id, scale in TEST_MODELS[cat].items():
+            j += 1
             path = join(ASSET_PATH, 'models', cat, id)
             body = load_body(path, scale, locations[j], random_yaw=True)
             world.add_body(body, f'{cat.lower()}#{id}')
@@ -219,8 +223,6 @@ def test_grasps(categories=[]):
             # set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.8)
             visualize_grasps(problem, outputs, body_pose, RETAIN_ALL=True)
             set_renderer(True)
-            j += 1
-        i += 1
     set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.5)
 
     wait_if_gui('Finish?')
@@ -495,16 +497,17 @@ if __name__ == '__main__':
     # test_texture(category='CoffeeMachine', id='103127')
 
 
-    ## --- robot related  ---
+    ## --- robot (FEGripper) related  ---
     # test_gripper_joints()
     # test_gripper_range()
 
 
     ## --- grasps related ---
-    # test_grasps(['Bottle'])  ## 'Bottle'
+    robot = 'feg' ## 'pr2' ##
+    test_grasps(['Bottle'], robot)  ## 'Bottle'
     # test_handle_grasps_counter()
     # test_handle_grasps_fridges()
 
 
     ## --- placement related  ---
-    test_placement_counter()
+    # test_placement_counter()
