@@ -126,7 +126,7 @@ def get_test_world(robot='feg'):
 def add_robot(world, robot):
     if robot == 'pr2':
         from world_builder.loaders import BASE_LIMITS as custom_limits
-        base_q = [3, 1, 0]
+        base_q = [0, -0.5, 0]
         robot = create_pr2_robot(world, custom_limits=custom_limits, base_q=base_q)
 
     elif robot == 'feg':
@@ -203,7 +203,7 @@ def test_grasps(categories=[], robot='feg'):
     for cat in categories:
         i += 1
         n = len(TEST_MODELS[cat])
-        locations = [(i, 0.15 * n) for n in range(1, n+1)]
+        locations = [(i, 0.5 * n) for n in range(1, n+1)]
         j = -1
         for id, scale in TEST_MODELS[cat].items():
             j += 1
@@ -217,6 +217,7 @@ def test_grasps(categories=[], robot='feg'):
             # draw_fitted_box(body, draw_centroid=True)
             # grasps = get_hand_grasps(problem, body)
 
+            set_renderer(True)
             body_pose = get_pose(body)  ## multiply(get_pose(body), Pose(euler=Euler(math.pi/2, 0, -math.pi/2)))
             outputs = funk(body)
             print(f'grasps on body {body}:', outputs)
@@ -503,7 +504,7 @@ if __name__ == '__main__':
 
 
     ## --- grasps related ---
-    robot = 'feg' ## 'pr2' ##
+    robot = 'pr2' ## 'feg' ##
     test_grasps(['Bottle'], robot)  ## 'Bottle'
     # test_handle_grasps_counter()
     # test_handle_grasps_fridges()
