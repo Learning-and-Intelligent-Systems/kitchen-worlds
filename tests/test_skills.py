@@ -45,6 +45,7 @@ from pybullet_planning.lisdf_tools.lisdf_planning import pddl_to_init_goal, Prob
 from world_builder.world import State
 from world_builder.loaders import create_gripper_robot, create_pr2_robot
 # from pybullet_planning.world_builder.colors import *
+from world_builder.partnet_scales import MODEL_SCALES as TEST_MODELS
 
 from test_pddlstream import get_args
 
@@ -61,62 +62,11 @@ import math
 DEFAULT_TEST = 'kitchen' ## 'blocks_pick'
 ASSET_PATH = join('..', 'assets')
 
-TEST_MODELS = {
-    'Fridge': {
-        # '10144': 1.09,
-        '10905': 1,
-        '11299': 1,
-        '11846': 1,
-        '12036': 1,
-        '12248': 1
-    },
-    'BottleTest': {
-        # '3380': 0.2,
-        '3517': 0.15,
-        '3763': 0.16,
-        '3933': 0.16,
-        '4043': 0.18,
-        '4403': 0.1,
-        '6771': 0.2,
-        '8736': 0.15,
-        '8848': 0.11
-    },
-    'Bottle': {
-        # '3380': 0.2,
-        '3558': 0.15,
-        '3574': 0.16,
-        '3614': 0.16,
-        '3615': 0.18,
-        '3616': 0.1,
-        '3822': 0.2,
-    },
-    'Camera': {
-        '101352': 0.08,
-        '102411': 0.1,
-        '102472': 0.1,
-        '102434': 0.1,
-        '102873': 0.1,
-    },
-    'Glasses': {
-        '101284': 0.15,
-        '101287': 0.16,
-        '101326': 0.16,
-        '101293': 0.18,
-        '101328': 0.1,
-    },
-    'Stapler': {
-        '103100': 0.15,
-        '103104': 0.16,
-        '103283': 0.16,
-        '103299': 0.18,
-        '103307': 0.1,
-    }
-}
 # ####################################
 
 def get_test_world(robot='feg'):
     args = get_args() ## exp_name
-    connect(use_gui=True, shadows=False, width=360, height=270)  ## , width=1980, height=1238
+    connect(use_gui=True, shadows=False, width=1980, height=1238)  ##  , width=360, height=270
     draw_pose(unit_pose(), length=2.)
     # create_floor()
     world = World(args)
@@ -224,6 +174,7 @@ def test_grasps(categories=[], robot='feg'):
             # set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.8)
             visualize_grasps(problem, outputs, body_pose, RETAIN_ALL=True)
             set_renderer(True)
+        wait_if_gui(f'------------- Next object category? finished ({i+1}/{len(categories)})')
     set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.5)
 
     wait_if_gui('Finish?')
@@ -460,14 +411,14 @@ def test_placement_counter():
 
 
 def get_data(category):
-    partnet_full_dataset_path = join('..', '..', 'dataset')
+    from world_builder.paths import PARTNET_PATH
     target_model_path = join(ASSET_PATH, 'models', category)
     if not isdir(target_model_path):
         os.mkdir(target_model_path)
 
-    if isdir(partnet_full_dataset_path):
+    if isdir(PARTNET_PATH):
         for idx, scale in TEST_MODELS[category].items():
-            old_path = join(partnet_full_dataset_path, idx)
+            old_path = join(PARTNET_PATH, idx)
             new_path = join(target_model_path, idx)
             if isdir(old_path) and not isdir(new_path):
                 shutil.copytree(old_path, new_path)
@@ -505,7 +456,7 @@ if __name__ == '__main__':
 
     ## --- grasps related ---
     robot = 'pr2' ## 'feg' ##
-    test_grasps(['Bottle'], robot)  ## 'Bottle'
+    test_grasps(['Stapler', 'Camera', 'Glasses'], robot)  ## 'Bottle'
     # test_handle_grasps_counter()
     # test_handle_grasps_fridges()
 
