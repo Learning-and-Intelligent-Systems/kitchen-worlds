@@ -46,6 +46,7 @@ from world_builder.world import State
 from world_builder.loaders import create_gripper_robot, create_pr2_robot
 # from pybullet_planning.world_builder.colors import *
 from world_builder.partnet_scales import MODEL_SCALES as TEST_MODELS
+from world_builder.partnet_scales import MODEL_HEIGHTS
 
 from test_pddlstream import get_args
 
@@ -55,7 +56,6 @@ from pybullet_tools.utils import connect, draw_pose, unit_pose, link_from_name, 
     sample_aabb, AABB, set_pose, get_aabb, get_aabb_center, quat_from_euler, Euler, HideOutput, get_aabb_extent, \
     set_camera_pose
 from pybullet_tools.flying_gripper_utils import create_fe_gripper, set_se3_conf
-from lisdf_tools.lisdf_loader import World
 import math
 
 
@@ -64,12 +64,17 @@ ASSET_PATH = join('..', 'assets')
 
 # ####################################
 
-def get_test_world(robot='feg'):
+def get_test_world(robot='feg', semantic_world=False):
     args = get_args() ## exp_name
     connect(use_gui=True, shadows=False, width=1980, height=1238)  ##  , width=360, height=270
     draw_pose(unit_pose(), length=2.)
     # create_floor()
-    world = World(args)
+    if semantic_world:
+        from world_builder.world import World
+        world = World(args)
+    else:
+        from lisdf_tools.lisdf_loader import World
+        world = World(args)
     add_robot(world, robot)
     return world
 
@@ -412,12 +417,16 @@ def test_placement_counter():
 
 def get_data(category):
     from world_builder.paths import PARTNET_PATH
+
+    models = TEST_MODELS[category] if category in TEST_MODELS \
+        else MODEL_HEIGHTS[category]['models']
+
     target_model_path = join(ASSET_PATH, 'models', category)
     if not isdir(target_model_path):
         os.mkdir(target_model_path)
 
     if isdir(PARTNET_PATH):
-        for idx, scale in TEST_MODELS[category].items():
+        for idx in models:
             old_path = join(PARTNET_PATH, idx)
             new_path = join(target_model_path, idx)
             if isdir(old_path) and not isdir(new_path):
@@ -441,11 +450,15 @@ def test_texture(category, id):
     # with open(path.replace('mobility', 'mobility_2'), "wb") as files:
     #     tree.write(files)
 
+def test_pick_place_counter(robot):
+    from world_builder.loaders import load_random_mini_kitchen_counter
+    world = get_test_world(robot, semantic_world=True)
+    load_random_mini_kitchen_counter(world)
 
 if __name__ == '__main__':
 
     ## --- MODELS  ---
-    # get_data(category='Bottle')
+    # get_data(category='KitchenMicrowave')
     # test_texture(category='CoffeeMachine', id='103127')
 
 
@@ -456,9 +469,10 @@ if __name__ == '__main__':
 
     ## --- grasps related ---
     robot = 'pr2' ## 'feg' ##
-    test_grasps(['Stapler', 'Camera', 'Glasses'], robot)  ## 'Bottle'
+    # test_grasps(['Stapler', 'Camera', 'Glasses'], robot)  ## 'Bottle'
     # test_handle_grasps_counter()
     # test_handle_grasps_fridges()
+    test_pick_place_counter(robot)
 
 
     ## --- placement related  ---
