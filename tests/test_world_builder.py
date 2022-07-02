@@ -98,15 +98,15 @@ if __name__ == '__main__':
 
     start_time = time.time()
     if parallel:
-        import multiprocess
-        from multiprocess import Pool
+        import multiprocessing
+        from multiprocessing import Pool
 
         def process(index):
             np.random.seed(index)
             random.seed(index)
             return create_pybullet_world(builder, out_dir=out_dir, SAVE_TESTCASE=True, EXIT=False)
 
-        num_cpus = multiprocess.cpu_count()
+        num_cpus = multiprocessing.cpu_count()
         print(f'using {num_cpus} cpus')
         with Pool(processes=num_cpus) as pool:
             pool.map(process, range(num_cases))
