@@ -45,6 +45,8 @@ from pybullet_planning.lisdf_tools.lisdf_planning import pddl_to_init_goal, Prob
 from world_builder.world import State
 from world_builder.loaders import create_gripper_robot, create_pr2_robot
 # from pybullet_planning.world_builder.colors import *
+from world_builder.partnet_scales import MODEL_SCALES as TEST_MODELS
+from world_builder.partnet_scales import MODEL_HEIGHTS
 
 from test_pddlstream import get_args
 
@@ -54,79 +56,32 @@ from pybullet_tools.utils import connect, draw_pose, unit_pose, link_from_name, 
     sample_aabb, AABB, set_pose, get_aabb, get_aabb_center, quat_from_euler, Euler, HideOutput, get_aabb_extent, \
     set_camera_pose
 from pybullet_tools.flying_gripper_utils import create_fe_gripper, set_se3_conf
-from lisdf_tools.lisdf_loader import World
 import math
 
 
 DEFAULT_TEST = 'kitchen' ## 'blocks_pick'
 ASSET_PATH = join('..', 'assets')
 
-TEST_MODELS = {
-    'Fridge': {
-        # '10144': 1.09,
-        '10905': 1,
-        '11299': 1,
-        '11846': 1,
-        '12036': 1,
-        '12248': 1
-    },
-    'BottleTest': {
-        # '3380': 0.2,
-        '3517': 0.15,
-        '3763': 0.16,
-        '3933': 0.16,
-        '4043': 0.18,
-        '4403': 0.1,
-        '6771': 0.2,
-        '8736': 0.15,
-        '8848': 0.11
-    },
-    'Bottle': {
-        # '3380': 0.2,
-        '3558': 0.15,
-        '3574': 0.16,
-        '3614': 0.16,
-        '3615': 0.18,
-        '3616': 0.1,
-        '3822': 0.2,
-    },
-    'Camera': {
-        '101352': 0.08,
-        '102411': 0.1,
-        '102472': 0.1,
-        '102434': 0.1,
-        '102873': 0.1,
-    },
-    'Glasses': {
-        '101284': 0.15,
-        '101287': 0.16,
-        '101326': 0.16,
-        '101293': 0.18,
-        '101328': 0.1,
-    },
-    'Stapler': {
-        '103100': 0.15,
-        '103104': 0.16,
-        '103283': 0.16,
-        '103299': 0.18,
-        '103307': 0.1,
-    }
-}
 # ####################################
 
-def get_feg_world(exp_name=DEFAULT_TEST):
+def get_test_world(robot='feg', semantic_world=False):
     args = get_args() ## exp_name
-    connect(use_gui=True, shadows=False, width=360, height=270)  ## , width=1980, height=1238
+    connect(use_gui=True, shadows=False, width=1980, height=1238)  ##  , width=360, height=270
     draw_pose(unit_pose(), length=2.)
     # create_floor()
-    world = World(args)
-    add_robot(world, 'feg')
+    if semantic_world:
+        from world_builder.world import World
+        world = World(args)
+    else:
+        from lisdf_tools.lisdf_loader import World
+        world = World(args)
+    add_robot(world, robot)
     return world
 
 def add_robot(world, robot):
     if robot == 'pr2':
         from world_builder.loaders import BASE_LIMITS as custom_limits
-        base_q = [3, 1, 0]
+        base_q = [0, -0.5, 0]
         robot = create_pr2_robot(world, custom_limits=custom_limits, base_q=base_q)
 
     elif robot == 'feg':
@@ -192,17 +147,21 @@ def test_spatial_algebra(body, robot):
     set_pose(gripper, W_X_G)
     set_camera_target_body(gripper, dx=0.5, dy=0, dz=0.5)
 
-def test_grasps(categories=[]):
-    world = get_feg_world()
-    problem = State(world, grasp_types=['hand']) ## , 'side' , 'top'
+def test_grasps(categories=[], robot='feg'):
+    world = get_test_world(robot)
+    robot = world.robot
+
+    problem = State(world, grasp_types=robot.grasp_types) ## , 'side' , 'top'
     funk = get_grasp_list_gen(problem, collisions=True, visualize=False, RETAIN_ALL=False)
 
-    i = 0
+    i = -1
     for cat in categories:
+        i += 1
         n = len(TEST_MODELS[cat])
         locations = [(i, 0.5 * n) for n in range(1, n+1)]
-        j = 0
+        j = -1
         for id, scale in TEST_MODELS[cat].items():
+            j += 1
             path = join(ASSET_PATH, 'models', cat, id)
             body = load_body(path, scale, locations[j], random_yaw=True)
             world.add_body(body, f'{cat.lower()}#{id}')
@@ -213,14 +172,14 @@ def test_grasps(categories=[]):
             # draw_fitted_box(body, draw_centroid=True)
             # grasps = get_hand_grasps(problem, body)
 
+            set_renderer(True)
             body_pose = get_pose(body)  ## multiply(get_pose(body), Pose(euler=Euler(math.pi/2, 0, -math.pi/2)))
             outputs = funk(body)
             print(f'grasps on body {body}:', outputs)
             # set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.8)
             visualize_grasps(problem, outputs, body_pose, RETAIN_ALL=True)
             set_renderer(True)
-            j += 1
-        i += 1
+        wait_if_gui(f'------------- Next object category? finished ({i+1}/{len(categories)})')
     set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.5)
 
     wait_if_gui('Finish?')
@@ -457,14 +416,18 @@ def test_placement_counter():
 
 
 def get_data(category):
-    partnet_full_dataset_path = join('..', '..', 'dataset')
+    from world_builder.paths import PARTNET_PATH
+
+    models = TEST_MODELS[category] if category in TEST_MODELS \
+        else MODEL_HEIGHTS[category]['models']
+
     target_model_path = join(ASSET_PATH, 'models', category)
     if not isdir(target_model_path):
         os.mkdir(target_model_path)
 
-    if isdir(partnet_full_dataset_path):
-        for idx, scale in TEST_MODELS[category].items():
-            old_path = join(partnet_full_dataset_path, idx)
+    if isdir(PARTNET_PATH):
+        for idx in models:
+            old_path = join(PARTNET_PATH, idx)
             new_path = join(target_model_path, idx)
             if isdir(old_path) and not isdir(new_path):
                 shutil.copytree(old_path, new_path)
@@ -487,24 +450,30 @@ def test_texture(category, id):
     # with open(path.replace('mobility', 'mobility_2'), "wb") as files:
     #     tree.write(files)
 
+def test_pick_place_counter(robot):
+    from world_builder.loaders import load_random_mini_kitchen_counter
+    world = get_test_world(robot, semantic_world=True)
+    load_random_mini_kitchen_counter(world)
 
 if __name__ == '__main__':
 
     ## --- MODELS  ---
-    # get_data(category='Bottle')
+    # get_data(category='KitchenMicrowave')
     # test_texture(category='CoffeeMachine', id='103127')
 
 
-    ## --- robot related  ---
+    ## --- robot (FEGripper) related  ---
     # test_gripper_joints()
     # test_gripper_range()
 
 
     ## --- grasps related ---
-    # test_grasps(['Bottle'])  ## 'Bottle'
+    robot = 'pr2' ## 'feg' ##
+    # test_grasps(['Stapler', 'Camera', 'Glasses'], robot)  ## 'Bottle'
     # test_handle_grasps_counter()
     # test_handle_grasps_fridges()
+    test_pick_place_counter(robot)
 
 
     ## --- placement related  ---
-    test_placement_counter()
+    # test_placement_counter()
