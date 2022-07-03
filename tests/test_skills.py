@@ -458,7 +458,7 @@ def test_pick_place_counter(robot):
 if __name__ == '__main__':
 
     ## --- MODELS  ---
-    # get_data(category='KitchenMicrowave')
+    get_data(category='KitchenCounter')
     # test_texture(category='CoffeeMachine', id='103127')
 
 
@@ -472,7 +472,7 @@ if __name__ == '__main__':
     # test_grasps(['Stapler', 'Camera', 'Glasses'], robot)  ## 'Bottle'
     # test_handle_grasps_counter()
     # test_handle_grasps_fridges()
-    test_pick_place_counter(robot)
+    # test_pick_place_counter(robot)
 
 
     ## --- placement related  ---

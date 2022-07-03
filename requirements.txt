@@ -8,3 +8,4 @@ pydot
 pygraphviz
 networkx
 seaborn
+tqdm

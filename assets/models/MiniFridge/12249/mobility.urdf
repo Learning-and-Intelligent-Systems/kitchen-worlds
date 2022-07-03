@@ -1,6 +1,30 @@
 <?xml version="1.0" ?>
 <robot name="partnet_3158fd17e409d38a732208e596b26ebc">
 	<link name="base"/>
+
+	<link name="handle">
+		<visual name="door_frame-7">
+			<origin xyz="-0.4767337469989671 -0.780485987663269 -0.45759143604256247"/>
+			<geometry>
+				<mesh filename="textured_objs/original-2-new.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<origin xyz="-0.4767337469989671 -0.780485987663269 -0.45759143604256247"/>
+			<geometry>
+				<mesh filename="textured_objs/original-2-new.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_handle" type="fixed">
+		<!-- <origin xyz="0.4767337469989671 0.780485987663269 0.49759143604256247"/> -->
+		<origin xyz="0 0 0.04"/>
+		<axis xyz="0 0.9999999999999999 0"/>
+		<child link="handle"/>
+		<parent link="link_0"/>
+	</joint>
+
+
 	<link name="link_0">
 		<visual name="door_frame-7">
 			<origin xyz="-0.4767337469989671 -0.780485987663269 -0.45759143604256247"/>
