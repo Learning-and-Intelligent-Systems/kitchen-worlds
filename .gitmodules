@@ -7,3 +7,6 @@
 [submodule "pddlstream"]
 	path = pddlstream
 	url = git@github.com:zt-yang/pddlstream.git
+[submodule "assets/models"]
+	path = assets/models
+	url = git@github.com:zt-yang/kitchen-models.git
