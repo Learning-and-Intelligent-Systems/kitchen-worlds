@@ -195,22 +195,34 @@ def load_body(path, scale, pose_2d=(0,0), random_yaw=False):
     set_pose(body, pose)
     return body
 
-def test_handle_grasps_fridges(custom_limits):
+def load_model_instance(category, id, location = (0, 0)):
+    path = join(ASSET_PATH, 'models', 'Fridge', id)
+
+    if category in MODEL_HEIGHTS:
+        height = MODEL_HEIGHTS[category]['height']
+        scale =
+        
+    body = load_body(path, scale, location)
+
+
+    return path, body
+
+def test_handle_grasps_fridges(robot, category):
     from pybullet_tools.pr2_streams import get_handle_pose
 
-    world = get_feg_world()
+    world = get_test_world(robot)
     problem = State(world)
     funk = get_handle_grasp_gen(problem, visualize=False)
 
     ## load fridge
-    n = len(TEST_MODELS['Fridge'])
+    instances = get_instances(category)
+    n = len(instances)
     i = 0
     locations = [(0, 2*n) for n in range(0, n)]
     set_camera_pose((4, 3, 2), (0, 3, 0.5))
-    for id, scale in TEST_MODELS['Fridge'].items():
-        path = join(ASSET_PATH, 'models', 'Fridge', id)
-        body = load_body(path, scale, locations[i])
-        world.add_body(body, f'fridge#{id}')
+    for id in instances:
+        path, body = load_model_instance(category, id, location=locations[i])
+        world.add_body(body, f'{category.lower()}#{id}')
         # set_camera_target_body(body, dx=1, dy=1, dz=1)
 
         ## color links corresponding to semantic labels
@@ -414,12 +426,14 @@ def test_placement_counter():
     wait_if_gui('Finish?')
     disconnect()
 
+def get_instances(category):
+    return TEST_MODELS[category] if category in TEST_MODELS \
+        else MODEL_HEIGHTS[category]['models']
 
 def get_data(category):
     from world_builder.paths import PARTNET_PATH
 
-    models = TEST_MODELS[category] if category in TEST_MODELS \
-        else MODEL_HEIGHTS[category]['models']
+    models = get_instances(category)
 
     target_model_path = join(ASSET_PATH, 'models', category)
     if not isdir(target_model_path):
@@ -458,7 +472,7 @@ def test_pick_place_counter(robot):
 if __name__ == '__main__':
 
     ## --- MODELS  ---
-    get_data(category='KitchenCounter')
+    # get_data(category='KitchenCounter')
     # test_texture(category='CoffeeMachine', id='103127')
 
 
@@ -471,7 +485,7 @@ if __name__ == '__main__':
     robot = 'pr2' ## 'feg' ##
     # test_grasps(['Stapler', 'Camera', 'Glasses'], robot)  ## 'Bottle'
     # test_handle_grasps_counter()
-    # test_handle_grasps_fridges()
+    test_handle_grasps_fridges(robot, category='MiniFridge')
     # test_pick_place_counter(robot)
 
 
