@@ -18,7 +18,7 @@ from pybullet_planning.pybullet_tools.utils import disconnect, LockRenderer, has
     SEPARATOR, get_aabb, get_pose, approximate_as_prism, draw_aabb, multiply, unit_quat, remove_body, invert, \
     Pose, get_link_pose, get_joint_limits, WHITE, RGBA, set_all_color, RED, GREEN, set_renderer
 from pybullet_planning.pybullet_tools.bullet_utils import summarize_facts, print_goal, nice, set_camera_target_body, \
-    draw_bounding_lines, fit_dimensions, draw_fitted_box, get_hand_grasps
+    draw_bounding_lines, fit_dimensions, draw_fitted_box, get_hand_grasps, get_partnet_doors
 from pybullet_planning.pybullet_tools.pr2_agent import get_stream_info, post_process, move_cost_fn, \
     visualize_grasps_by_quat, visualize_grasps
 from pybullet_planning.pybullet_tools.logging import TXT_FILE
@@ -196,44 +196,49 @@ def load_body(path, scale, pose_2d=(0,0), random_yaw=False):
     return body
 
 def load_model_instance(category, id, location = (0, 0)):
-    path = join(ASSET_PATH, 'models', 'Fridge', id)
+    from world_builder.utils import get_model_scale
+
+    path = join(ASSET_PATH, 'models', category, id)
 
     if category in MODEL_HEIGHTS:
         height = MODEL_HEIGHTS[category]['height']
-        scale =
-        
+        scale = get_model_scale(path, h=height)
+    else:
+        scale = TEST_MODELS[category][id]
+
     body = load_body(path, scale, location)
-
-
     return path, body
 
-def test_handle_grasps_fridges(robot, category):
+def test_handle_grasps(robot, category):
     from pybullet_tools.pr2_streams import get_handle_pose
 
     world = get_test_world(robot)
     problem = State(world)
-    funk = get_handle_grasp_gen(problem, visualize=False)
+    funk = get_handle_grasp_gen(problem, visualize=True)
 
     ## load fridge
     instances = get_instances(category)
     n = len(instances)
     i = 0
-    locations = [(0, 2*n) for n in range(0, n)]
+    locations = [(0, 2*n) for n in range(1, n+1)]
     set_camera_pose((4, 3, 2), (0, 3, 0.5))
     for id in instances:
         path, body = load_model_instance(category, id, location=locations[i])
         world.add_body(body, f'{category.lower()}#{id}')
-        # set_camera_target_body(body, dx=1, dy=1, dz=1)
+        set_camera_target_body(body, dx=1, dy=1, dz=1)
 
         ## color links corresponding to semantic labels
-        file = join(path, 'semantics.txt')
-        body_joints = world.add_semantic_label(body, file)
+        body_joints = get_partnet_doors(path, body)
+        world.add_semantic_label(body, body_joints)
+
         for body_joint in body_joints:
             outputs = funk(body_joint)
             body_pose = get_handle_pose(body_joint)
-            # set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.8)
+
+            set_renderer(True)
+            set_camera_target_body(body, dx=2, dy=1, dz=1)
             visualize_grasps(problem, outputs, body_pose, RETAIN_ALL=True)
-            # set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.8)
+            set_camera_target_body(body, dx=2, dy=1, dz=1)
 
         i += 1
 
@@ -472,7 +477,7 @@ def test_pick_place_counter(robot):
 if __name__ == '__main__':
 
     ## --- MODELS  ---
-    # get_data(category='KitchenCounter')
+    get_data(category='MiniFridge')
     # test_texture(category='CoffeeMachine', id='103127')
 
 
@@ -485,7 +490,7 @@ if __name__ == '__main__':
     robot = 'pr2' ## 'feg' ##
     # test_grasps(['Stapler', 'Camera', 'Glasses'], robot)  ## 'Bottle'
     # test_handle_grasps_counter()
-    test_handle_grasps_fridges(robot, category='MiniFridge')
+    test_handle_grasps(robot, category='MiniFridge')
     # test_pick_place_counter(robot)
 
 
