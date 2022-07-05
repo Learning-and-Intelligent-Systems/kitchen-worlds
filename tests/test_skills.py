@@ -214,7 +214,7 @@ def test_handle_grasps(robot, category):
 
     world = get_test_world(robot)
     problem = State(world)
-    funk = get_handle_grasp_gen(problem, visualize=True)
+    funk = get_handle_grasp_gen(problem, visualize=False)
 
     ## load fridge
     instances = get_instances(category)
