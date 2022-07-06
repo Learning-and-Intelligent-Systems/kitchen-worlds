@@ -16,12 +16,14 @@ from pybullet_planning.pybullet_tools.pr2_utils import get_group_conf
 from pybullet_planning.pybullet_tools.pr2_primitives import get_base_custom_limits, control_commands, apply_commands
 from pybullet_planning.pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, wait_if_gui, \
     SEPARATOR, get_aabb, get_pose, approximate_as_prism, draw_aabb, multiply, unit_quat, remove_body, invert, \
-    Pose, get_link_pose, get_joint_limits, WHITE, RGBA, set_all_color, RED, GREEN, set_renderer
+    Pose, get_link_pose, get_joint_limits, WHITE, RGBA, set_all_color, RED, GREEN, set_renderer, clone_body
 from pybullet_planning.pybullet_tools.bullet_utils import summarize_facts, print_goal, nice, set_camera_target_body, \
-    draw_bounding_lines, fit_dimensions, draw_fitted_box, get_hand_grasps, get_partnet_doors
+    draw_bounding_lines, fit_dimensions, draw_fitted_box, get_hand_grasps, get_partnet_doors, get_partnet_spaces, \
+    open_joint
 from pybullet_planning.pybullet_tools.pr2_agent import get_stream_info, post_process, move_cost_fn, \
     visualize_grasps_by_quat, visualize_grasps
 from pybullet_planning.pybullet_tools.logging import TXT_FILE
+from pybullet_tools.srl_stream_utils import process_urdf, TEMP_URDF_DIR
 
 ## custom stream_map
 from pybullet_planning.pybullet_tools.general_streams import get_grasp_list_gen, get_contain_list_gen
@@ -44,6 +46,7 @@ from pybullet_planning.lisdf_tools.lisdf_planning import pddl_to_init_goal, Prob
 
 from world_builder.world import State
 from world_builder.loaders import create_gripper_robot, create_pr2_robot
+from world_builder.utils import load_asset
 # from pybullet_planning.world_builder.colors import *
 from world_builder.partnet_scales import MODEL_SCALES as TEST_MODELS
 from world_builder.partnet_scales import MODEL_HEIGHTS
@@ -193,7 +196,7 @@ def load_body(path, scale, pose_2d=(0,0), random_yaw=False):
         if isinstance(body, tuple): body = body[0]
     pose = pose_from_2d(body, pose_2d, random_yaw=random_yaw)
     set_pose(body, pose)
-    return body
+    return body, file
 
 def load_model_instance(category, id, location = (0, 0)):
     from world_builder.utils import get_model_scale
@@ -206,8 +209,8 @@ def load_model_instance(category, id, location = (0, 0)):
     else:
         scale = TEST_MODELS[category][id]
 
-    body = load_body(path, scale, location)
-    return path, body
+    body, file = load_body(path, scale, location)
+    return file, body, scale
 
 def test_handle_grasps(robot, category):
     from pybullet_tools.pr2_streams import get_handle_pose
@@ -223,7 +226,7 @@ def test_handle_grasps(robot, category):
     locations = [(0, 2*n) for n in range(1, n+1)]
     set_camera_pose((4, 3, 2), (0, 3, 0.5))
     for id in instances:
-        path, body = load_model_instance(category, id, location=locations[i])
+        path, body, _ = load_model_instance(category, id, location=locations[i])
         world.add_body(body, f'{category.lower()}#{id}')
         set_camera_target_body(body, dx=1, dy=1, dz=1)
 
@@ -239,19 +242,71 @@ def test_handle_grasps(robot, category):
             set_camera_target_body(body, dx=2, dy=1, dz=1)
             visualize_grasps(problem, outputs, body_pose, RETAIN_ALL=True)
             set_camera_target_body(body, dx=2, dy=1, dz=1)
-
         i += 1
 
-    ## sample grasp
     set_camera_pose((4, 3, 2), (0, 3, 0.5))
-    print()
-
-    ## sample traj
-
-    ## execute traj
-
     wait_if_gui('Finish?')
     disconnect()
+
+
+def reload_after_vhacd(path, body, scale, id=None):
+    pose = get_pose(body)
+    remove_body(body)
+    new_urdf_path = process_urdf(path)
+    id_urdf_path = join(TEMP_URDF_DIR, f"{id}.urdf")
+    os.rename(new_urdf_path, id_urdf_path)
+    body = load_pybullet(id_urdf_path, scale=scale)
+    set_pose(body, pose)
+    return id_urdf_path, body
+
+
+def test_placement_in(robot, category):
+    from pybullet_tools.pr2_streams import get_handle_pose
+
+    world = get_test_world(robot)
+    problem = State(world)
+    funk = get_contain_list_gen(problem, collisions=True, verbose=False)
+
+    ## load fridge
+    instances = get_instances(category)
+    n = len(instances)
+    i = 0
+    locations = [(0, 2 * n) for n in range(1, n + 1)]
+    set_camera_pose((4, 3, 2), (0, 3, 0.5))
+    for id in instances:
+        (x, y) = locations[i]
+        path, body, scale = load_model_instance(category, id, location=(x, y))
+        new_urdf_path, body = reload_after_vhacd(path, body, scale, id=id)
+
+        world.add_body(body, f'{category.lower()}#{id}')
+        set_camera_target_body(body, dx=1, dy=0, dz=1)
+
+        ## color links corresponding to semantic labels
+        spaces = get_partnet_spaces(path, body)
+        world.add_spaces(body, spaces)
+
+        for door in get_partnet_doors(path, body):
+            open_joint(door[0], door[1])
+
+        for body_link in spaces:
+            x += 1
+            # space = clone_body(body, links=body_link[-1:], visual=True, collision=True)
+            # world.add_body(space, f'{category.lower()}#{id}-{body_link}')
+
+            cabbage = load_asset('VeggieCabbage', x=x, y=y, z=0, yaw=0)[0]
+            world.add_body(cabbage, f'cabbage#{i}-{body_link}')
+
+            outputs = funk(cabbage, body_link)
+            set_pose(cabbage, outputs[0][0].value)
+            set_renderer(True)
+            set_camera_target_body(cabbage, dx=1, dy=0, dz=1)
+        i += 1
+
+    # set_camera_pose((4, 3, 2), (0, 3, 0.5))
+    wait_if_gui('Finish?')
+    disconnect()
+
+
 
 def test_gripper_joints():
     """ visualize ee link pose as conf changes """
@@ -474,12 +529,28 @@ def test_pick_place_counter(robot):
     world = get_test_world(robot, semantic_world=True)
     load_random_mini_kitchen_counter(world)
 
+
+def test_vhacd():
+
+    urdf_path = '../assets/models/MiniFridge/11709/mobility.urdf'
+
+    world = get_test_world()
+    body = load_pybullet(urdf_path)
+    set_pose(body, ((0, 0, 0), unit_quat()))
+
+    new_urdf_path = process_urdf(urdf_path)
+    body = load_pybullet(new_urdf_path)
+    set_pose(body, ((0, 2, 0), unit_quat()))
+
+    set_camera_target_body(body, dx=1, dy=1, dz=1)
+    print()
+
 if __name__ == '__main__':
 
     ## --- MODELS  ---
-    get_data(category='MiniFridge')
+    # get_data(category='MiniFridge')
     # test_texture(category='CoffeeMachine', id='103127')
-
+    # test_vhacd()
 
     ## --- robot (FEGripper) related  ---
     # test_gripper_joints()
@@ -487,12 +558,13 @@ if __name__ == '__main__':
 
 
     ## --- grasps related ---
-    robot = 'pr2' ## 'feg' ##
+    robot = 'feg' ## 'pr2' ##
     # test_grasps(['Stapler', 'Camera', 'Glasses'], robot)  ## 'Bottle'
     # test_handle_grasps_counter()
-    test_handle_grasps(robot, category='MiniFridge')
+    # test_handle_grasps(robot, category='MiniFridge')
     # test_pick_place_counter(robot)
 
 
     ## --- placement related  ---
     # test_placement_counter()
+    test_placement_in(robot, category='MiniFridge')

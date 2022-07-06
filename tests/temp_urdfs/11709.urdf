@@ -1,0 +1,299 @@
+<?xml version='1.0' encoding='ASCII'?>
+<robot name="partnet_f71397f01cab21ffaff7331733d1f0f5">
+  <link name="base">
+    <inertial>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
+      <mass value="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+  </link>
+  <link name="link_0">
+    <inertial>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
+      <mass value="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+    <visual name="glass-20">
+      <geometry>
+        <mesh filename="../assets/models/MiniFridge/11709/textured_objs/original-9.obj"/>
+      </geometry>
+      <origin xyz="-0.2569944013908141 0.7078800201416013 -0.25011729958012885" rpy="0.0 -0.0 0.0"/>
+    </visual>
+    <visual name="glass-20">
+      <geometry>
+        <mesh filename="../assets/models/MiniFridge/11709/textured_objs/original-9-fixed.obj"/>
+      </geometry>
+      <origin xyz="-0.2569944013908141 0.7078800201416013 -0.25011729958012885" rpy="0.0 -0.0 0.0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="vhacd/original-9_vhacd_1474831609_part-0.obj"/>
+      </geometry>
+      <origin xyz="-0.2569944013908141 0.7078800201416013 -0.25011729958012885" rpy="0.0 -0.0 0.0"/>
+    </collision>
+    <collision>
+      <geometry>
+        <mesh filename="vhacd/original-9_vhacd_1474831609_part-1.obj"/>
+      </geometry>
+      <origin xyz="-0.2569944013908141 0.7078800201416013 -0.25011729958012885" rpy="0.0 -0.0 0.0"/>
+    </collision>
+    <collision>
+      <geometry>
+        <mesh filename="vhacd/original-9_vhacd_1474831609_part-2.obj"/>
+      </geometry>
+      <origin xyz="-0.2569944013908141 0.7078800201416013 -0.25011729958012885" rpy="0.0 -0.0 0.0"/>
+    </collision>
+    <collision>
+      <geometry>
+        <mesh filename="vhacd/original-9_vhacd_1474831609_part-3.obj"/>
+      </geometry>
+      <origin xyz="-0.2569944013908141 0.7078800201416013 -0.25011729958012885" rpy="0.0 -0.0 0.0"/>
+    </collision>
+    <collision>
+      <geometry>
+        <mesh filename="../assets/models/MiniFridge/11709/textured_objs/original-9-fixed.obj"/>
+      </geometry>
+      <origin xyz="-0.2569944013908141 0.7078800201416013 -0.19011729958012885" rpy="0.0 -0.0 0.0"/>
+    </collision>
+  </link>
+  <link name="link_1">
+    <inertial>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
+      <mass value="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+    <visual name="glass-19">
+      <geometry>
+        <mesh filename="../assets/models/MiniFridge/11709/textured_objs/original-8.obj"/>
+      </geometry>
+      <origin xyz="0.19707658594083446 0.7078800201416016 -0.24847328997979495" rpy="0.0 -0.0 0.0"/>
+    </visual>
+    <visual name="glass-19">
+      <geometry>
+        <mesh filename="../assets/models/MiniFridge/11709/textured_objs/original-8-fixed.obj"/>
+      </geometry>
+      <origin xyz="0.19707658594083446 0.7078800201416016 -0.24847328997979495" rpy="0.0 -0.0 0.0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="vhacd/original-8_vhacd_1474503928_part-0.obj"/>
+      </geometry>
+      <origin xyz="0.19707658594083446 0.7078800201416016 -0.24847328997979495" rpy="0.0 -0.0 0.0"/>
+    </collision>
+    <collision>
+      <geometry>
+        <mesh filename="vhacd/original-8_vhacd_1474503928_part-1.obj"/>
+      </geometry>
+      <origin xyz="0.19707658594083446 0.7078800201416016 -0.24847328997979495" rpy="0.0 -0.0 0.0"/>
+    </collision>
+    <collision>
+      <geometry>
+        <mesh filename="vhacd/original-8_vhacd_1474503928_part-2.obj"/>
+      </geometry>
+      <origin xyz="0.19707658594083446 0.7078800201416016 -0.24847328997979495" rpy="0.0 -0.0 0.0"/>
+    </collision>
+    <collision>
+      <geometry>
+        <mesh filename="vhacd/original-8_vhacd_1474503928_part-3.obj"/>
+      </geometry>
+      <origin xyz="0.19707658594083446 0.7078800201416016 -0.24847328997979495" rpy="0.0 -0.0 0.0"/>
+    </collision>
+    <collision>
+      <geometry>
+        <mesh filename="../assets/models/MiniFridge/11709/textured_objs/original-8-fixed.obj"/>
+      </geometry>
+      <origin xyz="0.19707658594083446 0.7078800201416016 -0.19847328997979494" rpy="0.0 -0.0 0.0"/>
+    </collision>
+  </link>
+  <link name="link_2">
+    <inertial>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
+      <mass value="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+    <visual name="glass-18">
+      <geometry>
+        <mesh filename="../assets/models/MiniFridge/11709/textured_objs/original-7.obj"/>
+      </geometry>
+      <origin xyz="0.6384173208185699 0.7078800201416015 -0.24279461035976008" rpy="0.0 -0.0 0.0"/>
+    </visual>
+    <visual name="glass-18">
+      <geometry>
+        <mesh filename="../assets/models/MiniFridge/11709/textured_objs/original-7-fixed.obj"/>
+      </geometry>
+      <origin xyz="0.6384173208185699 0.7078800201416015 -0.24279461035976008" rpy="0.0 -0.0 0.0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="vhacd/original-7_vhacd_1474176247_part-0.obj"/>
+      </geometry>
+      <origin xyz="0.6384173208185699 0.7078800201416015 -0.24279461035976008" rpy="0.0 -0.0 0.0"/>
+    </collision>
+    <collision>
+      <geometry>
+        <mesh filename="vhacd/original-7_vhacd_1474176247_part-1.obj"/>
+      </geometry>
+      <origin xyz="0.6384173208185699 0.7078800201416015 -0.24279461035976008" rpy="0.0 -0.0 0.0"/>
+    </collision>
+    <collision>
+      <geometry>
+        <mesh filename="vhacd/original-7_vhacd_1474176247_part-2.obj"/>
+      </geometry>
+      <origin xyz="0.6384173208185699 0.7078800201416015 -0.24279461035976008" rpy="0.0 -0.0 0.0"/>
+    </collision>
+    <collision>
+      <geometry>
+        <mesh filename="vhacd/original-7_vhacd_1474176247_part-3.obj"/>
+      </geometry>
+      <origin xyz="0.6384173208185699 0.7078800201416015 -0.24279461035976008" rpy="0.0 -0.0 0.0"/>
+    </collision>
+    <collision>
+      <geometry>
+        <mesh filename="../assets/models/MiniFridge/11709/textured_objs/original-7-fixed.obj"/>
+      </geometry>
+      <origin xyz="0.6384173208185699 0.7078800201416015 -0.1927946103597601" rpy="0.0 -0.0 0.0"/>
+    </collision>
+  </link>
+  <link name="link_3">
+    <inertial>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
+      <mass value="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+    <visual name="frame-10">
+      <geometry>
+        <mesh filename="../assets/models/MiniFridge/11709/textured_objs/original-128.obj"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
+    </visual>
+    <visual name="foot-4">
+      <geometry>
+        <mesh filename="../assets/models/MiniFridge/11709/textured_objs/original-3.obj"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
+    </visual>
+    <visual name="foot-5">
+      <geometry>
+        <mesh filename="../assets/models/MiniFridge/11709/textured_objs/original-6.obj"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
+    </visual>
+    <visual name="foot-6">
+      <geometry>
+        <mesh filename="../assets/models/MiniFridge/11709/textured_objs/original-2.obj"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
+    </visual>
+    <visual name="foot-7">
+      <geometry>
+        <mesh filename="../assets/models/MiniFridge/11709/textured_objs/original-1.obj"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
+    </visual>
+    <visual name="foot-8">
+      <geometry>
+        <mesh filename="../assets/models/MiniFridge/11709/textured_objs/original-5.obj"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
+    </visual>
+    <visual name="foot-9">
+      <geometry>
+        <mesh filename="../assets/models/MiniFridge/11709/textured_objs/original-4.obj"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="vhacd/original-128_vhacd_2702452059_part-0.obj"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
+    </collision>
+    <collision>
+      <geometry>
+        <mesh filename="vhacd/original-128_vhacd_2702452059_part-1.obj"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
+    </collision>
+    <collision>
+      <geometry>
+        <mesh filename="vhacd/original-128_vhacd_2702452059_part-2.obj"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
+    </collision>
+    <collision>
+      <geometry>
+        <mesh filename="vhacd/original-128_vhacd_2702452059_part-3.obj"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
+    </collision>
+    <collision>
+      <geometry>
+        <mesh filename="vhacd/original-128_vhacd_2702452059_part-4.obj"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
+    </collision>
+    <collision>
+      <geometry>
+        <mesh filename="/home/zhutiany/Documents/kitchen-worlds/tests/vhacd/original-3_vhacd_1472865523.obj"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
+    </collision>
+    <collision>
+      <geometry>
+        <mesh filename="/home/zhutiany/Documents/kitchen-worlds/tests/vhacd/original-6_vhacd_1473848566.obj"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
+    </collision>
+    <collision>
+      <geometry>
+        <mesh filename="/home/zhutiany/Documents/kitchen-worlds/tests/vhacd/original-2_vhacd_1472537842.obj"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
+    </collision>
+    <collision>
+      <geometry>
+        <mesh filename="/home/zhutiany/Documents/kitchen-worlds/tests/vhacd/original-1_vhacd_1472210161.obj"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
+    </collision>
+    <collision>
+      <geometry>
+        <mesh filename="/home/zhutiany/Documents/kitchen-worlds/tests/vhacd/original-5_vhacd_1473520885.obj"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
+    </collision>
+    <collision>
+      <geometry>
+        <mesh filename="/home/zhutiany/Documents/kitchen-worlds/tests/vhacd/original-4_vhacd_1473193204.obj"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
+    </collision>
+  </link>
+  <joint name="joint_0" type="revolute">
+    <parent link="link_3"/>
+    <child link="link_0"/>
+    <origin xyz="0.2569944013908141 -0.7078800201416013 0.25011729958012885" rpy="0.0 -0.0 0.0"/>
+    <axis xyz="0.0 -1.0 0.0"/>
+    <limit lower="0.0" upper="1.5707963267948966"/>
+  </joint>
+  <joint name="joint_1" type="revolute">
+    <parent link="link_3"/>
+    <child link="link_1"/>
+    <origin xyz="-0.19707658594083446 -0.7078800201416016 0.24847328997979495" rpy="0.0 -0.0 0.0"/>
+    <axis xyz="0.0 -1.0 0.0"/>
+    <limit lower="0.0" upper="1.5707963267948966"/>
+  </joint>
+  <joint name="joint_2" type="revolute">
+    <parent link="link_3"/>
+    <child link="link_2"/>
+    <origin xyz="-0.6384173208185699 -0.7078800201416015 0.24279461035976008" rpy="0.0 -0.0 0.0"/>
+    <axis xyz="0.0 -1.0 0.0"/>
+    <limit lower="0.0" upper="1.5707963267948966"/>
+  </joint>
+  <joint name="joint_3" type="fixed">
+    <parent link="base"/>
+    <child link="link_3"/>
+    <origin xyz="0.0 0.0 0.0" rpy="1.570796326794897 -0.0 -1.570796326794897"/>
+    <axis xyz="1.0 0.0 0.0"/>
+  </joint>
+</robot>
