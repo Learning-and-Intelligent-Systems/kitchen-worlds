@@ -22,6 +22,7 @@ test_cases/
 tests/txt_file.txt
 tests/visualizations/
 tests/statistics/
+tests/vhacd/
 
 outputs/
 !outputs/data_demo.html
