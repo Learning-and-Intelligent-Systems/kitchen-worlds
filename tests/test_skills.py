@@ -23,7 +23,6 @@ from pybullet_planning.pybullet_tools.bullet_utils import summarize_facts, print
 from pybullet_planning.pybullet_tools.pr2_agent import get_stream_info, post_process, move_cost_fn, \
     visualize_grasps_by_quat, visualize_grasps
 from pybullet_planning.pybullet_tools.logging import TXT_FILE
-from pybullet_tools.srl_stream_utils import process_urdf, TEMP_URDF_DIR
 
 ## custom stream_map
 from pybullet_planning.pybullet_tools.general_streams import get_grasp_list_gen, get_contain_list_gen
@@ -250,6 +249,8 @@ def test_handle_grasps(robot, category):
 
 
 def reload_after_vhacd(path, body, scale, id=None):
+    from pybullet_tools.srl_stream_utils import process_urdf, TEMP_URDF_DIR
+
     pose = get_pose(body)
     remove_body(body)
     new_urdf_path = process_urdf(path)
@@ -276,7 +277,7 @@ def test_placement_in(robot, category):
     for id in instances:
         (x, y) = locations[i]
         path, body, scale = load_model_instance(category, id, location=(x, y))
-        new_urdf_path, body = reload_after_vhacd(path, body, scale, id=id)
+        # new_urdf_path, body = reload_after_vhacd(path, body, scale, id=id)
 
         world.add_body(body, f'{category.lower()}#{id}')
         set_camera_target_body(body, dx=1, dy=0, dz=1)
