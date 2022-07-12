@@ -50,9 +50,10 @@
     ;(on cabbage stove)
     ;(on pepper stove)
     ;(on salt steak)
-    (on m7 m8)
-    (on m2 m7)
+    ;(on m7 m8)
+    ;(on m2 m7)
     ;(on steak m2)
+    (on pepper salt)
   ))
 )
 
