@@ -46,10 +46,13 @@
  )
 
   (:goal (and
-    (on steak stove)
-    (on cabbage stove)
-    (on pepper stove)
-    (on salt stove)
+    ;(on steak pepper)
+    ;(on cabbage stove)
+    ;(on pepper stove)
+    ;(on salt steak)
+    (on m7 m8)
+    (on m2 m7)
+    ;(on steak m2)
   ))
 )
 
