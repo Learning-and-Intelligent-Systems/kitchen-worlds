@@ -49,6 +49,7 @@
   ; Stacking a tower
   ; (:goal (and (on m7 m8) (on m2 m7) (on steak m2) (on pepper steak)))
   ; Tricky stacking
-  (:goal (and (on pepper salt) (on salt sink)))
+  ; (:goal (and (on pepper salt) (on salt sink)))
+  (:goal (and (on m9 stove)))
 )
 
