@@ -53,7 +53,18 @@
     ;(on m7 m8)
     ;(on m2 m7)
     ;(on steak m2)
-    (on pepper salt)
+    ;(on pepper salt)
+
+    ; case 1
+    ; (on m8 stove)
+
+    ; case 2
+    (on m9 stove)
+
+    ; case 3
+    ;(on m8 stove)
+    ;(on m9 stove)
+
   ))
 )
 
