@@ -44,16 +44,11 @@
     (workspace lo=(-1.25, -1.25, 0.0) hi=(1.25, 1.25, 2.0))
 
  )
-
-  (:goal (and
-    ;(on steak pepper)
-    ;(on cabbage stove)
-    ;(on pepper stove)
-    ;(on salt steak)
-    ;(on m7 m8)
-    ;(on m2 m7)
-    ;(on steak m2)
-    (on pepper salt)
-  ))
+  ; Tidy goal
+  ; (:goal (and (on cabbage stove) (on pepper stove) (on salt stove) (on pepper stove)))
+  ; Stacking a tower
+  ; (:goal (and (on m7 m8) (on m2 m7) (on steak m2) (on pepper steak)))
+  ; Tricky stacking
+  (:goal (and (on pepper salt) (on salt sink)))
 )
 
