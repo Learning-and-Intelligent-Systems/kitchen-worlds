@@ -11,7 +11,7 @@ from pybullet_tools.utils import set_random_seed, connect, enable_preview, \
     disconnect, draw_pose, set_all_static, wait_if_gui, remove_handles, unit_pose, get_sample_fn, pairwise_collision, \
     set_camera_pose, add_line, get_point, BLACK, get_name, CLIENTS, get_client, link_from_name, \
     get_link_subtree, clone_body, set_all_color, GREEN, BROWN, invert, multiply, set_pose, VideoSaver
-
+from pybullet_tools.bullet_utils import get_datetime
 from pybullet_tools.utils import apply_alpha, get_camera_matrix, LockRenderer, HideOutput, load_model, TURTLEBOT_URDF, \
     set_all_color, dump_body, draw_base_limits, multiply, Pose, Euler, PI, draw_pose, unit_pose, create_box, TAN, Point, \
     GREEN, create_cylinder, INF, BLACK, WHITE, RGBA, GREY, YELLOW, BLUE, BROWN, RED, stable_z, set_point, set_camera_pose, \
@@ -28,7 +28,7 @@ from world_builder.entities import Object, Region, Environment, Robot, Camera, F
     Surface, Moveable, Supporter, Steerable, Door
 from world_builder.world_generator import to_lisdf, save_to_test_cases
 
-from world_builder.builders import test_pick, test_exist_omelette, test_kitchen_oven, test_feg_pick
+from world_builder.builders import test_pick, test_exist_omelette, test_kitchen_oven, test_feg_pick, test_one_fridge
 
 import argparse
 from datetime import datetime
@@ -49,6 +49,7 @@ def get_parser():
     args = parser.parse_args()  # TODO: flag to save a video
     set_random_seed(args.seed)
     return args
+
 
 def create_pybullet_world(builder, world_name='test_scene', SAVE_LISDF=False, EXIT=True,
                           SAVE_TESTCASE=False, template_name=None, out_dir=None, verbose=False):
@@ -92,11 +93,10 @@ def create_pybullet_world(builder, world_name='test_scene', SAVE_LISDF=False, EX
 
 
 if __name__ == '__main__':
-    parallel = True
-    num_cases = 10
-    builder = test_feg_pick  ## test_kitchen_oven  ## test_exist_omelette ##
-    out_dir = test_feg_pick.__name__  ##.replace('test', '')
-    out_dir += f'_{datetime.now().strftime("%m%d_%H:%M")}'
+    parallel = False
+    num_cases = 4
+    builder = test_one_fridge  ## test_feg_pick | test_kitchen_oven | test_exist_omelette
+    out_dir = f'{test_feg_pick.__name__}_{get_datetime()}'
 
     def process(index):
         np.random.seed(index)

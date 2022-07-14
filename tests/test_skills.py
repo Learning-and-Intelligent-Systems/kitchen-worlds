@@ -231,7 +231,7 @@ def test_handle_grasps(robot, category):
 
         ## color links corresponding to semantic labels
         body_joints = get_partnet_doors(path, body)
-        world.add_semantic_label(body, body_joints)
+        world.add_joints(body, body_joints)
 
         for body_joint in body_joints:
             outputs = funk(body_joint)
@@ -562,10 +562,10 @@ if __name__ == '__main__':
     robot = 'feg' ## 'pr2' ##
     # test_grasps(['Stapler', 'Camera', 'Glasses'], robot)  ## 'Bottle'
     # test_handle_grasps_counter()
-    # test_handle_grasps(robot, category='MiniFridge')
+    test_handle_grasps(robot, category='MiniFridge')
     # test_pick_place_counter(robot)
 
 
     ## --- placement related  ---
     # test_placement_counter()
-    test_placement_in(robot, category='MiniFridge')
+    # test_placement_in(robot, category='MiniFridge')

@@ -31,24 +31,6 @@ from world_builder.actions import apply_actions
 
 DEFAULT_TEST = 'test_pr2_kitchen' ##  'test_blocks_kitchen' ##
 
-def pddlstream_from_dir(problem, exp_dir, collisions=True, teleport=False):
-
-    world = problem.world
-
-    domain_pddl = read(join(exp_dir, 'domain_full.pddl'))
-    stream_pddl = read(join(exp_dir, 'stream.pddl'))
-    planning_config = json.load(open(join(exp_dir, 'planning_config.json')))
-
-    init, goal, constant_map = pddl_to_init_goal(exp_dir, world)
-    goal = [AND] + goal
-    problem.add_init(init)
-
-    base_limits = planning_config['base_limits']
-    custom_limits = get_base_custom_limits(world.robot, base_limits)
-    stream_map = get_stream_map(problem, collisions, custom_limits, teleport)
-
-    return PDDLProblem(domain_pddl, constant_map, stream_pddl, stream_map, init, goal)
-
 def init_experiment(exp_dir):
     if isfile(TXT_FILE):
         os.remove(TXT_FILE)
@@ -79,7 +61,7 @@ def main(exp_name, verbose=True):
                                              teleport=args.teleport)
     world.summarize_all_objects()
 
-    stream_info = get_stream_info(partial=False, defer=False)
+    stream_info = world.robot.get_stream_info(partial=False, defer=False)
     _, _, _, stream_map, init, goal = pddlstream_problem
     summarize_facts(init, world=world)
     print_goal(goal)

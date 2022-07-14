@@ -10,3 +10,4 @@ warnings.filterwarnings('ignore')
 
 ASSET_PATH = join(dirname(__file__), '..', 'assets')
 EXP_PATH = join(dirname(__file__), '..', 'test_cases')
+DATA_PATH = join(dirname(__file__), '..', 'outputs')

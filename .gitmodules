@@ -4,9 +4,9 @@
 [submodule "pybullet_planning"]
 	path = pybullet_planning
 	url = git@github.com:zt-yang/pybullet_planning.git
-[submodule "pddlstream"]
-	path = pddlstream
-	url = git@github.com:zt-yang/pddlstream.git
 [submodule "assets/models"]
 	path = assets/models
 	url = git@github.com:zt-yang/kitchen-models.git
+[submodule "pddlstream"]
+	path = pddlstream
+	url = git@github.com:zt-yang/pddlstream.git
