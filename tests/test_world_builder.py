@@ -7,10 +7,11 @@ import tqdm
 import pybullet as p
 import random
 import numpy as np
+
 from pybullet_tools.utils import set_random_seed, connect, enable_preview, \
     disconnect, draw_pose, set_all_static, wait_if_gui, remove_handles, unit_pose, get_sample_fn, pairwise_collision, \
     set_camera_pose, add_line, get_point, BLACK, get_name, CLIENTS, get_client, link_from_name, \
-    get_link_subtree, clone_body, set_all_color, GREEN, BROWN, invert, multiply, set_pose, VideoSaver
+    get_link_subtree, clone_body, set_all_color, GREEN, BROWN, invert, multiply, set_pose, VideoSaver, reset_simulation
 from pybullet_tools.bullet_utils import get_datetime
 from pybullet_tools.utils import apply_alpha, get_camera_matrix, LockRenderer, HideOutput, load_model, TURTLEBOT_URDF, \
     set_all_color, dump_body, draw_base_limits, multiply, Pose, Euler, PI, draw_pose, unit_pose, create_box, TAN, Point, \
@@ -33,6 +34,9 @@ from world_builder.builders import test_pick, test_exist_omelette, test_kitchen_
 import argparse
 from datetime import datetime
 
+DEFAULT_TEST = test_one_fridge  ## test_one_fridge | test_feg_pick | test_kitchen_oven | test_exist_omelette
+USE_GUI = True
+
 def get_parser():
     parser = argparse.ArgumentParser()
 
@@ -51,16 +55,15 @@ def get_parser():
     return args
 
 
-def create_pybullet_world(builder, world_name='test_scene', SAVE_LISDF=False, EXIT=True,
+def create_pybullet_world(args, builder, world_name='test_scene', SAVE_LISDF=False, EXIT=True,
                           SAVE_TESTCASE=False, template_name=None, out_dir=None, verbose=False):
-    args = get_parser()
     if template_name is None:
         template_name = builder.__name__
 
     """ ============== initiate simulator ==================== """
 
     ## for viewing, not the size of depth image
-    connect(use_gui=False, shadows=False, width=1980, height=1238)
+    connect(use_gui=USE_GUI, shadows=False, width=1980, height=1238)
 
     # set_camera_pose(camera_point=[2.5, 0., 3.5], target_point=[1., 0, 1.])
     if args.camera:
@@ -85,33 +88,36 @@ def create_pybullet_world(builder, world_name='test_scene', SAVE_LISDF=False, EX
         init = state.get_facts(verbose=verbose)
         file = to_lisdf(state.world, init, floorplan=floorplan, world_name=world_name, verbose=verbose)
     if SAVE_TESTCASE and out_dir is not None:
-        file = save_to_test_cases(state, goal, template_name, floorplan, out_dir, verbose=verbose)
+        file = save_to_test_cases(state, goal, template_name, floorplan, out_dir, verbose=verbose, DEPTH_IMAGES=True)
+
     if EXIT:
         wait_if_gui('exit?')
-    disconnect()
+    reset_simulation()
     return file
 
 
 if __name__ == '__main__':
+    args = get_parser()
     parallel = False
     num_cases = 4
-    builder = test_one_fridge  ## test_feg_pick | test_kitchen_oven | test_exist_omelette
-    out_dir = f'{test_feg_pick.__name__}_{get_datetime()}'
+    builder = DEFAULT_TEST
+    out_dir = f'{builder.__name__}_{get_datetime()}'
+    os.makedirs(out_dir, exist_ok=True)
 
     def process(index):
         np.random.seed(index)
         random.seed(index)
-        return create_pybullet_world(builder, out_dir=out_dir, SAVE_TESTCASE=True, EXIT=False, verbose=False)
+        return create_pybullet_world(args, builder, out_dir=out_dir, SAVE_TESTCASE=True, EXIT=False, verbose=False)
 
     start_time = time.time()
     if parallel:
         import multiprocessing
         from multiprocessing import Pool
 
-        def process(index):
-            np.random.seed(index)
-            random.seed(index)
-            return create_pybullet_world(builder, out_dir=out_dir, SAVE_TESTCASE=True, EXIT=False)
+        # def process(index):
+        #     np.random.seed(index)
+        #     random.seed(index)
+        #     return create_pybullet_world(builder, out_dir=out_dir, SAVE_TESTCASE=True, EXIT=False)
 
         max_cpus = 24
         num_cpus = min(multiprocessing.cpu_count(), max_cpus)
@@ -126,3 +132,4 @@ if __name__ == '__main__':
             process(i)
 
     print(f'generated {num_cases} problems (parallel={parallel}) in {round(time.time()-start_time, 3)} sec')
+    if USE_GUI: disconnect()
