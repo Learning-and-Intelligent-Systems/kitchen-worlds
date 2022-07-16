@@ -1,0 +1,125 @@
+<?xml version="1.0" ?>
+<!-- Based on a M0M test run -->
+<sdf version="1.9">
+  <world name="PandaTable">
+    <model name="floor">
+      <link name="floor">
+	<pose>0.0 0.0 0 0 0 0</pose>
+	<collision name="floor_collision">
+	  <geometry>
+	    <box> <size>3 3 0.001</size> </box>
+	  </geometry>
+	</collision>
+	<visual name="floor_visual">
+	  <geometry>
+	    <box> <size>3 3 0.001</size> </box>
+	  </geometry>
+	  <material>
+	    <ambient>0.4 0.4 0.4 1</ambient>
+	  </material>
+	</visual>
+      </link>
+    </model>
+
+    <model name="table">
+      <static>true</static>
+      <pose>0.0 0.0 0.05 0 0 0</pose>
+      <link name="table_link">
+	<collision name="table_collision">
+	  <geometry>
+	    <box><size>1. 1. 0.1</size></box>
+	  </geometry>
+	</collision>
+	<visual name="table_visual">
+	  <geometry>
+	    <box> <size>1. 1. 0.1</size> </box>
+	  </geometry>
+	  <material>
+	    <ambient>0.8 0.8 0.8 1</ambient>
+	  </material>
+	</visual>
+      </link>
+    </model>
+
+    <model name="steak">
+      <static>true</static>
+      <pose>0.65 0.0 0.155 0 0 0</pose>
+      <link name="steak_link">
+	<collision name="steak_collision">
+	  <geometry>
+	    <box><size>0.05 0.05 0.1</size></box>
+	  </geometry>
+	</collision>
+	<visual name="steak_visual">
+	  <geometry>
+	    <box> <size>0.05 0.05 0.1</size> </box>
+	  </geometry>
+	  <material>
+	    <ambient>1 0.1 0.1 1</ambient>
+	  </material>
+	</visual>
+      </link>
+    </model>
+
+    <model name="cabbage">
+      <static>true</static>
+      <pose>0.8 0.0 0.155 0 0 0</pose>
+      <link name="cabbage_link">
+	<collision name="cabbage_collision">
+	  <geometry>
+	    <box><size>0.05 0.05 0.1</size></box>
+	  </geometry>
+	</collision>
+	<visual name="cabbage_visual">
+	  <geometry>
+	    <box> <size>0.05 0.05 0.1</size> </box>
+	  </geometry>
+	  <material>
+	    <ambient>0.1 1 0.1 1</ambient>
+	  </material>
+	</visual>
+      </link>
+    </model>
+    
+    <model name="salt">
+      <static>true</static>
+      <pose>0.8 0.15 0.155 0 0 0</pose>
+      <link name="salt_link">
+	<collision name="salt_collision">
+	  <geometry>
+	    <box><size>0.05 0.05 0.1</size></box>
+	  </geometry>
+	</collision>
+	<visual name="salt_visual">
+	  <geometry>
+	    <box> <size>0.05 0.05 0.1</size> </box>
+	  </geometry>
+	  <material>
+	    <ambient>1 1 1 1</ambient>
+	  </material>
+	</visual>
+      </link>
+    </model>
+
+    <model name="pepper">
+      <static>true</static>
+      <pose>0.8 -0.15 0.155 0 0 0</pose>
+      <link name="pepper_link">
+	<collision name="pepper_collision">
+	  <geometry>
+	    <box><size>0.05 0.05 0.1</size></box>
+	  </geometry>
+	</collision>
+	<visual name="pepper_visual">
+	  <geometry>
+	    <box> <size>0.05 0.05 0.1</size> </box>
+	  </geometry>
+	  <material>
+	    <ambient>0.001 0.001 0.001 1</ambient>
+	  </material>
+	</visual>
+      </link>
+    </model>
+    
+  </world>
+</sdf>

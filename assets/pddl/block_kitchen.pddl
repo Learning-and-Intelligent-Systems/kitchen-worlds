@@ -12,10 +12,10 @@
     (canmove)
 
     (arm left)
-    (arm right)
+    ;(arm right)
 
     (controllable left)
-    (controllable right)
+    ;(controllable right)
     
     (handempty left)
     (handempty right)
@@ -40,16 +40,18 @@
     (surface table)
     (surface sink)
     (surface stove)
+    (surface shelf)
 
     (workspace lo=(-1.25, -1.25, 0.0) hi=(1.25, 1.25, 2.0))
 
  )
   ; Tidy goal
-  ; (:goal (and (on cabbage stove) (on pepper stove) (on salt stove) (on pepper stove)))
+  (:goal (and (on cabbage stove) (on pepper stove) (on salt stove) (on steak stove)))
   ; Stacking a tower
   ; (:goal (and (on m7 m8) (on m2 m7) (on steak m2) (on pepper steak)))
   ; Tricky stacking
   ; (:goal (and (on pepper salt) (on salt sink)))
-  (:goal (and (on m9 stove)))
+  ; (:goal (and (on m9 stove)))
+  ; (:goal (and (on cabbage stove) (on salt stove)))
 )
 
