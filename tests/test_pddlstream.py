@@ -23,13 +23,13 @@ from pddlstream.language.constants import Equal, AND, print_solution, PDDLProble
 from pddlstream.utils import read, INF, get_file_path, find_unique, Profiler, str_from_object
 from pddlstream.algorithms.meta import solve, create_parser
 
-from pybullet_planning.lisdf_tools.lisdf_loader import load_lisdf_pybullet
+from pybullet_planning.lisdf_tools.lisdf_loader import load_lisdf_pybullet, pddlstream_from_dir
 from pybullet_planning.lisdf_tools.lisdf_planning import pddl_to_init_goal, Problem
 
 from world_builder.actions import apply_actions
 
 
-DEFAULT_TEST = 'test_pr2_kitchen' ##  'test_blocks_kitchen' ##
+DEFAULT_TEST = 'one_fridge_pr2'  ## 'one_fridge_pick_pr2' | 'test_pr2_kitchen' | 'test_blocks_kitchen' ##
 
 def init_experiment(exp_dir):
     if isfile(TXT_FILE):
