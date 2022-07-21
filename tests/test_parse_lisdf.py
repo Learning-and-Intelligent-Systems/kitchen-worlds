@@ -2,7 +2,7 @@ from config import ASSET_PATH
 from os.path import join
 from lisdf.parsing.sdf_j import load_sdf
 
-test_cases = ['m0m_0_test', 'm0m_joint_test', 'kitchen_counter'] ## 'counter'
+test_cases = ['m0m_0_test', 'm0m_joint_test', 'kitchen_counter']  ## 'counter'
 
 if __name__ == "__main__":
 
