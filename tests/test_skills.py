@@ -19,7 +19,7 @@ from pybullet_planning.pybullet_tools.utils import disconnect, LockRenderer, has
     Pose, get_link_pose, get_joint_limits, WHITE, RGBA, set_all_color, RED, GREEN, set_renderer, clone_body
 from pybullet_planning.pybullet_tools.bullet_utils import summarize_facts, print_goal, nice, set_camera_target_body, \
     draw_bounding_lines, fit_dimensions, draw_fitted_box, get_hand_grasps, get_partnet_doors, get_partnet_spaces, \
-    open_joint
+    open_joint, get_instance_name
 from pybullet_planning.pybullet_tools.pr2_agent import get_stream_info, post_process, move_cost_fn, \
     visualize_grasps_by_quat, visualize_grasps
 from pybullet_planning.pybullet_tools.logging import TXT_FILE
@@ -45,10 +45,10 @@ from pybullet_planning.lisdf_tools.lisdf_planning import pddl_to_init_goal, Prob
 
 from world_builder.world import State
 from world_builder.loaders import create_gripper_robot, create_pr2_robot
-from world_builder.utils import load_asset
+from world_builder.utils import load_asset, get_instances
 # from pybullet_planning.world_builder.colors import *
 from world_builder.partnet_scales import MODEL_SCALES as TEST_MODELS
-from world_builder.partnet_scales import MODEL_HEIGHTS
+from world_builder.partnet_scales import MODEL_HEIGHTS, OBJ_SCALES
 
 from test_pddlstream import get_args
 
@@ -66,6 +66,7 @@ ASSET_PATH = join('..', 'assets')
 
 # ####################################
 
+
 def get_test_world(robot='feg', semantic_world=False):
     args = get_args() ## exp_name
     connect(use_gui=True, shadows=False, width=1980, height=1238)  ##  , width=360, height=270
@@ -79,6 +80,7 @@ def get_test_world(robot='feg', semantic_world=False):
         world = World(args)
     add_robot(world, robot)
     return world
+
 
 def add_robot(world, robot):
     if robot == 'pr2':
@@ -96,18 +98,22 @@ def add_robot(world, robot):
 
     return robot
 
+
 def get_z_on_floor(body):
     return get_aabb_extent(get_aabb(body))[-1]/2
+
 
 def get_floor_aabb(custom_limits):
     x_min, x_max = custom_limits[0]
     y_min, y_max = custom_limits[1]
     return AABB(lower=(x_min, y_min), upper=(x_max, y_max))
 
+
 def sample_pose_on_floor(body, custom_limits):
     x, y = sample_aabb(get_floor_aabb(custom_limits))
     z = get_z_on_floor(body)
     return ((x, y, z), quat_from_euler((0, 0, math.pi)))
+
 
 def pose_from_2d(body, xy, random_yaw=False):
     z = get_z_on_floor(body)
@@ -118,12 +124,14 @@ def pose_from_2d(body, xy, random_yaw=False):
 
 # ####################################
 
+
 def test_robot_rotation(body, robot):
     pose = ((0.2,0.3,0), quat_from_euler((math.pi/4, math.pi/2, 1.2)))
     set_pose(body, pose)
     conf = se3_ik(robot, pose)
     set_se3_conf(robot, conf)
     set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.5)
+
 
 def test_spatial_algebra(body, robot):
 
@@ -149,24 +157,30 @@ def test_spatial_algebra(body, robot):
     set_pose(gripper, W_X_G)
     set_camera_target_body(gripper, dx=0.5, dy=0, dz=0.5)
 
+
 def test_grasps(categories=[], robot='feg'):
     world = get_test_world(robot)
     robot = world.robot
 
-    problem = State(world, grasp_types=robot.grasp_types) ## , 'side' , 'top'
+    problem = State(world, grasp_types=robot.grasp_types)  ## , 'side' , 'top'
     funk = get_grasp_list_gen(problem, collisions=True, visualize=False, RETAIN_ALL=False)
 
     i = -1
     for cat in categories:
         i += 1
-        n = len(TEST_MODELS[cat])
+        instances = get_instances(cat)
+        n = len(instances)
         locations = [(i, 0.5 * n) for n in range(1, n+1)]
         j = -1
-        for id, scale in TEST_MODELS[cat].items():
+        for id, scale in instances.items():
             j += 1
-            path = join(ASSET_PATH, 'models', cat, id)
-            body = load_body(path, scale, locations[j], random_yaw=True)
-            world.add_body(body, f'{cat.lower()}#{id}')
+            path, body, _ = load_model_instance(cat, id, scale=scale, location=locations[i])
+        # for id, scale in TEST_MODELS[cat].items():
+        #     j += 1
+        #     path = join(ASSET_PATH, 'models', cat, id)
+        #     body = load_body(path, scale, locations[j], random_yaw=True)
+            instance_name = get_instance_name(abspath(path))
+            world.add_body(body, f'{cat.lower()}#{id}', instance_name)
             set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.5)
 
             # test_robot_rotation(body, world.robot)
@@ -187,6 +201,7 @@ def test_grasps(categories=[], robot='feg'):
     wait_if_gui('Finish?')
     disconnect()
 
+
 def load_body(path, scale, pose_2d=(0,0), random_yaw=False):
     file = join(path, 'mobility.urdf')
     print('loading', file)
@@ -197,7 +212,8 @@ def load_body(path, scale, pose_2d=(0,0), random_yaw=False):
     set_pose(body, pose)
     return body, file
 
-def load_model_instance(category, id, location = (0, 0)):
+
+def load_model_instance(category, id, scale=1, location = (0, 0)):
     from world_builder.utils import get_model_scale
 
     path = join(ASSET_PATH, 'models', category, id)
@@ -205,11 +221,12 @@ def load_model_instance(category, id, location = (0, 0)):
     if category in MODEL_HEIGHTS:
         height = MODEL_HEIGHTS[category]['height']
         scale = get_model_scale(path, h=height)
-    else:
+    elif category in TEST_MODELS:
         scale = TEST_MODELS[category][id]
 
     body, file = load_body(path, scale, location)
     return file, body, scale
+
 
 def test_handle_grasps(robot, category):
     from pybullet_tools.pr2_streams import get_handle_pose
@@ -226,7 +243,8 @@ def test_handle_grasps(robot, category):
     set_camera_pose((4, 3, 2), (0, 3, 0.5))
     for id in instances:
         path, body, _ = load_model_instance(category, id, location=locations[i])
-        world.add_body(body, f'{category.lower()}#{id}')
+        instance_name = get_instance_name(abspath(path))
+        world.add_body(body, f'{category.lower()}#{id}', instance_name)
         set_camera_target_body(body, dx=1, dy=1, dz=1)
 
         ## color links corresponding to semantic labels
@@ -308,7 +326,6 @@ def test_placement_in(robot, category):
     disconnect()
 
 
-
 def test_gripper_joints():
     """ visualize ee link pose as conf changes """
     world = get_feg_world()
@@ -328,6 +345,7 @@ def test_gripper_joints():
 
     wait_if_gui('Finish?')
     disconnect()
+
 
 def test_gripper_range(IK=False):
     """ visualize all possible gripper orientation """
@@ -380,6 +398,7 @@ def test_gripper_range(IK=False):
 
     wait_if_gui('Finish?')
     disconnect()
+
 
 def test_handle_grasps_counter():
     from world_builder.loaders import load_floor_plan
@@ -487,9 +506,6 @@ def test_placement_counter():
     wait_if_gui('Finish?')
     disconnect()
 
-def get_instances(category):
-    return TEST_MODELS[category] if category in TEST_MODELS \
-        else MODEL_HEIGHTS[category]['models']
 
 def get_data(category):
     from world_builder.paths import PARTNET_PATH
@@ -508,6 +524,7 @@ def get_data(category):
                 shutil.copytree(old_path, new_path)
                 print(f'copying {old_path} to {new_path}')
 
+
 def test_texture(category, id):
     import untangle
     connect(use_gui=True, shadows=False, width=1980, height=1238)
@@ -524,6 +541,7 @@ def test_texture(category, id):
     # tree = gfg.ElementTree(content)
     # with open(path.replace('mobility', 'mobility_2'), "wb") as files:
     #     tree.write(files)
+
 
 def test_pick_place_counter(robot):
     from world_builder.loaders import load_random_mini_kitchen_counter
@@ -546,6 +564,7 @@ def test_vhacd():
     set_camera_target_body(body, dx=1, dy=1, dz=1)
     print()
 
+
 if __name__ == '__main__':
 
     ## --- MODELS  ---
@@ -559,8 +578,8 @@ if __name__ == '__main__':
 
 
     ## --- grasps related ---
-    robot = 'feg' ## 'pr2' ##
-    # test_grasps(['Stapler', 'Camera', 'Glasses'], robot)  ## 'Bottle'
+    robot = 'pr2' ## 'feg' ##
+    # test_grasps(['VeggieCabbage'], robot)  ## 'Bottle', 'Stapler', 'Camera', 'Glasses'
     # test_handle_grasps_counter()
     test_handle_grasps(robot, category='MiniFridge')
     # test_pick_place_counter(robot)
