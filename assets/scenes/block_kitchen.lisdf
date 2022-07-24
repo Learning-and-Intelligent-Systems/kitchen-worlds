@@ -2,6 +2,12 @@
 <!-- Based on a M0M test run -->
 <sdf version="1.9">
   <world name="BlockKitchen">
+
+    <!-- <include name="pr2">     -->
+    <!--   <uri>../models/drake/pr2_description/urdf/pr2_simplified.urdf</uri> -->
+    <!--   <pose>2.5 0.0 0.051 0.0 -0.0 3.142</pose> -->
+    <!-- </include> -->
+    
     <model name="floor">
       <link name="floor">
 	<pose>0.0 0.0 0 0 0 0</pose>

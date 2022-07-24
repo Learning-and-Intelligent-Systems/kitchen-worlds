@@ -1,0 +1,442 @@
+<?xml version="1.0" ?>
+<!-- hand-created lisdf -->
+<sdf version="1.9">
+  <world name="willshen_box_world_16_boxes_3579046472">
+    <include name="panda">
+      <uri>models/franka_description/robots/panda_arm_hand.urdf</uri>
+      <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+    </include>
+    <model name="table">
+      <static>true</static>
+      <pose>0.8 0.0 -0.0251 0.0 0.0 0.0</pose>
+      <link name="box">
+        <collision name="box_collision">
+          <geometry>
+            <box>
+              <size>2.1 2.1 0.05</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual>
+          <geometry>
+            <box>
+              <size>2.1 2.1 0.05</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1.0 0.89 0.8 1.0</ambient>
+            <diffuse>1.0 0.89 0.8 1.0</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="fixed_plane">
+      <static>false</static>
+      <pose>-0.525 0.0 -0.45 0.0 0.0 0.0</pose>
+      <link name="box">
+        <collision name="box_collision">
+          <geometry>
+            <box>
+              <size>1.05 1.05 0.05</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual>
+          <geometry>
+            <box>
+              <size>1.05 1.05 0.05</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.95 0.95 0.95 0.5</ambient>
+            <diffuse>0.95 0.95 0.95 0.5</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="box_3">
+      <static>false</static>
+      <pose>0.4001518560903258 0.21735149867367787 0.048 0.0 0.0 -0.48822410219936135</pose>
+      <link name="box">
+        <collision name="box_collision">
+          <geometry>
+            <box>
+              <size>0.051 0.042 0.096</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual>
+          <geometry>
+            <box>
+              <size>0.051 0.042 0.096</size>
+            </box>
+          </geometry>
+            <material>
+              <ambient>0.92 0.44 0.1 1.0</ambient>
+              <diffuse>0.92 0.44 0.1 1.0</diffuse>
+            </material>
+        </visual>
+      </link>
+    </model>
+    <model name="box_4">
+      <static>false</static>
+      <pose>0.4565405897831188 0.164189074545921 0.0635 0.0 -0.0 0.30925331550041646</pose>
+      <link name="box">
+        <collision name="box_collision">
+          <geometry>
+            <box>
+              <size>0.059 0.045 0.127</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual>
+          <geometry>
+            <box>
+              <size>0.059 0.045 0.127</size>
+            </box>
+          </geometry>
+            <material>
+              <ambient>0.11 0.9 0.9 1.0</ambient>
+              <diffuse>0.11 0.9 0.9 1.0</diffuse>
+            </material>
+        </visual>
+      </link>
+    </model>
+    <model name="box_5">
+      <static>false</static>
+      <pose>0.1460179170510822 -0.8309410484923313 0.0495 0.0 0.0 -2.6385947818697364</pose>
+      <link name="box">
+        <collision name="box_collision">
+          <geometry>
+            <box>
+              <size>0.049 0.068 0.099</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual>
+          <geometry>
+            <box>
+              <size>0.049 0.068 0.099</size>
+            </box>
+          </geometry>
+            <material>
+              <ambient>0.74 0.21 0.37 1.0</ambient>
+              <diffuse>0.74 0.21 0.37 1.0</diffuse>
+            </material>
+        </visual>
+      </link>
+    </model>
+    <model name="box_6">
+      <static>false</static>
+      <pose>0.6709395711880327 -0.46663775855191614 0.0905 0.0 -0.0 2.9806404285063826</pose>
+      <link name="box">
+        <collision name="box_collision">
+          <geometry>
+            <box>
+              <size>0.044 0.062 0.181</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual>
+          <geometry>
+            <box>
+              <size>0.044 0.062 0.181</size>
+            </box>
+          </geometry>
+            <material>
+              <ambient>0.22 0.6 0.73 1.0</ambient>
+              <diffuse>0.22 0.6 0.73 1.0</diffuse>
+            </material>
+        </visual>
+      </link>
+    </model>
+    <model name="box_7">
+      <static>false</static>
+      <pose>0.11939252152238143 0.990902227529113 0.0675 0.0 -0.0 1.5576006382571406</pose>
+      <link name="box">
+        <collision name="box_collision">
+          <geometry>
+            <box>
+              <size>0.064 0.069 0.135</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual>
+          <geometry>
+            <box>
+              <size>0.064 0.069 0.135</size>
+            </box>
+          </geometry>
+            <material>
+              <ambient>0.68 0.24 0.17 1.0</ambient>
+              <diffuse>0.68 0.24 0.17 1.0</diffuse>
+            </material>
+        </visual>
+      </link>
+    </model>
+    <model name="box_8">
+      <static>false</static>
+      <pose>0.194254377563584 -0.7736557094249836 0.0625 0.0 0.0 -0.5519035034059316</pose>
+      <link name="box">
+        <collision name="box_collision">
+          <geometry>
+            <box>
+              <size>0.046 0.044 0.125</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual>
+          <geometry>
+            <box>
+              <size>0.046 0.044 0.125</size>
+            </box>
+          </geometry>
+            <material>
+              <ambient>0.82 0.26 0.92 1.0</ambient>
+              <diffuse>0.82 0.26 0.92 1.0</diffuse>
+            </material>
+        </visual>
+      </link>
+    </model>
+    <model name="box_9">
+      <static>false</static>
+      <pose>0.7271410277472 -0.5239767574411177 0.0605 0.0 -0.0 2.497293738637813</pose>
+      <link name="box">
+        <collision name="box_collision">
+          <geometry>
+            <box>
+              <size>0.055 0.063 0.121</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual>
+          <geometry>
+            <box>
+              <size>0.055 0.063 0.121</size>
+            </box>
+          </geometry>
+            <material>
+              <ambient>0.74 0.11 0.29 1.0</ambient>
+              <diffuse>0.74 0.11 0.29 1.0</diffuse>
+            </material>
+        </visual>
+      </link>
+    </model>
+    <model name="box_10">
+      <static>false</static>
+      <pose>0.5607278769045985 -0.48412349595425597 0.0335 0.0 0.0 -1.0263988984112857</pose>
+      <link name="box">
+        <collision name="box_collision">
+          <geometry>
+            <box>
+              <size>0.066 0.064 0.067</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual>
+          <geometry>
+            <box>
+              <size>0.066 0.064 0.067</size>
+            </box>
+          </geometry>
+            <material>
+              <ambient>0.33 0.64 0.2 1.0</ambient>
+              <diffuse>0.33 0.64 0.2 1.0</diffuse>
+            </material>
+        </visual>
+      </link>
+    </model>
+    <model name="box_11">
+      <static>false</static>
+      <pose>0.43169357487431226 -0.3683283854516133 0.0805 0.0 -0.0 0.04779264212997259</pose>
+      <link name="box">
+        <collision name="box_collision">
+          <geometry>
+            <box>
+              <size>0.058 0.057 0.161</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual>
+          <geometry>
+            <box>
+              <size>0.058 0.057 0.161</size>
+            </box>
+          </geometry>
+            <material>
+              <ambient>0.91 0.88 0.06 1.0</ambient>
+              <diffuse>0.91 0.88 0.06 1.0</diffuse>
+            </material>
+        </visual>
+      </link>
+    </model>
+    <model name="box_12">
+      <static>false</static>
+      <pose>0.3721270450191795 -0.740485200324962 0.0655 0.0 0.0 -0.04652834118831884</pose>
+      <link name="box">
+        <collision name="box_collision">
+          <geometry>
+            <box>
+              <size>0.05 0.063 0.131</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual>
+          <geometry>
+            <box>
+              <size>0.05 0.063 0.131</size>
+            </box>
+          </geometry>
+            <material>
+              <ambient>0.68 0.19 0.24 1.0</ambient>
+              <diffuse>0.68 0.19 0.24 1.0</diffuse>
+            </material>
+        </visual>
+      </link>
+    </model>
+    <model name="box_13">
+      <static>false</static>
+      <pose>0.3962692667815403 0.650161097871319 0.056 0.0 0.0 -1.7906269581056822</pose>
+      <link name="box">
+        <collision name="box_collision">
+          <geometry>
+            <box>
+              <size>0.069 0.045 0.112</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual>
+          <geometry>
+            <box>
+              <size>0.069 0.045 0.112</size>
+            </box>
+          </geometry>
+            <material>
+              <ambient>0.75 0.13 0.45 1.0</ambient>
+              <diffuse>0.75 0.13 0.45 1.0</diffuse>
+            </material>
+        </visual>
+      </link>
+    </model>
+    <model name="box_14">
+      <static>false</static>
+      <pose>0.6069714598557744 -0.5679582106268775 0.093 0.0 0.0 -0.49835955415990346</pose>
+      <link name="box">
+        <collision name="box_collision">
+          <geometry>
+            <box>
+              <size>0.07 0.041 0.186</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual>
+          <geometry>
+            <box>
+              <size>0.07 0.041 0.186</size>
+            </box>
+          </geometry>
+            <material>
+              <ambient>0.3 0.88 0.61 1.0</ambient>
+              <diffuse>0.3 0.88 0.61 1.0</diffuse>
+            </material>
+        </visual>
+      </link>
+    </model>
+    <model name="box_15">
+      <static>false</static>
+      <pose>0.34219593651697483 0.17094243530865189 0.038 0.0 -0.0 1.9311606684270028</pose>
+      <link name="box">
+        <collision name="box_collision">
+          <geometry>
+            <box>
+              <size>0.066 0.046 0.076</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual>
+          <geometry>
+            <box>
+              <size>0.066 0.046 0.076</size>
+            </box>
+          </geometry>
+            <material>
+              <ambient>0.22 0.79 0.46 1.0</ambient>
+              <diffuse>0.22 0.79 0.46 1.0</diffuse>
+            </material>
+        </visual>
+      </link>
+    </model>
+    <model name="box_16">
+      <static>false</static>
+      <pose>0.5116209713724118 0.20281691033585464 0.094 0.0 0.0 -2.6372968887673713</pose>
+      <link name="box">
+        <collision name="box_collision">
+          <geometry>
+            <box>
+              <size>0.046 0.065 0.188</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual>
+          <geometry>
+            <box>
+              <size>0.046 0.065 0.188</size>
+            </box>
+          </geometry>
+            <material>
+              <ambient>0.06 0.81 0.23 1.0</ambient>
+              <diffuse>0.06 0.81 0.23 1.0</diffuse>
+            </material>
+        </visual>
+      </link>
+    </model>
+    <model name="box_17">
+      <static>false</static>
+      <pose>0.32152084194180186 0.7815178527751091 0.084 0.0 0.0 -0.36091051093371224</pose>
+      <link name="box">
+        <collision name="box_collision">
+          <geometry>
+            <box>
+              <size>0.04 0.046 0.168</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual>
+          <geometry>
+            <box>
+              <size>0.04 0.046 0.168</size>
+            </box>
+          </geometry>
+            <material>
+              <ambient>0.71 0.26 0.81 1.0</ambient>
+              <diffuse>0.71 0.26 0.81 1.0</diffuse>
+            </material>
+        </visual>
+      </link>
+    </model>
+    <model name="box_18">
+      <static>false</static>
+      <pose>0.5654656986531725 0.2575670840638659 0.0575 0.0 -0.0 1.4616184337996065</pose>
+      <link name="box">
+        <collision name="box_collision">
+          <geometry>
+            <box>
+              <size>0.048 0.052 0.115</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual>
+          <geometry>
+            <box>
+              <size>0.048 0.052 0.115</size>
+            </box>
+          </geometry>
+            <material>
+              <ambient>0.93 0.02 0.56 1.0</ambient>
+              <diffuse>0.93 0.02 0.56 1.0</diffuse>
+            </material>
+        </visual>
+      </link>
+    </model>
+  </world>
+</sdf>

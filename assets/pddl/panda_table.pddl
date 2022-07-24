@@ -22,6 +22,6 @@
     (surface table)
 
  )
-  (:goal (and (on salt steak)))
+  (:goal (and (on steak pepper) (on salt steak) (on cabbage salt)))
 )
 
