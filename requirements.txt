@@ -10,3 +10,4 @@ networkx
 seaborn
 tqdm
 yourdfpy
+torch
