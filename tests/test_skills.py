@@ -19,14 +19,14 @@ from pybullet_planning.pybullet_tools.utils import disconnect, LockRenderer, has
     Pose, get_link_pose, get_joint_limits, WHITE, RGBA, set_all_color, RED, GREEN, set_renderer, clone_body
 from pybullet_planning.pybullet_tools.bullet_utils import summarize_facts, print_goal, nice, set_camera_target_body, \
     draw_bounding_lines, fit_dimensions, draw_fitted_box, get_hand_grasps, get_partnet_doors, get_partnet_spaces, \
-    open_joint
+    open_joint, get_instance_name
 from pybullet_planning.pybullet_tools.pr2_agent import get_stream_info, post_process, move_cost_fn, \
     visualize_grasps_by_quat, visualize_grasps
 from pybullet_planning.pybullet_tools.logging import TXT_FILE
 
 ## custom stream_map
 from pybullet_planning.pybullet_tools.general_streams import get_grasp_list_gen, get_contain_list_gen
-from pybullet_planning.pybullet_tools.pr2_streams import get_stable_gen, get_position_gen, \
+from pybullet_planning.pybullet_tools.pr2_streams import get_stable_gen, \
     Position, get_handle_grasp_gen
 from pybullet_planning.pybullet_tools.pr2_primitives import get_group_joints, Conf, get_base_custom_limits, Conf, \
     get_ik_ir_gen, get_motion_gen, get_cfree_approach_pose_test, get_cfree_pose_pose_test, get_cfree_traj_pose_test, \
@@ -52,7 +52,6 @@ from world_builder.partnet_scales import MODEL_HEIGHTS
 
 from test_pddlstream import get_args
 
-
 from pybullet_tools.pr2_problems import create_floor
 from pybullet_tools.utils import connect, draw_pose, unit_pose, link_from_name, load_pybullet, load_model, \
     sample_aabb, AABB, set_pose, get_aabb, get_aabb_center, quat_from_euler, Euler, HideOutput, get_aabb_extent, \
@@ -65,6 +64,7 @@ DEFAULT_TEST = 'kitchen' ## 'blocks_pick'
 ASSET_PATH = join('..', 'assets')
 
 # ####################################
+
 
 def get_test_world(robot='feg', semantic_world=False):
     args = get_args() ## exp_name
@@ -79,6 +79,7 @@ def get_test_world(robot='feg', semantic_world=False):
         world = World(args)
     add_robot(world, robot)
     return world
+
 
 def add_robot(world, robot):
     if robot == 'pr2':
@@ -96,18 +97,22 @@ def add_robot(world, robot):
 
     return robot
 
+
 def get_z_on_floor(body):
     return get_aabb_extent(get_aabb(body))[-1]/2
+
 
 def get_floor_aabb(custom_limits):
     x_min, x_max = custom_limits[0]
     y_min, y_max = custom_limits[1]
     return AABB(lower=(x_min, y_min), upper=(x_max, y_max))
 
+
 def sample_pose_on_floor(body, custom_limits):
     x, y = sample_aabb(get_floor_aabb(custom_limits))
     z = get_z_on_floor(body)
     return ((x, y, z), quat_from_euler((0, 0, math.pi)))
+
 
 def pose_from_2d(body, xy, random_yaw=False):
     z = get_z_on_floor(body)
@@ -118,12 +123,14 @@ def pose_from_2d(body, xy, random_yaw=False):
 
 # ####################################
 
+
 def test_robot_rotation(body, robot):
     pose = ((0.2,0.3,0), quat_from_euler((math.pi/4, math.pi/2, 1.2)))
     set_pose(body, pose)
     conf = se3_ik(robot, pose)
     set_se3_conf(robot, conf)
     set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.5)
+
 
 def test_spatial_algebra(body, robot):
 
@@ -149,6 +156,7 @@ def test_spatial_algebra(body, robot):
     set_pose(gripper, W_X_G)
     set_camera_target_body(gripper, dx=0.5, dy=0, dz=0.5)
 
+
 def test_grasps(categories=[], robot='feg'):
     world = get_test_world(robot)
     robot = world.robot
@@ -165,8 +173,9 @@ def test_grasps(categories=[], robot='feg'):
         for id, scale in TEST_MODELS[cat].items():
             j += 1
             path = join(ASSET_PATH, 'models', cat, id)
+            instance_name = get_instance_name(path)
             body = load_body(path, scale, locations[j], random_yaw=True)
-            world.add_body(body, f'{cat.lower()}#{id}')
+            world.add_body(body, f'{cat.lower()}#{id}', instance_name)
             set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.5)
 
             # test_robot_rotation(body, world.robot)
@@ -187,6 +196,7 @@ def test_grasps(categories=[], robot='feg'):
     wait_if_gui('Finish?')
     disconnect()
 
+
 def load_body(path, scale, pose_2d=(0,0), random_yaw=False):
     file = join(path, 'mobility.urdf')
     print('loading', file)
@@ -196,6 +206,7 @@ def load_body(path, scale, pose_2d=(0,0), random_yaw=False):
     pose = pose_from_2d(body, pose_2d, random_yaw=random_yaw)
     set_pose(body, pose)
     return body, file
+
 
 def load_model_instance(category, id, location = (0, 0)):
     from world_builder.utils import get_model_scale
@@ -210,6 +221,7 @@ def load_model_instance(category, id, location = (0, 0)):
 
     body, file = load_body(path, scale, location)
     return file, body, scale
+
 
 def test_handle_grasps(robot, category):
     from pybullet_tools.pr2_streams import get_handle_pose
@@ -226,7 +238,8 @@ def test_handle_grasps(robot, category):
     set_camera_pose((4, 3, 2), (0, 3, 0.5))
     for id in instances:
         path, body, _ = load_model_instance(category, id, location=locations[i])
-        world.add_body(body, f'{category.lower()}#{id}')
+        instance_name = get_instance_name(path)
+        world.add_body(body, f'{category.lower()}#{id}', instance_name)
         set_camera_target_body(body, dx=1, dy=1, dz=1)
 
         ## color links corresponding to semantic labels
@@ -278,8 +291,8 @@ def test_placement_in(robot, category):
         (x, y) = locations[i]
         path, body, scale = load_model_instance(category, id, location=(x, y))
         # new_urdf_path, body = reload_after_vhacd(path, body, scale, id=id)
-
-        world.add_body(body, f'{category.lower()}#{id}')
+        instance_name = get_instance_name(path)
+        world.add_body(body, f'{category.lower()}#{id}', instance_name)
         set_camera_target_body(body, dx=1, dy=0, dz=1)
 
         ## color links corresponding to semantic labels
@@ -328,6 +341,7 @@ def test_gripper_joints():
 
     wait_if_gui('Finish?')
     disconnect()
+
 
 def test_gripper_range(IK=False):
     """ visualize all possible gripper orientation """
@@ -559,13 +573,13 @@ if __name__ == '__main__':
 
 
     ## --- grasps related ---
-    robot = 'feg' ## 'pr2' ##
+    robot = 'pr2' ##  'feg' ##
     # test_grasps(['Stapler', 'Camera', 'Glasses'], robot)  ## 'Bottle'
     # test_handle_grasps_counter()
-    test_handle_grasps(robot, category='MiniFridge')
+    # test_handle_grasps(robot, category='MiniFridge')
     # test_pick_place_counter(robot)
 
 
     ## --- placement related  ---
     # test_placement_counter()
-    # test_placement_in(robot, category='MiniFridge')
+    test_placement_in(robot, category='MiniFridge')
