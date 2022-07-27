@@ -173,7 +173,7 @@ def test_grasps(categories=[], robot='feg'):
         j = -1
         for id, scale in instances.items():
             j += 1
-            path, body, _ = load_model_instance(cat, id, scale=scale, location=locations[i])
+            path, body, _ = load_model_instance(cat, id, scale=scale, location=locations[j])
         # for id, scale in TEST_MODELS[cat].items():
         #     j += 1
         #     path = join(ASSET_PATH, 'models', cat, id)
@@ -578,7 +578,7 @@ if __name__ == '__main__':
 
     ## --- grasps related ---
     robot = 'pr2' ## 'feg' ##
-    # test_grasps(['VeggieCabbage'], robot)  ## 'Bottle', 'Stapler', 'Camera', 'Glasses'
+    test_grasps(['Food'], robot)  ## 'Bottle', 'Stapler', 'Camera', 'Glasses'
     # test_handle_grasps_counter()
     # test_handle_grasps(robot, category='MiniFridge')
     # test_pick_place_counter(robot)
@@ -586,4 +586,4 @@ if __name__ == '__main__':
 
     ## --- placement related  ---
     # test_placement_counter()
-    test_placement_in(robot, category='MiniFridge')
+    # test_placement_in(robot, category='MiniFridge')
