@@ -45,10 +45,10 @@ from pybullet_planning.lisdf_tools.lisdf_planning import pddl_to_init_goal, Prob
 
 from world_builder.world import State
 from world_builder.loaders import create_gripper_robot, create_pr2_robot
-from world_builder.utils import load_asset
+from world_builder.utils import load_asset, get_instances
 # from pybullet_planning.world_builder.colors import *
 from world_builder.partnet_scales import MODEL_SCALES as TEST_MODELS
-from world_builder.partnet_scales import MODEL_HEIGHTS
+from world_builder.partnet_scales import MODEL_HEIGHTS, OBJ_SCALES
 
 from test_pddlstream import get_args
 
@@ -161,20 +161,24 @@ def test_grasps(categories=[], robot='feg'):
     world = get_test_world(robot)
     robot = world.robot
 
-    problem = State(world, grasp_types=robot.grasp_types) ## , 'side' , 'top'
+    problem = State(world, grasp_types=robot.grasp_types)  ## , 'side' , 'top'
     funk = get_grasp_list_gen(problem, collisions=True, visualize=False, RETAIN_ALL=False)
 
     i = -1
     for cat in categories:
         i += 1
-        n = len(TEST_MODELS[cat])
+        instances = get_instances(cat)
+        n = len(instances)
         locations = [(i, 0.5 * n) for n in range(1, n+1)]
         j = -1
-        for id, scale in TEST_MODELS[cat].items():
+        for id, scale in instances.items():
             j += 1
-            path = join(ASSET_PATH, 'models', cat, id)
-            instance_name = get_instance_name(path)
-            body = load_body(path, scale, locations[j], random_yaw=True)
+            path, body, _ = load_model_instance(cat, id, scale=scale, location=locations[i])
+        # for id, scale in TEST_MODELS[cat].items():
+        #     j += 1
+        #     path = join(ASSET_PATH, 'models', cat, id)
+        #     body = load_body(path, scale, locations[j], random_yaw=True)
+            instance_name = get_instance_name(abspath(path))
             world.add_body(body, f'{cat.lower()}#{id}', instance_name)
             set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.5)
 
@@ -208,7 +212,7 @@ def load_body(path, scale, pose_2d=(0,0), random_yaw=False):
     return body, file
 
 
-def load_model_instance(category, id, location = (0, 0)):
+def load_model_instance(category, id, scale=1, location = (0, 0)):
     from world_builder.utils import get_model_scale
 
     path = join(ASSET_PATH, 'models', category, id)
@@ -216,7 +220,7 @@ def load_model_instance(category, id, location = (0, 0)):
     if category in MODEL_HEIGHTS:
         height = MODEL_HEIGHTS[category]['height']
         scale = get_model_scale(path, h=height)
-    else:
+    elif category in TEST_MODELS:
         scale = TEST_MODELS[category][id]
 
     body, file = load_body(path, scale, location)
@@ -321,7 +325,6 @@ def test_placement_in(robot, category):
     disconnect()
 
 
-
 def test_gripper_joints():
     """ visualize ee link pose as conf changes """
     world = get_feg_world()
@@ -394,6 +397,7 @@ def test_gripper_range(IK=False):
 
     wait_if_gui('Finish?')
     disconnect()
+
 
 def test_handle_grasps_counter():
     from world_builder.loaders import load_floor_plan
@@ -501,9 +505,6 @@ def test_placement_counter():
     wait_if_gui('Finish?')
     disconnect()
 
-def get_instances(category):
-    return TEST_MODELS[category] if category in TEST_MODELS \
-        else MODEL_HEIGHTS[category]['models']
 
 def get_data(category):
     from world_builder.paths import PARTNET_PATH
@@ -522,6 +523,7 @@ def get_data(category):
                 shutil.copytree(old_path, new_path)
                 print(f'copying {old_path} to {new_path}')
 
+
 def test_texture(category, id):
     import untangle
     connect(use_gui=True, shadows=False, width=1980, height=1238)
@@ -538,6 +540,7 @@ def test_texture(category, id):
     # tree = gfg.ElementTree(content)
     # with open(path.replace('mobility', 'mobility_2'), "wb") as files:
     #     tree.write(files)
+
 
 def test_pick_place_counter(robot):
     from world_builder.loaders import load_random_mini_kitchen_counter
@@ -560,6 +563,7 @@ def test_vhacd():
     set_camera_target_body(body, dx=1, dy=1, dz=1)
     print()
 
+
 if __name__ == '__main__':
 
     ## --- MODELS  ---
@@ -573,8 +577,8 @@ if __name__ == '__main__':
 
 
     ## --- grasps related ---
-    robot = 'pr2' ##  'feg' ##
-    # test_grasps(['Stapler', 'Camera', 'Glasses'], robot)  ## 'Bottle'
+    robot = 'pr2' ## 'feg' ##
+    # test_grasps(['VeggieCabbage'], robot)  ## 'Bottle', 'Stapler', 'Camera', 'Glasses'
     # test_handle_grasps_counter()
     # test_handle_grasps(robot, category='MiniFridge')
     # test_pick_place_counter(robot)
