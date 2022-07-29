@@ -1,7 +1,7 @@
 import shutil
 
 from config import ASSET_PATH, EXP_PATH, DATA_PATH
-from os.path import join, abspath
+from os.path import join, abspath, isdir
 from os import listdir
 from pybullet_planning.lisdf_tools.lisdf_loader import load_lisdf_pybullet
 from pybullet_planning.pybullet_tools.utils import wait_if_gui, disconnect, reset_simulation
@@ -24,15 +24,20 @@ def load_test_cases():
 
 def load_dataset_cases(task_name = 'one_fridge_pick_pr2'):
     task_dir = join(DATA_PATH, task_name)
-    lisdf_paths = [f for f in listdir(task_dir)]
+    lisdf_paths = ['one_fridge_pr2_0729_081424']  ## [f for f in listdir(task_dir)]
 
     for f in lisdf_paths:
         old_path = join(task_dir, f)
         new_path = join(DATA_PATH, f)
-        shutil.copytree(old_path, new_path)
+        if not isdir(new_path):
+            shutil.copytree(old_path, new_path)
 
         world = load_lisdf_pybullet(new_path)
+
+        world.add_joints_by_keyword('minifridge')
+        world.summarize_all_objects()
         world.open_all_doors()
+
         wait_if_gui('load next test scene?')
         reset_simulation()
 
