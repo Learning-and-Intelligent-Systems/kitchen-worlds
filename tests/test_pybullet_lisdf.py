@@ -1,6 +1,6 @@
 import shutil
 
-from config import ASSET_PATH, EXP_PATH, DATA_PATH
+from config import ASSET_PATH, EXP_PATH, OUTPUT_PATH, MAMAO_DATA_PATH
 from os.path import join, abspath, isdir
 from os import listdir
 from pybullet_planning.lisdf_tools.lisdf_loader import load_lisdf_pybullet
@@ -23,13 +23,14 @@ def load_test_cases():
 
 
 def load_dataset_cases(task_name='one_fridge_pick_pr2'):
-    task_dir = join(DATA_PATH, task_name)
+    task_dir = join(OUTPUT_PATH, task_name)
     task_dir = join(EXP_PATH)
-    lisdf_paths = ['one_fridge_pr2_0729_115144']  ## [f for f in listdir(task_dir)]
+    task_dir = join(MAMAO_DATA_PATH, task_name)
+    lisdf_paths = ['1316']  ## [f for f in listdir(task_dir)]
 
     for f in lisdf_paths:
         old_path = join(task_dir, f)
-        new_path = join(DATA_PATH, f)
+        new_path = join(OUTPUT_PATH, f)
         if not isdir(new_path):
             shutil.copytree(old_path, new_path)
 

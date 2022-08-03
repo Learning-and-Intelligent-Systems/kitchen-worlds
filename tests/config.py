@@ -10,4 +10,5 @@ warnings.filterwarnings('ignore')
 
 ASSET_PATH = join(dirname(__file__), '..', 'assets')
 EXP_PATH = join(dirname(__file__), '..', 'test_cases')
-DATA_PATH = join(dirname(__file__), '..', 'outputs')
+OUTPUT_PATH = join(dirname(__file__), '..', 'outputs')
+MAMAO_DATA_PATH = join(dirname(__file__), '..', '..', 'mamao-data')
