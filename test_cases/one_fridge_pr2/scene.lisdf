@@ -1,19 +1,19 @@
 <?xml version="1.0" ?>
 <!-- sdf file created by Yang's kitchen scene generator -->
 <sdf version="1.9">
-  <world name="one_fridge_pr2_0718_100224">
+  <world name="one_fridge_pr2">
 
     <gui>
       <camera name="default_camera" definition_type="lookat">
-        <xyz>5.317 3.213 3.557</xyz>
-        <point_to>3.317 3.213 1.557</point_to>
+        <xyz>4.953 3.008 3.311</xyz>
+        <point_to>2.953 3.008 1.311</point_to>
       </camera>
     </gui>
 
 
     <include name="pr20">
       <uri>../../assets/models/drake/pr2_description/urdf/pr2_simplified.urdf</uri>
-      <pose>4.819 3.421 0.051 0.0 -0.0 2.51</pose>
+      <pose>5.0 3.0 0.051 0.0 -0.0 3.142</pose>
     </include>
 
 
@@ -42,37 +42,37 @@
     </model>
 
     <include name="counter">
-      <uri>../../assets/models/KitchenCounter/26387/mobility.urdf</uri>
+      <uri>../../assets/models/KitchenCounter/32052/mobility.urdf</uri>
       <static>true</static>
       <scale>1</scale>
-      <pose>3.0 3.0 0.715 0.0 -0.0 3.142</pose>
+      <pose>3.0 3.0 0.281 0.0 -0.0 3.142</pose>
     </include>
 
-    <include name="veggiecabbage#1">
-      <uri>../../assets/models/VeggieCabbage/00001/mobility.urdf</uri>
-      <static>true</static>
-      <scale>0.0034999999999999996</scale>
-      <pose>3.161 3.061 0.837 0.0 -0.0 2.89</pose>
+    <include name="veggiegreenpepper">
+      <uri>../../assets/models/Food/VeggieGreenPepper/mobility.urdf</uri>
+      <static>false</static>
+      <scale>0.0003</scale>
+      <pose>2.99 2.89 0.589 0.0 -0.0 1.943</pose>
     </include>
 
     <include name="minifridge">
-      <uri>../../assets/models/MiniFridge/10797/mobility.urdf</uri>
+      <uri>../../assets/models/MiniFridge/11231/mobility.urdf</uri>
       <static>true</static>
       <scale>1</scale>
-      <pose>2.943 2.953 1.534 0.0 -0.0 3.142</pose>
+      <pose>2.913 2.997 1.305 0.0 -0.0 3.142</pose>
     </include>
 
 
-    <state world_name="one_fridge_pr2_0718_100224">
+    <state world_name="one_fridge_pr2">
       <model name="pr20">
-        <joint name="x"><angle>4.819</angle></joint>
-        <joint name="y"><angle>3.421</angle></joint>
-        <joint name="theta"><angle>2.51</angle></joint>
-        <joint name="torso_lift_joint"><angle>0.477</angle></joint>
-        <joint name="x"><angle>4.819</angle></joint>
-        <joint name="y"><angle>3.421</angle></joint>
-        <joint name="torso_lift_joint"><angle>0.477</angle></joint>
-        <joint name="theta"><angle>2.51</angle></joint>
+        <joint name="x"><angle>5.0</angle></joint>
+        <joint name="y"><angle>3.0</angle></joint>
+        <joint name="theta"><angle>3.142</angle></joint>
+        <joint name="torso_lift_joint"><angle>0.2</angle></joint>
+        <joint name="x"><angle>5.0</angle></joint>
+        <joint name="y"><angle>3.0</angle></joint>
+        <joint name="torso_lift_joint"><angle>0.2</angle></joint>
+        <joint name="theta"><angle>3.142</angle></joint>
         <joint name="head_pan_joint"><angle>0.0</angle></joint>
         <joint name="head_tilt_joint"><angle>0.0</angle></joint>
         <joint name="l_shoulder_pan_joint"><angle>0.677</angle></joint>
@@ -99,7 +99,8 @@
         <joint name="r_gripper_r_finger_tip_joint"><angle>0.0</angle></joint>
       </model>
       <model name="minifridge">
-        <joint name="joint_1"><angle>2.095</angle></joint>
+        <joint name="joint_1"><angle>0.0</angle></joint>
+        <joint name="joint_2"><angle>0.0</angle></joint>
       </model>
     </state>
 
