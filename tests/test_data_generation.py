@@ -84,46 +84,6 @@ def main(exp_name, verbose=True):
 
     data output structure for one run:
 
-    kitchen-worlds/outputs/{exp_name}_{datetime}/   ## e.g. one_fridge_feg_220627-16:25/
-        domain.pddl            \
-        domain_full.pddl        } these will be the same for all planner runs
-        stream.pddl             |
-        planning_config.json   /
-        scenes/
-            scene_1/
-                scene.lisdf
-                init.png   ## graph of the initial state
-                init.dot   ## graph of the initial state
-                depth_maps/  ## of the whole scene, robot, movables, and movable links of joints
-                problems/
-                    problem_1/
-                        problem.pddl
-                        log.json   ## a list of partial plans and failed streams, the last one successful
-                        constraint_networks/  ## for each partial plan
-                            iteration_{x}.png
-                            iteration_{y}.png
-                            ...
-                            iteration_{x}.dot
-                            iteration_{y}.dot
-                            ...
-                        stream_plans/  ## for each partial plan
-                            fused_iteration_{x}.png
-                            fused_iteration_{y}.png
-                            ...
-                            iteration_{x}.dot
-                            iteration_{y}.dot
-                            ...
-                        facts/  ## for each partial plan, the full set of facts for
-                            iteration_{x}.png
-                            iteration_{y}.png
-                            ...
-                            iteration_{x}.dot
-                            iteration_{y}.dot
-                            ...
-                    problem_2/
-                    ...
-            scene_2/
-            ...
     """
 
     """
