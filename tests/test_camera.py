@@ -17,6 +17,7 @@ import pybullet as p
 from tqdm import tqdm
 from lisdf_tools.lisdf_loader import get_depth_images
 
+from utils import load_lisdf_synthesizer
 
 def get_camera_pose(viz_dir):
     camera_pose = json.load(open(join(viz_dir, 'planning_config.json')))["obs_camera_pose"]
@@ -168,6 +169,13 @@ def make_image_background(old_arr):
 def process(subdir):
     # if not isdir(join(dataset_dir, subdir)): return
     viz_dir = join(dataset_dir, subdir)
+
+    ## need to temporarily move the dir to the test_cases folder for asset paths to be found
+    test_dir = join(EXP_PATH, f"{task_name}_{subdir}")
+    if not isdir(test_dir):
+        shutil.copytree(viz_dir, test_dir)
+
+    # load_lisdf_synthesizer(test_dir)
     print(viz_dir)
 
     if isdir(join(viz_dir, 'rgbs')):
@@ -178,11 +186,6 @@ def process(subdir):
     if not isdir(join(viz_dir, 'seg_images')):
 
         camera_pose = get_camera_pose(viz_dir)
-
-        ## need to temporarily move the dir to the test_cases folder for asset paths to be found
-        test_dir = join(EXP_PATH, f"{task_name}_{subdir}")
-        if not isdir(test_dir):
-            shutil.copytree(viz_dir, test_dir)
 
         ## ------------- visualization function to test -------------------
         # render_rgb_image(test_dir, viz_dir, camera_pose)
@@ -195,13 +198,12 @@ def process(subdir):
         ## Pybullet segmentation mask
         render_segmentation_mask(test_dir, viz_dir, camera_pose)
 
-        shutil.rmtree(test_dir)
-        reset_simulation()
-
     # if not isdir(join(viz_dir, 'masked_rgbs')):
     #     render_masked_rgb_images(viz_dir)
     ## ----------------------------------------------------------------
 
+    shutil.rmtree(test_dir)
+    reset_simulation()
 
 if __name__ == "__main__":
     dataset_dir = '/home/zhutiany/Documents/mamao-data/one_fridge_pick_pr2'
@@ -209,7 +211,7 @@ if __name__ == "__main__":
     task_name = dataset_dir[dataset_dir.rfind('/')+1:]
     subdirs = listdir(dataset_dir)
     subdirs.sort()
-    parallel = True
+    parallel = False
 
     if parallel:
         import multiprocessing
@@ -221,7 +223,6 @@ if __name__ == "__main__":
         with Pool(processes=num_cpus) as pool:
             for result in pool.imap_unordered(process, subdirs):
                 pass
-            # pool.imap_unordered(process, subdirs)
 
     else:
         for subdir in subdirs:

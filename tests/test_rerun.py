@@ -16,7 +16,8 @@ from pybullet_tools.pr2_utils import get_group_conf
 from pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, wait_if_gui, \
     SEPARATOR, get_aabb, wait_for_duration, safe_remove, ensure_dir, reset_simulation
 from pybullet_tools.bullet_utils import summarize_facts, print_goal, nice, get_datetime
-from pybullet_tools.pr2_agent import get_stream_info, post_process, move_cost_fn, get_stream_map
+from pybullet_tools.pr2_agent import get_stream_info, post_process, move_cost_fn, \
+    get_stream_map, solve_multiple, solve_one
 from pybullet_tools.logging import TXT_FILE
 
 from pybullet_tools.pr2_primitives import get_group_joints, Conf, get_base_custom_limits, Pose, Conf, \
@@ -52,59 +53,39 @@ def init_experiment(exp_dir):
 
 #####################################
 
-
-def solve_one(pddlstream_problem, stream_info, fc):
-    with Profiler():
-        with LockRenderer(lock=True):
-            solution = solve(pddlstream_problem, algorithm=DEFAULT_ALGORITHM, unit_costs=False,
-                             stream_info=stream_info, success_cost=INF, verbose=True, debug=False,
-                             feasibility_checker=fc)
-    return solution
-
-
-def solve_multiple(problem, stream_info={}, lock=True):
-    reset_globals()
-    profiler = Profiler(field='tottime', num=25) ## , enable=profile # cumtime | tottime
-    profiler.save()
-
-    temp_dir = '/tmp/pddlstream-{}/'.format(os.getpid())
-    print(f'\n\n\n\nsolve_multiple at temp dir {temp_dir} \n\n\n\n')
-    safe_remove(temp_dir)
-    ensure_dir(temp_dir)
-    cwd_saver = TmpCWD(temp_cwd=temp_dir)  # TODO: multithread
-    cwd_saver.save()  # TODO: move to the constructor
-    lock_saver = LockRenderer(lock=lock)
-
-    try:
-        solution = solve(problem, algorithm=DEFAULT_ALGORITHM, unit_costs=False, visualize=False,
-                         stream_info=stream_info, success_cost=INF, verbose=True, debug=False)
-        # solve_fn = solve_restart
-        # solution = solve_fn(
-        #     problem,
-        #     stream_info=stream_info,
-        #     constraints=constraints,
-        #     # replan_actions={},
-        #     # temp_dir=temp_dir, # TODO: bug in temp_dir
-        #     initial_complexity=3,
-        #     planner='ff-astar1', max_planner_time=10,
-        #     unit_costs=False, success_cost=0 if anytime else INF,
-        #     max_time=max_time, max_post_time=max_post_time, max_memory=INF,
-        #     max_restarts=INF if restart else 0, iteration_time=2 * 60,
-        #     unit_efforts=True, max_effort=INF, effort_weight=1,
-        #     # bind=True,
-        #     max_skeletons=None,
-        #     search_sample_ratio=5,
-        #     post_process=True,
-        #     # https://github.mit.edu/Learning-and-Intelligent-Systems/open-world-tamp/commit/780b4fd8dded6c7c5eca806a09a5a426a1c70eae#diff-5e728784f74fcb370a8a829b715756b0
-        #     verbose=verbose, debug=False, **kwargs
-        # )
-    finally:
-        lock_saver.restore()
-        cwd_saver.restore()
-        safe_remove(temp_dir)
-
-    profiler.restore()
-    return solution
+#
+# def solve_one(pddlstream_problem, stream_info, fc):
+#     with Profiler():
+#         with LockRenderer(lock=True):
+#             solution = solve(pddlstream_problem, algorithm=DEFAULT_ALGORITHM, unit_costs=False,
+#                              stream_info=stream_info, success_cost=INF, verbose=True, debug=False,
+#                              feasibility_checker=fc)
+#     return solution
+#
+#
+# def solve_multiple(problem, stream_info={}, lock=True):
+#     reset_globals()
+#     profiler = Profiler(field='tottime', num=25) ## , enable=profile # cumtime | tottime
+#     profiler.save()
+#
+#     temp_dir = '/tmp/pddlstream-{}/'.format(os.getpid())
+#     print(f'\n\n\n\nsolve_multiple at temp dir {temp_dir} \n\n\n\n')
+#     safe_remove(temp_dir)
+#     ensure_dir(temp_dir)
+#     cwd_saver = TmpCWD(temp_cwd=temp_dir)  # TODO: multithread
+#     cwd_saver.save()  # TODO: move to the constructor
+#     lock_saver = LockRenderer(lock=lock)
+#
+#     try:
+#         solution = solve(problem, algorithm=DEFAULT_ALGORITHM, unit_costs=False, visualize=False,
+#                          stream_info=stream_info, success_cost=INF, verbose=True, debug=False)
+#     finally:
+#         lock_saver.restore()
+#         cwd_saver.restore()
+#         safe_remove(temp_dir)
+#
+#     profiler.restore()
+#     return solution
 
 
 def run_one(run_dir, PARALLEL=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF_SOLVED):

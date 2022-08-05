@@ -5,6 +5,7 @@ import scene_synthesizer as synth
 import untangle
 from trimesh import transformations
 
+
 def load_lisdf_synthesizer(lisdf_dir, scene_scale=1., robots=False, surfaces=False, texture=True, display=True):
     lisdf_path = os.path.join(lisdf_dir, 'scene.lisdf')
 
@@ -62,3 +63,8 @@ def load_lisdf_synthesizer(lisdf_dir, scene_scale=1., robots=False, surfaces=Fal
         scene.show()
 
     return scene
+
+
+if __name__ == "__main__":
+    p = os.path.abspath('/home/zhutiany/Documents/mamao-data/one_fridge_pick_pr2/1000')
+    load_lisdf_synthesizer(p)
