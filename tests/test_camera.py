@@ -53,7 +53,7 @@ def render_segmentation_mask(test_dir, viz_dir, camera_pose, width=1280, height=
 
     new_key = 'seg_image'
     rgb_dir = join(viz_dir, f"{new_key}s")
-    os.mkdir(rgb_dir)
+    os.makedirs(rgb_dir, exist_ok=True)
 
     im = PIL.Image.fromarray(rgb)
     im.save(join(rgb_dir, f'{new_key}_scene.png'))
@@ -183,27 +183,29 @@ def process(subdir):
     if isdir(join(viz_dir, 'masked_rgbs')):
         shutil.rmtree(join(viz_dir, 'masked_rgbs'))
 
-    if not isdir(join(viz_dir, 'seg_images')):
+    camera_pose = get_camera_pose(viz_dir)
 
-        camera_pose = get_camera_pose(viz_dir)
-
-        ## ------------- visualization function to test -------------------
-        # render_rgb_image(test_dir, viz_dir, camera_pose)
-        # if not isdir(join(viz_dir, 'rgb_images')):
-        #     render_segmented_rgb_images(test_dir, viz_dir, camera_pose, robot=True)
+    seg_dir = join(viz_dir, 'seg_images')
+    if not isdir(seg_dir) or len(listdir(seg_dir)) <= 2:
 
         # ## without robot
         # render_segmented_rgbd_images(test_dir, viz_dir, camera_pose)
 
         ## Pybullet segmentation mask
         render_segmentation_mask(test_dir, viz_dir, camera_pose)
+        reset_simulation()
+
+    ## ------------- visualization function to test -------------------
+    # render_rgb_image(test_dir, viz_dir, camera_pose)
+    if not isdir(join(viz_dir, 'rgb_images')):
+        render_segmented_rgb_images(test_dir, viz_dir, camera_pose, robot=False)
+        reset_simulation()
 
     # if not isdir(join(viz_dir, 'masked_rgbs')):
     #     render_masked_rgb_images(viz_dir)
     ## ----------------------------------------------------------------
-
     shutil.rmtree(test_dir)
-    reset_simulation()
+
 
 if __name__ == "__main__":
     dataset_dir = '/home/zhutiany/Documents/mamao-data/one_fridge_pick_pr2'
@@ -211,7 +213,7 @@ if __name__ == "__main__":
     task_name = dataset_dir[dataset_dir.rfind('/')+1:]
     subdirs = listdir(dataset_dir)
     subdirs.sort()
-    parallel = False
+    parallel = True
 
     if parallel:
         import multiprocessing
@@ -227,3 +229,4 @@ if __name__ == "__main__":
     else:
         for subdir in subdirs:
             process(subdir)
+            break
