@@ -17,7 +17,7 @@ from pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, 
     SEPARATOR, get_aabb, wait_for_duration, safe_remove, ensure_dir, reset_simulation
 from pybullet_tools.bullet_utils import summarize_facts, print_goal, nice, get_datetime
 from pybullet_tools.pr2_agent import get_stream_info, post_process, move_cost_fn, \
-    get_stream_map, solve_multiple, solve_one
+    get_stream_map # , solve_multiple, solve_one
 from pybullet_tools.logging import TXT_FILE
 
 from pybullet_tools.pr2_primitives import get_group_joints, Conf, get_base_custom_limits, Pose, Conf, \
@@ -98,9 +98,17 @@ def run_one(run_dir, PARALLEL=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
     if not isdir(exp_dir):
         shutil.copytree(ori_dir, exp_dir)
 
+    if False:
+        from utils import load_lisdf_synthesizer
+        scene = load_lisdf_nvisii(exp_dir)
+
     world = load_lisdf_pybullet(exp_dir, width=720, height=560)
     saver = WorldSaver()
     problem = Problem(world)
+
+    if False:
+        from utils import load_lisdf_nvisii
+        scene = load_lisdf_nvisii(exp_dir)
 
     pddlstream_problem = pddlstream_from_dir(problem, exp_dir=exp_dir, collisions=True, teleport=False)
     world.summarize_all_objects()
