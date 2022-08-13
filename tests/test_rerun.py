@@ -42,6 +42,7 @@ from mamao_tools.utils import get_feasibility_checker
 
 TASK_NAME = 'one_fridge_pick_pr2_20_oracle'  ## 'one_fridge_pick_pr2_20_parallel_1'
 DATABASE_DIR = join('..', '..', 'mamao-data', TASK_NAME)
+
 PARALLEL = False
 FEASIBILITY_CHECKER = 'oracle'
 SKIP_IF_SOLVED = False
@@ -92,6 +93,7 @@ def run_one(run_dir, PARALLEL=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
     ori_dir = join(DATABASE_DIR, run_dir)
     if SKIP_IF_SOLVED and isfile(join(ori_dir, f'plan_rerun_{FEASIBILITY_CHECKER}.json')): return
 
+    print(f'\n\n\n--------------------------\n    rerun {ori_dir} \n------------------------\n\n\n')
     exp_dir = join(EXP_PATH, f"{task_name}_{run_dir}")
     if not isdir(exp_dir):
         shutil.copytree(ori_dir, exp_dir)
@@ -179,6 +181,7 @@ def main(PARALLEL=True):
 
     else:
         for i in range(num_cases):
+            if i in [0, 1]: continue
             process(i, PARALLEL=False)
 
     print(f'solved {num_cases} problems (parallel={PARALLEL}) in {round(time.time() - start_time, 3)} sec')

@@ -4,7 +4,8 @@ import PIL.Image
 import numpy as np
 
 from config import EXP_PATH
-from pybullet_tools.utils import quat_from_euler, reset_simulation, remove_body
+from pybullet_tools.utils import quat_from_euler, reset_simulation, remove_body, AABB, \
+    get_aabb_extent, get_aabb_center
 from pybullet_tools.bullet_utils import get_segmask, get_door_links
 
 from mamao_tools.data_utils import get_indices
@@ -18,6 +19,9 @@ from tqdm import tqdm
 from lisdf_tools.lisdf_loader import get_depth_images
 
 from utils import load_lisdf_synthesizer
+
+N_PX = 224
+
 
 def get_camera_pose(viz_dir):
     camera_pose = json.load(open(join(viz_dir, 'planning_config.json')))["obs_camera_pose"]
@@ -44,14 +48,18 @@ def render_segmented_rgbd_images(test_dir, viz_dir, camera_pose, robot=False):
                      img_dir=join(viz_dir))
 
 
-def render_segmentation_mask(test_dir, viz_dir, camera_pose, width=1280, height=960):
+def render_segmentation_mask(test_dir, viz_dir, camera_pose,
+                             width=1280, height=960, crop=False):
     world = load_lisdf_pybullet(test_dir, width=width, height=height, verbose=True)
     remove_body(world.robot.body)
-    world.add_camera(camera_pose, viz_dir)
+    if crop:
+        world.add_camera(camera_pose, viz_dir, width=width, height=height)
+    else:
+        world.add_camera(camera_pose, viz_dir)
     imgs = world.camera.get_image(segment=True, segment_links=True)
     rgb = imgs.rgbPixels[:, :, :3]
 
-    new_key = 'seg_image'
+    new_key = 'seg_image' if not crop else 'crop_image'
     rgb_dir = join(viz_dir, f"{new_key}s")
     os.makedirs(rgb_dir, exist_ok=True)
 
@@ -63,7 +71,6 @@ def render_segmentation_mask(test_dir, viz_dir, camera_pose, width=1280, height=
     # seg = imgs.segmentationMaskBuffer[:, :, 0].astype('int32')
     unique = get_segmask(seg)
     indices = get_indices(viz_dir)
-    print(indices)
     for k, v in indices.items():
         k = eval(k)
         keys = []
@@ -87,9 +94,78 @@ def render_segmentation_mask(test_dir, viz_dir, camera_pose, width=1280, height=
         new_image = foreground + background
 
         im = PIL.Image.fromarray(new_image)
+        if crop:
+            bb = get_mask_bb(mask)
+            # if bb is not None:
+            #     draw_bb(new_image, bb)
+            im = crop_image(im, bb, width, height)
+
+        # im.show()
         im.save(join(rgb_dir, im_name.format(index=str(k), name=v)))
         print(v)
     print()
+
+
+def draw_bb(im, bb):
+    from PIL import ImageOps
+    im2 = np.array(ImageOps.grayscale(im))
+    for j in range(bb.lower[0], bb.upper[0]+1):
+        for i in [bb.lower[1], bb.upper[1]]:
+            im2[i, j] = 255
+    for i in range(bb.lower[1], bb.upper[1]+1):
+        for j in [bb.lower[0], bb.upper[0]]:
+            im2[i, j] = 255
+    im.show()
+    PIL.Image.fromarray(im2).show()
+
+
+def crop_image(im, bb, width, height):
+    if bb is None:
+        # crop the center of the blank image
+        left = int((width - N_PX) / 2)
+        top = int((height - N_PX) / 2)
+        right = left + N_PX
+        bottom = top + N_PX
+        cp = (left, top, right, bottom)
+    else:
+        # draw_bb(im, bb)
+
+        padding = 30
+        dx, dy = get_aabb_extent(bb)
+        cx, cy = get_aabb_center(bb)
+        dmax = max(dx, dy)
+        if dmax > height:
+            dmax = height
+            cy = height / 2
+        elif dmax > N_PX:
+            dmax += padding * 2
+        else:
+            dmax = N_PX
+        left = max(0, int(cx - dmax / 2))
+        top = max(0, int(cy - dmax / 2))
+        right = left + N_PX
+        bottom = top + N_PX
+        if right > width:
+            right = width
+            left = width - dmax
+        if bottom > height:
+            right = height
+            left = height - dmax
+        cp = (left, top, right, bottom)
+
+    if cp is not None:
+        im = im.crop(cp)
+    return im
+
+
+def get_mask_bb(mask):
+    if np.all(mask == 0):
+        return None
+    col = np.max(mask, axis=0)  ## 1280
+    row = np.max(mask, axis=1)  ## 960
+    col = np.where(col == 1)[0]
+    row = np.where(row == 1)[0]
+    return AABB(lower=(col[0], row[0]), upper=(col[-1], row[-1]))
 
 
 def expand_mask(mask):
@@ -176,33 +252,42 @@ def process(subdir):
         shutil.copytree(viz_dir, test_dir)
 
     # load_lisdf_synthesizer(test_dir)
-    print(viz_dir)
 
     if isdir(join(viz_dir, 'rgbs')):
         shutil.rmtree(join(viz_dir, 'rgbs'))
     if isdir(join(viz_dir, 'masked_rgbs')):
         shutil.rmtree(join(viz_dir, 'masked_rgbs'))
+    seg_dir = join(viz_dir, 'seg_images')
+    rgb_dir = join(viz_dir, 'rgb_images')
+    crop_dir = join(viz_dir, 'crop_images')
+
+    # if isdir(seg_dir):
+    #     shutil.rmtree(seg_dir)
+    # if isdir(rgb_dir):
+    #     shutil.rmtree(rgb_dir)
+    # if isdir(crop_dir):
+    #     shutil.rmtree(crop_dir)
 
     camera_pose = get_camera_pose(viz_dir)
+    (x, y, z), quat = camera_pose
+    camera_pose = (x+1, y, z), quat
 
-    seg_dir = join(viz_dir, 'seg_images')
+    ## ------------- visualization function to test -------------------
+    # render_rgb_image(test_dir, viz_dir, camera_pose)
+
     if not isdir(seg_dir) or len(listdir(seg_dir)) <= 2:
-
-        # ## without robot
-        # render_segmented_rgbd_images(test_dir, viz_dir, camera_pose)
-
         ## Pybullet segmentation mask
         render_segmentation_mask(test_dir, viz_dir, camera_pose)
         reset_simulation()
 
-    ## ------------- visualization function to test -------------------
-    # render_rgb_image(test_dir, viz_dir, camera_pose)
-    if not isdir(join(viz_dir, 'rgb_images')):
+    if not isdir(rgb_dir) or len(listdir(rgb_dir)) <= 2:
         render_segmented_rgb_images(test_dir, viz_dir, camera_pose, robot=False)
         reset_simulation()
 
-    # if not isdir(join(viz_dir, 'masked_rgbs')):
-    #     render_masked_rgb_images(viz_dir)
+    if not isdir(crop_dir) or len(listdir(crop_dir)) <= 2:
+        render_segmentation_mask(test_dir, viz_dir, camera_pose, crop=True)
+        reset_simulation()
+
     ## ----------------------------------------------------------------
     shutil.rmtree(test_dir)
 
