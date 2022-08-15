@@ -26,7 +26,7 @@ def load_dataset_cases(task_name='one_fridge_pick_pr2'):
     task_dir = join(OUTPUT_PATH, task_name)
     task_dir = join(EXP_PATH)
     task_dir = join(MAMAO_DATA_PATH, task_name)
-    lisdf_paths = ['1316']  ## [f for f in listdir(task_dir)]
+    lisdf_paths = ['11']  ## [f for f in listdir(task_dir)]
 
     for f in lisdf_paths:
         old_path = join(task_dir, f)

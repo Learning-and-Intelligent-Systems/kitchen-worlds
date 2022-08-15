@@ -13,7 +13,7 @@ from lisdf_tools.lisdf_loader import load_lisdf_pybullet
 import json
 import shutil
 from os import listdir
-from os.path import join, isdir
+from os.path import join, isdir, isfile
 import pybullet as p
 from tqdm import tqdm
 from lisdf_tools.lisdf_loader import get_depth_images
@@ -72,6 +72,8 @@ def render_segmentation_mask(test_dir, viz_dir, camera_pose,
     unique = get_segmask(seg)
     indices = get_indices(viz_dir)
     for k, v in indices.items():
+        file_name = join(rgb_dir, im_name.format(index=str(k), name=v))
+        if isfile(file_name): continue
         k = eval(k)
         keys = []
         if isinstance(k, int) and (k, 0) in unique:
@@ -101,9 +103,9 @@ def render_segmentation_mask(test_dir, viz_dir, camera_pose,
             im = crop_image(im, bb, width, height)
 
         # im.show()
-        im.save(join(rgb_dir, im_name.format(index=str(k), name=v)))
-        print(v)
-    print()
+        im.save(file_name)
+    #     print(v)
+    # print()
 
 
 def draw_bb(im, bb):
@@ -248,8 +250,11 @@ def process(subdir):
 
     ## need to temporarily move the dir to the test_cases folder for asset paths to be found
     test_dir = join(EXP_PATH, f"{task_name}_{subdir}")
+    if isdir(test_dir):
+        shutil.rmtree(test_dir)
     if not isdir(test_dir):
         shutil.copytree(viz_dir, test_dir)
+    print(viz_dir, end='\r')
 
     # load_lisdf_synthesizer(test_dir)
 
@@ -260,6 +265,8 @@ def process(subdir):
     seg_dir = join(viz_dir, 'seg_images')
     rgb_dir = join(viz_dir, 'rgb_images')
     crop_dir = join(viz_dir, 'crop_images')
+    constraint_dir = join(viz_dir, 'constraint_networks')
+    stream_dir = join(viz_dir, 'stream_plans')
 
     # if isdir(seg_dir):
     #     shutil.rmtree(seg_dir)
@@ -267,6 +274,10 @@ def process(subdir):
     #     shutil.rmtree(rgb_dir)
     # if isdir(crop_dir):
     #     shutil.rmtree(crop_dir)
+    if isdir(constraint_dir) and len(listdir(constraint_dir)) == 0:
+        shutil.rmtree(constraint_dir)
+    if isdir(stream_dir) and len(listdir(stream_dir)) == 0:
+        shutil.rmtree(stream_dir)
 
     camera_pose = get_camera_pose(viz_dir)
     (x, y, z), quat = camera_pose
@@ -275,16 +286,20 @@ def process(subdir):
     ## ------------- visualization function to test -------------------
     # render_rgb_image(test_dir, viz_dir, camera_pose)
 
-    if not isdir(seg_dir) or len(listdir(seg_dir)) <= 2:
-        ## Pybullet segmentation mask
-        render_segmentation_mask(test_dir, viz_dir, camera_pose)
-        reset_simulation()
-
-    if not isdir(rgb_dir) or len(listdir(rgb_dir)) <= 2:
+    if not isdir(rgb_dir):
+        print(viz_dir, 'rgbing ...')
         render_segmented_rgb_images(test_dir, viz_dir, camera_pose, robot=False)
         reset_simulation()
 
-    if not isdir(crop_dir) or len(listdir(crop_dir)) <= 2:
+    ## Pybullet segmentation mask
+    num_imgs = len(get_indices(viz_dir)) + 1
+    if not isdir(seg_dir) or len(listdir(seg_dir)) < num_imgs:
+        print(viz_dir, 'segmenting ...')
+        render_segmentation_mask(test_dir, viz_dir, camera_pose)
+        reset_simulation()
+
+    if not isdir(crop_dir) or len(listdir(crop_dir)) < num_imgs:
+        print(viz_dir, 'cropping ...')
         render_segmentation_mask(test_dir, viz_dir, camera_pose, crop=True)
         reset_simulation()
 
@@ -298,7 +313,7 @@ if __name__ == "__main__":
     task_name = dataset_dir[dataset_dir.rfind('/')+1:]
     subdirs = listdir(dataset_dir)
     subdirs.sort()
-    parallel = True
+    parallel = False
 
     if parallel:
         import multiprocessing
@@ -314,4 +329,3 @@ if __name__ == "__main__":
     else:
         for subdir in subdirs:
             process(subdir)
-            break
