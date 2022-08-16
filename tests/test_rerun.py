@@ -43,7 +43,7 @@ from mamao_tools.utils import get_feasibility_checker
 TASK_NAME = 'one_fridge_pick_pr2_tmp'  ## 'one_fridge_pick_pr2_20_parallel_1'
 DATABASE_DIR = join('..', '..', 'mamao-data', TASK_NAME)
 
-PARALLEL = True
+PARALLEL = False
 FEASIBILITY_CHECKER = 'oracle'
 SKIP_IF_SOLVED = False
 
