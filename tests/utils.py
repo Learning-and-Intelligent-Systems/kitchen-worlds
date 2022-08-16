@@ -204,6 +204,7 @@ def load_lisdf_nvisii(lisdf_dir, **kwargs):
         world_scene.show()
     return visii_world
 
+
 if __name__ == "__main__":
     p = os.path.abspath('/home/zhutiany/Documents/mamao-data/one_fridge_pick_pr2/1000')
     load_lisdf_synthesizer(p)
