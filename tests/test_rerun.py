@@ -54,47 +54,49 @@ def init_experiment(exp_dir):
 
 #####################################
 
-#
-# def solve_one(pddlstream_problem, stream_info, fc):
-#     with Profiler():
-#         with LockRenderer(lock=True):
-#             solution = solve(pddlstream_problem, algorithm=DEFAULT_ALGORITHM, unit_costs=False,
-#                              stream_info=stream_info, success_cost=INF, verbose=True, debug=False,
-#                              feasibility_checker=fc)
-#     return solution
-#
-#
-# def solve_multiple(problem, stream_info={}, lock=True):
-#     reset_globals()
-#     profiler = Profiler(field='tottime', num=25) ## , enable=profile # cumtime | tottime
-#     profiler.save()
-#
-#     temp_dir = '/tmp/pddlstream-{}/'.format(os.getpid())
-#     print(f'\n\n\n\nsolve_multiple at temp dir {temp_dir} \n\n\n\n')
-#     safe_remove(temp_dir)
-#     ensure_dir(temp_dir)
-#     cwd_saver = TmpCWD(temp_cwd=temp_dir)  # TODO: multithread
-#     cwd_saver.save()  # TODO: move to the constructor
-#     lock_saver = LockRenderer(lock=lock)
-#
-#     try:
-#         solution = solve(problem, algorithm=DEFAULT_ALGORITHM, unit_costs=False, visualize=False,
-#                          stream_info=stream_info, success_cost=INF, verbose=True, debug=False)
-#     finally:
-#         lock_saver.restore()
-#         cwd_saver.restore()
-#         safe_remove(temp_dir)
-#
-#     profiler.restore()
-#     return solution
+def solve_one(pddlstream_problem, stream_info, fc):
+    with Profiler():
+        with LockRenderer(lock=True):
+            solution = solve(pddlstream_problem, algorithm=DEFAULT_ALGORITHM, unit_costs=False,
+                             stream_info=stream_info, success_cost=INF, verbose=True, debug=False,
+                             feasibility_checker=fc)
+    return solution
+
+
+def solve_multiple(problem, stream_info={}, lock=True):
+    reset_globals()
+    profiler = Profiler(field='tottime', num=25) ## , enable=profile # cumtime | tottime
+    profiler.save()
+
+    temp_dir = '/tmp/pddlstream-{}/'.format(os.getpid())
+    print(f'\n\n\n\nsolve_multiple at temp dir {temp_dir} \n\n\n\n')
+    safe_remove(temp_dir)
+    ensure_dir(temp_dir)
+    cwd_saver = TmpCWD(temp_cwd=temp_dir)  # TODO: multithread
+    cwd_saver.save()  # TODO: move to the constructor
+    lock_saver = LockRenderer(lock=lock)
+
+    try:
+        solution = solve(problem, algorithm=DEFAULT_ALGORITHM, unit_costs=False, visualize=False,
+                         stream_info=stream_info, success_cost=INF, verbose=True, debug=False)
+    finally:
+        lock_saver.restore()
+        cwd_saver.restore()
+        safe_remove(temp_dir)
+
+    profiler.restore()
+    return solution
 
 
 def run_one(run_dir, PARALLEL=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     ori_dir = join(DATABASE_DIR, run_dir)
-    if SKIP_IF_SOLVED and isfile(join(ori_dir, f'plan_rerun_{FEASIBILITY_CHECKER}.json')): return
+    if SKIP_IF_SOLVED and isfile(join(ori_dir, f'plan_rerun_{FEASIBILITY_CHECKER}.json')):
+        return
 
     print(f'\n\n\n--------------------------\n    rerun {ori_dir} \n------------------------\n\n\n')
     exp_dir = join(EXP_PATH, f"{task_name}_{run_dir}")
+    print('Problem:', os.path.abspath(ori_dir))
+    print('Experiment:', os.path.abspath(exp_dir))
     if not isdir(exp_dir):
         shutil.copytree(ori_dir, exp_dir)
 
