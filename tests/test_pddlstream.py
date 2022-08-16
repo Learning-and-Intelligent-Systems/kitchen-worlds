@@ -95,7 +95,7 @@ def main(exp_name, verbose=True):
         control_commands(commands)
     else:
         # apply_commands(State(), commands, time_step=0.01)
-        apply_actions(problem, commands, time_step=0.01)
+        apply_actions(problem, commands, time_step=0.1)
     wait_if_gui('Finish?')
     disconnect()
 

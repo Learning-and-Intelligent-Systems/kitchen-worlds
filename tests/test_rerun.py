@@ -17,7 +17,7 @@ from pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, 
     SEPARATOR, get_aabb, wait_for_duration, safe_remove, ensure_dir, reset_simulation
 from pybullet_tools.bullet_utils import summarize_facts, print_goal, nice, get_datetime
 from pybullet_tools.pr2_agent import get_stream_info, post_process, move_cost_fn, \
-    get_stream_map # , solve_multiple, solve_one
+    get_stream_map, solve_multiple, solve_one
 from pybullet_tools.logging import TXT_FILE
 
 from pybullet_tools.pr2_primitives import get_group_joints, Conf, get_base_custom_limits, Pose, Conf, \
@@ -40,10 +40,10 @@ from world_builder.actions import apply_actions
 from mamao_tools.utils import get_feasibility_checker
 
 
-TASK_NAME = 'one_fridge_pick_pr2_20_oracle'  ## 'one_fridge_pick_pr2_20_parallel_1'
+TASK_NAME = 'one_fridge_pick_pr2_tmp'  ## 'one_fridge_pick_pr2_20_parallel_1'
 DATABASE_DIR = join('..', '..', 'mamao-data', TASK_NAME)
 
-PARALLEL = False
+PARALLEL = True
 FEASIBILITY_CHECKER = 'oracle'
 SKIP_IF_SOLVED = False
 
@@ -90,17 +90,18 @@ def init_experiment(exp_dir):
 
 
 def run_one(run_dir, PARALLEL=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
-    ori_dir = join(DATABASE_DIR, run_dir)
+    ori_dir = run_dir ## join(DATABASE_DIR, run_dir)
     if SKIP_IF_SOLVED and isfile(join(ori_dir, f'plan_rerun_{FEASIBILITY_CHECKER}.json')): return
 
     print(f'\n\n\n--------------------------\n    rerun {ori_dir} \n------------------------\n\n\n')
-    exp_dir = join(EXP_PATH, f"{task_name}_{run_dir}")
+    run_name = os.path.basename(ori_dir)
+    exp_dir = join(EXP_PATH, f"{task_name}_{run_name}")
     if not isdir(exp_dir):
         shutil.copytree(ori_dir, exp_dir)
 
     if False:
         from utils import load_lisdf_synthesizer
-        scene = load_lisdf_nvisii(exp_dir)
+        scene = load_lisdf_synthesizer(exp_dir)
 
     world = load_lisdf_pybullet(exp_dir, width=720, height=560)
     saver = WorldSaver()
@@ -164,8 +165,8 @@ def run_one(run_dir, PARALLEL=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
 
 
 def process(index, PARALLEL=True):
-    np.random.seed(index)
-    random.seed(index)
+    np.random.seed(int(time.time()))
+    random.seed(time.time())
     return run_one(str(index), PARALLEL=PARALLEL)
 
 
@@ -174,7 +175,8 @@ def main(PARALLEL=True):
         shutil.rmtree('visualizations')
 
     start_time = time.time()
-    num_cases = len([f for f in listdir(DATABASE_DIR) if isdir(join(DATABASE_DIR, f))])
+    cases = [join(DATABASE_DIR, f) for f in listdir(DATABASE_DIR) if isdir(join(DATABASE_DIR, f))]
+    num_cases = len(cases)
     if PARALLEL:
         import multiprocessing
         from multiprocessing import Pool
@@ -185,12 +187,13 @@ def main(PARALLEL=True):
         with Pool(processes=num_cpus) as pool:
             # for result in pool.imap_unordered(process, range(num_cases)):
             #     pass
-            pool.map(process, range(num_cases))
+            pool.map(process, cases)
+            # pool.map(process, range(num_cases))
 
     else:
         for i in range(num_cases):
-            if i in [0, 1]: continue
-            process(i, PARALLEL=False)
+            # if i in [0, 1]: continue
+            process(cases[i], PARALLEL=False)
 
     print(f'solved {num_cases} problems (parallel={PARALLEL}) in {round(time.time() - start_time, 3)} sec')
 

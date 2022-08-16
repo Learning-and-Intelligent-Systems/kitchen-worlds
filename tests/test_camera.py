@@ -1,3 +1,4 @@
+import copy
 import os
 
 import PIL.Image
@@ -5,15 +6,16 @@ import numpy as np
 
 from config import EXP_PATH
 from pybullet_tools.utils import quat_from_euler, reset_simulation, remove_body, AABB, \
-    get_aabb_extent, get_aabb_center
-from pybullet_tools.bullet_utils import get_segmask, get_door_links
+    get_aabb_extent, get_aabb_center, get_joint_name, get_link_name, euler_from_quat
+from pybullet_tools.bullet_utils import get_segmask, get_door_links, nice
 
 from mamao_tools.data_utils import get_indices
 from lisdf_tools.lisdf_loader import load_lisdf_pybullet
 import json
 import shutil
 from os import listdir
-from os.path import join, isdir, isfile
+from os.path import join, isdir, isfile, dirname, getmtime
+import time
 import pybullet as p
 from tqdm import tqdm
 from lisdf_tools.lisdf_loader import get_depth_images
@@ -21,6 +23,7 @@ from lisdf_tools.lisdf_loader import get_depth_images
 from utils import load_lisdf_synthesizer
 
 N_PX = 224
+NEW_KEY = 'crop_fix'
 
 
 def get_camera_pose(viz_dir):
@@ -48,16 +51,48 @@ def render_segmented_rgbd_images(test_dir, viz_dir, camera_pose, robot=False):
                      img_dir=join(viz_dir))
 
 
+def fix_planning_config(viz_dir):
+    config_file = join(viz_dir, 'planning_config.json')
+    config = json.load(open(config_file, 'r'))
+    if 'body_to_name' in config:
+        body_to_name = config['body_to_name']
+        new_body_to_name = {}
+        changed = False
+        for k, v in body_to_name.items():
+            k = eval(k)
+            if isinstance(k, tuple) and not ('link' in v or 'joint' in v):
+                name = body_to_name[str(k[0])] + '::'
+                if len(k) == 2:
+                    name += get_joint_name(k[0], k[-1])
+                elif len(k) == 3:
+                    name += get_link_name(k[0], k[-1])
+                v = name
+                changed = True
+            new_body_to_name[str(k)] = v
+        if changed:
+            config['body_to_name'] = new_body_to_name
+            tmp_config_file = join(viz_dir, 'planning_config_tmp.json')
+            shutil.move(config_file, tmp_config_file)
+            with open(config_file, 'w') as f:
+                json.dump(config, f, indent=3)
+
+
 def render_segmentation_mask(test_dir, viz_dir, camera_pose,
-                             width=1280, height=960, crop=False):
+                             width=1280, height=960, fx=800, crop=False):
     world = load_lisdf_pybullet(test_dir, width=width, height=height, verbose=True)
     remove_body(world.robot.body)
+    # width = 1960
+    # height = 1470
+    # fx = 800
     if crop:
-        world.add_camera(camera_pose, viz_dir, width=width, height=height)
+        world.add_camera(camera_pose, viz_dir, width=width, height=height, fx=fx)
     else:
-        world.add_camera(camera_pose, viz_dir)
+        world.add_camera(camera_pose, viz_dir, width=width, height=height, fx=fx)
     imgs = world.camera.get_image(segment=True, segment_links=True)
     rgb = imgs.rgbPixels[:, :, :3]
+
+    ## a fix for previous wrong lisdf names in planning_config[name_to_body]
+    fix_planning_config(viz_dir)
 
     new_key = 'seg_image' if not crop else 'crop_image'
     rgb_dir = join(viz_dir, f"{new_key}s")
@@ -76,12 +111,15 @@ def render_segmentation_mask(test_dir, viz_dir, camera_pose,
         if isfile(file_name): continue
         k = eval(k)
         keys = []
-        if isinstance(k, int) and (k, 0) in unique:
-            keys = [(k, 0)]
+        if isinstance(k, int): ##  and (k, 0) in unique
+            keys = [u for u in unique if u[0] == k]
+            # print('viz_dir', viz_dir, k, keys)
         elif isinstance(k, tuple) and len(k) == 3:
             keys = [(k[0], k[2])]
         elif isinstance(k, tuple) and len(k) == 2:
             keys = [(k[0], l) for l in get_door_links(k[0], k[1])]
+        # else:
+        #     print('theres nothing to do with this key:', k)
 
         mask = np.zeros_like(rgb[:, :, 0])
         background = make_image_background(rgb)
@@ -92,7 +130,7 @@ def render_segmentation_mask(test_dir, viz_dir, camera_pose,
             # else:
             #     print('key not found', k)
         foreground = rgb * expand_mask(mask)
-        background[np.where(foreground!= 0)] = 0
+        background[np.where(mask!= 0)] = 0
         new_image = foreground + background
 
         im = PIL.Image.fromarray(new_image)
@@ -129,34 +167,38 @@ def crop_image(im, bb, width, height):
         right = left + N_PX
         bottom = top + N_PX
         cp = (left, top, right, bottom)
-    else:
-        # draw_bb(im, bb)
+        im = im.crop(cp)
+        return im
 
-        padding = 30
-        dx, dy = get_aabb_extent(bb)
-        cx, cy = get_aabb_center(bb)
-        dmax = max(dx, dy)
+    # draw_bb(im, bb)
+    need_resizing = False
+    size = N_PX
+    padding = 30
+    dx, dy = get_aabb_extent(bb)
+    cx, cy = get_aabb_center(bb)
+    dmax = max(dx, dy)
+    if dmax > N_PX:
+        dmax += padding * 2
         if dmax > height:
             dmax = height
             cy = height / 2
-        elif dmax > N_PX:
-            dmax += padding * 2
-        else:
-            dmax = N_PX
-        left = max(0, int(cx - dmax / 2))
-        top = max(0, int(cy - dmax / 2))
-        right = left + N_PX
-        bottom = top + N_PX
-        if right > width:
-            right = width
-            left = width - dmax
-        if bottom > height:
-            right = height
-            left = height - dmax
-        cp = (left, top, right, bottom)
+        need_resizing = True
+        size = dmax
+    left = max(0, int(cx - size / 2))
+    top = max(0, int(cy - size / 2))
+    right = left + size
+    bottom = top + size
+    if right > width:
+        right = width
+        left = width - size
+    if bottom > height:
+        bottom = height
+        top = height - size
+    cp = (left, top, right, bottom)
 
-    if cp is not None:
-        im = im.crop(cp)
+    im = im.crop(cp)
+    if need_resizing:
+        im = im.resize((N_PX, N_PX))
     return im
 
 
@@ -244,6 +286,37 @@ def make_image_background(old_arr):
 #         im.save(rgb_obj.replace('rgb', new_key))
 
 
+def add_key(viz_dir):
+    config_file = join(viz_dir, 'planning_config.json')
+    config = json.load(open(config_file, 'r'))
+    if 'version_key' not in config or config['version_key'] != NEW_KEY:
+        config['version_key'] = NEW_KEY
+        tmp_config_file = join(viz_dir, 'planning_config_tmp.json')
+        if isfile(tmp_config_file):
+            os.remove(tmp_config_file)
+        shutil.move(config_file, tmp_config_file)
+        with open(config_file, 'w') as f:
+            json.dump(config, f, indent=3)
+
+
+def check_key_same(viz_dir):
+    config_file = join(viz_dir, 'planning_config.json')
+    config = json.load(open(config_file, 'r'))
+    if 'version_key' not in config:
+        crop_dir = join(viz_dir, 'crop_images')
+        if isdir(crop_dir):
+            imgs = [join(crop_dir, f) for f in listdir(crop_dir) if 'png' in f]
+            if len(imgs) > 0:
+                image_time = getmtime(imgs[0])
+                now = time.time()
+                since_generated = now - image_time
+                print('found recently generated images')
+                return since_generated < 6000
+            return False
+        return False
+    return config['version_key'] == NEW_KEY
+
+
 def process(subdir):
     # if not isdir(join(dataset_dir, subdir)): return
     viz_dir = join(dataset_dir, subdir)
@@ -258,6 +331,13 @@ def process(subdir):
 
     # load_lisdf_synthesizer(test_dir)
 
+    constraint_dir = join(viz_dir, 'constraint_networks')
+    stream_dir = join(viz_dir, 'stream_plans')
+    if isdir(constraint_dir) and len(listdir(constraint_dir)) == 0:
+        shutil.rmtree(constraint_dir)
+    if isdir(stream_dir) and len(listdir(stream_dir)) == 0:
+        shutil.rmtree(stream_dir)
+
     if isdir(join(viz_dir, 'rgbs')):
         shutil.rmtree(join(viz_dir, 'rgbs'))
     if isdir(join(viz_dir, 'masked_rgbs')):
@@ -265,31 +345,28 @@ def process(subdir):
     seg_dir = join(viz_dir, 'seg_images')
     rgb_dir = join(viz_dir, 'rgb_images')
     crop_dir = join(viz_dir, 'crop_images')
-    constraint_dir = join(viz_dir, 'constraint_networks')
-    stream_dir = join(viz_dir, 'stream_plans')
 
-    # if isdir(seg_dir):
-    #     shutil.rmtree(seg_dir)
-    # if isdir(rgb_dir):
-    #     shutil.rmtree(rgb_dir)
-    # if isdir(crop_dir):
-    #     shutil.rmtree(crop_dir)
-    if isdir(constraint_dir) and len(listdir(constraint_dir)) == 0:
-        shutil.rmtree(constraint_dir)
-    if isdir(stream_dir) and len(listdir(stream_dir)) == 0:
-        shutil.rmtree(stream_dir)
+    if not check_key_same(viz_dir):
+        # if isdir(rgb_dir):
+        #     shutil.rmtree(rgb_dir)
+        if isdir(seg_dir):
+            shutil.rmtree(seg_dir)
+        if isdir(crop_dir):
+            shutil.rmtree(crop_dir)
 
     camera_pose = get_camera_pose(viz_dir)
     (x, y, z), quat = camera_pose
-    camera_pose = (x+1, y, z), quat
+    (r, p, w) = euler_from_quat(quat)
+    camera_pose = (x, y, z+1), quat_from_euler((r-0.3, p, w))
+    # print('camera_pose', nice(camera_pose))
 
     ## ------------- visualization function to test -------------------
     # render_rgb_image(test_dir, viz_dir, camera_pose)
 
-    if not isdir(rgb_dir):
-        print(viz_dir, 'rgbing ...')
-        render_segmented_rgb_images(test_dir, viz_dir, camera_pose, robot=False)
-        reset_simulation()
+    # if not isdir(rgb_dir):
+    #     print(viz_dir, 'rgbing ...')
+    #     render_segmented_rgb_images(test_dir, viz_dir, camera_pose, robot=False)
+    #     reset_simulation()
 
     ## Pybullet segmentation mask
     num_imgs = len(get_indices(viz_dir)) + 1
@@ -304,6 +381,7 @@ def process(subdir):
         reset_simulation()
 
     ## ----------------------------------------------------------------
+    add_key(viz_dir)
     shutil.rmtree(test_dir)
 
 
@@ -313,6 +391,7 @@ if __name__ == "__main__":
     task_name = dataset_dir[dataset_dir.rfind('/')+1:]
     subdirs = listdir(dataset_dir)
     subdirs.sort()
+    # subdirs = ['2102']
     parallel = False
 
     if parallel:
