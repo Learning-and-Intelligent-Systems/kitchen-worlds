@@ -3,11 +3,14 @@ import os
 
 import PIL.Image
 import numpy as np
+import argparse
 
 from config import EXP_PATH
 from pybullet_tools.utils import quat_from_euler, reset_simulation, remove_body, AABB, \
-    get_aabb_extent, get_aabb_center, get_joint_name, get_link_name, euler_from_quat
-from pybullet_tools.bullet_utils import get_segmask, get_door_links, nice
+    get_aabb_extent, get_aabb_center, get_joint_name, get_link_name, euler_from_quat, \
+    set_color, apply_alpha, YELLOW, WHITE
+from pybullet_tools.bullet_utils import get_segmask, get_door_links, nice, \
+    get_partnet_doors
 
 from mamao_tools.data_utils import get_indices
 from lisdf_tools.lisdf_loader import load_lisdf_pybullet
@@ -19,11 +22,18 @@ import time
 import pybullet as p
 from tqdm import tqdm
 from lisdf_tools.lisdf_loader import get_depth_images
+from mamao_tools.utils import organize_dataset
 
 from utils import load_lisdf_synthesizer
 
 N_PX = 224
-NEW_KEY = 'crop_fix'
+NEW_KEY = 'meraki'
+ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb']
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-p', action='store_true', default=False)
+parser.add_argument('-t', type=str, default='one_fridge_pick_pr2')  ## 'one_fridge_pick_pr2_tmp'
+args = parser.parse_args()
 
 
 def get_camera_pose(viz_dir):
@@ -33,6 +43,29 @@ def get_camera_pose(viz_dir):
         euler = camera_pose[3:]
         camera_pose = (point, quat_from_euler(euler))
     return camera_pose
+
+
+def render_transparent_doors(test_dir, viz_dir, camera_pose):
+    world = load_lisdf_pybullet(test_dir, width=720, height=560)
+
+    paths = {}
+    for m in world.lisdf.models:
+        if m.name in ['minifridge', 'cabinet']:
+            path = m.uri.replace('../../', '').replace('/mobility.urdf', '')
+            paths[m.name] = path
+
+    count = 0
+    bodies = copy.deepcopy(world.body_to_name)
+    for b, name in bodies.items():
+        if name in['minifridge', 'cabinet']:
+            doors = world.add_joints_by_keyword(name)
+            for _, d in doors:
+                for l in get_door_links(b, d):
+                    set_color(b, link=l, color=apply_alpha(WHITE, alpha=0.2))
+                    count += 1
+    print(f'changed {count} doors to transparent')
+    world.add_camera(camera_pose, viz_dir)
+    world.visualize_image(index='trans', rgb=True)
 
 
 def render_rgb_image(test_dir, viz_dir, camera_pose):
@@ -314,7 +347,7 @@ def check_key_same(viz_dir):
                 return since_generated < 6000
             return False
         return False
-    return config['version_key'] == NEW_KEY
+    return config['version_key'] in ACCEPTED_KEYS
 
 
 def process(subdir):
@@ -345,28 +378,37 @@ def process(subdir):
     seg_dir = join(viz_dir, 'seg_images')
     rgb_dir = join(viz_dir, 'rgb_images')
     crop_dir = join(viz_dir, 'crop_images')
+    tmp_file = join(viz_dir, 'planning_config_tmp.json')
 
-    if not check_key_same(viz_dir):
-        # if isdir(rgb_dir):
-        #     shutil.rmtree(rgb_dir)
+    if isfile(tmp_file):
+        os.remove(tmp_file)
+
+    redo = False
+    camera_pose = get_camera_pose(viz_dir)
+    (x, y, z), quat = camera_pose
+    (r, p, w) = euler_from_quat(quat)
+    if x < 6.5:
+        x = np.random.normal(7, 0.2)
+        # redo = True
+    camera_pose = (x, y, z + 1), quat_from_euler((r - 0.3, p, w))
+    # print('camera_pose', nice(camera_pose))
+
+    if not check_key_same(viz_dir) or redo:
+        if isdir(rgb_dir):
+            shutil.rmtree(rgb_dir)
         if isdir(seg_dir):
             shutil.rmtree(seg_dir)
         if isdir(crop_dir):
             shutil.rmtree(crop_dir)
 
-    camera_pose = get_camera_pose(viz_dir)
-    (x, y, z), quat = camera_pose
-    (r, p, w) = euler_from_quat(quat)
-    camera_pose = (x, y, z+1), quat_from_euler((r-0.3, p, w))
-    # print('camera_pose', nice(camera_pose))
-
     ## ------------- visualization function to test -------------------
     # render_rgb_image(test_dir, viz_dir, camera_pose)
+    # render_transparent_doors(test_dir, viz_dir, camera_pose)
 
-    # if not isdir(rgb_dir):
-    #     print(viz_dir, 'rgbing ...')
-    #     render_segmented_rgb_images(test_dir, viz_dir, camera_pose, robot=False)
-    #     reset_simulation()
+    if not isdir(rgb_dir):
+        print(viz_dir, 'rgbing ...')
+        render_segmented_rgb_images(test_dir, viz_dir, camera_pose, robot=False)
+        reset_simulation()
 
     ## Pybullet segmentation mask
     num_imgs = len(get_indices(viz_dir)) + 1
@@ -386,13 +428,18 @@ def process(subdir):
 
 
 if __name__ == "__main__":
-    dataset_dir = '/home/zhutiany/Documents/mamao-data/one_fridge_pick_pr2'
-    # dataset_dir = '/Users/z/Documents/simulators/PyBullet/kitchen-worlds/outputs/one_fridge_pick_pr2'
-    task_name = dataset_dir[dataset_dir.rfind('/')+1:]
+    task_name = args.t
+    dataset_dir = join('/home/zhutiany/Documents/mamao-data/', task_name)
+
+    # dataset_dir = '/home/zhutiany/Documents/mamao-data/'
+    # task_name = dataset_dir[dataset_dir.rfind('/')+1:]
+
+    # organize_dataset(task_name)
+
     subdirs = listdir(dataset_dir)
     subdirs.sort()
     # subdirs = ['2102']
-    parallel = False
+    parallel = args.p
 
     if parallel:
         import multiprocessing
@@ -408,3 +455,4 @@ if __name__ == "__main__":
     else:
         for subdir in subdirs:
             process(subdir)
+            # break
