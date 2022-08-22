@@ -112,7 +112,7 @@ def fix_planning_config(viz_dir):
 
 def render_segmentation_mask(test_dir, viz_dir, camera_pose,
                              width=1280, height=960, fx=800, crop=False):
-    world = load_lisdf_pybullet(test_dir, width=width, height=height, verbose=True)
+    world = load_lisdf_pybullet(test_dir, width=width, height=height, verbose=False)
     remove_body(world.robot.body)
     # width = 1960
     # height = 1470
@@ -393,9 +393,10 @@ def process(subdir):
     camera_pose = (x, y, z + 1), quat_from_euler((r - 0.3, p, w))
     # print('camera_pose', nice(camera_pose))
 
+    redo = True
     if not check_key_same(viz_dir) or redo:
-        if isdir(rgb_dir):
-            shutil.rmtree(rgb_dir)
+        # if isdir(rgb_dir):
+        #     shutil.rmtree(rgb_dir)
         if isdir(seg_dir):
             shutil.rmtree(seg_dir)
         if isdir(crop_dir):
@@ -405,10 +406,10 @@ def process(subdir):
     # render_rgb_image(test_dir, viz_dir, camera_pose)
     # render_transparent_doors(test_dir, viz_dir, camera_pose)
 
-    if not isdir(rgb_dir):
-        print(viz_dir, 'rgbing ...')
-        render_segmented_rgb_images(test_dir, viz_dir, camera_pose, robot=False)
-        reset_simulation()
+    # if not isdir(rgb_dir):
+    #     print(viz_dir, 'rgbing ...')
+    #     render_segmented_rgb_images(test_dir, viz_dir, camera_pose, robot=False)
+    #     reset_simulation()
 
     ## Pybullet segmentation mask
     num_imgs = len(get_indices(viz_dir)) + 1
