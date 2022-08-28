@@ -10,6 +10,7 @@ import time
 
 import numpy as np
 from os.path import join, abspath, dirname, isdir, isfile
+from os import listdir
 from config import EXP_PATH
 
 from pybullet_planning.pybullet_tools.pr2_utils import get_group_conf
@@ -194,6 +195,7 @@ def test_grasps(categories=[], robot='feg'):
             # set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.8)
             visualize_grasps(problem, outputs, body_pose, RETAIN_ALL=True)
             set_renderer(True)
+            
         wait_if_gui(f'------------- Next object category? finished ({i+1}/{len(categories)})')
     set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.5)
 
@@ -215,7 +217,11 @@ def load_body(path, scale, pose_2d=(0,0), random_yaw=False):
 def load_model_instance(category, id, scale=1, location = (0, 0)):
     from world_builder.utils import get_model_scale
 
-    path = join(ASSET_PATH, 'models', category, id)
+    models_path = join(ASSET_PATH, 'models')
+    category = [c for c in listdir(models_path) if c.lower() == category.lower()][0]
+    if not id.isdigit():
+        id = [i for i in listdir(join(models_path, category)) if i.lower() == id.lower()][0]
+    path = join(models_path, category, id)
 
     if category in MODEL_HEIGHTS:
         height = MODEL_HEIGHTS[category]['height']

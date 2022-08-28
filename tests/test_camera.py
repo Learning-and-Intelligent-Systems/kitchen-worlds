@@ -29,10 +29,13 @@ from utils import load_lisdf_synthesizer
 N_PX = 224
 NEW_KEY = 'meraki'
 ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb']
+DEFAULT_TASK = 'one_fridge_pick_pr2'
+DEFAULT_TASK = 'fault'
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-p', action='store_true', default=False)
-parser.add_argument('-t', type=str, default='one_fridge_pick_pr2')  ## 'one_fridge_pick_pr2_tmp'
+parser.add_argument('-t', type=str, default=DEFAULT_TASK)  ## 'one_fridge_pick_pr2_tmp'
 args = parser.parse_args()
 
 
