@@ -393,7 +393,7 @@ def process(subdir):
     camera_pose = (x, y, z + 1), quat_from_euler((r - 0.3, p, w))
     # print('camera_pose', nice(camera_pose))
 
-    redo = True
+    # redo = True
     if not check_key_same(viz_dir) or redo:
         # if isdir(rgb_dir):
         #     shutil.rmtree(rgb_dir)
