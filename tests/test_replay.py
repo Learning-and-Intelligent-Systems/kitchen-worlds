@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from ipaddress import v4_int_to_packed
 import os
 import json
 import pickle
@@ -46,7 +47,8 @@ PARALLEL = False
 TASK_NAME = 'one_fridge_pick_pr2'  ## 'one_fridge_pick_pr2_20_parallel_1'
 TASK_NAME = 'tt_two_fridge_in'
 TASK_NAME = 'tt_one_fridge_table_in'
-DATABASE_DIR = join('..', '..', 'mamao-data', TASK_NAME)
+TASK_NAME = 'tt_one_fridge_pick'
+DATABASE_DIR = join('..', '..', 'mamao-data')
 
 
 #####################################
@@ -128,11 +130,12 @@ def main(parallel=True, cases=None):
         shutil.rmtree('visualizations')
 
     start_time = time.time()
+    dataset_dir = join(DATABASE_DIR, TASK_NAME)
     if cases is None:
-        cases = [join(DATABASE_DIR, f) for f in listdir(DATABASE_DIR) if isdir(join(DATABASE_DIR, f))]
+        cases = [join(dataset_dir, f) for f in listdir(dataset_dir) if isdir(join(dataset_dir, f))]
         cases.sort()    
     else:
-        cases = [join(DATABASE_DIR, f) for f in cases if isdir(join(DATABASE_DIR, f))]
+        cases = [join(dataset_dir, f) for f in cases if isdir(join(dataset_dir, f))]
     num_cases = len(cases)
 
     if parallel:

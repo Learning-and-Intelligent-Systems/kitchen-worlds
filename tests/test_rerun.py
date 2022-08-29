@@ -7,6 +7,7 @@ import pickle
 import shutil
 from os import listdir
 from os.path import join, abspath, dirname, isdir, isfile
+from tabnanny import verbose
 from config import EXP_PATH
 import numpy as np
 import random
@@ -40,7 +41,7 @@ from world_builder.actions import apply_actions
 from mamao_tools.utils import get_feasibility_checker
 
 
-TASK_NAME = 'tt_two_fridge_in'  
+TASK_NAME = 'tt_one_fridge_pick'  
 DATABASE_DIR = join('..', '..', 'mamao-data', TASK_NAME)
 
 PARALLEL = False
@@ -69,7 +70,7 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
         from utils import load_lisdf_synthesizer
         scene = load_lisdf_synthesizer(exp_dir)
 
-    world = load_lisdf_pybullet(exp_dir, width=720, height=560)
+    world = load_lisdf_pybullet(exp_dir, width=720, height=560, verbose=False)
     saver = WorldSaver()
     problem = Problem(world)
 
