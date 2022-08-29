@@ -7,10 +7,12 @@ import pickle
 import shutil
 from os import listdir
 from os.path import join, abspath, dirname, isdir, isfile
+from tabnanny import verbose
 from config import EXP_PATH
 import numpy as np
 import random
 import time
+import sys
 
 from pybullet_tools.pr2_utils import get_group_conf
 from pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, wait_if_gui, \
@@ -42,10 +44,43 @@ from mamao_tools.utils import get_feasibility_checker
 
 PARALLEL = False
 TASK_NAME = 'one_fridge_pick_pr2'  ## 'one_fridge_pick_pr2_20_parallel_1'
+TASK_NAME = 'tt_two_fridge_in'
+TASK_NAME = 'tt_one_fridge_table_in'
 DATABASE_DIR = join('..', '..', 'mamao-data', TASK_NAME)
 
 
 #####################################
+
+
+def query_yes_no(question, default="no"):
+    """Ask a yes/no question via raw_input() and return their answer.
+
+    "question" is a string that is presented to the user.
+    "default" is the presumed answer if the user just hits <Enter>.
+            It must be "yes" (the default), "no" or None (meaning
+            an answer is required of the user).
+
+    The "answer" return value is True for "yes" or False for "no".
+    """
+    valid = {"yes": True, "y": True, "ye": True, "no": False, "n": False}
+    if default is None:
+        prompt = " [y/n] "
+    elif default == "yes":
+        prompt = " [Y/n] "
+    elif default == "no":
+        prompt = " [y/N] "
+    else:
+        raise ValueError("invalid default answer: '%s'" % default)
+
+    while True:
+        sys.stdout.write(question + prompt)
+        choice = input().lower()
+        if default is not None and choice == "":
+            return valid[default]
+        elif choice in valid:
+            return valid[choice]
+        else:
+            sys.stdout.write("Please respond with 'yes' or 'no' " "(or 'y' or 'n').\n")
 
 
 def run_one(run_dir, task_name=TASK_NAME, save_mp4=False):
@@ -57,7 +92,7 @@ def run_one(run_dir, task_name=TASK_NAME, save_mp4=False):
     if not isdir(exp_dir):
         shutil.copytree(ori_dir, exp_dir)
 
-    world = load_lisdf_pybullet(exp_dir, width=720, height=560)
+    world = load_lisdf_pybullet(exp_dir, width=720, height=560, verbose=False)
     problem = Problem(world)
 
     commands = pickle.load(open(join(exp_dir, 'commands.pkl'), "rb"))
@@ -65,12 +100,17 @@ def run_one(run_dir, task_name=TASK_NAME, save_mp4=False):
     if save_mp4:
         video_path = join(ori_dir, 'replay.mp4')
         with VideoSaver(video_path):
-            apply_actions(problem, commands, time_step=0.025)
+            apply_actions(problem, commands, time_step=0.025, verbose=False)
         print('saved to', abspath(video_path))
     else:
-        wait_if_gui('start replay?')
-        apply_actions(problem, commands, time_step=0.05)
-        wait_if_gui('replay next run?')
+        wait_if_gui(f'start replay {run_name}?')
+        apply_actions(problem, commands, time_step=0.05, verbose=False)
+        answer = query_yes_no(f"delete this run {run_name}?", default='no')
+        if answer:
+            new_dir = join(DATABASE_DIR, 'impossible', f"{task_name}_{run_name}")
+            shutil.move(run_dir, new_dir)
+            print(f"moved {run_dir} to {new_dir}")
+        # wait_if_gui('replay next run?')
 
     # disconnect()
     reset_simulation()
@@ -83,18 +123,19 @@ def process(index):
     return run_one(str(index))
 
 
-def main(PARALLEL=True, cases=None):
+def main(parallel=True, cases=None):
     if isdir('visualizations'):
         shutil.rmtree('visualizations')
 
     start_time = time.time()
     if cases is None:
         cases = [join(DATABASE_DIR, f) for f in listdir(DATABASE_DIR) if isdir(join(DATABASE_DIR, f))]
+        cases.sort()    
     else:
         cases = [join(DATABASE_DIR, f) for f in cases if isdir(join(DATABASE_DIR, f))]
     num_cases = len(cases)
 
-    if PARALLEL:
+    if parallel:
         import multiprocessing
         from multiprocessing import Pool
 
@@ -106,10 +147,9 @@ def main(PARALLEL=True, cases=None):
 
     else:
         for i in range(num_cases):
-            # if i in [0, 1]: continue
             process(cases[i])
 
-    print(f'solved {num_cases} problems (parallel={PARALLEL}) in {round(time.time() - start_time, 3)} sec')
+    print(f'solved {num_cases} problems (parallel={parallel}) in {round(time.time() - start_time, 3)} sec')
 
 
 def mp4_to_gif(mp4_file, frame_folder='output'):
@@ -144,4 +184,4 @@ def mp4_to_gif(mp4_file, frame_folder='output'):
 
 
 if __name__ == '__main__':
-    main(PARALLEL=PARALLEL, cases=['2137'])
+    main(parallel=PARALLEL) ## , cases=['1']

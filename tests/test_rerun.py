@@ -40,11 +40,11 @@ from world_builder.actions import apply_actions
 from mamao_tools.utils import get_feasibility_checker
 
 
-TASK_NAME = 'one_fridge_pick_pr2_tmp'  ## 'one_fridge_pick_pr2_20_parallel_1'
+TASK_NAME = 'tt_two_fridge_in'  
 DATABASE_DIR = join('..', '..', 'mamao-data', TASK_NAME)
 
 PARALLEL = False
-FEASIBILITY_CHECKER = 'oracle'
+FEASIBILITY_CHECKER = None  ## 'oracle'
 SKIP_IF_SOLVED = False
 
 
@@ -54,42 +54,8 @@ def init_experiment(exp_dir):
 
 #####################################
 
-#
-# def solve_one(pddlstream_problem, stream_info, fc):
-#     with Profiler():
-#         with LockRenderer(lock=True):
-#             solution = solve(pddlstream_problem, algorithm=DEFAULT_ALGORITHM, unit_costs=False,
-#                              stream_info=stream_info, success_cost=INF, verbose=True, debug=False,
-#                              feasibility_checker=fc)
-#     return solution
-#
-#
-# def solve_multiple(problem, stream_info={}, lock=True):
-#     reset_globals()
-#     profiler = Profiler(field='tottime', num=25) ## , enable=profile # cumtime | tottime
-#     profiler.save()
-#
-#     temp_dir = '/tmp/pddlstream-{}/'.format(os.getpid())
-#     print(f'\n\n\n\nsolve_multiple at temp dir {temp_dir} \n\n\n\n')
-#     safe_remove(temp_dir)
-#     ensure_dir(temp_dir)
-#     cwd_saver = TmpCWD(temp_cwd=temp_dir)  # TODO: multithread
-#     cwd_saver.save()  # TODO: move to the constructor
-#     lock_saver = LockRenderer(lock=lock)
-#
-#     try:
-#         solution = solve(problem, algorithm=DEFAULT_ALGORITHM, unit_costs=False, visualize=False,
-#                          stream_info=stream_info, success_cost=INF, verbose=True, debug=False)
-#     finally:
-#         lock_saver.restore()
-#         cwd_saver.restore()
-#         safe_remove(temp_dir)
-#
-#     profiler.restore()
-#     return solution
 
-
-def run_one(run_dir, PARALLEL=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
+def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     ori_dir = run_dir ## join(DATABASE_DIR, run_dir)
     if SKIP_IF_SOLVED and isfile(join(ori_dir, f'plan_rerun_{FEASIBILITY_CHECKER}.json')): return
 
@@ -124,7 +90,7 @@ def run_one(run_dir, PARALLEL=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
     fc = get_feasibility_checker(ori_dir, mode=FEASIBILITY_CHECKER)
 
     start = time.time()
-    if PARALLEL:
+    if parallel:
         solution = solve_multiple(pddlstream_problem, stream_info)
     else:
         solution = solve_one(pddlstream_problem, stream_info, fc)
@@ -164,20 +130,20 @@ def run_one(run_dir, PARALLEL=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
     shutil.rmtree(exp_dir)
 
 
-def process(index, PARALLEL=True):
+def process(index, parallel=True):
     np.random.seed(int(time.time()))
     random.seed(time.time())
-    return run_one(str(index), PARALLEL=PARALLEL)
+    return run_one(str(index), parallel=parallel)
 
 
-def main(PARALLEL=True):
+def main(parallel=True):
     if isdir('visualizations'):
         shutil.rmtree('visualizations')
 
     start_time = time.time()
     cases = [join(DATABASE_DIR, f) for f in listdir(DATABASE_DIR) if isdir(join(DATABASE_DIR, f))]
     num_cases = len(cases)
-    if PARALLEL:
+    if parallel:
         import multiprocessing
         from multiprocessing import Pool
 
@@ -193,10 +159,10 @@ def main(PARALLEL=True):
     else:
         for i in range(num_cases):
             # if i in [0, 1]: continue
-            process(cases[i], PARALLEL=False)
+            process(cases[i], parallel=False)
 
-    print(f'solved {num_cases} problems (parallel={PARALLEL}) in {round(time.time() - start_time, 3)} sec')
+    print(f'solved {num_cases} problems (parallel={parallel}) in {round(time.time() - start_time, 3)} sec')
 
 
 if __name__ == '__main__':
-    main(PARALLEL=PARALLEL)
+    main(parallel=PARALLEL)
