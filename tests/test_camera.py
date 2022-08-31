@@ -29,12 +29,12 @@ from utils import load_lisdf_synthesizer
 N_PX = 224
 NEW_KEY = 'meraki'
 ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb']
-DEFAULT_TASK = 'one_fridge_pick_pr2'
-DEFAULT_TASK = 'fault'
+DEFAULT_TASK = 'tt_one_fridge_pick'
+# DEFAULT_TASK = 'fault'
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-p', action='store_true', default=False)
+parser.add_argument('-p', action='store_true', default=True)
 parser.add_argument('-t', type=str, default=DEFAULT_TASK)  ## 'one_fridge_pick_pr2_tmp'
 args = parser.parse_args()
 
@@ -456,7 +456,7 @@ if __name__ == "__main__":
 
         max_cpus = 24
         num_cpus = min(multiprocessing.cpu_count(), max_cpus)
-        print(f'using {num_cpus} cpus')
+        print(f'using {num_cpus} cpus for {len(all_subdirs)} subdirs')
         with Pool(processes=num_cpus) as pool:
             for result in pool.imap_unordered(process, all_subdirs):
                 pass

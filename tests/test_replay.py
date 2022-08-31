@@ -19,29 +19,12 @@ from pybullet_tools.pr2_utils import get_group_conf
 from pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, wait_if_gui, \
     SEPARATOR, get_aabb, wait_for_duration, safe_remove, ensure_dir, reset_simulation, \
     VideoSaver
-from pybullet_tools.bullet_utils import summarize_facts, print_goal, nice, get_datetime
-from pybullet_tools.pr2_agent import get_stream_info, post_process, move_cost_fn, \
-    get_stream_map # , solve_multiple, solve_one
-from pybullet_tools.logging import TXT_FILE
-
-from pybullet_tools.pr2_primitives import get_group_joints, Conf, get_base_custom_limits, Pose, Conf, \
-    get_ik_ir_gen, get_motion_gen, get_cfree_approach_pose_test, get_cfree_pose_pose_test, get_cfree_traj_pose_test, \
-    get_grasp_gen, Attach, Detach, Clean, Cook, control_commands, Command, \
-    get_gripper_joints, GripperCommand, State
-
-from pddlstream.language.constants import Equal, AND, print_solution, PDDLProblem
-from pddlstream.algorithms.meta import solve, DEFAULT_ALGORITHM
-from pddlstream.algorithms.constraints import PlanConstraints
-from pddlstream.algorithms.algorithm import reset_globals
-from pddlstream.algorithms.common import SOLUTIONS
-from pddlstream.utils import read, INF, get_file_path, find_unique, Profiler, str_from_object, TmpCWD
-
 from lisdf_tools.lisdf_loader import load_lisdf_pybullet, pddlstream_from_dir
 from lisdf_tools.lisdf_planning import pddl_to_init_goal, Problem
 
 from world_builder.actions import apply_actions
 
-from mamao_tools.utils import get_feasibility_checker
+from mamao_tools.utils import get_feasibility_checker, get_plan
 
 PARALLEL = False
 TASK_NAME = 'one_fridge_pick_pr2'  ## 'one_fridge_pick_pr2_20_parallel_1'
@@ -86,13 +69,14 @@ def query_yes_no(question, default="no"):
 
 
 def run_one(run_dir, task_name=TASK_NAME, save_mp4=False):
-    ori_dir = run_dir ## join(DATABASE_DIR, run_dir)
+    ori_dir = run_dir  ## join(DATABASE_DIR, run_dir)
 
     print(f'\n\n\n--------------------------\n    replay {ori_dir} \n------------------------\n\n\n')
     run_name = os.path.basename(ori_dir)
     exp_dir = join(EXP_PATH, f"{task_name}_{run_name}")
     if not isdir(exp_dir):
         shutil.copytree(ori_dir, exp_dir)
+    plan = get_plan(run_dir)
 
     world = load_lisdf_pybullet(exp_dir, width=720, height=560, verbose=False)
     problem = Problem(world)
@@ -106,7 +90,7 @@ def run_one(run_dir, task_name=TASK_NAME, save_mp4=False):
         print('saved to', abspath(video_path))
     else:
         wait_if_gui(f'start replay {run_name}?')
-        apply_actions(problem, commands, time_step=0.05, verbose=False)
+        apply_actions(problem, commands, time_step=0.05, verbose=False, plan=plan)
         answer = query_yes_no(f"delete this run {run_name}?", default='no')
         if answer:
             new_dir = join(DATABASE_DIR, 'impossible', f"{task_name}_{run_name}")

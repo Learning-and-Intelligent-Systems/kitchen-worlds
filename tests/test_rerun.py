@@ -45,7 +45,7 @@ TASK_NAME = 'tt_one_fridge_pick'
 DATABASE_DIR = join('..', '..', 'mamao-data', TASK_NAME)
 
 PARALLEL = False
-FEASIBILITY_CHECKER = None  ## 'oracle'
+FEASIBILITY_CHECKER = 'oracle'  ## None |
 SKIP_IF_SOLVED = False
 
 
@@ -58,7 +58,7 @@ def init_experiment(exp_dir):
 
 def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     ori_dir = run_dir ## join(DATABASE_DIR, run_dir)
-    if SKIP_IF_SOLVED and isfile(join(ori_dir, f'plan_rerun_{FEASIBILITY_CHECKER}.json')): return
+    if SKIP_IF_SOLVED and isfile(join(ori_dir, f'plan_rerun_fc={FEASIBILITY_CHECKER}.json')): return
 
     print(f'\n\n\n--------------------------\n    rerun {ori_dir} \n------------------------\n\n\n')
     run_name = os.path.basename(ori_dir)
@@ -111,14 +111,14 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
         saver.restore()
 
     """ log plan, planning stats, and commands """
-    with open(join(ori_dir, f'plan_rerun_{FEASIBILITY_CHECKER}.json'), 'w') as f:
+    with open(join(ori_dir, f'plan_rerun_fc={FEASIBILITY_CHECKER}.json'), 'w') as f:
         data = {
             'planning_time': planning_time,
             'plan': [[str(a.name)]+[str(v) for v in a.args] for a in plan],
             'datatime': get_datetime(),
         }
         json.dump(data, f, indent=3)
-    with open(join(ori_dir, f'commands_rerun_{FEASIBILITY_CHECKER}.txt'), 'w') as f:
+    with open(join(ori_dir, f'commands_rerun_fc={FEASIBILITY_CHECKER}.txt'), 'w') as f:
         f.write('\n'.join([str(n) for n in commands]))
     # with open(join(ori_dir, 'commands_rerun.pkl'), 'wb') as f:
     #     pickle.dump(commands, f, pickle.HIGHEST_PROTOCOL)
@@ -143,6 +143,9 @@ def main(parallel=True):
 
     start_time = time.time()
     cases = [join(DATABASE_DIR, f) for f in listdir(DATABASE_DIR) if isdir(join(DATABASE_DIR, f))]
+    cases.sort()
+    cases = [f for f in cases if '/2' in f]
+
     num_cases = len(cases)
     if parallel:
         import multiprocessing
