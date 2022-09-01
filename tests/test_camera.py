@@ -34,7 +34,7 @@ DEFAULT_TASK = 'tt_one_fridge_pick'
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-p', action='store_true', default=True)
+parser.add_argument('-p', action='store_true', default=False)
 parser.add_argument('-t', type=str, default=DEFAULT_TASK)  ## 'one_fridge_pick_pr2_tmp'
 args = parser.parse_args()
 

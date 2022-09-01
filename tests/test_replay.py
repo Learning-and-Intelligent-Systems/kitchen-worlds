@@ -27,10 +27,17 @@ from world_builder.actions import apply_actions
 from mamao_tools.utils import get_feasibility_checker, get_plan
 
 PARALLEL = False
+EVALUATE_QUALITY = False
+SAVE_MP4 = True
+
 TASK_NAME = 'one_fridge_pick_pr2'  ## 'one_fridge_pick_pr2_20_parallel_1'
 TASK_NAME = 'tt_two_fridge_in'
-TASK_NAME = 'tt_one_fridge_table_in'
-TASK_NAME = 'tt_one_fridge_pick'
+# TASK_NAME = 'tt_one_fridge_table_in'
+# TASK_NAME = 'tt_one_fridge_pick'
+# TASK_NAME = 'mm_one_fridge_pick'
+# TASK_NAME = 'mm_two_fridge_in'
+# TASK_NAME = 'mm_one_fridge_table_in'
+# TASK_NAME = 'mm_one_fridge_table_on'
 DATABASE_DIR = join('..', '..', 'mamao-data')
 
 
@@ -68,7 +75,7 @@ def query_yes_no(question, default="no"):
             sys.stdout.write("Please respond with 'yes' or 'no' " "(or 'y' or 'n').\n")
 
 
-def run_one(run_dir, task_name=TASK_NAME, save_mp4=False):
+def run_one(run_dir, task_name=TASK_NAME, save_mp4=SAVE_MP4):
     ori_dir = run_dir  ## join(DATABASE_DIR, run_dir)
 
     print(f'\n\n\n--------------------------\n    replay {ori_dir} \n------------------------\n\n\n')
@@ -83,19 +90,24 @@ def run_one(run_dir, task_name=TASK_NAME, save_mp4=False):
 
     commands = pickle.load(open(join(exp_dir, 'commands.pkl'), "rb"))
 
-    if save_mp4:
+    if SAVE_MP4:
         video_path = join(ori_dir, 'replay.mp4')
         with VideoSaver(video_path):
-            apply_actions(problem, commands, time_step=0.025, verbose=False)
+            apply_actions(problem, commands, time_step=0.025, verbose=False, plan=plan)
         print('saved to', abspath(video_path))
     else:
-        wait_if_gui(f'start replay {run_name}?')
-        apply_actions(problem, commands, time_step=0.05, verbose=False, plan=plan)
-        answer = query_yes_no(f"delete this run {run_name}?", default='no')
+        # wait_if_gui(f'start replay {run_name}?')
+        answer = query_yes_no(f"start replay {run_name}?", default='yes')
         if answer:
-            new_dir = join(DATABASE_DIR, 'impossible', f"{task_name}_{run_name}")
-            shutil.move(run_dir, new_dir)
-            print(f"moved {run_dir} to {new_dir}")
+            apply_actions(problem, commands, time_step=0.05, verbose=False, plan=plan)
+
+        if EVALUATE_QUALITY:
+            answer = query_yes_no(f"delete this run {run_name}?", default='no')
+            if answer:
+                new_dir = join(DATABASE_DIR, 'impossible', f"{task_name}_{run_name}")
+                shutil.move(run_dir, new_dir)
+                print(f"moved {run_dir} to {new_dir}")
+
         # wait_if_gui('replay next run?')
 
     # disconnect()
@@ -117,9 +129,10 @@ def main(parallel=True, cases=None):
     dataset_dir = join(DATABASE_DIR, TASK_NAME)
     if cases is None:
         cases = [join(dataset_dir, f) for f in listdir(dataset_dir) if isdir(join(dataset_dir, f))]
-        cases.sort()    
+        cases.sort()
     else:
         cases = [join(dataset_dir, f) for f in cases if isdir(join(dataset_dir, f))]
+
     num_cases = len(cases)
 
     if parallel:
@@ -171,4 +184,5 @@ def mp4_to_gif(mp4_file, frame_folder='output'):
 
 
 if __name__ == '__main__':
-    main(parallel=PARALLEL) ## , cases=['1']
+    main(parallel=PARALLEL, cases=['0']) ##
+    # main(parallel=PARALLEL) ## , cases=['2']

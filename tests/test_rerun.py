@@ -41,12 +41,14 @@ from world_builder.actions import apply_actions
 from mamao_tools.utils import get_feasibility_checker
 
 
-TASK_NAME = 'tt_one_fridge_pick'  
+TASK_NAME = 'tt_one_fridge_pick'
+TASK_NAME = 'tt_one_fridge_table_in'
+TASK_NAME = 'tt_two_fridge_in'
 DATABASE_DIR = join('..', '..', 'mamao-data', TASK_NAME)
 
 PARALLEL = False
-FEASIBILITY_CHECKER = 'oracle'  ## None |
-SKIP_IF_SOLVED = False
+FEASIBILITY_CHECKER = 'None'  ## None | oracle
+SKIP_IF_SOLVED = True
 
 
 def init_experiment(exp_dir):
@@ -63,6 +65,8 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
     print(f'\n\n\n--------------------------\n    rerun {ori_dir} \n------------------------\n\n\n')
     run_name = os.path.basename(ori_dir)
     exp_dir = join(EXP_PATH, f"{task_name}_{run_name}")
+    if isdir(exp_dir):
+        shutil.rmtree(exp_dir)
     if not isdir(exp_dir):
         shutil.copytree(ori_dir, exp_dir)
 
@@ -144,7 +148,7 @@ def main(parallel=True):
     start_time = time.time()
     cases = [join(DATABASE_DIR, f) for f in listdir(DATABASE_DIR) if isdir(join(DATABASE_DIR, f))]
     cases.sort()
-    cases = [f for f in cases if '/2' in f]
+    # cases = [f for f in cases if '/6' in f or '/7' in f or '/8' in f or '/9' in f]
 
     num_cases = len(cases)
     if parallel:
