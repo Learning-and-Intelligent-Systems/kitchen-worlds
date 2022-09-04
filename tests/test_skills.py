@@ -17,7 +17,8 @@ from pybullet_planning.pybullet_tools.pr2_utils import get_group_conf
 from pybullet_planning.pybullet_tools.pr2_primitives import get_base_custom_limits, control_commands, apply_commands
 from pybullet_planning.pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, wait_if_gui, \
     SEPARATOR, get_aabb, get_pose, approximate_as_prism, draw_aabb, multiply, unit_quat, remove_body, invert, \
-    Pose, get_link_pose, get_joint_limits, WHITE, RGBA, set_all_color, RED, GREEN, set_renderer, clone_body
+    Pose, get_link_pose, get_joint_limits, WHITE, RGBA, set_all_color, RED, GREEN, set_renderer, clone_body, \
+    add_text
 from pybullet_planning.pybullet_tools.bullet_utils import summarize_facts, print_goal, nice, set_camera_target_body, \
     draw_bounding_lines, fit_dimensions, draw_fitted_box, get_hand_grasps, get_partnet_doors, get_partnet_spaces, \
     open_joint, get_instance_name
@@ -46,7 +47,8 @@ from pybullet_planning.lisdf_tools.lisdf_planning import pddl_to_init_goal, Prob
 
 from world_builder.world import State
 from world_builder.loaders import create_gripper_robot, create_pr2_robot
-from world_builder.utils import load_asset, get_instances
+from world_builder.utils import load_asset
+from world_builder.utils import get_instances as get_instances_helper
 # from pybullet_planning.world_builder.colors import *
 from world_builder.partnet_scales import MODEL_SCALES as TEST_MODELS
 from world_builder.partnet_scales import MODEL_HEIGHTS, OBJ_SCALES
@@ -66,11 +68,19 @@ ASSET_PATH = join('..', 'assets')
 
 # ####################################
 
+def get_instances(category):
+    instances = get_instances_helper(category)
+    keys = list(instances.keys())
+    if not keys[0].isdigit():
+        keys = list(set([k.lower() for k in keys]))
+        instances = {k: instances[k] for k in keys}
+    return instances
 
-def get_test_world(robot='feg', semantic_world=False):
+
+def get_test_world(robot='feg', semantic_world=False, DRAW_BASE_LIMITS=False):
     args = get_args() ## exp_name
     connect(use_gui=True, shadows=False, width=1980, height=1238)  ##  , width=360, height=270
-    draw_pose(unit_pose(), length=2.)
+    draw_pose(unit_pose(), length=.5)
     # create_floor()
     if semantic_world:
         from world_builder.world import World
@@ -78,15 +88,16 @@ def get_test_world(robot='feg', semantic_world=False):
     else:
         from lisdf_tools.lisdf_loader import World
         world = World(args)
-    add_robot(world, robot)
+    add_robot(world, robot, DRAW_BASE_LIMITS=DRAW_BASE_LIMITS)
     return world
 
 
-def add_robot(world, robot):
+def add_robot(world, robot, **kwargs):
     if robot == 'pr2':
         from world_builder.loaders import BASE_LIMITS as custom_limits
         base_q = [0, -0.5, 0]
-        robot = create_pr2_robot(world, custom_limits=custom_limits, base_q=base_q)
+        robot = create_pr2_robot(world, custom_limits=custom_limits,
+                                 base_q=base_q, **kwargs)
 
     elif robot == 'feg':
         custom_limits = {0: (-5, 5), 1: (-5, 5), 2: (0, 3)}
@@ -94,7 +105,8 @@ def add_robot(world, robot):
         init_q = [0, 0, 0, 0, 0, 0]
         # robot = create_fe_gripper(init_q=init_q)
         # world.add_robot(robot, 'feg')
-        robot = create_gripper_robot(world, custom_limits=custom_limits, initial_q=init_q)
+        robot = create_gripper_robot(world, custom_limits=custom_limits,
+                                     initial_q=init_q, **kwargs)
 
     return robot
 
@@ -182,23 +194,30 @@ def test_grasps(categories=[], robot='feg'):
             instance_name = get_instance_name(abspath(path))
             world.add_body(body, f'{cat.lower()}#{id}', instance_name)
             set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.5)
+            text = id.replace('veggie', '').replace('meat', '')
+            draw_text_label(body, text, offset=(0, -0.2, 0.1))
 
+            """ test others """
             # test_robot_rotation(body, world.robot)
             # test_spatial_algebra(body, world.robot)
             # draw_fitted_box(body, draw_centroid=True)
             # grasps = get_hand_grasps(problem, body)
 
-            set_renderer(True)
-            body_pose = get_pose(body)  ## multiply(get_pose(body), Pose(euler=Euler(math.pi/2, 0, -math.pi/2)))
-            outputs = funk(body)
-            print(f'grasps on body {body}:', outputs)
-            # set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.8)
-            visualize_grasps(problem, outputs, body_pose, RETAIN_ALL=True)
-            set_renderer(True)
-            
-        wait_if_gui(f'------------- Next object category? finished ({i+1}/{len(categories)})')
-    set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.5)
+            """ test grasps """
+            # set_renderer(True)
+            # body_pose = get_pose(body)  ## multiply(get_pose(body), Pose(euler=Euler(math.pi/2, 0, -math.pi/2)))
+            # outputs = funk(body)
+            # print(f'grasps on body {body}:', outputs)
+            # # set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.8)
+            # visualize_grasps(problem, outputs, body_pose, RETAIN_ALL=True)
+            # set_renderer(True)
 
+        if len(categories) > 1:
+            wait_if_gui(f'------------- Next object category? finished ({i+1}/{len(categories)})')
+
+    # set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.5)
+    set_camera_pose((3, 3, 2), (0, 3, 1))
+    set_renderer(True)
     wait_if_gui('Finish?')
     disconnect()
 
@@ -233,10 +252,17 @@ def load_model_instance(category, id, scale=1, location = (0, 0)):
     return file, body, scale
 
 
+def draw_text_label(body, text, offset=(0, -0.05, .5)):
+    lower, upper = get_aabb(body)
+    position = ((lower[0] + upper[0]) / 2, (lower[1] + upper[1]) / 2, upper[2])
+    position = [position[i] + offset[i] for i in range(len(position))]
+    add_text(text, position=position, color=(1, 0, 0), lifetime=0)
+
+
 def test_handle_grasps(robot, category):
     from pybullet_tools.pr2_streams import get_handle_pose
 
-    world = get_test_world(robot)
+    world = get_test_world(robot, DRAW_BASE_LIMITS=False)
     problem = State(world)
     funk = get_handle_grasp_gen(problem, visualize=False)
 
@@ -251,22 +277,23 @@ def test_handle_grasps(robot, category):
         instance_name = get_instance_name(path)
         world.add_body(body, f'{category.lower()}#{id}', instance_name)
         set_camera_target_body(body, dx=1, dy=1, dz=1)
+        draw_text_label(body, id)
 
-        ## color links corresponding to semantic labels
-        body_joints = get_partnet_doors(path, body)
-        world.add_joints(body, body_joints)
-
-        for body_joint in body_joints:
-            outputs = funk(body_joint)
-            body_pose = get_handle_pose(body_joint)
-
-            set_renderer(True)
-            set_camera_target_body(body, dx=2, dy=1, dz=1)
-            visualize_grasps(problem, outputs, body_pose, RETAIN_ALL=True)
-            set_camera_target_body(body, dx=2, dy=1, dz=1)
+        # ## color links corresponding to semantic labels
+        # body_joints = get_partnet_doors(path, body)
+        # world.add_joints(body, body_joints)
+        #
+        # for body_joint in body_joints:
+        #     outputs = funk(body_joint)
+        #     body_pose = get_handle_pose(body_joint)
+        #
+        #     set_renderer(True)
+        #     set_camera_target_body(body, dx=2, dy=1, dz=1)
+        #     visualize_grasps(problem, outputs, body_pose, RETAIN_ALL=True)
+        #     set_camera_target_body(body, dx=2, dy=1, dz=1)
         i += 1
 
-    set_camera_pose((4, 3, 2), (0, 3, 0.5))
+    set_camera_pose((8, 8, 2), (0, 8, 1))
     wait_if_gui('Finish?')
     disconnect()
 
@@ -418,7 +445,7 @@ def test_handle_grasps_counter():
 
     world = World(args)
     floor = load_floor_plan(world, plan_name='counter.svg')
-    robot = add_robot(world, 'feg')
+    robot = add_robot(world, 'feg', DRAW_BASE_LIMITS=False)
 
     world.summarize_all_objects()
     state = State(world, grasp_types=robot.grasp_types)
