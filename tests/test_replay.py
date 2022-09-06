@@ -31,12 +31,12 @@ EVALUATE_QUALITY = False
 SAVE_MP4 = True
 
 TASK_NAME = 'one_fridge_pick_pr2'  ## 'one_fridge_pick_pr2_20_parallel_1'
-TASK_NAME = 'tt_two_fridge_in'
+# TASK_NAME = 'tt_two_fridge_in'
 # TASK_NAME = 'tt_one_fridge_table_in'
 # TASK_NAME = 'tt_one_fridge_pick'
 # TASK_NAME = 'mm_one_fridge_pick'
 # TASK_NAME = 'mm_two_fridge_in'
-# TASK_NAME = 'mm_one_fridge_table_in'
+TASK_NAME = 'mm_one_fridge_table_in'
 # TASK_NAME = 'mm_one_fridge_table_on'
 DATABASE_DIR = join('..', '..', 'mamao-data')
 
@@ -184,5 +184,5 @@ def mp4_to_gif(mp4_file, frame_folder='output'):
 
 
 if __name__ == '__main__':
-    main(parallel=PARALLEL, cases=['0']) ##
+    main(parallel=PARALLEL, cases=['223']) ##
     # main(parallel=PARALLEL) ## , cases=['2']
