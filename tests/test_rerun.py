@@ -12,6 +12,7 @@ from config import EXP_PATH
 import numpy as np
 import random
 import time
+import argparse
 
 from pybullet_tools.pr2_utils import get_group_conf
 from pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, wait_if_gui, \
@@ -41,15 +42,27 @@ from world_builder.actions import apply_actions
 from mamao_tools.utils import get_feasibility_checker
 
 
+SKIP_IF_SOLVED = False
+SKIP_IF_SOLVED_RECENTLY = True
+
 TASK_NAME = 'tt_one_fridge_pick'
 TASK_NAME = 'tt_one_fridge_table_in'
 TASK_NAME = 'tt_two_fridge_in'
-DATABASE_DIR = join('..', '..', 'mamao-data', TASK_NAME)
 
 PARALLEL = False
 FEASIBILITY_CHECKER = 'None'  ## None | oracle
-SKIP_IF_SOLVED = True
 
+parser = argparse.ArgumentParser()
+parser.add_argument('-t', type=str, default=TASK_NAME)
+parser.add_argument('-f', type=str, default=FEASIBILITY_CHECKER)
+parser.add_argument('-p', action='store_true', default=PARALLEL)
+args = parser.parse_args()
+
+TASK_NAME = args.t
+PARALLEL = args.p
+FEASIBILITY_CHECKER = args.f
+
+DATABASE_DIR = join('..', '..', 'mamao-data', TASK_NAME)
 
 def init_experiment(exp_dir):
     if isfile(TXT_FILE):
@@ -60,7 +73,16 @@ def init_experiment(exp_dir):
 
 def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     ori_dir = run_dir ## join(DATABASE_DIR, run_dir)
-    if SKIP_IF_SOLVED and isfile(join(ori_dir, f'plan_rerun_fc={FEASIBILITY_CHECKER}.json')): return
+    file = join(ori_dir, f'plan_rerun_fc={FEASIBILITY_CHECKER}.json')
+    if isfile(file):
+        if SKIP_IF_SOLVED:
+            print('skipping solved problem', run_dir)
+            return
+        elif SKIP_IF_SOLVED_RECENTLY:
+            last_modified = os.path.getmtime(file)
+            if time.time() - last_modified < 60 * 60 * 24:
+                print('skipping recently solved problem', run_dir)
+                return
 
     print(f'\n\n\n--------------------------\n    rerun {ori_dir} \n------------------------\n\n\n')
     run_name = os.path.basename(ori_dir)
