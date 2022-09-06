@@ -46,27 +46,24 @@ git submodule update --init --recursive
 2. Build FastDownward, used by PDDLStream planner
 
 ```shell
-cd pddlstream
-./downward/build.py
+## sudo apt install cmake g++ git make python3
+(cd pddlstream; ./downward/build.py)
 ```
 
-3. Checkout the right branch of lisdf paerse
+3. Build FastIK solver
 
 ```shell
-cd ../lisdf
-git checkout main
+## sudo apt-get install python-dev
+(cd pybullet_planning/pybullet_tools/ikfast/pr2; python setup.py)
 ```
 
-4Install dependencies, in a virtual environment if you'd like. Have been tested on Python 3.7 and 3.8, on MacOS and on Ubuntu.
+
+4. Install dependencies, in a virtual environment if you'd like. Have been tested on Python 3.7 and 3.8, on MacOS and on Ubuntu.
 
 ```shell
-pip install virtualenv  ## if you haven't install
-python3 -m virtualenv venv/kitchen
-source venv/kitchen/bin/activate
-
-cd kitchen-worlds
-pip install -r requirements.txt
-sudo apt-get install graphviz graphviz-dev  ## on Ubuntue
+conda env create -f environment.yml
+conda activate kitchen
+sudo apt-get install graphviz graphviz-dev  ## on Ubuntu
 ```
 
 [graphviz](https://pygraphviz.github.io/documentation/latest/install.html)

@@ -1,43 +1,137 @@
-name: base
+name: kitchen
 channels:
   - defaults
 dependencies:
   - _libgcc_mutex=0.1=main
   - _openmp_mutex=5.1=1_gnu
+  - atk-1.0=2.36.0=ha1a6a79_0
+  - blas=1.0=mkl
+  - bottleneck=1.3.5=py38h7deecbd_0
+  - brotli=1.0.9=h5eee18b_7
+  - brotli-bin=1.0.9=h5eee18b_7
   - brotlipy=0.7.0=py38h27cfd23_1003
   - ca-certificates=2022.07.19=h06a4308_0
+  - cairo=1.16.0=h19f5f5c_2
   - certifi=2022.6.15=py38h06a4308_0
   - cffi=1.15.0=py38hd667e15_1
   - charset-normalizer=2.0.4=pyhd3eb1b0_0
-  - conda=4.13.0=py38h06a4308_0
+  - conda=4.14.0=py38h06a4308_0
   - conda-package-handling=1.8.1=py38h7f8727e_0
   - cryptography=37.0.1=py38h9ce1e76_0
+  - cycler=0.11.0=pyhd3eb1b0_0
+  - cytoolz=0.11.0=py38h7b6447c_0
+  - dbus=1.13.18=hb2f20db_0
+  - expat=2.4.4=h295c915_0
+  - fftw=3.3.9=h27cfd23_1
+  - font-ttf-dejavu-sans-mono=2.37=hd3eb1b0_0
+  - font-ttf-inconsolata=2.001=hcb22688_0
+  - font-ttf-source-code-pro=2.030=hd3eb1b0_0
+  - font-ttf-ubuntu=0.83=h8b1ccd4_0
+  - fontconfig=2.13.1=h6c09931_0
+  - fonts-anaconda=1=h8fa9717_0
+  - fonts-conda-ecosystem=1=hd3eb1b0_0
+  - freetype=2.11.0=h70c0345_0
+  - fribidi=1.0.10=h7b6447c_0
+  - gdk-pixbuf=2.42.8=h433bba3_0
+  - giflib=5.2.1=h7b6447c_0
+  - glib=2.69.1=h4ff587b_1
+  - gobject-introspection=1.72.0=py38hbb6d50b_0
+  - graphite2=1.3.14=h295c915_1
+  - graphviz=2.50.0=h3cd0ef9_0
+  - gst-plugins-base=1.14.0=h8213a91_2
+  - gstreamer=1.14.0=h28cd5cc_2
+  - gtk2=2.24.33=h73c1081_2
+  - gts=0.7.6=hb67d8dd_3
+  - harfbuzz=4.3.0=hd55b92a_0
+  - icu=58.2=he6710b0_3
   - idna=3.3=pyhd3eb1b0_0
+  - intel-openmp=2021.4.0=h06a4308_3561
+  - jpeg=9e=h7f8727e_0
+  - krb5=1.19.2=hac12032_0
+  - lcms2=2.12=h3be6417_0
   - ld_impl_linux-64=2.38=h1181459_1
+  - lerc=3.0=h295c915_0
+  - libbrotlicommon=1.0.9=h5eee18b_7
+  - libbrotlidec=1.0.9=h5eee18b_7
+  - libbrotlienc=1.0.9=h5eee18b_7
+  - libclang=10.0.1=default_hb85057a_2
+  - libdeflate=1.8=h7f8727e_5
+  - libedit=3.1.20210910=h7f8727e_0
+  - libevent=2.1.12=h8f2d780_0
   - libffi=3.3=he6710b0_2
   - libgcc-ng=11.2.0=h1234567_1
+  - libgd=2.3.3=h695aa2c_1
+  - libgfortran-ng=11.2.0=h00389a5_1
+  - libgfortran5=11.2.0=h1234567_1
   - libgomp=11.2.0=h1234567_1
+  - libllvm10=10.0.1=hbcb73fb_5
+  - libpng=1.6.37=hbc83047_0
+  - libpq=12.9=h16c4e8d_3
+  - librsvg=2.54.4=h19fe530_0
   - libstdcxx-ng=11.2.0=h1234567_1
+  - libtiff=4.4.0=hecacb30_0
+  - libtool=2.4.6=h295c915_1008
+  - libuuid=1.0.3=h7f8727e_2
+  - libwebp=1.2.2=h55f646e_0
+  - libwebp-base=1.2.2=h7f8727e_0
+  - libxcb=1.15=h7f8727e_0
+  - libxkbcommon=1.0.1=hfa300c1_0
+  - libxml2=2.9.14=h74e7548_0
+  - libxslt=1.1.35=h4e12654_0
+  - lz4-c=1.9.3=h295c915_1
+  - matplotlib-base=3.5.2=py38hf590b9c_0
+  - mkl=2021.4.0=h06a4308_640
+  - mkl-service=2.4.0=py38h7f8727e_0
+  - mkl_fft=1.3.1=py38hd3c417c_0
+  - mkl_random=1.2.2=py38h51133e4_0
+  - munkres=1.1.4=py_0
   - ncurses=6.3=h5eee18b_3
+  - ninja=1.10.2=h06a4308_5
+  - ninja-base=1.10.2=hd09550d_5
+  - nspr=4.33=h295c915_0
+  - nss=3.74=h0370c37_0
+  - numexpr=2.8.3=py38h807cd23_0
+  - numpy=1.21.5=py38h6c91a56_3
+  - numpy-base=1.21.5=py38ha15fc14_3
   - openssl=1.1.1q=h7f8727e_0
+  - packaging=21.3=pyhd3eb1b0_0
+  - pango=1.50.7=h05da053_0
+  - pcre=8.45=h295c915_0
   - pip=22.1.2=py38h06a4308_0
+  - pixman=0.40.0=h7f8727e_1
+  - ply=3.11=py38_0
   - pycosat=0.6.3=py38h7b6447c_1
   - pycparser=2.21=pyhd3eb1b0_0
+  - pygraphviz=1.9=py38h5eee18b_0
   - pyopenssl=22.0.0=pyhd3eb1b0_0
+  - pyparsing=3.0.9=py38h06a4308_0
+  - pyqt=5.15.7=py38h6a678d5_1
+  - pyqt5-sip=12.11.0=py38h6a678d5_1
   - pysocks=1.7.1=py38h06a4308_0
   - python=3.8.13=h12debd9_0
+  - python-dateutil=2.8.2=pyhd3eb1b0_0
+  - qt-main=5.15.2=h327a75a_6
+  - qt-webengine=5.15.9=hd2b0992_4
+  - qtwebkit=5.212=h4eab89a_4
   - readline=8.1.2=h7f8727e_1
   - requests=2.28.1=py38h06a4308_0
   - ruamel_yaml=0.15.100=py38h27cfd23_0
+  - seaborn=0.11.2=pyhd3eb1b0_0
   - setuptools=61.2.0=py38h06a4308_0
+  - sip=6.6.2=py38h6a678d5_0
+  - six=1.16.0=pyhd3eb1b0_1
   - sqlite=3.38.5=hc218d9a_0
   - tk=8.6.12=h1ccaba5_0
+  - toml=0.10.2=pyhd3eb1b0_0
+  - toolz=0.11.2=pyhd3eb1b0_0
+  - tornado=6.2=py38h5eee18b_0
   - tqdm=4.64.0=py38h06a4308_0
   - urllib3=1.26.9=py38h06a4308_0
   - wheel=0.37.1=pyhd3eb1b0_0
   - xz=5.2.5=h7f8727e_1
   - yaml=0.2.5=h7b6447c_0
   - zlib=1.2.12=h7f8727e_2
+  - zstd=1.5.2=ha4553b6_0
   - pip:
     - addict==2.4.0
     - anyio==3.6.1
@@ -71,6 +165,7 @@ dependencies:
     - ipython-genutils==0.2.0
     - ipywidgets==7.7.1
     - jedi==0.18.1
+    - jinja2==3.1.2
     - joblib==1.1.0
     - json5==0.9.8
     - jsonschema==4.7.2
@@ -83,7 +178,10 @@ dependencies:
     - jupyterlab-server==2.15.0
     - jupyterlab-widgets==1.1.1
     - kiwisolver==1.4.3
+    - lark==1.1.2
     - lxml==4.9.1
+    - markupsafe==2.1.1
+    - matplotlib==3.5.3
     - matplotlib-inline==0.1.3
     - mistune==0.8.4
     - nbclassic==0.4.3
@@ -94,14 +192,7 @@ dependencies:
     - networkx==2.2
     - notebook==6.4.12
     - notebook-shim==0.1.0
-    - numpy==1.21.5
     - numpy-quaternion==2022.4.2
-    - nvidia-meshsets==0.4.1
-    - nvidia-scene-synthesizer==0.3.16
-    - nvidia-srl==0.7.3
-    - nvidia-srl-content==0.6.0
-    - nvidia-state-machine==0.2.0
-    - nvidia-storm==0.2.0
     - nvisii==1.1.72
     - open3d==0.15.2
     - opencv-python==4.6.0.66
@@ -126,6 +217,7 @@ dependencies:
     - pyrender==0.1.45
     - pyrsistent==0.18.1
     - python-fcl==0.7.0.1
+    - pytz==2022.2.1
     - pyyaml==5.4.1
     - pyzmq==23.2.0
     - rtree==1.0.0
@@ -143,7 +235,6 @@ dependencies:
     - tomlkit==0.11.1
     - torch==1.12.0
     - torchtyping==0.1.4
-    - tornado==6.2
     - tqdm-stubs==0.2.0
     - traitlets==5.3.0
     - triangle==20220202
@@ -151,6 +242,7 @@ dependencies:
     - typeguard==2.13.3
     - types-termcolor==1.1.3
     - typing-extensions==4.3.0
+    - untangle==1.2.1
     - urdf-parser-py==0.0.4
     - urdfpy==0.0.22
     - usd-core==21.11
@@ -160,4 +252,4 @@ dependencies:
     - widgetsnbextension==3.6.1
     - yourdfpy==0.0.51
     - zipp==3.8.1
-prefix: /home/zhutiany/miniconda3
+prefix: /home/yang/miniconda3/envs/kitchen
