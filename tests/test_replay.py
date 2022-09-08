@@ -27,18 +27,26 @@ from world_builder.actions import apply_actions
 from mamao_tools.utils import get_feasibility_checker, get_plan
 
 PARALLEL = False
-EVALUATE_QUALITY = False
-SAVE_MP4 = True
+SAVE_MP4 = False
+AUTO_PLAY = False
+EVALUATE_QUALITY = True
 
 TASK_NAME = 'one_fridge_pick_pr2'  ## 'one_fridge_pick_pr2_20_parallel_1'
-# TASK_NAME = 'tt_two_fridge_in'
-# TASK_NAME = 'tt_one_fridge_table_in'
-# TASK_NAME = 'tt_one_fridge_pick'
-# TASK_NAME = 'mm_one_fridge_pick'
-# TASK_NAME = 'mm_two_fridge_in'
+
+TASK_NAME = 'mm_one_fridge_pick'
 TASK_NAME = 'mm_one_fridge_table_in'
-# TASK_NAME = 'mm_one_fridge_table_on'
-DATABASE_DIR = join('..', '..', 'mamao-data')
+TASK_NAME = 'mm_one_fridge_table_on'
+TASK_NAME = 'mm_two_fridge_pick'
+TASK_NAME = 'mm_two_fridge_in'
+
+# TASK_NAME = 'tt_one_fridge_pick'
+# TASK_NAME = 'tt_one_fridge_table_in'
+TASK_NAME = 'tt_two_fridge_in'
+
+# TASK_NAME = '_examples'
+
+DATABASE_DIR = join('..', '..', 'fastamp-data')
+# DATABASE_DIR = join('..', '..', 'mamao-data')
 
 
 #####################################
@@ -75,7 +83,7 @@ def query_yes_no(question, default="no"):
             sys.stdout.write("Please respond with 'yes' or 'no' " "(or 'y' or 'n').\n")
 
 
-def run_one(run_dir, task_name=TASK_NAME, save_mp4=SAVE_MP4):
+def run_one(run_dir, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, height=1120):
     ori_dir = run_dir  ## join(DATABASE_DIR, run_dir)
 
     print(f'\n\n\n--------------------------\n    replay {ori_dir} \n------------------------\n\n\n')
@@ -85,19 +93,21 @@ def run_one(run_dir, task_name=TASK_NAME, save_mp4=SAVE_MP4):
         shutil.copytree(ori_dir, exp_dir)
     plan = get_plan(run_dir)
 
-    world = load_lisdf_pybullet(exp_dir, width=720, height=560, verbose=False)
+    world = load_lisdf_pybullet(exp_dir, width=width, height=height, verbose=False)
     problem = Problem(world)
 
     commands = pickle.load(open(join(exp_dir, 'commands.pkl'), "rb"))
 
-    if SAVE_MP4:
+    if save_mp4:
         video_path = join(ori_dir, 'replay.mp4')
         with VideoSaver(video_path):
             apply_actions(problem, commands, time_step=0.025, verbose=False, plan=plan)
         print('saved to', abspath(video_path))
     else:
         # wait_if_gui(f'start replay {run_name}?')
-        answer = query_yes_no(f"start replay {run_name}?", default='yes')
+        answer = True
+        if not AUTO_PLAY:
+            answer = query_yes_no(f"start replay {run_name}?", default='yes')
         if answer:
             apply_actions(problem, commands, time_step=0.05, verbose=False, plan=plan)
 
@@ -184,5 +194,5 @@ def mp4_to_gif(mp4_file, frame_folder='output'):
 
 
 if __name__ == '__main__':
-    main(parallel=PARALLEL, cases=['223']) ##
+    main(parallel=PARALLEL, cases=['14']  ) ##
     # main(parallel=PARALLEL) ## , cases=['2']

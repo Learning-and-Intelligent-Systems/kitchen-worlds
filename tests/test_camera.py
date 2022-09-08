@@ -28,9 +28,9 @@ from utils import load_lisdf_synthesizer
 
 N_PX = 224
 NEW_KEY = 'meraki'
-ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb']
-DEFAULT_TASK = 'tt_one_fridge_pick'
-# DEFAULT_TASK = 'fault'
+ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb', 'meraki']
+DEFAULT_TASK = 'tt_two_fridge_in'
+DEFAULT_TASK = 'tt'
 
 
 parser = argparse.ArgumentParser()
@@ -436,13 +436,15 @@ if __name__ == "__main__":
 
     task_name = args.t
     if task_name == 'tt':
-        task_names = ['tt_one_fridge_pick', 'tt_one_fridge_table_in', 'tt_two_fridge_in']
+        task_names = ['tt_one_fridge_pick',
+                      'tt_one_fridge_table_pick', 'tt_one_fridge_table_in', 'tt_one_fridge_table_on',
+                      'tt_two_fridge_in']
     else:
         task_names = [task_name]
 
     all_subdirs = []
     for task_name in task_names:
-        dataset_dir = join('/home/zhutiany/Documents/mamao-data/', task_name)
+        dataset_dir = join('/home/yang/Documents/fastamp-data/', task_name)
         # organize_dataset(task_name)
         subdirs = listdir(dataset_dir)
         subdirs.sort()

@@ -43,14 +43,15 @@ from mamao_tools.utils import get_feasibility_checker
 
 
 SKIP_IF_SOLVED = False
-SKIP_IF_SOLVED_RECENTLY = True
+SKIP_IF_SOLVED_RECENTLY = False
 
 TASK_NAME = 'tt_one_fridge_pick'
+TASK_NAME = 'tt_one_fridge_table_pick'
 TASK_NAME = 'tt_one_fridge_table_in'
-TASK_NAME = 'tt_two_fridge_in'
+# TASK_NAME = 'tt_two_fridge_in'
 
 PARALLEL = False
-FEASIBILITY_CHECKER = 'None'  ## None | oracle
+FEASIBILITY_CHECKER = 'pvt-task'  ## None | oracle | pvt
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-t', type=str, default=TASK_NAME)
@@ -62,7 +63,8 @@ TASK_NAME = args.t
 PARALLEL = args.p
 FEASIBILITY_CHECKER = args.f
 
-DATABASE_DIR = join('..', '..', 'mamao-data', TASK_NAME)
+DATABASE_DIR = join('..', '..', 'fastamp-data', TASK_NAME)
+
 
 def init_experiment(exp_dir):
     if isfile(TXT_FILE):
@@ -80,7 +82,7 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
             return
         elif SKIP_IF_SOLVED_RECENTLY:
             last_modified = os.path.getmtime(file)
-            if time.time() - last_modified < 60 * 60 * 24:
+            if time.time() - last_modified < 60 * 60 * 5:
                 print('skipping recently solved problem', run_dir)
                 return
 
@@ -96,7 +98,7 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
         from utils import load_lisdf_synthesizer
         scene = load_lisdf_synthesizer(exp_dir)
 
-    world = load_lisdf_pybullet(exp_dir, width=720, height=560, verbose=False)
+    world = load_lisdf_pybullet(exp_dir, width=720, height=560, verbose=False, use_gui=False)
     saver = WorldSaver()
     problem = Problem(world)
 
@@ -126,31 +128,31 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
 
     print_solution(solution)
     plan, cost, evaluations = solution
-    if (plan is None) or not has_gui():
-        disconnect()
-        return
+    # if (plan is None) or not has_gui():
+    #     disconnect()
+    #     return
 
-    print(SEPARATOR)
-    with LockRenderer(lock=True):
-        commands = post_process(problem, plan)
-        problem.remove_gripper()
-        saver.restore()
-
-    """ log plan, planning stats, and commands """
+    """ log plan, planning stats, commands, and fc stats """
     with open(join(ori_dir, f'plan_rerun_fc={FEASIBILITY_CHECKER}.json'), 'w') as f:
         data = {
             'planning_time': planning_time,
-            'plan': [[str(a.name)]+[str(v) for v in a.args] for a in plan],
+            'plan': [[str(a.name)]+[str(v) for v in a.args] for a in plan] if plan is not None else None,
             'datatime': get_datetime(),
         }
         json.dump(data, f, indent=3)
-    with open(join(ori_dir, f'commands_rerun_fc={FEASIBILITY_CHECKER}.txt'), 'w') as f:
-        f.write('\n'.join([str(n) for n in commands]))
-    # with open(join(ori_dir, 'commands_rerun.pkl'), 'wb') as f:
-    #     pickle.dump(commands, f, pickle.HIGHEST_PROTOCOL)
 
-    saver.restore()
-    apply_actions(problem, commands, time_step=0.01)
+    fc.dump_log(join(ori_dir, f'fc_log={FEASIBILITY_CHECKER}.json'))
+
+    if plan is not None:
+        print(SEPARATOR)
+        with LockRenderer(lock=True):
+            commands = post_process(problem, plan)
+            problem.remove_gripper()
+            saver.restore()
+        with open(join(ori_dir, f'commands_rerun_fc={FEASIBILITY_CHECKER}.txt'), 'w') as f:
+            f.write('\n'.join([str(n) for n in commands]))
+        saver.restore()
+        apply_actions(problem, commands, time_step=0.01)
 
     # disconnect()
     reset_simulation()
@@ -170,7 +172,8 @@ def main(parallel=True):
     start_time = time.time()
     cases = [join(DATABASE_DIR, f) for f in listdir(DATABASE_DIR) if isdir(join(DATABASE_DIR, f))]
     cases.sort()
-    # cases = [f for f in cases if '/6' in f or '/7' in f or '/8' in f or '/9' in f]
+    # if TASK_NAME == 'tt_two_fridge_in':
+    #     cases = [f for f in cases if '/12' not in f and '/14' not in f]
 
     num_cases = len(cases)
     if parallel:

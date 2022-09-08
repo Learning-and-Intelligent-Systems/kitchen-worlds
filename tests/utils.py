@@ -1,7 +1,6 @@
 import os.path
 
 import numpy as np
-import scene_synthesizer as synth
 import trimesh
 import untangle
 from trimesh import transformations
@@ -55,6 +54,7 @@ def look_at_scene(scene, pose=None, use_aabb=False):
     return scene.camera_transform
 
 def load_lisdf_synthesizer(lisdf_dir, scene_scale=1., robots=False, surfaces=False, texture=True, display=True):
+    import scene_synthesizer as synth
     lisdf_path = os.path.join(lisdf_dir, 'scene.lisdf')
 
     scene = synth.Scene()
