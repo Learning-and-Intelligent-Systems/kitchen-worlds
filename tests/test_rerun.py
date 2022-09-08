@@ -43,7 +43,7 @@ from mamao_tools.utils import get_feasibility_checker
 
 
 SKIP_IF_SOLVED = False
-SKIP_IF_SOLVED_RECENTLY = False
+SKIP_IF_SOLVED_RECENTLY = True
 
 TASK_NAME = 'tt_one_fridge_pick'
 TASK_NAME = 'tt_one_fridge_table_pick'
@@ -51,7 +51,7 @@ TASK_NAME = 'tt_one_fridge_table_in'
 # TASK_NAME = 'tt_two_fridge_in'
 
 PARALLEL = False
-FEASIBILITY_CHECKER = 'pvt-task'  ## None | oracle | pvt
+FEASIBILITY_CHECKER = 'pvt'  ## None | oracle | pvt
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-t', type=str, default=TASK_NAME)
