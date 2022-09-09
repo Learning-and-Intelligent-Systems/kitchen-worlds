@@ -44,6 +44,7 @@ from mamao_tools.utils import get_feasibility_checker
 
 SKIP_IF_SOLVED = False
 SKIP_IF_SOLVED_RECENTLY = True
+check_time = 1662647476.5
 
 TASK_NAME = 'tt_one_fridge_pick'
 TASK_NAME = 'tt_one_fridge_table_pick'
@@ -51,7 +52,7 @@ TASK_NAME = 'tt_one_fridge_table_in'
 # TASK_NAME = 'tt_two_fridge_in'
 
 PARALLEL = False
-FEASIBILITY_CHECKER = 'pvt'  ## None | oracle | pvt
+FEASIBILITY_CHECKER = 'pvt-task'  ## None | oracle | pvt
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-t', type=str, default=TASK_NAME)
@@ -82,7 +83,7 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
             return
         elif SKIP_IF_SOLVED_RECENTLY:
             last_modified = os.path.getmtime(file)
-            if time.time() - last_modified < 60 * 60 * 5:
+            if last_modified > check_time:
                 print('skipping recently solved problem', run_dir)
                 return
 
