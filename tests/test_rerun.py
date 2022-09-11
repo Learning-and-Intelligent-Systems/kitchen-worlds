@@ -42,17 +42,20 @@ from world_builder.actions import apply_actions
 from mamao_tools.utils import get_feasibility_checker
 
 
+DIVERSE = True
+PREFIX = 'diverse_' if DIVERSE else ''
 SKIP_IF_SOLVED = False
-SKIP_IF_SOLVED_RECENTLY = True
+SKIP_IF_SOLVED_RECENTLY = False
+RETRY_IF_FAILED = True
 check_time = 1662647476.5
 
 TASK_NAME = 'tt_one_fridge_pick'
 TASK_NAME = 'tt_one_fridge_table_pick'
-TASK_NAME = 'tt_one_fridge_table_in'
-# TASK_NAME = 'tt_two_fridge_in'
+# TASK_NAME = 'tt_one_fridge_table_in'
+TASK_NAME = 'tt_two_fridge_in'
 
 PARALLEL = False
-FEASIBILITY_CHECKER = 'pvt-task'  ## None | oracle | pvt
+FEASIBILITY_CHECKER = 'pvt+'  ## None | oracle | pvt
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-t', type=str, default=TASK_NAME)
@@ -76,16 +79,21 @@ def init_experiment(exp_dir):
 
 def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     ori_dir = run_dir ## join(DATABASE_DIR, run_dir)
-    file = join(ori_dir, f'plan_rerun_fc={FEASIBILITY_CHECKER}.json')
+    file = join(ori_dir, f'{PREFIX}plan_rerun_fc={FEASIBILITY_CHECKER}.json')
     if isfile(file):
-        if SKIP_IF_SOLVED:
-            print('skipping solved problem', run_dir)
-            return
-        elif SKIP_IF_SOLVED_RECENTLY:
-            last_modified = os.path.getmtime(file)
-            if last_modified > check_time:
-                print('skipping recently solved problem', run_dir)
+        failed = False
+        if RETRY_IF_FAILED:
+            failed = json.load(open(file, 'r'))['plan'] is None
+
+        if not RETRY_IF_FAILED or not failed:
+            if SKIP_IF_SOLVED:
+                print('skipping solved problem', run_dir)
                 return
+            elif SKIP_IF_SOLVED_RECENTLY:
+                last_modified = os.path.getmtime(file)
+                if last_modified > check_time:
+                    print('skipping recently solved problem', run_dir)
+                    return
 
     print(f'\n\n\n--------------------------\n    rerun {ori_dir} \n------------------------\n\n\n')
     run_name = os.path.basename(ori_dir)
@@ -99,7 +107,7 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
         from utils import load_lisdf_synthesizer
         scene = load_lisdf_synthesizer(exp_dir)
 
-    world = load_lisdf_pybullet(exp_dir, width=720, height=560, verbose=False, use_gui=False)
+    world = load_lisdf_pybullet(exp_dir, width=720, height=560, verbose=False, use_gui=True)
     saver = WorldSaver()
     problem = Problem(world)
 
@@ -117,13 +125,18 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
     print(SEPARATOR)
     init_experiment(exp_dir)
 
-    fc = get_feasibility_checker(ori_dir, mode=FEASIBILITY_CHECKER)
+    fc = get_feasibility_checker(ori_dir, mode=FEASIBILITY_CHECKER, diverse=True)
 
     start = time.time()
     if parallel:
         solution = solve_multiple(pddlstream_problem, stream_info)
     else:
-        solution = solve_one(pddlstream_problem, stream_info, fc)
+        if DIVERSE:
+            solution = solve_one(pddlstream_problem, stream_info, fc,
+                                 diverse=True, downward_time=10, ## max time to get 100, 10 sec
+                                 evaluation_time=60) ## on each skeleton
+        else:
+            solution = solve_one(pddlstream_problem, stream_info, fc)
     planning_time = time.time() - start
     saver.restore()
 
@@ -134,7 +147,7 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
     #     return
 
     """ log plan, planning stats, commands, and fc stats """
-    with open(join(ori_dir, f'plan_rerun_fc={FEASIBILITY_CHECKER}.json'), 'w') as f:
+    with open(join(ori_dir, f'{PREFIX}plan_rerun_fc={FEASIBILITY_CHECKER}.json'), 'w') as f:
         data = {
             'planning_time': planning_time,
             'plan': [[str(a.name)]+[str(v) for v in a.args] for a in plan] if plan is not None else None,
@@ -142,7 +155,7 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
         }
         json.dump(data, f, indent=3)
 
-    fc.dump_log(join(ori_dir, f'fc_log={FEASIBILITY_CHECKER}.json'))
+    fc.dump_log(join(ori_dir, f'{PREFIX}fc_log={FEASIBILITY_CHECKER}.json'))
 
     if plan is not None:
         print(SEPARATOR)
@@ -150,7 +163,7 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
             commands = post_process(problem, plan)
             problem.remove_gripper()
             saver.restore()
-        with open(join(ori_dir, f'commands_rerun_fc={FEASIBILITY_CHECKER}.txt'), 'w') as f:
+        with open(join(ori_dir, f'{PREFIX}commands_rerun_fc={FEASIBILITY_CHECKER}.txt'), 'w') as f:
             f.write('\n'.join([str(n) for n in commands]))
         saver.restore()
         apply_actions(problem, commands, time_step=0.01)
@@ -192,7 +205,7 @@ def main(parallel=True):
 
     else:
         for i in range(num_cases):
-            # if i in [0, 1]: continue
+            if i in [0]: continue
             process(cases[i], parallel=False)
 
     print(f'solved {num_cases} problems (parallel={parallel}) in {round(time.time() - start_time, 3)} sec')
