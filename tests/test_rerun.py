@@ -107,7 +107,7 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
         from utils import load_lisdf_synthesizer
         scene = load_lisdf_synthesizer(exp_dir)
 
-    world = load_lisdf_pybullet(exp_dir, width=720, height=560, verbose=False, use_gui=True)
+    world = load_lisdf_pybullet(exp_dir, width=720, height=560, verbose=False, use_gui=False)
     saver = WorldSaver()
     problem = Problem(world)
 
@@ -205,7 +205,7 @@ def main(parallel=True):
 
     else:
         for i in range(num_cases):
-            if i in [0]: continue
+            if i in [0, 1]: continue
             process(cases[i], parallel=False)
 
     print(f'solved {num_cases} problems (parallel={parallel}) in {round(time.time() - start_time, 3)} sec')
