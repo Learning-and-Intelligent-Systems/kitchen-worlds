@@ -44,6 +44,7 @@ from mamao_tools.utils import get_feasibility_checker
 
 DIVERSE = True
 PREFIX = 'diverse_' if DIVERSE else ''
+
 SKIP_IF_SOLVED = False
 SKIP_IF_SOLVED_RECENTLY = False
 RETRY_IF_FAILED = True
@@ -55,7 +56,7 @@ TASK_NAME = 'tt_one_fridge_table_pick'
 TASK_NAME = 'tt_two_fridge_in'
 
 PARALLEL = False
-FEASIBILITY_CHECKER = 'pvt+'  ## None | oracle | pvt
+FEASIBILITY_CHECKER = 'oracle'  ## None | oracle | pvt | pvt+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-t', type=str, default=TASK_NAME)
@@ -134,7 +135,7 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
         if DIVERSE:
             solution = solve_one(pddlstream_problem, stream_info, fc,
                                  diverse=True, downward_time=10, ## max time to get 100, 10 sec
-                                 evaluation_time=60) ## on each skeleton
+                                 evaluation_time=300) ## on each skeleton
         else:
             solution = solve_one(pddlstream_problem, stream_info, fc)
     planning_time = time.time() - start
@@ -205,7 +206,7 @@ def main(parallel=True):
 
     else:
         for i in range(num_cases):
-            if i in [0, 1]: continue
+            if i in [0, 1, 10]: continue
             process(cases[i], parallel=False)
 
     print(f'solved {num_cases} problems (parallel={parallel}) in {round(time.time() - start_time, 3)} sec')
