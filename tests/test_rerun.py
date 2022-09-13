@@ -62,6 +62,12 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-t', type=str, default=TASK_NAME)
 parser.add_argument('-f', type=str, default=FEASIBILITY_CHECKER)
 parser.add_argument('-p', action='store_true', default=PARALLEL)
+parser.add_argument('-v', '--viewer', action='store_true',
+                    help='When enabled, enables the PyBullet viewer.')
+parser.add_argument('-u', '--unlock', action='store_true',
+                    help='When enabled, unlocks the PyBullet viewer.')
+parser.add_argument('-c', '--cfree', action='store_true',
+                    help='When enabled, disables collision checking.')
 args = parser.parse_args()
 
 TASK_NAME = args.t
@@ -108,7 +114,7 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
         from utils import load_lisdf_synthesizer
         scene = load_lisdf_synthesizer(exp_dir)
 
-    world = load_lisdf_pybullet(exp_dir, width=720, height=560, verbose=False, use_gui=False)
+    world = load_lisdf_pybullet(exp_dir, width=720, height=560, verbose=False, use_gui=args.viewer)
     saver = WorldSaver()
     problem = Problem(world)
 
@@ -116,7 +122,8 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
         from utils import load_lisdf_nvisii
         scene = load_lisdf_nvisii(exp_dir)
 
-    pddlstream_problem = pddlstream_from_dir(problem, exp_dir=exp_dir, collisions=True, teleport=False)
+    pddlstream_problem = pddlstream_from_dir(problem, exp_dir=exp_dir, replace_pddl=False,
+                                             collisions=not args.cfree, teleport=False)
     world.summarize_all_objects()
 
     stream_info = world.robot.get_stream_info(partial=False, defer=False)
@@ -133,11 +140,14 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
         solution = solve_multiple(pddlstream_problem, stream_info)
     else:
         if DIVERSE:
-            solution = solve_one(pddlstream_problem, stream_info, fc,
-                                 diverse=True, downward_time=10, ## max time to get 100, 10 sec
-                                 evaluation_time=30) ## on each skeleton
+            kwargs = dict(
+                diverse=DIVERSE,
+                downward_time=10,  ## max time to get 100, 10 sec
+                evaluation_time=30,  ## on each skeleton
+            )
         else:
-            solution = solve_one(pddlstream_problem, stream_info, fc)
+            kwargs = dict()
+        solution = solve_one(pddlstream_problem, stream_info, fc=fc, lock=not args.unlock, **kwargs)
     planning_time = time.time() - start
     saver.restore()
 
