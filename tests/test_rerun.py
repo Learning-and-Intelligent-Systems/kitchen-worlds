@@ -48,7 +48,7 @@ PREFIX = 'diverse_' if DIVERSE else ''
 SKIP_IF_SOLVED = False
 SKIP_IF_SOLVED_RECENTLY = False
 RETRY_IF_FAILED = True
-check_time = 1662647476.5
+check_time = 1663093665 ## after caelan changes ## 1663080399 ## Tue morning
 
 TASK_NAME = 'tt_one_fridge_pick'
 TASK_NAME = 'tt_one_fridge_table_pick'
@@ -56,7 +56,7 @@ TASK_NAME = 'tt_one_fridge_table_pick'
 TASK_NAME = 'tt_two_fridge_in'
 
 PARALLEL = False
-FEASIBILITY_CHECKER = 'oracle'  ## None | oracle | pvt | pvt+
+FEASIBILITY_CHECKER = 'pvt'  ## None | oracle | pvt | pvt+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-t', type=str, default=TASK_NAME)
@@ -122,7 +122,7 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
         from utils import load_lisdf_nvisii
         scene = load_lisdf_nvisii(exp_dir)
 
-    pddlstream_problem = pddlstream_from_dir(problem, exp_dir=exp_dir, replace_pddl=False,
+    pddlstream_problem = pddlstream_from_dir(problem, exp_dir=exp_dir, replace_pddl=True,
                                              collisions=not args.cfree, teleport=False)
     world.summarize_all_objects()
 
@@ -143,7 +143,7 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
             kwargs = dict(
                 diverse=DIVERSE,
                 downward_time=10,  ## max time to get 100, 10 sec
-                evaluation_time=30,  ## on each skeleton
+                evaluation_time=120,  ## on each skeleton
             )
         else:
             kwargs = dict()
@@ -216,7 +216,8 @@ def main(parallel=True):
 
     else:
         for i in range(num_cases):
-            if i in [0]: continue
+            # if i in [0, 1]: continue
+            # if '17' not in cases[i]: continue
             process(cases[i], parallel=False)
 
     print(f'solved {num_cases} problems (parallel={parallel}) in {round(time.time() - start_time, 3)} sec')
