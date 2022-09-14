@@ -56,7 +56,7 @@ TASK_NAME = 'tt_two_fridge_in'
 # TASK_NAME = 'tt_two_fridge_pick'
 
 PARALLEL = False
-FEASIBILITY_CHECKER = 'oracle'  ## None | oracle | pvt | pvt+
+FEASIBILITY_CHECKER = 'pvt'  ## None | oracle | pvt | pvt+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-t', type=str, default=TASK_NAME)
@@ -90,7 +90,7 @@ def init_experiment(exp_dir):
 def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     ori_dir = run_dir ## join(DATABASE_DIR, run_dir)
     file = join(ori_dir, f'{PREFIX}plan_rerun_fc={FEASIBILITY_CHECKER}.json')
-    if isfile(file) and '/18' not in file:
+    if isfile(file):
         failed = False
         if RETRY_IF_FAILED:
             failed = json.load(open(file, 'r'))['plan'] is None
