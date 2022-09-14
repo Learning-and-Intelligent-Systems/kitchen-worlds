@@ -45,7 +45,7 @@ from mamao_tools.utils import get_feasibility_checker
 DIVERSE = False
 
 SKIP_IF_SOLVED = False
-SKIP_IF_SOLVED_RECENTLY = False
+SKIP_IF_SOLVED_RECENTLY = True
 RETRY_IF_FAILED = True
 check_time = 1663139616 ## after relabeling
 
