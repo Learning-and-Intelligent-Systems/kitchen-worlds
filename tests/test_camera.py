@@ -439,6 +439,10 @@ if __name__ == "__main__":
         task_names = ['tt_one_fridge_pick',
                       'tt_one_fridge_table_pick', 'tt_one_fridge_table_in', 'tt_one_fridge_table_on',
                       'tt_two_fridge_in']
+    elif task_name == 'bb':
+        task_names = ['bb_one_fridge_pick',
+                      'bb_one_fridge_table_pick', 'bb_one_fridge_table_in', 'bb_one_fridge_table_on',
+                      'bb_two_fridge_in', 'bb_two_fridge_pick']
     else:
         task_names = [task_name]
 

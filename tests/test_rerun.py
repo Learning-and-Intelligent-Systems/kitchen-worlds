@@ -43,23 +43,24 @@ from mamao_tools.utils import get_feasibility_checker
 
 
 DIVERSE = True
-PREFIX = 'diverse_' if DIVERSE else ''
 
 SKIP_IF_SOLVED = False
 SKIP_IF_SOLVED_RECENTLY = False
 RETRY_IF_FAILED = True
-check_time = 1663093665 ## after caelan changes ## 1663080399 ## Tue morning
+check_time = 1663139616 ## after relabeling
 
 TASK_NAME = 'tt_one_fridge_pick'
 TASK_NAME = 'tt_one_fridge_table_pick'
 # TASK_NAME = 'tt_one_fridge_table_in'
 TASK_NAME = 'tt_two_fridge_in'
+# TASK_NAME = 'tt_two_fridge_pick'
 
 PARALLEL = False
-FEASIBILITY_CHECKER = 'pvt'  ## None | oracle | pvt | pvt+
+FEASIBILITY_CHECKER = 'oracle'  ## None | oracle | pvt | pvt+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-t', type=str, default=TASK_NAME)
+parser.add_argument('-d', type=str, default=DIVERSE)
 parser.add_argument('-f', type=str, default=FEASIBILITY_CHECKER)
 parser.add_argument('-p', action='store_true', default=PARALLEL)
 parser.add_argument('-v', '--viewer', action='store_true',
@@ -71,10 +72,12 @@ parser.add_argument('-c', '--cfree', action='store_true',
 args = parser.parse_args()
 
 TASK_NAME = args.t
+DIVERSE = args.d
 PARALLEL = args.p
 FEASIBILITY_CHECKER = args.f
 
 DATABASE_DIR = join('..', '..', 'fastamp-data', TASK_NAME)
+PREFIX = 'diverse_' if DIVERSE else ''
 
 
 def init_experiment(exp_dir):
@@ -133,7 +136,7 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
     print(SEPARATOR)
     init_experiment(exp_dir)
 
-    fc = get_feasibility_checker(ori_dir, mode=FEASIBILITY_CHECKER, diverse=True)
+    fc = get_feasibility_checker(ori_dir, mode=FEASIBILITY_CHECKER, diverse=DIVERSE)
 
     start = time.time()
     if parallel:
@@ -143,7 +146,7 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
             kwargs = dict(
                 diverse=DIVERSE,
                 downward_time=10,  ## max time to get 100, 10 sec
-                evaluation_time=120,  ## on each skeleton
+                evaluation_time=60,  ## on each skeleton
             )
         else:
             kwargs = dict()
