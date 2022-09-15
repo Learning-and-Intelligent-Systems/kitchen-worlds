@@ -49,14 +49,14 @@ SKIP_IF_SOLVED_RECENTLY = True
 RETRY_IF_FAILED = True
 check_time = 1663139616 ## after relabeling
 
-TASK_NAME = 'tt_one_fridge_pick'
-TASK_NAME = 'tt_one_fridge_table_pick'
+# TASK_NAME = 'tt_one_fridge_pick'
+# TASK_NAME = 'tt_one_fridge_table_pick'
 # TASK_NAME = 'tt_one_fridge_table_in'
-TASK_NAME = 'tt_two_fridge_in'
 # TASK_NAME = 'tt_two_fridge_pick'
+TASK_NAME = 'tt_two_fridge_in'
 
 PARALLEL = False
-FEASIBILITY_CHECKER = 'pvt'  ## None | oracle | pvt | pvt+
+FEASIBILITY_CHECKER = 'binary'  ## None | oracle | pvt | pvt-2 | pvt-2
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-t', type=str, default=TASK_NAME)
