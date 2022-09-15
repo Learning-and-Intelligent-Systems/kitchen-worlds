@@ -56,7 +56,7 @@ check_time = 1663139616 ## after relabeling
 TASK_NAME = 'tt_two_fridge_in'
 
 PARALLEL = False
-FEASIBILITY_CHECKER = 'binary'  ## None | oracle | pvt | pvt-2 | pvt-2
+FEASIBILITY_CHECKER = 'shuffle'  ## None | oracle | pvt | pvt-2 | pvt-2 | binary
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-t', type=str, default=TASK_NAME)
