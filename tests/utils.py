@@ -10,13 +10,13 @@ def test_is_robot(name, robots=["pr2"]):
         return True
     return any(name.startswith(prefix) for prefix in robots)
 
-def load_lisdf(lisdf_dir, scene_scale=1., robots=False, verbose=True):
+def load_lisdf(lisdf_dir, scene_scale=1., robots=False, skip=[], verbose=True):
     # TODO: apply within load_lisdf_synthesizer
     lisdf_path = os.path.join(lisdf_dir, 'scene.lisdf')
     world_xml = untangle.parse(lisdf_path).sdf.world
     for obj_xml in world_xml.include:
         name = obj_xml._attributes["name"]
-        if not robots and test_is_robot(name): # TODO: generalize
+        if (name in skip) or (not robots and test_is_robot(name)): # TODO: generalize
             continue
 
         path = os.path.abspath(os.path.join(os.path.dirname(lisdf_path), obj_xml.uri.cdata))
