@@ -45,18 +45,18 @@ from mamao_tools.utils import get_feasibility_checker
 DIVERSE = True
 
 SKIP_IF_SOLVED = False
-SKIP_IF_SOLVED_RECENTLY = True
+SKIP_IF_SOLVED_RECENTLY = False
 RETRY_IF_FAILED = True
-check_time = 1663139616 ## after relabeling
+check_time = 1663221059  ## first done  | 1663139616 ## after relabeling
 
 # TASK_NAME = 'tt_one_fridge_pick'
-# TASK_NAME = 'tt_one_fridge_table_pick'
+TASK_NAME = 'tt_one_fridge_table_pick'
 # TASK_NAME = 'tt_one_fridge_table_in'
 # TASK_NAME = 'tt_two_fridge_pick'
 TASK_NAME = 'tt_two_fridge_in'
 
 PARALLEL = False
-FEASIBILITY_CHECKER = 'shuffle'  ## None | oracle | pvt | pvt-2 | pvt-2 | binary
+FEASIBILITY_CHECKER = 'shuffle'  ## None | oracle | pvt | pvt-2 | pvt-2 | binary | shuffle
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-t', type=str, default=TASK_NAME)
@@ -90,7 +90,7 @@ def init_experiment(exp_dir):
 def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     ori_dir = run_dir ## join(DATABASE_DIR, run_dir)
     file = join(ori_dir, f'{PREFIX}plan_rerun_fc={FEASIBILITY_CHECKER}.json')
-    if isfile(file):
+    if isfile(file): ## and not '/11' in ori_dir
         failed = False
         if RETRY_IF_FAILED:
             failed = json.load(open(file, 'r'))['plan'] is None
@@ -222,7 +222,7 @@ def main(parallel=True):
     else:
         for i in range(num_cases):
             # if i in [0, 1]: continue
-            # if '17' not in cases[i]: continue
+            # if '/11' not in cases[i]: continue
             process(cases[i], parallel=False)
 
     print(f'solved {num_cases} problems (parallel={parallel}) in {round(time.time() - start_time, 3)} sec')

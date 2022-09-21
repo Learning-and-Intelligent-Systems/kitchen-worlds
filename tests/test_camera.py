@@ -4,6 +4,7 @@ import os
 import PIL.Image
 import numpy as np
 import argparse
+import sys
 
 from config import EXP_PATH
 from pybullet_tools.utils import quat_from_euler, reset_simulation, remove_body, AABB, \
@@ -12,8 +13,9 @@ from pybullet_tools.utils import quat_from_euler, reset_simulation, remove_body,
 from pybullet_tools.bullet_utils import get_segmask, get_door_links, nice, \
     get_partnet_doors
 
-from mamao_tools.data_utils import get_indices
-from lisdf_tools.lisdf_loader import load_lisdf_pybullet
+from mamao_tools.utils import organize_dataset
+from mamao_tools.data_utils import get_indices, exist_instance
+from lisdf_tools.lisdf_loader import load_lisdf_pybullet, get_depth_images
 import json
 import shutil
 from os import listdir
@@ -21,10 +23,8 @@ from os.path import join, isdir, isfile, dirname, getmtime, basename
 import time
 import pybullet as p
 from tqdm import tqdm
-from lisdf_tools.lisdf_loader import get_depth_images
-from mamao_tools.utils import organize_dataset
 
-from utils import load_lisdf_synthesizer
+# from utils import load_lisdf_synthesizer
 
 N_PX = 224
 NEW_KEY = 'meraki'
@@ -261,67 +261,6 @@ def make_image_background(old_arr):
     return new_arr
 
 
-# def render_masked_rgb_images(viz_dir):
-#     import numpy as np
-#
-#     new_key = 'masked_rgb'
-#     out_dir = join(viz_dir, f"{new_key}s")
-#     if not isdir(out_dir): os.mkdir(out_dir)
-#
-#     # crops = { 'rgb': (50, 50, 562, 413), 'depth': (49, 30, 446, 398) }
-#
-#     def load_rgbd(rgb_image_name):
-#         depth_image_name = rgb_image_name.replace('rgb', 'depth')
-#         rgb_img = np.asarray(PIL.Image.open(rgb_image_name).convert('RGB')) ## .crop(crops['rgb']))
-#         depth_img = np.asarray(PIL.Image.open(depth_image_name)) ## .crop(crops['rgb']))
-#         return rgb_img, depth_img
-#
-#     def mask_from_rgb_image(arr):
-#         background = make_image_background(arr)
-#         i = np.where(np.sum(np.abs(arr - background), axis=2) > 5)
-#         mask = np.zeros_like(arr[:, :, 0])
-#         mask[i] = 1
-#         return expand_mask(mask)
-#
-#     def mask_from_depth_image(arr):
-#         i = np.where(arr != 0)
-#         mask = np.zeros_like(arr)
-#         mask[i] = 1
-#         return mask
-#
-#     def get_visibility_mask(obj, scene, mask):
-#         visibility_mask = np.zeros_like(obj)
-#         i = np.where(obj*mask == scene*mask)
-#         visibility_mask[i] = 1
-#         return expand_mask(visibility_mask*mask)
-#
-#     ## ----- step 1: read the instance rgb and depth images
-#     rgb_dir = join(viz_dir, 'rgbs')
-#     rgb_files = [f for f in listdir(rgb_dir)]
-#     rgb_scene = [join(rgb_dir, f) for f in rgb_files if 'scene' in f][0]
-#     rgb_scene_img, depth_scene_img = load_rgbd(rgb_scene)
-#     shutil.copy(rgb_scene, rgb_scene.replace('rgb', new_key))
-#
-#     ## ----- step 2: render the masked out version of the scene rgb if the depth values are the same
-#     rgb_files.sort()
-#     for f in rgb_files:
-#         if 'scene' in f: continue
-#         rgb_obj = join(rgb_dir, f)
-#         rgb_obj_img, depth_obj_img = load_rgbd(rgb_obj)
-#
-#         rgb_mask = mask_from_rgb_image(rgb_obj_img)
-#         depth_mask = mask_from_depth_image(depth_obj_img)
-#
-#         visibility_mask = get_visibility_mask(depth_obj_img, depth_scene_img, depth_mask)
-#
-#         background = make_image_background(rgb_obj_img)  ## background color [178, 178, 204] in png image
-#         foreground = np.zeros_like(background) + rgb_scene_img * rgb_mask * visibility_mask
-#         background[np.where(foreground!=0)] = 0
-#         background += foreground
-#         im = PIL.Image.fromarray(background)
-#         im.save(rgb_obj.replace('rgb', new_key))
-
-
 def add_key(viz_dir):
     config_file = join(viz_dir, 'planning_config.json')
     config = json.load(open(config_file, 'r'))
@@ -387,7 +326,7 @@ def process(viz_dir):
     if isfile(tmp_file):
         os.remove(tmp_file)
 
-    redo = False
+    redo = True
     camera_pose = get_camera_pose(viz_dir)
     (x, y, z), quat = camera_pose
     (r, p, w) = euler_from_quat(quat)
@@ -436,9 +375,8 @@ if __name__ == "__main__":
 
     task_name = args.t
     if task_name == 'tt':
-        task_names = ['tt_one_fridge_pick',
-                      'tt_one_fridge_table_pick', 'tt_one_fridge_table_in', 'tt_one_fridge_table_on',
-                      'tt_two_fridge_in']
+        task_names = ['tt_one_fridge_table_pick', 'tt_one_fridge_table_in',
+                      'tt_two_fridge_in', 'tt_two_fridge_pick']
     elif task_name == 'bb':
         task_names = ['bb_one_fridge_pick',
                       'bb_one_fridge_table_pick', 'bb_one_fridge_table_in', 'bb_one_fridge_table_on',
@@ -454,13 +392,19 @@ if __name__ == "__main__":
         subdirs.sort()
         # subdirs = ['2102']
         subdirs = [join(dataset_dir, s) for s in subdirs if isdir(join(dataset_dir, s))]
-        all_subdirs += subdirs
+        for s in subdirs:
+            if exist_instance(s, '10849'):
+                # print('skipping', s)
+                all_subdirs += [s]
+            # print('redoing', s)
+        # all_subdirs += subdirs
+    # sys.exit()
     
     if args.p:
         import multiprocessing
         from multiprocessing import Pool
 
-        max_cpus = 24
+        max_cpus = 12
         num_cpus = min(multiprocessing.cpu_count(), max_cpus)
         print(f'using {num_cpus} cpus for {len(all_subdirs)} subdirs')
         with Pool(processes=num_cpus) as pool:

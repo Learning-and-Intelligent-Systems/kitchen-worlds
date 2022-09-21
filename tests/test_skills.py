@@ -170,6 +170,15 @@ def test_spatial_algebra(body, robot):
     set_camera_target_body(gripper, dx=0.5, dy=0, dz=0.5)
 
 
+def get_gap(category):
+    gap = 1
+    if category == 'MiniFridge':
+        gap = 2
+    if category == 'Food':
+        gap = 0.5
+    return gap
+
+
 def test_grasps(categories=[], robot='feg'):
     world = get_test_world(robot)
     robot = world.robot
@@ -182,7 +191,7 @@ def test_grasps(categories=[], robot='feg'):
         i += 1
         instances = get_instances(cat)
         n = len(instances)
-        locations = [(i, 0.5 * n) for n in range(1, n+1)]
+        locations = [(i, get_gap(cat) * n) for n in range(1, n+1)]
         j = -1
         for id, scale in instances.items():
             j += 1
@@ -215,8 +224,12 @@ def test_grasps(categories=[], robot='feg'):
         if len(categories) > 1:
             wait_if_gui(f'------------- Next object category? finished ({i+1}/{len(categories)})')
 
+        if cat == 'MiniFridge':
+            set_camera_pose((3, 7, 2), (0, 7, 1))
+        elif cat == 'Food':
+            set_camera_pose((3, 3, 2), (0, 3, 1))
+
     # set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.5)
-    set_camera_pose((3, 3, 2), (0, 3, 1))
     set_renderer(True)
     wait_if_gui('Finish?')
     disconnect()
@@ -311,12 +324,30 @@ def reload_after_vhacd(path, body, scale, id=None):
     return id_urdf_path, body
 
 
+def get_contain_list_gen(problem, num_samples=10, **kwargs):
+    from pybullet_tools.general_streams import get_contain_list_gen as gen_helper
+    funk = gen_helper(problem, num_samples=num_samples, **kwargs)
+
+    def contain_list_gen(body, container):
+        g = funk(body, container)
+        poses = []
+        while len(poses) < num_samples:
+            try:
+                pose = next(g)
+                poses.append(pose)
+            except StopIteration:
+                break
+        return poses
+    return contain_list_gen
+
+
 def test_placement_in(robot, category):
     from pybullet_tools.pr2_streams import get_handle_pose
 
     world = get_test_world(robot)
     problem = State(world)
-    funk = get_contain_list_gen(problem, collisions=True, verbose=False)
+    funk = get_contain_list_gen(problem, collisions=True, verbose=False,
+                                force_storage=True, num_samples=60)
 
     ## load fridge
     instances = get_instances(category)
@@ -325,11 +356,16 @@ def test_placement_in(robot, category):
     locations = [(0, 2 * n) for n in range(1, n + 1)]
     set_camera_pose((4, 3, 2), (0, 3, 0.5))
     for id in instances:
+        if id not in ['11709']:
+            continue
         (x, y) = locations[i]
         path, body, scale = load_model_instance(category, id, location=(x, y))
         # new_urdf_path, body = reload_after_vhacd(path, body, scale, id=id)
         instance_name = get_instance_name(path)
-        world.add_body(body, f'{category.lower()}#{id}', instance_name)
+        name = f'{category.lower()}#{id}'
+        if category in ['MiniFridge', 'Fridge', 'Cabinet', 'Microwave']:
+            name += '_storage'
+        world.add_body(body, name, instance_name)
         set_camera_target_body(body, dx=1, dy=0, dz=1)
 
         ## color links corresponding to semantic labels
@@ -345,10 +381,16 @@ def test_placement_in(robot, category):
             # world.add_body(space, f'{category.lower()}#{id}-{body_link}')
 
             cabbage = load_asset('VeggieCabbage', x=x, y=y, z=0, yaw=0)[0]
-            world.add_body(cabbage, f'cabbage#{i}-{body_link}')
+            cabbage_name = f'cabbage#{i}-{body_link}'
+            world.add_body(cabbage, cabbage_name)
 
             outputs = funk(cabbage, body_link)
             set_pose(cabbage, outputs[0][0].value)
+            for i in range(1, len(outputs)):
+                marker = load_asset('VeggieCabbage', x=x, y=y, z=0, yaw=0)[0]
+                world.add_body(cabbage, cabbage_name+f"_({i})")
+                set_pose(marker, outputs[i][0].value)
+
             set_renderer(True)
             set_camera_target_body(cabbage, dx=1, dy=0, dz=1)
         i += 1
@@ -611,7 +653,7 @@ if __name__ == '__main__':
 
     ## --- grasps related ---
     robot = 'pr2' ## 'feg' ##
-    test_grasps(['Food'], robot)  ## 'Bottle', 'Stapler', 'Camera', 'Glasses'
+    # test_grasps(['MiniFridge'], robot)  ## 'Bottle', 'Stapler', 'Camera', 'Glasses', 'Food'
     # test_handle_grasps_counter()
     # test_handle_grasps(robot, category='MiniFridge')
     # test_pick_place_counter(robot)
@@ -619,4 +661,4 @@ if __name__ == '__main__':
 
     ## --- placement related  ---
     # test_placement_counter()
-    # test_placement_in(robot, category='MiniFridge')
+    test_placement_in(robot, category='MiniFridge')
