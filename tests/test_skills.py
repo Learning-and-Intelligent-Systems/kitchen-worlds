@@ -13,12 +13,6 @@ from os.path import join, abspath, dirname, isdir, isfile
 from os import listdir
 from config import EXP_PATH
 
-from pybullet_planning.pybullet_tools.pr2_utils import get_group_conf
-from pybullet_planning.pybullet_tools.pr2_primitives import get_base_custom_limits, control_commands, apply_commands
-from pybullet_planning.pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, wait_if_gui, \
-    SEPARATOR, get_aabb, get_pose, approximate_as_prism, draw_aabb, multiply, unit_quat, remove_body, invert, \
-    Pose, get_link_pose, get_joint_limits, WHITE, RGBA, set_all_color, RED, GREEN, set_renderer, clone_body, \
-    add_text
 from pybullet_planning.pybullet_tools.bullet_utils import summarize_facts, print_goal, nice, set_camera_target_body, \
     draw_bounding_lines, fit_dimensions, draw_fitted_box, get_hand_grasps, get_partnet_doors, get_partnet_spaces, \
     open_joint, get_instance_name
@@ -58,7 +52,10 @@ from test_pddlstream import get_args
 from pybullet_tools.pr2_problems import create_floor
 from pybullet_tools.utils import connect, draw_pose, unit_pose, link_from_name, load_pybullet, load_model, \
     sample_aabb, AABB, set_pose, get_aabb, get_aabb_center, quat_from_euler, Euler, HideOutput, get_aabb_extent, \
-    set_camera_pose
+    set_camera_pose, wait_unlocked, disconnect, wait_if_gui, \
+    SEPARATOR, get_aabb, get_pose, approximate_as_prism, draw_aabb, multiply, unit_quat, remove_body, invert, \
+    Pose, get_link_pose, get_joint_limits, WHITE, RGBA, set_all_color, RED, GREEN, set_renderer, clone_body, \
+    add_text, joint_from_name, set_caching
 from pybullet_tools.flying_gripper_utils import create_fe_gripper, set_se3_conf
 import math
 
@@ -81,6 +78,8 @@ def get_test_world(robot='feg', semantic_world=False, DRAW_BASE_LIMITS=False):
     args = get_args() ## exp_name
     connect(use_gui=True, shadows=False, width=1980, height=1238)  ##  , width=360, height=270
     draw_pose(unit_pose(), length=.5)
+    set_caching(cache=False)
+    # import ipdb; ipdb.set_trace()
     # create_floor()
     if semantic_world:
         from world_builder.world import World
@@ -347,17 +346,17 @@ def test_placement_in(robot, category):
     world = get_test_world(robot)
     problem = State(world)
     funk = get_contain_list_gen(problem, collisions=True, verbose=False,
-                                force_storage=True, num_samples=60)
+                                force_storage=True, num_samples=30)
 
     ## load fridge
     instances = get_instances(category)
     n = len(instances)
     i = 0
-    locations = [(0, 2 * n) for n in range(1, n + 1)]
+    locations = [(0, get_gap(category) * n) for n in range(1, n + 1)]
     set_camera_pose((4, 3, 2), (0, 3, 0.5))
     for id in instances:
-        if id not in ['11709']:
-            continue
+        # if id not in ['11231']:
+        #     continue
         (x, y) = locations[i]
         path, body, scale = load_model_instance(category, id, location=(x, y))
         # new_urdf_path, body = reload_after_vhacd(path, body, scale, id=id)
@@ -386,13 +385,19 @@ def test_placement_in(robot, category):
 
             outputs = funk(cabbage, body_link)
             set_pose(cabbage, outputs[0][0].value)
-            for i in range(1, len(outputs)):
-                marker = load_asset('VeggieCabbage', x=x, y=y, z=0, yaw=0)[0]
-                world.add_body(cabbage, cabbage_name+f"_({i})")
-                set_pose(marker, outputs[i][0].value)
+            markers = []
+            # for j in range(1, len(outputs)):
+            #     marker = load_asset('VeggieCabbage', x=x, y=y, z=0, yaw=0)[0]
+            #     # world.add_body(cabbage, cabbage_name+f"_({j})")
+            #     markers.append(marker)
+            #     set_pose(marker, outputs[j][0].value)
 
             set_renderer(True)
+            set_renderer(True)
             set_camera_target_body(cabbage, dx=1, dy=0, dz=1)
+            wait_if_gui('Next space?')
+            for m in markers:
+                remove_body(m)
         i += 1
 
     # set_camera_pose((4, 3, 2), (0, 3, 0.5))
@@ -402,7 +407,7 @@ def test_placement_in(robot, category):
 
 def test_gripper_joints():
     """ visualize ee link pose as conf changes """
-    world = get_feg_world()
+    world = get_test_world(robot='feg')
     robot = world.robot
 
     set_se3_conf(robot, (0, 0, 0, 0, 0, 0))
@@ -423,7 +428,7 @@ def test_gripper_joints():
 
 def test_gripper_range(IK=False):
     """ visualize all possible gripper orientation """
-    world = get_feg_world()
+    world = get_test_world(robot='feg')
     robot = world.robot
 
     set_se3_conf(robot, (0, 0, 0, 0, 0, 0))
@@ -472,6 +477,19 @@ def test_gripper_range(IK=False):
 
     wait_if_gui('Finish?')
     disconnect()
+
+
+def test_torso():
+    world = get_test_world(robot='pr2')
+    robot = world.robot
+    torso_joint = joint_from_name(robot, 'torso_lift_joint')
+    l = get_joint_limits(robot, torso_joint)
+    robot.set_joint_positions([torso_joint], [1.5])
+    print(l)
+    # x, y, z, yaw = robot.get_positions('base-torso')
+    # robot.set_positions_by_group('base-torso', (x, y, 0.9, yaw))
+    wait_unlocked()
+    print(robot)
 
 
 def test_handle_grasps_counter():
@@ -649,6 +667,7 @@ if __name__ == '__main__':
     ## --- robot (FEGripper) related  ---
     # test_gripper_joints()
     # test_gripper_range()
+    test_torso()
 
 
     ## --- grasps related ---
@@ -661,4 +680,4 @@ if __name__ == '__main__':
 
     ## --- placement related  ---
     # test_placement_counter()
-    test_placement_in(robot, category='MiniFridge')
+    # test_placement_in(robot, category='MiniFridge')

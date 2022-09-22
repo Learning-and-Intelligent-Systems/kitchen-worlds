@@ -25,7 +25,7 @@ from pybullet_tools.logging import TXT_FILE
 from pybullet_tools.pr2_primitives import get_group_joints, Conf, get_base_custom_limits, Pose, Conf, \
     get_ik_ir_gen, get_motion_gen, get_cfree_approach_pose_test, get_cfree_pose_pose_test, get_cfree_traj_pose_test, \
     get_grasp_gen, Attach, Detach, Clean, Cook, control_commands, Command, \
-    get_gripper_joints, GripperCommand, State
+    get_gripper_joints, GripperCommand, State, apply_commands
 
 from pddlstream.language.constants import Equal, AND, print_solution, PDDLProblem
 from pddlstream.algorithms.meta import solve, DEFAULT_ALGORITHM
@@ -40,6 +40,7 @@ from lisdf_tools.lisdf_planning import pddl_to_init_goal, Problem
 from world_builder.actions import apply_actions
 
 from mamao_tools.utils import get_feasibility_checker
+from mamao_tools.feasibility_checkers import Shuffler
 
 
 DIVERSE = True
@@ -69,6 +70,8 @@ parser.add_argument('-u', '--unlock', action='store_true',
                     help='When enabled, unlocks the PyBullet viewer.')
 parser.add_argument('-c', '--cfree', action='store_true',
                     help='When enabled, disables collision checking.')
+parser.add_argument('-i', '--index', type=int, default=0,
+                    help='The index of the first problem.')
 args = parser.parse_args()
 
 TASK_NAME = args.t
@@ -76,7 +79,7 @@ DIVERSE = args.d
 PARALLEL = args.p
 FEASIBILITY_CHECKER = args.f
 
-DATABASE_DIR = join('..', '..', 'fastamp-data', TASK_NAME)
+DATABASE_DIR = abspath(join('..', '..', 'fastamp-data', TASK_NAME))
 PREFIX = 'diverse_' if DIVERSE else ''
 
 
@@ -125,6 +128,16 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
         from utils import load_lisdf_nvisii
         scene = load_lisdf_nvisii(exp_dir)
 
+    update_fn = None
+    if False:
+        #from test_gym import load_lisdf_isaacgym
+        from test_gym import update_gym_world
+        gym_world = load_lisdf_isaacgym(exp_dir) #, skip=['meatturkeyleg'])
+        #world.gym_world = gym_world
+        update_fn = lambda pause=False: update_gym_world(gym_world, pb_world=world, pause=pause)
+        update_fn(pause=True)
+        #gym_world.wait_if_gui()
+
     pddlstream_problem = pddlstream_from_dir(problem, exp_dir=exp_dir, replace_pddl=True,
                                              collisions=not args.cfree, teleport=False)
     world.summarize_all_objects()
@@ -137,6 +150,7 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
     init_experiment(exp_dir)
 
     fc = get_feasibility_checker(ori_dir, mode=FEASIBILITY_CHECKER, diverse=DIVERSE)
+    # fc = Shuffler()
 
     start = time.time()
     if parallel:
@@ -171,16 +185,26 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
 
     fc.dump_log(join(ori_dir, f'{PREFIX}fc_log={FEASIBILITY_CHECKER}.json'))
 
+    use_commands = True
     if plan is not None:
         print(SEPARATOR)
         with LockRenderer(lock=True):
-            commands = post_process(problem, plan)
+            commands = post_process(problem, plan, use_commands=use_commands)
+            print('Commands:', commands)
             problem.remove_gripper()
+            world.robot.remove_grippers()
             saver.restore()
         with open(join(ori_dir, f'{PREFIX}commands_rerun_fc={FEASIBILITY_CHECKER}.txt'), 'w') as f:
             f.write('\n'.join([str(n) for n in commands]))
-        saver.restore()
-        apply_actions(problem, commands, time_step=0.01)
+        if has_gui():
+            saver.restore()
+            input('Begin?')
+            if use_commands:
+                state = State()
+                apply_commands(state, commands, time_step=1e-2, pause=False, update_fn=update_fn)
+            else:
+                apply_actions(problem, commands, time_step=5e-2, verbose=False)
+            input('End?')
 
     # disconnect()
     reset_simulation()
@@ -204,6 +228,8 @@ def main(parallel=True):
     cases.sort()
     # if TASK_NAME == 'tt_two_fridge_in':
     #     cases = [f for f in cases if '/12' not in f and '/14' not in f]
+    #cases = [path for path in cases if path.endswith('/14')]
+    print('Cases:', cases)
 
     num_cases = len(cases)
     if parallel:
