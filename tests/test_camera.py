@@ -9,7 +9,7 @@ import sys
 from config import EXP_PATH
 from pybullet_tools.utils import quat_from_euler, reset_simulation, remove_body, AABB, \
     get_aabb_extent, get_aabb_center, get_joint_name, get_link_name, euler_from_quat, \
-    set_color, apply_alpha, YELLOW, WHITE
+    set_color, apply_alpha, YELLOW, WHITE, get_aabb, get_point, wait_unlocked
 from pybullet_tools.bullet_utils import get_segmask, get_door_links, nice, \
     get_partnet_doors
 
@@ -30,7 +30,7 @@ N_PX = 224
 NEW_KEY = 'meraki'
 ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb', 'meraki']
 DEFAULT_TASK = 'tt_two_fridge_in'
-DEFAULT_TASK = 'tt'
+DEFAULT_TASK = 'mm'
 
 
 parser = argparse.ArgumentParser()
@@ -292,9 +292,62 @@ def check_key_same(viz_dir):
     return config['version_key'] in ACCEPTED_KEYS
 
 
+def adjust_table_scale(test_dir, viz_dir):
+    import untangle
+    print('adjust_table_scale', test_dir)
+    world = load_lisdf_pybullet(test_dir, use_gui=False, verbose=False)
+    old_file = join(test_dir, 'scene.lisdf')
+    new_file = join(test_dir, 'scene_tmp.lisdf')
+    if not isfile(new_file) or True:
+        shutil.copy(old_file, new_file)
+        old_lines = open(old_file, 'r').readlines()
+        models = untangle.parse(old_file).sdf.world.include
+        other = {'counter': 'minifridge', 'table': 'cabinet'}
+        for model in models:
+            if 'kitchencounter' in model.uri.cdata.lower():
+                scale = eval(model.scale.cdata)
+                name = model['name']
+                # if scale != 1:
+                #     print(name, 'put back', scale)
+                #     old_lines = replace_scale(old_lines, name, 1)
+                if scale == 1:
+                    body = world.name_to_body[name]
+                    h = get_aabb_extent(get_aabb(body))[2]
+                    ceiling_name = other[name]
+                    if ceiling_name in world.name_to_body:
+                        ceiling = world.name_to_body[ceiling_name]
+                        h_space = get_aabb(ceiling).lower[2]
+                        new_scale = h_space / h
+                    else:
+                        z = get_point(body)[2]
+                        new_scale = z / (z - get_aabb(body).lower[2])
+                    print(name, 'new_scale', new_scale)
+                    old_lines = replace_scale(old_lines, name, new_scale)
+        with open(old_file, 'w') as f:
+            f.writelines(old_lines)
+    ori_file = join(viz_dir, 'scene.lisdf')
+    tmp_file = join(viz_dir, 'scene_tmp.lisdf')
+    if not isfile(tmp_file) or True:
+        os.remove(ori_file)
+        shutil.copy(old_file, ori_file)
+        shutil.copy(new_file, tmp_file)
+    reset_simulation()
+
+
+def replace_scale(lines, name, new_scale):
+    to_find = f'<include name="{name}">'
+    for i in range(len(lines)):
+        if to_find in lines[i] and '<scale>' in lines[i+3]:
+            l = lines[i+3]
+            old_scale = l[l.index('<scale>')+7: l.index('</scale>')]
+            lines[i+3] = l.replace(old_scale, str(new_scale))
+    return lines
+
+
 def process(viz_dir):
     # if not isdir(join(dataset_dir, subdir)): return
     # viz_dir = join(dataset_dir, subdir)
+
     subdir = basename(viz_dir)
 
     ## need to temporarily move the dir to the test_cases folder for asset paths to be found
@@ -306,6 +359,11 @@ def process(viz_dir):
     print(viz_dir, end='\r')
 
     # load_lisdf_synthesizer(test_dir)
+
+    ## ------------------ adjust table scale ------------------
+    # adjust_table_scale(test_dir, viz_dir)
+    # return
+    ## --------------------------------------------------------
 
     constraint_dir = join(viz_dir, 'constraint_networks')
     stream_dir = join(viz_dir, 'stream_plans')
@@ -336,7 +394,6 @@ def process(viz_dir):
     camera_pose = (x, y, z + 1), quat_from_euler((r - 0.3, p, w))
     # print('camera_pose', nice(camera_pose))
 
-    # redo = True
     if not check_key_same(viz_dir) or redo:
         # if isdir(rgb_dir):
         #     shutil.rmtree(rgb_dir)
@@ -374,7 +431,10 @@ def process(viz_dir):
 if __name__ == "__main__":
 
     task_name = args.t
-    if task_name == 'tt':
+    if task_name == 'mm':
+        task_names = ['mm_one_fridge_table_pick', 'mm_one_fridge_table_in', 'mm_one_fridge_table_on',
+                      'mm_two_fridge_in', 'mm_two_fridge_pick']
+    elif task_name == 'tt':
         task_names = ['tt_one_fridge_table_pick', 'tt_one_fridge_table_in',
                       'tt_two_fridge_in', 'tt_two_fridge_pick']
     elif task_name == 'bb':
@@ -390,14 +450,14 @@ if __name__ == "__main__":
         # organize_dataset(task_name)
         subdirs = listdir(dataset_dir)
         subdirs.sort()
-        # subdirs = ['2102']
+        # subdirs = ['111']
         subdirs = [join(dataset_dir, s) for s in subdirs if isdir(join(dataset_dir, s))]
-        for s in subdirs:
-            if exist_instance(s, '10849'):
-                # print('skipping', s)
-                all_subdirs += [s]
-            # print('redoing', s)
-        # all_subdirs += subdirs
+        # for s in subdirs:
+        #     if exist_instance(s, '10849'):
+        #         # print('skipping', s)
+        #         all_subdirs += [s]
+        #     # print('redoing', s)
+        all_subdirs += subdirs
     # sys.exit()
     
     if args.p:

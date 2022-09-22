@@ -355,8 +355,8 @@ def test_placement_in(robot, category):
     locations = [(0, get_gap(category) * n) for n in range(1, n + 1)]
     set_camera_pose((4, 3, 2), (0, 3, 0.5))
     for id in instances:
-        # if id not in ['11231']:
-        #     continue
+        if id not in ['11709']:
+            continue
         (x, y) = locations[i]
         path, body, scale = load_model_instance(category, id, location=(x, y))
         # new_urdf_path, body = reload_after_vhacd(path, body, scale, id=id)
@@ -386,11 +386,11 @@ def test_placement_in(robot, category):
             outputs = funk(cabbage, body_link)
             set_pose(cabbage, outputs[0][0].value)
             markers = []
-            # for j in range(1, len(outputs)):
-            #     marker = load_asset('VeggieCabbage', x=x, y=y, z=0, yaw=0)[0]
-            #     # world.add_body(cabbage, cabbage_name+f"_({j})")
-            #     markers.append(marker)
-            #     set_pose(marker, outputs[j][0].value)
+            for j in range(1, len(outputs)):
+                marker = load_asset('VeggieCabbage', x=x, y=y, z=0, yaw=0)[0]
+                # world.add_body(cabbage, cabbage_name+f"_({j})")
+                markers.append(marker)
+                set_pose(marker, outputs[j][0].value)
 
             set_renderer(True)
             set_renderer(True)
@@ -667,12 +667,12 @@ if __name__ == '__main__':
     ## --- robot (FEGripper) related  ---
     # test_gripper_joints()
     # test_gripper_range()
-    test_torso()
+    # test_torso()
 
 
     ## --- grasps related ---
     robot = 'pr2' ## 'feg' ##
-    # test_grasps(['MiniFridge'], robot)  ## 'Bottle', 'Stapler', 'Camera', 'Glasses', 'Food'
+    test_grasps(['MiniFridge'], robot)  ## 'Bottle', 'Stapler', 'Camera', 'Glasses', 'Food'
     # test_handle_grasps_counter()
     # test_handle_grasps(robot, category='MiniFridge')
     # test_pick_place_counter(robot)

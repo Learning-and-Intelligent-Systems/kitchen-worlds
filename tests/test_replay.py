@@ -18,7 +18,7 @@ import sys
 from pybullet_tools.pr2_utils import get_group_conf
 from pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, wait_if_gui, \
     SEPARATOR, get_aabb, wait_for_duration, safe_remove, ensure_dir, reset_simulation, \
-    VideoSaver
+    VideoSaver, wait_unlocked
 from lisdf_tools.lisdf_loader import load_lisdf_pybullet, pddlstream_from_dir
 from lisdf_tools.lisdf_planning import pddl_to_init_goal, Problem
 
@@ -31,17 +31,19 @@ SAVE_MP4 = False
 AUTO_PLAY = False
 EVALUATE_QUALITY = True
 
+GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/one_fridge_pick_pr2/one_fridge_pr2_0921_220304'
 TASK_NAME = 'one_fridge_pick_pr2'  ## 'one_fridge_pick_pr2_20_parallel_1'
 
 TASK_NAME = 'mm_one_fridge_pick'
 TASK_NAME = 'mm_one_fridge_table_in'
 TASK_NAME = 'mm_one_fridge_table_on'
-TASK_NAME = 'mm_two_fridge_pick'
-TASK_NAME = 'mm_two_fridge_in'
+TASK_NAME = 'mm_one_fridge_table_pick'
+# TASK_NAME = 'mm_two_fridge_pick'
+# TASK_NAME = 'mm_two_fridge_in'
 
 # TASK_NAME = 'tt_one_fridge_pick'
 # TASK_NAME = 'tt_one_fridge_table_in'
-TASK_NAME = 'tt_two_fridge_in'
+# TASK_NAME = 'tt_two_fridge_in'
 
 # TASK_NAME = '_examples'
 
@@ -95,6 +97,7 @@ def run_one(run_dir, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, height=
 
     world = load_lisdf_pybullet(exp_dir, width=width, height=height, verbose=False)
     problem = Problem(world)
+    wait_unlocked()
 
     commands = pickle.load(open(join(exp_dir, 'commands.pkl'), "rb"))
 
@@ -131,7 +134,7 @@ def process(index):
     return run_one(str(index))
 
 
-def main(parallel=True, cases=None):
+def main(parallel=True, cases=None, path=None):
     if isdir('visualizations'):
         shutil.rmtree('visualizations')
 
@@ -142,6 +145,8 @@ def main(parallel=True, cases=None):
         cases.sort()
     else:
         cases = [join(dataset_dir, f) for f in cases if isdir(join(dataset_dir, f))]
+    if path is not None:
+        cases = [path]
 
     num_cases = len(cases)
 
@@ -194,5 +199,5 @@ def mp4_to_gif(mp4_file, frame_folder='output'):
 
 
 if __name__ == '__main__':
-    main(parallel=PARALLEL, cases=['14']  ) ##
-    # main(parallel=PARALLEL) ## , cases=['2']
+    main(parallel=PARALLEL) ## , cases=[]
+    # main(parallel=PARALLEL, path=GIVEN_PATH)
