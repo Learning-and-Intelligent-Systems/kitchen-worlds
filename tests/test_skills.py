@@ -187,7 +187,8 @@ def test_grasps(categories=[], robot='feg'):
     robot = world.robot
 
     problem = State(world, grasp_types=robot.grasp_types)  ## , 'side' , 'top'
-    funk = get_grasp_list_gen(problem, collisions=True, visualize=False, RETAIN_ALL=False)
+    funk = get_grasp_list_gen(problem, collisions=True, visualize=False,
+                              RETAIN_ALL=False, top_grasp_tolerance=math.pi/4)
 
     i = -1
     for cat in categories:
@@ -227,7 +228,8 @@ def test_grasps(categories=[], robot='feg'):
             set_renderer(True)
             body_pose = get_pose(body)  ## multiply(get_pose(body), Pose(euler=Euler(math.pi/2, 0, -math.pi/2)))
             outputs = funk(body)
-            print(f'grasps on body {body}:', outputs)
+            if isinstance(outputs, list):
+                print(f'grasps on body {body}:', outputs)
             # set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.8)
             visualize_grasps(problem, outputs, body_pose, RETAIN_ALL=True)
             set_renderer(True)

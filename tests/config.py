@@ -4,6 +4,7 @@ sys.path.append(join('..'))
 sys.path.append(join('..', 'lisdf'))
 sys.path.append(join('..', 'pddlstream'))
 sys.path.append(join('..', 'pybullet_planning'))
+sys.path.append(join('..', 'pybullet_planning', 'fastamp'))
 
 import warnings
 warnings.filterwarnings('ignore')

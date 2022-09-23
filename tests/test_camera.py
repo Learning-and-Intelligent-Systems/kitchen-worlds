@@ -10,18 +10,22 @@ from config import EXP_PATH
 from pybullet_tools.utils import quat_from_euler, reset_simulation, remove_body, AABB, \
     get_aabb_extent, get_aabb_center, get_joint_name, get_link_name, euler_from_quat, \
     set_color, apply_alpha, YELLOW, WHITE, get_aabb, get_point, wait_unlocked, \
-    get_joint_positions
+    get_joint_positions, GREEN, get_pose
 from pybullet_tools.bullet_utils import get_segmask, get_door_links, nice, \
-    get_partnet_doors
+    get_partnet_doors, collided
+from pybullet_planning.pybullet_tools.general_streams import get_grasp_list_gen
+from pybullet_tools.flying_gripper_utils import get_cloned_se3_conf, plan_se3_motion
 
+from world_builder.world import State
 from mamao_tools.utils import organize_dataset
-from mamao_tools.data_utils import get_indices, exist_instance
+from mamao_tools.data_utils import get_indices, exist_instance, get_init_tuples
 from lisdf_tools.lisdf_loader import load_lisdf_pybullet, get_depth_images, create_gripper_robot
 import json
 import shutil
 from os import listdir
 from os.path import join, isdir, isfile, dirname, getmtime, basename
 import time
+import math
 import pybullet as p
 from tqdm import tqdm
 
@@ -295,15 +299,59 @@ def check_key_same(viz_dir):
 
 
 def add_reachability_feature(test_dir, viz_dir):
-    world = load_lisdf_pybullet(test_dir, use_gui=False, verbose=False)
+    REACHABLE_OBJ = "ReachableObject {object}"
+    UNREACHABLE_OBJ = "UnreachableObject {object}"
+    REACHABLE_SPACE = "ReachableSpace {space}"
+    UNREACHABLE_SPACE = "UnreachableSpace {space}"
+    world = load_lisdf_pybullet(test_dir, use_gui=True, verbose=False)
     old_file = join(test_dir, 'features.txt')
     custom_limits = world.robot.custom_limits
     init_q = get_joint_positions(world.robot, world.robot.get_base_joints())[:-1]
     init_q = list(init_q) + [0] * 3
     world.remove_object(world.robot)
+    movable = [o for n, o in world.name_to_body.items() if 'veggie' in n or 'meat' in n]
+    obstacles = [o for n, o in world.name_to_body.items() if o not in movable]
     robot = create_gripper_robot(world, custom_limits=custom_limits, initial_q=init_q)
-    print(robot)
+    problem = State(world, grasp_types=robot.grasp_types)  ## , 'side' , 'top'
+    funk = get_grasp_list_gen(problem, collisions=True, visualize=False,
+                              RETAIN_ALL=False, top_grasp_tolerance=math.pi / 4)
+    lines = []
+    # for body in movable:
+    #     result = False
+    #     body_pose = get_pose(body)
+    #     outputs = funk(body)
+    #     for output in outputs:
+    #         grasp = output[0]
+    #         w = grasp.grasp_width
+    #         gripper_grasp = robot.visualize_grasp(body_pose, grasp.value, body=grasp.body,
+    #                                               color=GREEN, width=w)
+    #         end_q = get_cloned_se3_conf(robot, gripper_grasp)
+    #         if not collided(gripper_grasp, obstacles, verbose=True, tag='check reachability of movable'):
+    #             print('... check reachability from', nice(init_q), 'to', nice(end_q))
+    #             path = plan_se3_motion(robot, init_q, end_q, obstacles=obstacles,
+    #                                    custom_limits=robot.custom_limits)
+    #             if path is not None:
+    #                 print('... path found of length', len(path))
+    #                 result = True
+    #                 break
+    #             else:
+    #                 print('... no path found', nice(end_q))
+    #         else:
+    #             print('... collided', nice(end_q))
+    #
+    #     if result:
+    #         lines.append(REACHABLE_OBJ.format(object=body))
+    #     else:
+    #         lines.append(UNREACHABLE_OBJ.format(object=body))
+
+    indices = get_indices(test_dir)
+    init = get_init_tuples(test_dir)
+    spaces = world.cat_to_bodies('space', init)
+    # for space in spaces:
+
+
     reset_simulation()
+    sys.exit()
 
 
 def adjust_table_scale(test_dir, viz_dir):
@@ -376,8 +424,8 @@ def process(viz_dir):
 
     ## ------------------ adjust table scale ------------------
     # adjust_table_scale(test_dir, viz_dir)
-    # add_reachability_feature(test_dir, viz_dir)
-    # return
+    add_reachability_feature(test_dir, viz_dir)
+    return
     ## --------------------------------------------------------
 
     constraint_dir = join(viz_dir, 'constraint_networks')
