@@ -31,6 +31,7 @@ NEW_KEY = 'meraki'
 ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb', 'meraki']
 DEFAULT_TASK = 'tt_two_fridge_in'
 DEFAULT_TASK = 'mm'
+MODIFIED_TIME = 1663895681.8584874
 
 
 parser = argparse.ArgumentParser()
@@ -381,6 +382,8 @@ def process(viz_dir):
     crop_dir = join(viz_dir, 'crop_images')
     tmp_file = join(viz_dir, 'planning_config_tmp.json')
 
+    if isdir(rgb_dir):
+        shutil.rmtree(rgb_dir)
     if isfile(tmp_file):
         os.remove(tmp_file)
 
@@ -393,6 +396,10 @@ def process(viz_dir):
         # redo = True
     camera_pose = (x, y, z + 1), quat_from_euler((r - 0.3, p, w))
     # print('camera_pose', nice(camera_pose))
+
+    check_file = join(crop_dir, 'crop_image_scene.png')
+    if isfile(check_file) and os.path.getmtime(check_file) > MODIFIED_TIME:
+        redo = False
 
     if not check_key_same(viz_dir) or redo:
         # if isdir(rgb_dir):
@@ -432,7 +439,8 @@ if __name__ == "__main__":
 
     task_name = args.t
     if task_name == 'mm':
-        task_names = ['mm_one_fridge_table_pick', 'mm_one_fridge_table_in', 'mm_one_fridge_table_on',
+        task_names = ['mm_one_fridge_pick',
+                      'mm_one_fridge_table_pick', 'mm_one_fridge_table_in', 'mm_one_fridge_table_on',
                       'mm_two_fridge_in', 'mm_two_fridge_pick']
     elif task_name == 'tt':
         task_names = ['tt_one_fridge_table_pick', 'tt_one_fridge_table_in',

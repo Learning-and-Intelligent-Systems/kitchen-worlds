@@ -38,8 +38,8 @@ TASK_NAME = 'mm_one_fridge_pick'
 TASK_NAME = 'mm_one_fridge_table_in'
 TASK_NAME = 'mm_one_fridge_table_on'
 TASK_NAME = 'mm_one_fridge_table_pick'
-# TASK_NAME = 'mm_two_fridge_pick'
-# TASK_NAME = 'mm_two_fridge_in'
+TASK_NAME = 'mm_two_fridge_pick'
+TASK_NAME = 'mm_two_fridge_in'
 
 # TASK_NAME = 'tt_one_fridge_pick'
 # TASK_NAME = 'tt_one_fridge_table_in'
@@ -199,5 +199,5 @@ def mp4_to_gif(mp4_file, frame_folder='output'):
 
 
 if __name__ == '__main__':
-    main(parallel=PARALLEL) ## , cases=[]
+    main(parallel=PARALLEL, cases=['273']) ## , cases=[]
     # main(parallel=PARALLEL, path=GIVEN_PATH)

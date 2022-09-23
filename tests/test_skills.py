@@ -65,9 +65,12 @@ ASSET_PATH = join('..', 'assets')
 
 # ####################################
 
+
 def get_instances(category):
     instances = get_instances_helper(category)
     keys = list(instances.keys())
+    keys = [k for k in keys if isdir(join(ASSET_PATH, 'models', category, k))]
+    instances = {k: instances[k] for k in keys}
     if not keys[0].isdigit():
         keys = list(set([k.lower() for k in keys]))
         instances = {k: instances[k] for k in keys}
@@ -189,10 +192,13 @@ def test_grasps(categories=[], robot='feg'):
     for cat in categories:
         i += 1
         instances = get_instances(cat)
+        print(instances)
         n = len(instances)
         locations = [(i, get_gap(cat) * n) for n in range(1, n+1)]
         j = -1
         for id, scale in instances.items():
+            # if id not in ['10849']:
+            #     continue
             j += 1
             path, body, _ = load_model_instance(cat, id, scale=scale, location=locations[j])
         # for id, scale in TEST_MODELS[cat].items():
@@ -200,10 +206,15 @@ def test_grasps(categories=[], robot='feg'):
         #     path = join(ASSET_PATH, 'models', cat, id)
         #     body = load_body(path, scale, locations[j], random_yaw=True)
             instance_name = get_instance_name(abspath(path))
-            world.add_body(body, f'{cat.lower()}#{id}', instance_name)
+            obj_name = f'{cat.lower()}#{id}'
+            world.add_body(body, obj_name, instance_name)
             set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.5)
             text = id.replace('veggie', '').replace('meat', '')
             draw_text_label(body, text, offset=(0, -0.2, 0.1))
+
+            """ --- fixing texture issues ---"""
+            world.add_joints_by_keyword(obj_name)
+            world.open_all_doors()
 
             """ test others """
             # test_robot_rotation(body, world.robot)
@@ -219,6 +230,8 @@ def test_grasps(categories=[], robot='feg'):
             # # set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.8)
             # visualize_grasps(problem, outputs, body_pose, RETAIN_ALL=True)
             # set_renderer(True)
+
+            wait_unlocked()
 
         if len(categories) > 1:
             wait_if_gui(f'------------- Next object category? finished ({i+1}/{len(categories)})')
@@ -236,6 +249,9 @@ def test_grasps(categories=[], robot='feg'):
 
 def load_body(path, scale, pose_2d=(0,0), random_yaw=False):
     file = join(path, 'mobility.urdf')
+    if 'MiniFridge' in file:
+        file = file[file.index('../')+2:]
+        file = '/home/yang/Documents/cognitive-architectures/bullet' + file
     print('loading', file)
     with HideOutput(True):
         body = load_model(file, scale=scale)
@@ -672,7 +688,8 @@ if __name__ == '__main__':
 
     ## --- grasps related ---
     robot = 'pr2' ## 'feg' ##
-    test_grasps(['MiniFridge'], robot)  ## 'Bottle', 'Stapler', 'Camera', 'Glasses', 'Food'
+    test_grasps(['MiniFridge'], robot)
+    ## 'Bottle', 'Stapler', 'Camera', 'Glasses', 'Food', 'MiniFridge', 'KitchenCounter'
     # test_handle_grasps_counter()
     # test_handle_grasps(robot, category='MiniFridge')
     # test_pick_place_counter(robot)
