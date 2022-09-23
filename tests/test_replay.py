@@ -46,6 +46,7 @@ TASK_NAME = 'mm_two_fridge_in'
 # TASK_NAME = 'tt_two_fridge_in'
 
 # TASK_NAME = '_examples'
+TASK_NAME = 'elsewhere'
 
 DATABASE_DIR = join('..', '..', 'fastamp-data')
 # DATABASE_DIR = join('..', '..', 'mamao-data')
@@ -199,5 +200,5 @@ def mp4_to_gif(mp4_file, frame_folder='output'):
 
 
 if __name__ == '__main__':
-    main(parallel=PARALLEL, cases=['273']) ## , cases=[]
+    main(parallel=PARALLEL, cases=['1075']) ## , cases=[]
     # main(parallel=PARALLEL, path=GIVEN_PATH)

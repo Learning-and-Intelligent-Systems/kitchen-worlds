@@ -9,13 +9,14 @@ import sys
 from config import EXP_PATH
 from pybullet_tools.utils import quat_from_euler, reset_simulation, remove_body, AABB, \
     get_aabb_extent, get_aabb_center, get_joint_name, get_link_name, euler_from_quat, \
-    set_color, apply_alpha, YELLOW, WHITE, get_aabb, get_point, wait_unlocked
+    set_color, apply_alpha, YELLOW, WHITE, get_aabb, get_point, wait_unlocked, \
+    get_joint_positions
 from pybullet_tools.bullet_utils import get_segmask, get_door_links, nice, \
     get_partnet_doors
 
 from mamao_tools.utils import organize_dataset
 from mamao_tools.data_utils import get_indices, exist_instance
-from lisdf_tools.lisdf_loader import load_lisdf_pybullet, get_depth_images
+from lisdf_tools.lisdf_loader import load_lisdf_pybullet, get_depth_images, create_gripper_robot
 import json
 import shutil
 from os import listdir
@@ -293,6 +294,18 @@ def check_key_same(viz_dir):
     return config['version_key'] in ACCEPTED_KEYS
 
 
+def add_reachability_feature(test_dir, viz_dir):
+    world = load_lisdf_pybullet(test_dir, use_gui=False, verbose=False)
+    old_file = join(test_dir, 'features.txt')
+    custom_limits = world.robot.custom_limits
+    init_q = get_joint_positions(world.robot, world.robot.get_base_joints())[:-1]
+    init_q = list(init_q) + [0] * 3
+    world.remove_object(world.robot)
+    robot = create_gripper_robot(world, custom_limits=custom_limits, initial_q=init_q)
+    print(robot)
+    reset_simulation()
+
+
 def adjust_table_scale(test_dir, viz_dir):
     import untangle
     print('adjust_table_scale', test_dir)
@@ -363,6 +376,7 @@ def process(viz_dir):
 
     ## ------------------ adjust table scale ------------------
     # adjust_table_scale(test_dir, viz_dir)
+    # add_reachability_feature(test_dir, viz_dir)
     # return
     ## --------------------------------------------------------
 

@@ -69,10 +69,11 @@ ASSET_PATH = join('..', 'assets')
 def get_instances(category):
     instances = get_instances_helper(category)
     keys = list(instances.keys())
-    keys = [k for k in keys if isdir(join(ASSET_PATH, 'models', category, k))]
-    instances = {k: instances[k] for k in keys}
     if not keys[0].isdigit():
         keys = list(set([k.lower() for k in keys]))
+        instances = {k: instances[k] for k in keys}
+    else:
+        keys = [k for k in keys if isdir(join(ASSET_PATH, 'models', category, k))]
         instances = {k: instances[k] for k in keys}
     return instances
 
@@ -94,12 +95,12 @@ def get_test_world(robot='feg', semantic_world=False, DRAW_BASE_LIMITS=False):
     return world
 
 
-def add_robot(world, robot, **kwargs):
+def add_robot(world, robot, DRAW_BASE_LIMITS=False):
     if robot == 'pr2':
         from world_builder.loaders import BASE_LIMITS as custom_limits
         base_q = [0, -0.5, 0]
         robot = create_pr2_robot(world, custom_limits=custom_limits,
-                                 base_q=base_q, **kwargs)
+                                 base_q=base_q, DRAW_BASE_LIMITS=DRAW_BASE_LIMITS)
 
     elif robot == 'feg':
         custom_limits = {0: (-5, 5), 1: (-5, 5), 2: (0, 3)}
@@ -108,7 +109,7 @@ def add_robot(world, robot, **kwargs):
         # robot = create_fe_gripper(init_q=init_q)
         # world.add_robot(robot, 'feg')
         robot = create_gripper_robot(world, custom_limits=custom_limits,
-                                     initial_q=init_q, **kwargs)
+                                     initial_q=init_q)
 
     return robot
 
@@ -213,8 +214,8 @@ def test_grasps(categories=[], robot='feg'):
             draw_text_label(body, text, offset=(0, -0.2, 0.1))
 
             """ --- fixing texture issues ---"""
-            world.add_joints_by_keyword(obj_name)
-            world.open_all_doors()
+            # world.add_joints_by_keyword(obj_name)
+            # world.open_all_doors()
 
             """ test others """
             # test_robot_rotation(body, world.robot)
@@ -223,13 +224,13 @@ def test_grasps(categories=[], robot='feg'):
             # grasps = get_hand_grasps(problem, body)
 
             """ test grasps """
-            # set_renderer(True)
-            # body_pose = get_pose(body)  ## multiply(get_pose(body), Pose(euler=Euler(math.pi/2, 0, -math.pi/2)))
-            # outputs = funk(body)
-            # print(f'grasps on body {body}:', outputs)
-            # # set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.8)
-            # visualize_grasps(problem, outputs, body_pose, RETAIN_ALL=True)
-            # set_renderer(True)
+            set_renderer(True)
+            body_pose = get_pose(body)  ## multiply(get_pose(body), Pose(euler=Euler(math.pi/2, 0, -math.pi/2)))
+            outputs = funk(body)
+            print(f'grasps on body {body}:', outputs)
+            # set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.8)
+            visualize_grasps(problem, outputs, body_pose, RETAIN_ALL=True)
+            set_renderer(True)
 
             wait_unlocked()
 
@@ -687,8 +688,8 @@ if __name__ == '__main__':
 
 
     ## --- grasps related ---
-    robot = 'pr2' ## 'feg' ##
-    test_grasps(['MiniFridge'], robot)
+    robot = 'feg' ## 'feg' | 'pr2'
+    test_grasps(['Food'], robot)
     ## 'Bottle', 'Stapler', 'Camera', 'Glasses', 'Food', 'MiniFridge', 'KitchenCounter'
     # test_handle_grasps_counter()
     # test_handle_grasps(robot, category='MiniFridge')
