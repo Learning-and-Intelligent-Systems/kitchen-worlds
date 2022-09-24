@@ -13,8 +13,10 @@ from pybullet_tools.utils import quat_from_euler, reset_simulation, remove_body,
     get_joint_positions, GREEN, get_pose
 from pybullet_tools.bullet_utils import get_segmask, get_door_links, nice, \
     get_partnet_doors, collided
+from pybullet_tools.general_streams import get_contain_list_gen
 from pybullet_planning.pybullet_tools.general_streams import get_grasp_list_gen
-from pybullet_tools.flying_gripper_utils import get_cloned_se3_conf, plan_se3_motion
+from pybullet_tools.flying_gripper_utils import get_cloned_se3_conf, plan_se3_motion, \
+    set_cloned_se3_conf
 
 from world_builder.world import State
 from mamao_tools.utils import organize_dataset
@@ -40,7 +42,7 @@ MODIFIED_TIME = 1663895681.8584874
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-p', action='store_true', default=False)
+parser.add_argument('-p', action='store_true', default=True)
 parser.add_argument('-t', type=str, default=DEFAULT_TASK)  ## 'one_fridge_pick_pr2_tmp'
 args = parser.parse_args()
 
@@ -298,12 +300,16 @@ def check_key_same(viz_dir):
     return config['version_key'] in ACCEPTED_KEYS
 
 
-def add_reachability_feature(test_dir, viz_dir):
-    REACHABLE_OBJ = "ReachableObject {object}"
-    UNREACHABLE_OBJ = "UnreachableObject {object}"
-    REACHABLE_SPACE = "ReachableSpace {space}"
-    UNREACHABLE_SPACE = "UnreachableSpace {space}"
-    world = load_lisdf_pybullet(test_dir, use_gui=True, verbose=False)
+def add_reachability_feature(test_dir, viz_dir, verbose=False):
+    ori_file = join(viz_dir, 'features.txt')
+    if isfile(ori_file):
+        return
+    REACHABLE_OBJ = "reachable {object}"
+    UNREACHABLE_OBJ = "unreachable {object}"
+    REACHABLE_SPACE = "reachable {space}"
+    UNREACHABLE_SPACE = "unreachable {space}"
+    world = load_lisdf_pybullet(test_dir, use_gui=False, verbose=False)
+    world.check_world_obstacles()
     old_file = join(test_dir, 'features.txt')
     custom_limits = world.robot.custom_limits
     init_q = get_joint_positions(world.robot, world.robot.get_base_joints())[:-1]
@@ -316,42 +322,85 @@ def add_reachability_feature(test_dir, viz_dir):
     funk = get_grasp_list_gen(problem, collisions=True, visualize=False,
                               RETAIN_ALL=False, top_grasp_tolerance=math.pi / 4)
     lines = []
-    # for body in movable:
-    #     result = False
-    #     body_pose = get_pose(body)
-    #     outputs = funk(body)
-    #     for output in outputs:
-    #         grasp = output[0]
-    #         w = grasp.grasp_width
-    #         gripper_grasp = robot.visualize_grasp(body_pose, grasp.value, body=grasp.body,
-    #                                               color=GREEN, width=w)
-    #         end_q = get_cloned_se3_conf(robot, gripper_grasp)
-    #         if not collided(gripper_grasp, obstacles, verbose=True, tag='check reachability of movable'):
-    #             print('... check reachability from', nice(init_q), 'to', nice(end_q))
-    #             path = plan_se3_motion(robot, init_q, end_q, obstacles=obstacles,
-    #                                    custom_limits=robot.custom_limits)
-    #             if path is not None:
-    #                 print('... path found of length', len(path))
-    #                 result = True
-    #                 break
-    #             else:
-    #                 print('... no path found', nice(end_q))
-    #         else:
-    #             print('... collided', nice(end_q))
-    #
-    #     if result:
-    #         lines.append(REACHABLE_OBJ.format(object=body))
-    #     else:
-    #         lines.append(UNREACHABLE_OBJ.format(object=body))
+    for body in movable:
+        result = False
+        body_pose = get_pose(body)
+        outputs = funk(body)
+        for output in outputs:
+            grasp = output[0]
+            w = grasp.grasp_width
+            gripper_grasp = robot.visualize_grasp(body_pose, grasp.value, body=grasp.body,
+                                                  color=GREEN, width=w)
+            end_q = get_cloned_se3_conf(robot, gripper_grasp)
+            if not collided(gripper_grasp, obstacles, verbose=True, tag='check reachability of movable'):
+                if verbose: print('\n... check reachability from', nice(init_q), 'to', nice(end_q))
+                path = plan_se3_motion(robot, init_q, end_q, obstacles=obstacles,
+                                       custom_limits=robot.custom_limits)
+                if path is not None:
+                    if verbose: print('... path found of length', len(path))
+                    result = True
+                    break
+                else:
+                    if verbose: print('... no path found', nice(end_q))
+            else:
+                if verbose: print('... collided', nice(end_q))
+
+        name = world.body_to_name[body]
+        if result:
+            lines.append(REACHABLE_OBJ.format(object=name))
+        else:
+            lines.append(UNREACHABLE_OBJ.format(object=name))
 
     indices = get_indices(test_dir)
+    indices_inv = {v: eval(k) for k, v in indices.items()}
     init = get_init_tuples(test_dir)
     spaces = world.cat_to_bodies('space', init)
-    # for space in spaces:
+    funk = get_contain_list_gen(problem)
+    names = {
+        'minifridge': 'minifridge::fridgestorage',
+        'cabinet': 'cabinet::cabinetstorage',
+    }
+    for space in spaces:
+        result = False
+        body_link = indices_inv[space]
+        if space not in world.name_to_body:
+            body_name = names[space[:space.index('::')]]
+            world.add_body(body_link, body_name)
+        marker = robot.create_gripper(color=YELLOW)
+        set_cloned_se3_conf(robot.body, marker, [0] * 6)
+        gen = funk(marker, body_link)
+        count = 3
+        for output in gen:
+            p = output[0].value
+            (x, y, z), quat = p
+            end_q = list([x, y, z+0.1]) + list(euler_from_quat(quat))
+            path = plan_se3_motion(robot, init_q, end_q, obstacles=obstacles,
+                                   custom_limits=robot.custom_limits)
+            if verbose: print('\n... check reachability from', nice(init_q), 'to space', nice(end_q))
+            if path is not None:
+                if verbose: print('... path found of length', len(path))
+                result = True
+                break
+            else:
+                if verbose: print('... no path found', nice(end_q))
 
+            if count == 0:
+                break
+            count -= 1
 
+        remove_body(marker)
+        if result:
+            lines.append(REACHABLE_SPACE.format(space=space))
+        else:
+            lines.append(UNREACHABLE_SPACE.format(space=space))
+    lines = '\n'.join(lines)
+    with open(old_file, 'w') as f:
+        f.writelines(lines)
+    print('\n', ori_file)
+    print(lines, '\n')
+    shutil.copy(old_file, ori_file)
     reset_simulation()
-    sys.exit()
+    # sys.exit()
 
 
 def adjust_table_scale(test_dir, viz_dir):
@@ -422,10 +471,10 @@ def process(viz_dir):
 
     # load_lisdf_synthesizer(test_dir)
 
-    ## ------------------ adjust table scale ------------------
+    ## ------------------ process run folders ------------------
     # adjust_table_scale(test_dir, viz_dir)
-    add_reachability_feature(test_dir, viz_dir)
-    return
+    # add_reachability_feature(test_dir, viz_dir)
+    # return
     ## --------------------------------------------------------
 
     constraint_dir = join(viz_dir, 'constraint_networks')

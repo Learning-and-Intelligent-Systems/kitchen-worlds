@@ -43,6 +43,7 @@ from mamao_tools.utils import get_feasibility_checker
 from mamao_tools.feasibility_checkers import Shuffler
 
 
+USE_VIEWER = True
 DIVERSE = True
 
 SKIP_IF_SOLVED = False
@@ -54,17 +55,18 @@ check_time = 1663221059  ## first done  | 1663139616 ## after relabeling
 TASK_NAME = 'tt_one_fridge_table_pick'
 # TASK_NAME = 'tt_one_fridge_table_in'
 # TASK_NAME = 'tt_two_fridge_pick'
-TASK_NAME = 'tt_two_fridge_in'
+# TASK_NAME = 'tt_two_fridge_in'
+TASK_NAME = 'mm_two_fridge_in'
 
 PARALLEL = False
-FEASIBILITY_CHECKER = 'shuffle'  ## None | oracle | pvt | pvt-2 | pvt-2 | binary | shuffle
+FEASIBILITY_CHECKER = 'oracle'  ## None | oracle | pvt | pvt-2 | pvt-2 | binary | shuffle
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-t', type=str, default=TASK_NAME)
 parser.add_argument('-d', type=str, default=DIVERSE)
 parser.add_argument('-f', type=str, default=FEASIBILITY_CHECKER)
 parser.add_argument('-p', action='store_true', default=PARALLEL)
-parser.add_argument('-v', '--viewer', action='store_true',
+parser.add_argument('-v', '--viewer', action='store_true', default=USE_VIEWER,
                     help='When enabled, enables the PyBullet viewer.')
 parser.add_argument('-u', '--unlock', action='store_true',
                     help='When enabled, unlocks the PyBullet viewer.')
@@ -120,7 +122,7 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
         from utils import load_lisdf_synthesizer
         scene = load_lisdf_synthesizer(exp_dir)
 
-    world = load_lisdf_pybullet(exp_dir, width=720, height=560, verbose=False, use_gui=args.viewer)
+    world = load_lisdf_pybullet(exp_dir, verbose=False, use_gui=args.viewer) ## , width=720, height=560
     saver = WorldSaver()
     problem = Problem(world)
 
@@ -140,7 +142,7 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
 
     pddlstream_problem = pddlstream_from_dir(problem, exp_dir=exp_dir, replace_pddl=True,
                                              collisions=not args.cfree, teleport=False)
-    world.summarize_all_objects()
+    world.summarize_all_objects(pddlstream_problem.init)
 
     stream_info = world.robot.get_stream_info(partial=False, defer=False)
     _, _, _, stream_map, init, goal = pddlstream_problem
@@ -159,7 +161,7 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
         if DIVERSE:
             kwargs = dict(
                 diverse=DIVERSE,
-                downward_time=10,  ## max time to get 100, 10 sec
+                downward_time=20,  ## max time to get 100, 10 sec
                 evaluation_time=60,  ## on each skeleton
             )
         else:
@@ -192,7 +194,6 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
             commands = post_process(problem, plan, use_commands=use_commands)
             print('Commands:', commands)
             problem.remove_gripper()
-            world.robot.remove_grippers()
             saver.restore()
         with open(join(ori_dir, f'{PREFIX}commands_rerun_fc={FEASIBILITY_CHECKER}.txt'), 'w') as f:
             f.write('\n'.join([str(n) for n in commands]))
@@ -201,7 +202,7 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
             input('Begin?')
             if use_commands:
                 state = State()
-                apply_commands(state, commands, time_step=1e-2, pause=False, update_fn=update_fn)
+                apply_commands(state, commands, time_step=1e-2, pause=False) ## , update_fn=update_fn
             else:
                 apply_actions(problem, commands, time_step=5e-2, verbose=False)
             input('End?')
@@ -219,16 +220,19 @@ def process(index, parallel=True):
     return run_one(str(index), parallel=parallel)
 
 
-def main(parallel=True):
+def main(parallel=True, cases=None):
     if isdir('visualizations'):
         shutil.rmtree('visualizations')
 
     start_time = time.time()
-    cases = [join(DATABASE_DIR, f) for f in listdir(DATABASE_DIR) if isdir(join(DATABASE_DIR, f))]
-    cases.sort()
-    # if TASK_NAME == 'tt_two_fridge_in':
-    #     cases = [f for f in cases if '/12' not in f and '/14' not in f]
-    #cases = [path for path in cases if path.endswith('/14')]
+    if cases is None:
+        cases = [join(DATABASE_DIR, f) for f in listdir(DATABASE_DIR) if isdir(join(DATABASE_DIR, f))]
+        cases.sort()
+        # if TASK_NAME == 'tt_two_fridge_in':
+        #     cases = [f for f in cases if '/12' not in f and '/14' not in f]
+        #cases = [path for path in cases if path.endswith('/14')]
+    else:
+        cases = [join(DATABASE_DIR, c) for c in cases]
     print('Cases:', cases)
 
     num_cases = len(cases)
@@ -255,4 +259,4 @@ def main(parallel=True):
 
 
 if __name__ == '__main__':
-    main(parallel=PARALLEL)
+    main(parallel=PARALLEL, cases=['297'])

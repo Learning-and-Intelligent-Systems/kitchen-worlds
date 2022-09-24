@@ -47,7 +47,7 @@ TASK_NAME = 'mm_two_fridge_in'
 
 # TASK_NAME = '_examples'
 # TASK_NAME = 'elsewhere'
-TASK_NAME = 'discarded'
+# TASK_NAME = 'discarded'
 
 DATABASE_DIR = join('..', '..', 'fastamp-data')
 # DATABASE_DIR = join('..', '..', 'mamao-data')
@@ -99,7 +99,7 @@ def run_one(run_dir, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, height=
         shutil.copytree(ori_dir, exp_dir)
     plan = get_plan(run_dir)
 
-    world = load_lisdf_pybullet(exp_dir, width=width, height=height, verbose=True)
+    world = load_lisdf_pybullet(exp_dir, width=width, height=height, verbose=False)
     problem = Problem(world)
     wait_unlocked()
 
@@ -203,5 +203,5 @@ def mp4_to_gif(mp4_file, frame_folder='output'):
 
 
 if __name__ == '__main__':
-    main(parallel=PARALLEL, cases=['0']) ##
+    main(parallel=PARALLEL, cases=['298']) ##
     # main(parallel=PARALLEL, path=GIVEN_PATH)
