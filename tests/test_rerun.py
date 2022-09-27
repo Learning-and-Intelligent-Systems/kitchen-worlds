@@ -8,7 +8,7 @@ import shutil
 from os import listdir
 from os.path import join, abspath, dirname, isdir, isfile
 from tabnanny import verbose
-from config import EXP_PATH
+from config import EXP_PATH, MAMAO_DATA_PATH
 import numpy as np
 import random
 import time
@@ -41,33 +41,40 @@ from world_builder.actions import apply_actions
 
 from mamao_tools.utils import get_feasibility_checker
 from mamao_tools.feasibility_checkers import Shuffler
+from mamao_tools.data_utils import get_instance_info, exist_instance
+
+from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 
 
-USE_VIEWER = True
+USE_VIEWER = False
 DIVERSE = True
+PREFIX = 'diverse_' if DIVERSE else ''
+RERUN_SUBDIR = 'rerun_1'
 
-SKIP_IF_SOLVED = False
-SKIP_IF_SOLVED_RECENTLY = False
+SKIP_IF_SOLVED = True
+SKIP_IF_SOLVED_RECENTLY = True
 RETRY_IF_FAILED = True
-check_time = 1663221059  ## first done  | 1663139616 ## after relabeling
+check_time = 1664255601.350403
 
 # TASK_NAME = 'tt_one_fridge_pick'
-TASK_NAME = 'tt_one_fridge_table_pick'
+# TASK_NAME = 'tt_one_fridge_table_pick'
 # TASK_NAME = 'tt_one_fridge_table_in'
 # TASK_NAME = 'tt_two_fridge_pick'
 # TASK_NAME = 'tt_two_fridge_in'
-TASK_NAME = 'mm_two_fridge_in'
+# TASK_NAME = 'mm_two_fridge_in'
+TASK_NAME = 'tt'
+
+CASES = None
+# CASES = ['1']
 
 PARALLEL = False
-FEASIBILITY_CHECKER = 'oracle'  ## None | oracle | pvt | pvt-2 | pvt-2 | binary | shuffle
+FEASIBILITY_CHECKER = 'None'  ## None | oracle | pvt | pvt-2 | pvt-2 | binary | shuffle
 
-parser = argparse.ArgumentParser()
-parser.add_argument('-t', type=str, default=TASK_NAME)
+## =========================================
+
+parser = get_base_parser(task_name=TASK_NAME, parallel=PARALLEL, use_viewer=USE_VIEWER)
 parser.add_argument('-d', type=str, default=DIVERSE)
 parser.add_argument('-f', type=str, default=FEASIBILITY_CHECKER)
-parser.add_argument('-p', action='store_true', default=PARALLEL)
-parser.add_argument('-v', '--viewer', action='store_true', default=USE_VIEWER,
-                    help='When enabled, enables the PyBullet viewer.')
 parser.add_argument('-u', '--unlock', action='store_true',
                     help='When enabled, unlocks the PyBullet viewer.')
 parser.add_argument('-c', '--cfree', action='store_true',
@@ -81,8 +88,7 @@ DIVERSE = args.d
 PARALLEL = args.p
 FEASIBILITY_CHECKER = args.f
 
-DATABASE_DIR = abspath(join('..', '..', 'fastamp-data', TASK_NAME))
-PREFIX = 'diverse_' if DIVERSE else ''
+# DATABASE_DIR = abspath(join(MAMAO_DATA_PATH, TASK_NAME))
 
 
 def init_experiment(exp_dir):
@@ -92,8 +98,32 @@ def init_experiment(exp_dir):
 #####################################
 
 
-def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
-    ori_dir = run_dir ## join(DATABASE_DIR, run_dir)
+def clear_all_rerun_results(run_dir, **kwargs):
+    files = [f for f in listdir(run_dir) if '_fc' in f or 'fc_' in f]
+    if len(files) > 0:
+        print('\n'+run_dir)
+        print('clearing files', '\n'.join(files))
+        rerun_dir = join(run_dir, RERUN_SUBDIR)
+        if not isdir(rerun_dir):
+            os.mkdir(rerun_dir)
+        for f in files:
+            shutil.move(join(run_dir, f), join(rerun_dir, f))
+        seg_images_dir = join(run_dir, 'seg_images')
+        if isdir(seg_images_dir):
+            shutil.rmtree(seg_images_dir)
+
+    ## delete those with problematic meshes
+    # model_instances = get_instance_info(run_dir)
+    # if exist_instance(model_instances, '10849') or exist_instance(model_instances, '11178'):
+    #     print('clearing files', run_dir)
+    #     shutil.rmtree(run_dir)
+
+
+def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
+    ori_dir = join(run_dir, RERUN_SUBDIR) ## join(DATABASE_DIR, run_dir)
+    if not isdir(ori_dir):
+        os.mkdir(ori_dir)
+
     file = join(ori_dir, f'{PREFIX}plan_rerun_fc={FEASIBILITY_CHECKER}.json')
     if isfile(file): ## and not '/11' in ori_dir
         failed = False
@@ -110,13 +140,7 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
                     print('skipping recently solved problem', run_dir)
                     return
 
-    print(f'\n\n\n--------------------------\n    rerun {ori_dir} \n------------------------\n\n\n')
-    run_name = os.path.basename(ori_dir)
-    exp_dir = join(EXP_PATH, f"{task_name}_{run_name}")
-    if isdir(exp_dir):
-        shutil.rmtree(exp_dir)
-    if not isdir(exp_dir):
-        shutil.copytree(ori_dir, exp_dir)
+    exp_dir = copy_dir_for_process(run_dir, tag='replaying')
 
     if False:
         from utils import load_lisdf_synthesizer
@@ -151,7 +175,7 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
     print(SEPARATOR)
     init_experiment(exp_dir)
 
-    fc = get_feasibility_checker(ori_dir, mode=FEASIBILITY_CHECKER, diverse=DIVERSE)
+    fc = get_feasibility_checker(run_dir, mode=FEASIBILITY_CHECKER, diverse=DIVERSE)
     # fc = Shuffler()
 
     start = time.time()
@@ -201,7 +225,7 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
             saver.restore()
             input('Begin?')
             if use_commands:
-                state = State()
+                state = State(attachments={})
                 apply_commands(state, commands, time_step=1e-2, pause=False) ## , update_fn=update_fn
             else:
                 apply_actions(problem, commands, time_step=5e-2, verbose=False)
@@ -212,51 +236,50 @@ def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
     shutil.rmtree(exp_dir)
 
 
-def process(index, parallel=True):
+def process(index):
     t = int(time.time())
     print('current time', t)
     np.random.seed(t)
     random.seed(t)
-    return run_one(str(index), parallel=parallel)
+    return run_one(str(index), parallel=PARALLEL)
 
 
-def main(parallel=True, cases=None):
-    if isdir('visualizations'):
-        shutil.rmtree('visualizations')
-
-    start_time = time.time()
-    if cases is None:
-        cases = [join(DATABASE_DIR, f) for f in listdir(DATABASE_DIR) if isdir(join(DATABASE_DIR, f))]
-        cases.sort()
-        # if TASK_NAME == 'tt_two_fridge_in':
-        #     cases = [f for f in cases if '/12' not in f and '/14' not in f]
-        #cases = [path for path in cases if path.endswith('/14')]
-    else:
-        cases = [join(DATABASE_DIR, c) for c in cases]
-    print('Cases:', cases)
-
-    num_cases = len(cases)
-    if parallel:
-        import multiprocessing
-        from multiprocessing import Pool
-
-        max_cpus = 24
-        num_cpus = min(multiprocessing.cpu_count(), max_cpus)
-        print(f'using {num_cpus} cpus')
-        with Pool(processes=num_cpus) as pool:
-            # for result in pool.imap_unordered(process, range(num_cases)):
-            #     pass
-            pool.map(process, cases)
-            # pool.map(process, range(num_cases))
-
-    else:
-        for i in range(num_cases):
-            # if i in [0, 1]: continue
-            # if '/11' not in cases[i]: continue
-            process(cases[i], parallel=False)
-
-    print(f'solved {num_cases} problems (parallel={parallel}) in {round(time.time() - start_time, 3)} sec')
+# def main(parallel=True, cases=None):
+#     if isdir('visualizations'):
+#         shutil.rmtree('visualizations')
+#
+#     start_time = time.time()
+#     if cases is None:
+#         cases = [join(DATABASE_DIR, f) for f in listdir(DATABASE_DIR) if isdir(join(DATABASE_DIR, f))]
+#         cases.sort()
+#     else:
+#         cases = [join(DATABASE_DIR, c) for c in cases]
+#     print('Cases:', cases)
+#
+#     num_cases = len(cases)
+#     if parallel:
+#         import multiprocessing
+#         from multiprocessing import Pool
+#
+#         max_cpus = 24
+#         num_cpus = min(multiprocessing.cpu_count(), max_cpus)
+#         print(f'using {num_cpus} cpus')
+#         with Pool(processes=num_cpus) as pool:
+#             # for result in pool.imap_unordered(process, range(num_cases)):
+#             #     pass
+#             pool.map(process, cases)
+#             # pool.map(process, range(num_cases))
+#
+#     else:
+#         for i in range(num_cases):
+#             # if i in [0, 1]: continue
+#             # if '/11' not in cases[i]: continue
+#             process(cases[i], parallel=False)
+#
+#     print(f'solved {num_cases} problems (parallel={parallel}) in {round(time.time() - start_time, 3)} sec')
 
 
 if __name__ == '__main__':
-    main(parallel=PARALLEL, cases=['297'])
+    process_all_tasks(process, args.t, parallel=PARALLEL, cases=CASES)
+    # process_all_tasks(clear_all_rerun_results, args.t, parallel=False)
+

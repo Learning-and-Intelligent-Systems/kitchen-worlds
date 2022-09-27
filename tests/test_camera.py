@@ -32,18 +32,21 @@ import pybullet as p
 from tqdm import tqdm
 
 # from utils import load_lisdf_synthesizer
+from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 
 N_PX = 224
 NEW_KEY = 'meraki'
 ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb', 'meraki']
 DEFAULT_TASK = 'tt_two_fridge_in'
-DEFAULT_TASK = 'mm'
+DEFAULT_TASK = 'tt'
+DEFAULT_TASK = 'ff'
 MODIFIED_TIME = 1663895681.8584874
+PARALLEL = False
+USE_VIEWER = True
+REDO = False
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument('-p', action='store_true', default=True)
-parser.add_argument('-t', type=str, default=DEFAULT_TASK)  ## 'one_fridge_pick_pr2_tmp'
+parser = get_base_parser(task_name=DEFAULT_TASK, parallel=PARALLEL, use_viewer=USE_VIEWER)
 args = parser.parse_args()
 
 
@@ -300,182 +303,10 @@ def check_key_same(viz_dir):
     return config['version_key'] in ACCEPTED_KEYS
 
 
-def add_reachability_feature(test_dir, viz_dir, verbose=False):
-    ori_file = join(viz_dir, 'features.txt')
-    if isfile(ori_file):
-        return
-    REACHABLE_OBJ = "reachable {object}"
-    UNREACHABLE_OBJ = "unreachable {object}"
-    REACHABLE_SPACE = "reachable {space}"
-    UNREACHABLE_SPACE = "unreachable {space}"
-    world = load_lisdf_pybullet(test_dir, use_gui=False, verbose=False)
-    world.check_world_obstacles()
-    old_file = join(test_dir, 'features.txt')
-    custom_limits = world.robot.custom_limits
-    init_q = get_joint_positions(world.robot, world.robot.get_base_joints())[:-1]
-    init_q = list(init_q) + [0] * 3
-    world.remove_object(world.robot)
-    movable = [o for n, o in world.name_to_body.items() if 'veggie' in n or 'meat' in n]
-    obstacles = [o for n, o in world.name_to_body.items() if o not in movable]
-    robot = create_gripper_robot(world, custom_limits=custom_limits, initial_q=init_q)
-    problem = State(world, grasp_types=robot.grasp_types)  ## , 'side' , 'top'
-    funk = get_grasp_list_gen(problem, collisions=True, visualize=False,
-                              RETAIN_ALL=False, top_grasp_tolerance=math.pi / 4)
-    lines = []
-    for body in movable:
-        result = False
-        body_pose = get_pose(body)
-        outputs = funk(body)
-        for output in outputs:
-            grasp = output[0]
-            w = grasp.grasp_width
-            gripper_grasp = robot.visualize_grasp(body_pose, grasp.value, body=grasp.body,
-                                                  color=GREEN, width=w)
-            end_q = get_cloned_se3_conf(robot, gripper_grasp)
-            if not collided(gripper_grasp, obstacles, verbose=True, tag='check reachability of movable'):
-                if verbose: print('\n... check reachability from', nice(init_q), 'to', nice(end_q))
-                path = plan_se3_motion(robot, init_q, end_q, obstacles=obstacles,
-                                       custom_limits=robot.custom_limits)
-                if path is not None:
-                    if verbose: print('... path found of length', len(path))
-                    result = True
-                    break
-                else:
-                    if verbose: print('... no path found', nice(end_q))
-            else:
-                if verbose: print('... collided', nice(end_q))
-
-        name = world.body_to_name[body]
-        if result:
-            lines.append(REACHABLE_OBJ.format(object=name))
-        else:
-            lines.append(UNREACHABLE_OBJ.format(object=name))
-
-    indices = get_indices(test_dir)
-    indices_inv = {v: eval(k) for k, v in indices.items()}
-    init = get_init_tuples(test_dir)
-    spaces = world.cat_to_bodies('space', init)
-    funk = get_contain_list_gen(problem)
-    names = {
-        'minifridge': 'minifridge::fridgestorage',
-        'cabinet': 'cabinet::cabinetstorage',
-    }
-    for space in spaces:
-        result = False
-        body_link = indices_inv[space]
-        if space not in world.name_to_body:
-            body_name = names[space[:space.index('::')]]
-            world.add_body(body_link, body_name)
-        marker = robot.create_gripper(color=YELLOW)
-        set_cloned_se3_conf(robot.body, marker, [0] * 6)
-        gen = funk(marker, body_link)
-        count = 3
-        for output in gen:
-            p = output[0].value
-            (x, y, z), quat = p
-            end_q = list([x, y, z+0.1]) + list(euler_from_quat(quat))
-            path = plan_se3_motion(robot, init_q, end_q, obstacles=obstacles,
-                                   custom_limits=robot.custom_limits)
-            if verbose: print('\n... check reachability from', nice(init_q), 'to space', nice(end_q))
-            if path is not None:
-                if verbose: print('... path found of length', len(path))
-                result = True
-                break
-            else:
-                if verbose: print('... no path found', nice(end_q))
-
-            if count == 0:
-                break
-            count -= 1
-
-        remove_body(marker)
-        if result:
-            lines.append(REACHABLE_SPACE.format(space=space))
-        else:
-            lines.append(UNREACHABLE_SPACE.format(space=space))
-    lines = '\n'.join(lines)
-    with open(old_file, 'w') as f:
-        f.writelines(lines)
-    print('\n', ori_file)
-    print(lines, '\n')
-    shutil.copy(old_file, ori_file)
-    reset_simulation()
-    # sys.exit()
-
-
-def adjust_table_scale(test_dir, viz_dir):
-    import untangle
-    print('adjust_table_scale', test_dir)
-    world = load_lisdf_pybullet(test_dir, use_gui=False, verbose=False)
-    old_file = join(test_dir, 'scene.lisdf')
-    new_file = join(test_dir, 'scene_tmp.lisdf')
-    if not isfile(new_file) or True:
-        shutil.copy(old_file, new_file)
-        old_lines = open(old_file, 'r').readlines()
-        models = untangle.parse(old_file).sdf.world.include
-        other = {'counter': 'minifridge', 'table': 'cabinet'}
-        for model in models:
-            if 'kitchencounter' in model.uri.cdata.lower():
-                scale = eval(model.scale.cdata)
-                name = model['name']
-                # if scale != 1:
-                #     print(name, 'put back', scale)
-                #     old_lines = replace_scale(old_lines, name, 1)
-                if scale == 1:
-                    body = world.name_to_body[name]
-                    h = get_aabb_extent(get_aabb(body))[2]
-                    ceiling_name = other[name]
-                    if ceiling_name in world.name_to_body:
-                        ceiling = world.name_to_body[ceiling_name]
-                        h_space = get_aabb(ceiling).lower[2]
-                        new_scale = h_space / h
-                    else:
-                        z = get_point(body)[2]
-                        new_scale = z / (z - get_aabb(body).lower[2])
-                    print(name, 'new_scale', new_scale)
-                    old_lines = replace_scale(old_lines, name, new_scale)
-        with open(old_file, 'w') as f:
-            f.writelines(old_lines)
-    ori_file = join(viz_dir, 'scene.lisdf')
-    tmp_file = join(viz_dir, 'scene_tmp.lisdf')
-    if not isfile(tmp_file) or True:
-        os.remove(ori_file)
-        shutil.copy(old_file, ori_file)
-        shutil.copy(new_file, tmp_file)
-    reset_simulation()
-
-
-def replace_scale(lines, name, new_scale):
-    to_find = f'<include name="{name}">'
-    for i in range(len(lines)):
-        if to_find in lines[i] and '<scale>' in lines[i+3]:
-            l = lines[i+3]
-            old_scale = l[l.index('<scale>')+7: l.index('</scale>')]
-            lines[i+3] = l.replace(old_scale, str(new_scale))
-    return lines
-
-
-def process(viz_dir):
-    # if not isdir(join(dataset_dir, subdir)): return
-    # viz_dir = join(dataset_dir, subdir)
-
-    subdir = basename(viz_dir)
-
-    ## need to temporarily move the dir to the test_cases folder for asset paths to be found
-    test_dir = join(EXP_PATH, f"{task_name}_{subdir}")
-    if isdir(test_dir):
-        shutil.rmtree(test_dir)
-    if not isdir(test_dir):
-        shutil.copytree(viz_dir, test_dir)
-    print(viz_dir, end='\r')
+def process(viz_dir, redo=REDO):
+    test_dir = copy_dir_for_process(viz_dir)
 
     # load_lisdf_synthesizer(test_dir)
-
-    ## ------------------ process run folders ------------------
-    # adjust_table_scale(test_dir, viz_dir)
-    # add_reachability_feature(test_dir, viz_dir)
-    # return
-    ## --------------------------------------------------------
 
     constraint_dir = join(viz_dir, 'constraint_networks')
     stream_dir = join(viz_dir, 'stream_plans')
@@ -498,7 +329,6 @@ def process(viz_dir):
     if isfile(tmp_file):
         os.remove(tmp_file)
 
-    redo = True
     camera_pose = get_camera_pose(viz_dir)
     (x, y, z), quat = camera_pose
     (r, p, w) = euler_from_quat(quat)
@@ -547,50 +377,4 @@ def process(viz_dir):
 
 
 if __name__ == "__main__":
-
-    task_name = args.t
-    if task_name == 'mm':
-        task_names = ['mm_one_fridge_pick',
-                      'mm_one_fridge_table_pick', 'mm_one_fridge_table_in', 'mm_one_fridge_table_on',
-                      'mm_two_fridge_in', 'mm_two_fridge_pick']
-    elif task_name == 'tt':
-        task_names = ['tt_one_fridge_table_pick', 'tt_one_fridge_table_in',
-                      'tt_two_fridge_in', 'tt_two_fridge_pick']
-    elif task_name == 'bb':
-        task_names = ['bb_one_fridge_pick',
-                      'bb_one_fridge_table_pick', 'bb_one_fridge_table_in', 'bb_one_fridge_table_on',
-                      'bb_two_fridge_in', 'bb_two_fridge_pick']
-    else:
-        task_names = [task_name]
-
-    all_subdirs = []
-    for task_name in task_names:
-        dataset_dir = join('/home/yang/Documents/fastamp-data/', task_name)
-        # organize_dataset(task_name)
-        subdirs = listdir(dataset_dir)
-        subdirs.sort()
-        # subdirs = ['111']
-        subdirs = [join(dataset_dir, s) for s in subdirs if isdir(join(dataset_dir, s))]
-        # for s in subdirs:
-        #     if exist_instance(s, '10849'):
-        #         # print('skipping', s)
-        #         all_subdirs += [s]
-        #     # print('redoing', s)
-        all_subdirs += subdirs
-    # sys.exit()
-    
-    if args.p:
-        import multiprocessing
-        from multiprocessing import Pool
-
-        max_cpus = 12
-        num_cpus = min(multiprocessing.cpu_count(), max_cpus)
-        print(f'using {num_cpus} cpus for {len(all_subdirs)} subdirs')
-        with Pool(processes=num_cpus) as pool:
-            for result in pool.imap_unordered(process, all_subdirs):
-                pass
-
-    else:
-        for subdir in all_subdirs:
-            process(subdir)
-            # break
+    process_all_tasks(process, args.t, parallel=args.p)

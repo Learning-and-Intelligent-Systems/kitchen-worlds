@@ -7,9 +7,9 @@ import json
 import pickle
 import shutil
 from os import listdir
-from os.path import join, abspath, dirname, isdir, isfile
+from os.path import join, abspath, dirname, isdir, isfile, basename
 from tabnanny import verbose
-from config import EXP_PATH
+from config import EXP_PATH, MAMAO_DATA_PATH
 import numpy as np
 import random
 import time
@@ -26,20 +26,21 @@ from world_builder.actions import apply_actions
 
 from mamao_tools.utils import get_feasibility_checker, get_plan
 
-PARALLEL = False
+from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
+
 SAVE_MP4 = False
 AUTO_PLAY = False
 EVALUATE_QUALITY = True
 
 GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/one_fridge_pick_pr2/one_fridge_pr2_0921_220304'
-TASK_NAME = 'one_fridge_pick_pr2'  ## 'one_fridge_pick_pr2_20_parallel_1'
+TASK_NAME = 'one_fridge_pick_pr2'
 
 TASK_NAME = 'mm_one_fridge_pick'
-TASK_NAME = 'mm_one_fridge_table_in'
-TASK_NAME = 'mm_one_fridge_table_on'
-TASK_NAME = 'mm_one_fridge_table_pick'
-TASK_NAME = 'mm_two_fridge_pick'
-TASK_NAME = 'mm_two_fridge_in'
+# TASK_NAME = 'mm_one_fridge_table_in'
+# TASK_NAME = 'mm_one_fridge_table_on'
+# TASK_NAME = 'mm_one_fridge_table_pick'
+# TASK_NAME = 'mm_two_fridge_pick'
+# TASK_NAME = 'mm_two_fridge_in'
 
 # TASK_NAME = 'tt_one_fridge_pick'
 # TASK_NAME = 'tt_one_fridge_table_in'
@@ -49,9 +50,10 @@ TASK_NAME = 'mm_two_fridge_in'
 # TASK_NAME = 'elsewhere'
 # TASK_NAME = 'discarded'
 
-DATABASE_DIR = join('..', '..', 'fastamp-data')
-# DATABASE_DIR = join('..', '..', 'mamao-data')
+CASES = ['1598']  ## None
 
+parser = get_base_parser(task_name=TASK_NAME, parallel=False, use_viewer=True)
+args = parser.parse_args()
 
 #####################################
 
@@ -88,15 +90,8 @@ def query_yes_no(question, default="no"):
 
 
 def run_one(run_dir, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, height=1120):
-    ori_dir = run_dir  ## join(DATABASE_DIR, run_dir)
-
-    print(f'\n\n\n--------------------------\n    replay {ori_dir} \n------------------------\n\n\n')
-    run_name = os.path.basename(ori_dir)
-    exp_dir = join(EXP_PATH, f"{task_name}_{run_name}")
-    if isdir(exp_dir):
-        shutil.rmtree(exp_dir)
-    if not isdir(exp_dir):
-        shutil.copytree(ori_dir, exp_dir)
+    run_name = basename(run_dir)
+    exp_dir = copy_dir_for_process(run_dir, tag='replaying')
     plan = get_plan(run_dir)
 
     world = load_lisdf_pybullet(exp_dir, width=width, height=height, verbose=False)
@@ -106,7 +101,7 @@ def run_one(run_dir, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, height=
     commands = pickle.load(open(join(exp_dir, 'commands.pkl'), "rb"))
 
     if save_mp4:
-        video_path = join(ori_dir, 'replay.mp4')
+        video_path = join(run_dir, 'replay.mp4')
         with VideoSaver(video_path):
             apply_actions(problem, commands, time_step=0.025, verbose=False, plan=plan)
         print('saved to', abspath(video_path))
@@ -121,7 +116,7 @@ def run_one(run_dir, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, height=
         if EVALUATE_QUALITY:
             answer = query_yes_no(f"delete this run {run_name}?", default='no')
             if answer:
-                new_dir = join(DATABASE_DIR, 'impossible', f"{task_name}_{run_name}")
+                new_dir = join(MAMAO_DATA_PATH, 'impossible', f"{task_name}_{run_name}")
                 shutil.move(run_dir, new_dir)
                 print(f"moved {run_dir} to {new_dir}")
 
@@ -136,39 +131,6 @@ def process(index):
     np.random.seed(int(time.time()))
     random.seed(time.time())
     return run_one(str(index))
-
-
-def main(parallel=True, cases=None, path=None):
-    if isdir('visualizations'):
-        shutil.rmtree('visualizations')
-
-    start_time = time.time()
-    dataset_dir = join(DATABASE_DIR, TASK_NAME)
-    if cases is None:
-        cases = [join(dataset_dir, f) for f in listdir(dataset_dir) if isdir(join(dataset_dir, f))]
-        cases.sort()
-    else:
-        cases = [join(dataset_dir, f) for f in cases if isdir(join(dataset_dir, f))]
-    if path is not None:
-        cases = [path]
-
-    num_cases = len(cases)
-
-    if parallel:
-        import multiprocessing
-        from multiprocessing import Pool
-
-        max_cpus = 24
-        num_cpus = min(multiprocessing.cpu_count(), max_cpus)
-        print(f'using {num_cpus} cpus')
-        with Pool(processes=num_cpus) as pool:
-            pool.map(process, cases)
-
-    else:
-        for i in range(num_cases):
-            process(cases[i])
-
-    print(f'solved {num_cases} problems (parallel={parallel}) in {round(time.time() - start_time, 3)} sec')
 
 
 def mp4_to_gif(mp4_file, frame_folder='output'):
@@ -203,5 +165,5 @@ def mp4_to_gif(mp4_file, frame_folder='output'):
 
 
 if __name__ == '__main__':
-    main(parallel=PARALLEL, cases=['298']) ##
-    # main(parallel=PARALLEL, path=GIVEN_PATH)
+    process_all_tasks(process, args.t, cases=CASES)
+    # process_all_tasks(process, args.t, path=GIVEN_PATH)
