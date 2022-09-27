@@ -60,15 +60,15 @@ check_time = 1664255601.350403
 # TASK_NAME = 'tt_one_fridge_table_pick'
 # TASK_NAME = 'tt_one_fridge_table_in'
 # TASK_NAME = 'tt_two_fridge_pick'
-# TASK_NAME = 'tt_two_fridge_in'
+TASK_NAME = 'tt_two_fridge_in'
 # TASK_NAME = 'mm_two_fridge_in'
-TASK_NAME = 'tt'
+# TASK_NAME = 'tt'
 
 CASES = None
 # CASES = ['1']
 
 PARALLEL = False
-FEASIBILITY_CHECKER = 'None'  ## None | oracle | pvt | pvt-2 | pvt-2 | binary | shuffle
+FEASIBILITY_CHECKER = 'pvt*'  ## None | oracle | pvt | binary | shuffle
 
 ## =========================================
 
