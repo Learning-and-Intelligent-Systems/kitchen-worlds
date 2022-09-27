@@ -68,7 +68,7 @@ CASES = None
 # CASES = ['1']
 
 PARALLEL = False
-FEASIBILITY_CHECKER = 'None'  ## None | oracle | pvt | pvt-2 | pvt-2 | binary | shuffle
+FEASIBILITY_CHECKER = 'pvt'  ## None | oracle | pvt | pvt-2 | pvt-2 | binary | shuffle
 
 ## =========================================
 
