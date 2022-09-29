@@ -34,21 +34,29 @@ from tqdm import tqdm
 # from utils import load_lisdf_synthesizer
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 
-DEFAULT_TASK = 'tt'
+DEFAULT_TASK = 'mm'
+# DEFAULT_TASK = 'tt'
 # DEFAULT_TASK = 'ff'
+# DEFAULT_TASK = 'ww_two_fridge_in'
 
-PARALLEL = False
+CASES = None  ## ['0'] | None
+
+PARALLEL = True
 USE_VIEWER = False
 
 parser = get_base_parser(task_name=DEFAULT_TASK, parallel=PARALLEL, use_viewer=USE_VIEWER)
 args = parser.parse_args()
 
 USE_VIEWER = args.viewer
+CHECK_TIME = 1664399646.826951
 
 
 def add_features(test_dir, viz_dir, verbose=False):
     ori_file = join(viz_dir, 'features.txt')
     print('\n'+ori_file)
+
+    if os.path.getmtime(ori_file) > CHECK_TIME:
+        return
 
     REACHABILITY = 'reachability'
     AABBY = 'aabby'
@@ -93,7 +101,7 @@ def add_features(test_dir, viz_dir, verbose=False):
     spaces = world.cat_to_bodies('space', init)
     doors = world.cat_to_bodies('door', init)
     movable = [o for n, o in world.name_to_body.items() if 'veggie' in n or 'meat' in n]
-    obstacles = [o for n, o in world.name_to_body.items() if o not in movable]
+    obstacles = [o for n, o in world.name_to_body.items() if o not in movable and o != robot]
     lines = []
 
     """ ============== reachability of movable objects ============= """
@@ -101,9 +109,9 @@ def add_features(test_dir, viz_dir, verbose=False):
                               RETAIN_ALL=False, top_grasp_tolerance=math.pi / 4)
     for body in movable:
         name = world.body_to_name[body]
-        if name in data[REACHABILITY]:
-            lines.append(' '.join([data[REACHABILITY][name], name]))
-            continue
+        # if name in data[REACHABILITY]:
+        #     lines.append(' '.join([data[REACHABILITY][name], name]))
+        #     continue
         result = False
         body_pose = get_pose(body)
         outputs = funk(body)
@@ -125,8 +133,8 @@ def add_features(test_dir, viz_dir, verbose=False):
                     if verbose: print('... no path found', nice(end_q))
             else:
                 if verbose: print('... collided', nice(end_q))
+            remove_body(gripper_grasp)
 
-        name = world.body_to_name[body]
         if result:
             lines.append(REACHABLE_OBJ.format(object=name))
         else:
@@ -138,10 +146,11 @@ def add_features(test_dir, viz_dir, verbose=False):
         'minifridge': 'minifridge::fridgestorage',
         'cabinet': 'cabinet::cabinetstorage',
     }
+    print('reachability of spaces')
     for space in spaces:
-        if space in data[REACHABILITY]:
-            lines.append(' '.join([data[REACHABILITY][space], space]))
-            continue
+        # if space in data[REACHABILITY]:
+        #     lines.append(' '.join([data[REACHABILITY][space], space]))
+        #     continue
         result = False
         body_link = indices_inv[space]
         if space not in world.name_to_body:
@@ -150,7 +159,7 @@ def add_features(test_dir, viz_dir, verbose=False):
         marker = robot.create_gripper(color=YELLOW)
         set_cloned_se3_conf(robot.body, marker, [0] * 6)
         gen = funk(marker, body_link)
-        count = 3
+        count = 4
         for output in gen:
             p = output[0].value
             (x, y, z), quat = p
@@ -219,14 +228,13 @@ def add_features(test_dir, viz_dir, verbose=False):
             lines.append(LINE_DISTANCEY.format(movable=name, obstacle=o, distance=round(y, 3)))
 
     """ ============== save in file ============= """
-    if lines != lines_ori:
-        if isfile(ori_file):
-            os.remove(ori_file)
-        lines = '\n'.join(lines)
-        with open(old_file, 'w') as f:
-            f.writelines(lines)
-        print(lines, '\n')
-        shutil.copy(old_file, ori_file)
+    if isfile(ori_file):
+        os.remove(ori_file)
+    lines = '\n'.join(lines)
+    with open(old_file, 'w') as f:
+        f.writelines(lines)
+    print(lines, '\n')
+    shutil.copy(old_file, ori_file)
     reset_simulation()
     # sys.exit()
 
@@ -293,4 +301,4 @@ def process(viz_dir):
 
 
 if __name__ == "__main__":
-    process_all_tasks(process, args.t, parallel=args.p)
+    process_all_tasks(process, args.t, parallel=args.p, cases=CASES)

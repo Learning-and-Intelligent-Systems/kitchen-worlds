@@ -40,6 +40,8 @@ ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb', 'meraki']
 DEFAULT_TASK = 'tt_two_fridge_in'
 DEFAULT_TASK = 'tt'
 DEFAULT_TASK = 'ff'
+DEFAULT_TASK = 'ww_two_fridge_in'
+
 MODIFIED_TIME = 1663895681.8584874
 PARALLEL = False
 USE_VIEWER = True
