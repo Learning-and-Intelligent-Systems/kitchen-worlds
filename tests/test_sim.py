@@ -34,6 +34,7 @@ def load_lisdf_isaacgym(lisdf_dir, robots=True, **kwargs):
         set_prim_pose(prim_path, pose_from_tform(tform))
     env.wait_if_gui()
 
+
 if __name__ == "__main__":
     lisdf_dir = '/home/caelan/Programs/interns/yang/kitchen-worlds/test_cases/tt_one_fridge_pick_2'
     load_lisdf_isaacgym(os.path.abspath(lisdf_dir))
