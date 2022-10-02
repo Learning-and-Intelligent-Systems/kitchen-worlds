@@ -46,13 +46,14 @@ from mamao_tools.data_utils import get_instance_info, exist_instance
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 
 
+GENERATE_SKELETONS = True
 USE_VIEWER = False
 DIVERSE = True
 PREFIX = 'diverse_' if DIVERSE else ''
 RERUN_SUBDIR = 'rerun_1'
 
-SKIP_IF_SOLVED = True
-SKIP_IF_SOLVED_RECENTLY = True
+SKIP_IF_SOLVED = True and not GENERATE_SKELETONS
+SKIP_IF_SOLVED_RECENTLY = True and not GENERATE_SKELETONS
 RETRY_IF_FAILED = True
 check_time = 1664255601.350403
 
@@ -63,12 +64,15 @@ TASK_NAME = 'tt_one_fridge_table_pick'
 # TASK_NAME = 'tt_two_fridge_in'
 # TASK_NAME = 'mm_two_fridge_in'
 # TASK_NAME = 'tt'
+# TASK_NAME = 'mm'
 
 CASES = None
-CASES = ['24']
+# CASES = ['24']
 
 PARALLEL = False
-FEASIBILITY_CHECKER = 'None'  ## None | oracle | pvt | pvt* | binary | shuffle
+FEASIBILITY_CHECKER = 'pvt-task'  ## None | oracle | pvt | pvt* | binary | shuffle
+if GENERATE_SKELETONS:
+    FEASIBILITY_CHECKER = 'oracle'
 
 ## =========================================
 
@@ -140,6 +144,11 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
                     print('skipping recently solved problem', run_dir)
                     return
 
+    if GENERATE_SKELETONS:
+        file = join(run_dir, f'diverse_plans.json')
+        if isfile(file):
+            return
+
     exp_dir = copy_dir_for_process(run_dir, tag='replaying')
 
     if False:
@@ -179,18 +188,29 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     # fc = Shuffler()
 
     start = time.time()
-    if parallel:
-        solution = solve_multiple(pddlstream_problem, stream_info)
+    if DIVERSE:
+        kwargs = dict(
+            diverse=DIVERSE,
+            downward_time=20,  ## max time to get 100, 10 sec
+            evaluation_time=60,  ## on each skeleton
+        )
+        if GENERATE_SKELETONS:
+            kwargs['evaluation_time'] = -0.5
     else:
-        if DIVERSE:
-            kwargs = dict(
-                diverse=DIVERSE,
-                downward_time=20,  ## max time to get 100, 10 sec
-                evaluation_time=60,  ## on each skeleton
-            )
-        else:
-            kwargs = dict()
+        kwargs = dict()
+
+    if parallel:
+        solution = solve_multiple(pddlstream_problem, stream_info, fc=fc, lock=not args.unlock, **kwargs)
+    else:
         solution = solve_one(pddlstream_problem, stream_info, fc=fc, lock=not args.unlock, **kwargs)
+
+    ## just to get all diverse plans as labels
+    if GENERATE_SKELETONS:
+        fc.dump_log(join(run_dir, f'diverse_plans.json'), plans_only=True)
+        reset_simulation()
+        shutil.rmtree(exp_dir)
+        return
+
     planning_time = time.time() - start
     saver.restore()
 

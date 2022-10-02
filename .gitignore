@@ -16,6 +16,7 @@ test_cases/
 !test_cases/test_pr2_kitchen
 !test_cases/test_feg_pick
 !test_cases/test_feg_cabinets
+_test_cases/
 
 */statistics/
 */temp/

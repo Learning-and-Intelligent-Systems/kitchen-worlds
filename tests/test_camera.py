@@ -41,9 +41,10 @@ DEFAULT_TASK = 'tt_two_fridge_in'
 DEFAULT_TASK = 'tt'
 DEFAULT_TASK = 'ff'
 DEFAULT_TASK = 'ww_two_fridge_in'
+DEFAULT_TASK = 'ww'
 
 MODIFIED_TIME = 1663895681.8584874
-PARALLEL = False
+PARALLEL = True
 USE_VIEWER = True
 REDO = False
 

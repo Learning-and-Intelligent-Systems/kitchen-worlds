@@ -1,13 +1,32 @@
 import os.path
+import sys
+
+from config import ASSET_PATH
+sys.path.append('/home/yang/Documents/srl_stream/src')
+print(sys.path)
 
 from srl_stream.gym_world import create_single_world, default_arguments
 
-from pybullet_planning.pybullet_tools.utils import pose_from_tform, get_pose, get_joint_name, get_joint_position, get_movable_joints
+from pybullet_tools.utils import pose_from_tform, get_pose, get_joint_name, get_joint_position, get_movable_joints
 from utils import load_lisdf, test_is_robot
+from test_utils import copy_dir_for_process
+
+"""
+# Note to myself on setting up slr_stream $ IsaacGym
+1. clone git@gitlab.com:nvidia_srl/caelan/srl_stream.git
+2. download isaac gym from https://developer.nvidia.com/isaac-gym/download, 
+    a. follow instruction in docs/install.html to install isaacgym 
+        `(cd ~/Documents/isaacgym/python; pip install -e .)`
+3. add python path to srl_stream (srl_stream/src)
+4. `pip install setuptools_scm trimesh`
+5. run from terminal. It will hang if ran in pycharm
+    `cd tests; python test_gym.py`
+"""
 
 
-def load_lisdf_isaacgym(lisdf_dir, robots=True, pause=False, **kwargs):
+def load_lisdf_isaacgym(ori_dir, robots=True, pause=True, **kwargs):
     # TODO: Segmentation fault - possibly cylinders & mimic joints
+    lisdf_dir = copy_dir_for_process(ori_dir)
     gym_world = create_single_world(args=default_arguments(use_gpu=False), spacing=5.)
     for name, path, scale, is_fixed, pose in load_lisdf(lisdf_dir, robots=robots, **kwargs):
         is_robot = test_is_robot(name)
@@ -20,6 +39,7 @@ def load_lisdf_isaacgym(lisdf_dir, robots=True, pause=False, **kwargs):
     if pause:
         gym_world.wait_if_gui()
     return gym_world
+
 
 def update_gym_world(gym_world, pb_world, pause=False, verbose=False):
     for actor in gym_world.get_actors():
@@ -44,6 +64,9 @@ def update_gym_world(gym_world, pb_world, pause=False, verbose=False):
     if pause:
         gym_world.wait_if_gui()
 
+
 if __name__ == "__main__":
     lisdf_dir = '/home/caelan/Programs/interns/yang/kitchen-worlds/test_cases/tt_one_fridge_pick_2'
-    load_lisdf_isaacgym(os.path.abspath(lisdf_dir))
+    lisdf_dir = '/home/yang/Documents/fastamp-data/tt_two_fridge_in/4'
+    world = load_lisdf_isaacgym(os.path.abspath(lisdf_dir))
+
