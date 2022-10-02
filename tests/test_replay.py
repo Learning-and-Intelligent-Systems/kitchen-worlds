@@ -22,12 +22,17 @@ from pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, 
 from lisdf_tools.lisdf_loader import load_lisdf_pybullet, pddlstream_from_dir
 from lisdf_tools.lisdf_planning import pddl_to_init_goal, Problem
 
-from world_builder.actions import apply_actions
+from world_builder.actions import adapt_action, apply_actions
+from world_builder.world import State
+from world_builder.actions import Action, AttachObjectAction
+from pybullet_tools.pr2_primitives import Trajectory, Command
 
 from mamao_tools.utils import get_feasibility_checker, get_plan
 
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
+from test_gym import load_lisdf_isaacgym, update_gym_world
 
+USE_GYM = True
 SAVE_MP4 = False
 AUTO_PLAY = False
 EVALUATE_QUALITY = True
@@ -35,7 +40,7 @@ EVALUATE_QUALITY = True
 GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/one_fridge_pick_pr2/one_fridge_pr2_0921_220304'
 TASK_NAME = 'one_fridge_pick_pr2'
 
-TASK_NAME = 'mm_one_fridge_pick'
+TASK_NAME = 'tt_two_fridge_in'
 # TASK_NAME = 'mm_one_fridge_table_in'
 # TASK_NAME = 'mm_one_fridge_table_on'
 # TASK_NAME = 'mm_one_fridge_table_pick'
@@ -50,7 +55,7 @@ TASK_NAME = 'mm_one_fridge_pick'
 # TASK_NAME = 'elsewhere'
 # TASK_NAME = 'discarded'
 
-CASES = ['1598']  ## None
+CASES = ['4']  ## None
 
 parser = get_base_parser(task_name=TASK_NAME, parallel=False, use_viewer=True)
 args = parser.parse_args()
@@ -94,18 +99,30 @@ def run_one(run_dir, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, height=
     exp_dir = copy_dir_for_process(run_dir, tag='replaying')
     plan = get_plan(run_dir)
 
-    world = load_lisdf_pybullet(exp_dir, width=width, height=height, verbose=False)
+    world = load_lisdf_pybullet(exp_dir, use_gui=not USE_GYM, width=width, height=height, verbose=False)
     problem = Problem(world)
-    wait_unlocked()
 
     commands = pickle.load(open(join(exp_dir, 'commands.pkl'), "rb"))
 
-    if save_mp4:
+    if USE_GYM:
+        gym_world = load_lisdf_isaacgym(os.path.abspath(exp_dir),
+                                        camera_width=1280, camera_height=800)
+        img_dir = join(exp_dir, 'gym_images')
+        gif_name = 'gym_replay.gif'
+        os.mkdir(img_dir)
+        gif_name = record_actions_in_gym(problem, commands, gym_world, img_dir=img_dir,
+                                         gif_name=gif_name, time_step=0, verbose=False, plan=plan)
+        shutil.copy(join(exp_dir, gif_name), join(run_dir, gif_name))
+        print('moved gif to {}'.format(join(run_dir, gif_name)))
+
+    elif save_mp4:
         video_path = join(run_dir, 'replay.mp4')
         with VideoSaver(video_path):
             apply_actions(problem, commands, time_step=0.025, verbose=False, plan=plan)
         print('saved to', abspath(video_path))
+
     else:
+        wait_unlocked()
         # wait_if_gui(f'start replay {run_name}?')
         answer = True
         if not AUTO_PLAY:
@@ -125,6 +142,47 @@ def run_one(run_dir, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, height=
     # disconnect()
     reset_simulation()
     shutil.rmtree(exp_dir)
+
+
+def record_actions_in_gym(problem, actions, gym_world, img_dir=None, gif_name='gym_replay.gif',
+                          time_step=0.5, verbose=False, plan=None):
+    """ act out the whole plan and event in the world without observation/replanning """
+    if actions is None:
+        return
+    state_event = State(problem.world)
+    camera = gym_world.cameras[0]
+    filenames = []
+    frame_gap = 3
+    for i, action in enumerate(actions):
+        if verbose:
+            print(i, action)
+        action = adapt_action(action, problem, plan)
+        if action is None:
+            continue
+        state_event = action.transition(state_event.copy())
+        if isinstance(action, AttachObjectAction):
+            print(action.grasp)
+        wait_for_duration(time_step)
+
+        """ update gym world """
+        update_gym_world(gym_world, problem.world)
+        if img_dir is not None and i % frame_gap == 0:
+            # img_file = join(img_dir, f'{i}.png')
+            # gym_world.get_rgba_image(camera, image_type='rgb', filename=img_file)  ##
+            img_file = gym_world.get_rgba_image(camera)
+            filenames.append(img_file)
+
+    import imageio
+    start = time.time()
+    gif_file = join(img_dir, '..', gif_name)
+    print(f'saving to {abspath(gif_file)} with {len(filenames)} frames')
+    with imageio.get_writer(gif_file, mode='I') as writer:
+        for filename in filenames:
+            # image = imageio.imread(filename)
+            writer.append_data(filename)
+
+    print(f'saved to {abspath(gif_file)} with {len(filenames)} frames in {round(time.time() - start, 2)} seconds')
+    return gif_name
 
 
 def process(index):

@@ -24,10 +24,16 @@ from test_utils import copy_dir_for_process
 """
 
 
-def load_lisdf_isaacgym(ori_dir, robots=True, pause=True, **kwargs):
+def load_lisdf_isaacgym(ori_dir, robots=True, pause=False,
+                        camera_width=2560, camera_height=1600, **kwargs):
     # TODO: Segmentation fault - possibly cylinders & mimic joints
     lisdf_dir = copy_dir_for_process(ori_dir)
     gym_world = create_single_world(args=default_arguments(use_gpu=False), spacing=5.)
+
+    point_from = (8.5, 3, 2.5)
+    point_to = (0, 3, 0)
+    gym_world.set_viewer_target(point_from, target=point_to)
+
     for name, path, scale, is_fixed, pose in load_lisdf(lisdf_dir, robots=robots, **kwargs):
         is_robot = test_is_robot(name)
         asset = gym_world.simulator.load_asset(
@@ -35,7 +41,14 @@ def load_lisdf_isaacgym(ori_dir, robots=True, pause=True, **kwargs):
             gravity_comp=is_robot, collapse=False, vhacd=False)
         actor = gym_world.create_actor(asset, name=name, scale=scale)
         gym_world.set_pose(actor, pose_from_tform(pose))
+
     gym_world.simulator.update_viewer()
+
+    img_file = os.path.join(ori_dir, 'gym_scene.png')
+    camera = gym_world.create_camera(width=camera_width, height=camera_height, fov=60)
+    gym_world.set_camera_target(camera, point_from, point_to)
+    gym_world.save_image(camera, image_type='rgb', filename=img_file)
+
     if pause:
         gym_world.wait_if_gui()
     return gym_world
@@ -68,5 +81,5 @@ def update_gym_world(gym_world, pb_world, pause=False, verbose=False):
 if __name__ == "__main__":
     lisdf_dir = '/home/caelan/Programs/interns/yang/kitchen-worlds/test_cases/tt_one_fridge_pick_2'
     lisdf_dir = '/home/yang/Documents/fastamp-data/tt_two_fridge_in/4'
-    world = load_lisdf_isaacgym(os.path.abspath(lisdf_dir))
+    world = load_lisdf_isaacgym(os.path.abspath(lisdf_dir), pause=True)
 
