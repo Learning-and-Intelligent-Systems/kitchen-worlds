@@ -63,7 +63,7 @@ def get_task_names(task_name):
                       'mm_two_fridge_in', 'mm_two_fridge_pick']
     elif task_name == 'tt':
         task_names = ['tt_one_fridge_table_pick', 'tt_one_fridge_table_in',
-                      'tt_two_fridge_in']  ## , 'tt_two_fridge_pick'
+                      'tt_two_fridge_pick', 'tt_two_fridge_in']  ##
     elif task_name == 'ff':
         task_names = ['ff_one_fridge_table_pick', 'ff_one_fridge_table_in',
                       'ff_two_fridge_in', 'ff_two_fridge_pick']

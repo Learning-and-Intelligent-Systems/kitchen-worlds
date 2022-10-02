@@ -34,14 +34,14 @@ from tqdm import tqdm
 # from utils import load_lisdf_synthesizer
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 
-DEFAULT_TASK = 'mm'
-# DEFAULT_TASK = 'tt'
+# DEFAULT_TASK = 'mm'
+DEFAULT_TASK = 'tt'
 # DEFAULT_TASK = 'ff'
 # DEFAULT_TASK = 'ww_two_fridge_in'
 
 CASES = None  ## ['0'] | None
 
-PARALLEL = True
+PARALLEL = False
 USE_VIEWER = False
 
 parser = get_base_parser(task_name=DEFAULT_TASK, parallel=PARALLEL, use_viewer=USE_VIEWER)
@@ -281,6 +281,18 @@ def adjust_table_scale(test_dir, viz_dir):
     reset_simulation()
 
 
+def duplicate_baseline(viz_dir, old_dir, new_dir):
+    old_dir = join(viz_dir, old_dir)
+    new_dir = join(viz_dir, new_dir)
+    if not isdir(new_dir):
+        os.mkdir(new_dir)
+    files = [f for f in listdir(old_dir) if '=None.' in f or '=oracle.' in f]
+    for file in files:
+        if not isfile(join(new_dir, file)):
+            print('duplicate_baseline', join(old_dir, file), join(new_dir, file))
+            shutil.copy(join(old_dir, file), join(new_dir, file))
+
+
 def replace_scale(lines, name, new_scale):
     to_find = f'<include name="{name}">'
     for i in range(len(lines)):
@@ -297,8 +309,12 @@ def process(viz_dir):
     # load_lisdf_synthesizer(test_dir)
     # adjust_table_scale(test_dir, viz_dir)
     add_features(test_dir, viz_dir)
-    return
+
+
+def duplicate_process(viz_dir):
+    duplicate_baseline(viz_dir, 'rerun_1', 'rerun_2')
 
 
 if __name__ == "__main__":
-    process_all_tasks(process, args.t, parallel=args.p, cases=CASES)
+    # process_all_tasks(process, args.t, parallel=args.p, cases=CASES)
+    process_all_tasks(duplicate_process, args.t, parallel=args.p, cases=CASES)
