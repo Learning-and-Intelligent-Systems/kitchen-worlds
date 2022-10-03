@@ -52,15 +52,15 @@ DIVERSE = True
 PREFIX = 'diverse_' if DIVERSE else ''
 RERUN_SUBDIR = 'rerun_2'
 
-SKIP_IF_SOLVED = True and not GENERATE_SKELETONS
+SKIP_IF_SOLVED = False and not GENERATE_SKELETONS
 SKIP_IF_SOLVED_RECENTLY = True and not GENERATE_SKELETONS
 RETRY_IF_FAILED = True
-check_time = 1664255601.350403
+check_time = 1664755683  ## 1664755683 for pick, 1664750094 for in
 
 # TASK_NAME = 'tt_one_fridge_pick'
-TASK_NAME = 'tt_one_fridge_table_pick'
+# TASK_NAME = 'tt_one_fridge_table_pick'
 # TASK_NAME = 'tt_one_fridge_table_in'
-# TASK_NAME = 'tt_two_fridge_pick'
+TASK_NAME = 'tt_two_fridge_pick'
 # TASK_NAME = 'tt_two_fridge_in'
 # TASK_NAME = 'mm_two_fridge_in'
 # TASK_NAME = 'tt'
@@ -191,7 +191,7 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     if DIVERSE:
         kwargs = dict(
             diverse=DIVERSE,
-            downward_time=20,  ## max time to get 100, 10 sec
+            downward_time=20,  ## max time to get 100, 10 sec, 30 sec for 300
             evaluation_time=60,  ## on each skeleton
         )
         if GENERATE_SKELETONS:
