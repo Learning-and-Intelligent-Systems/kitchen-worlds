@@ -6,13 +6,18 @@ import trimesh
 import untangle
 from trimesh import transformations
 
-def load_lisdf(lisdf_dir, scene_scale=1., robots=False):
+def test_is_robot(name, robots=["pr2"]):
+    if robots is None:
+        return True
+    return any(name.startswith(prefix) for prefix in robots)
+
+def load_lisdf(lisdf_dir, scene_scale=1., robots=False, verbose=True):
     # TODO: apply within load_lisdf_synthesizer
     lisdf_path = os.path.join(lisdf_dir, 'scene.lisdf')
     world_xml = untangle.parse(lisdf_path).sdf.world
     for obj_xml in world_xml.include:
         name = obj_xml._attributes["name"]
-        if not robots and any(name.startswith(prefix) for prefix in ["pr2"]):
+        if not robots and test_is_robot(name): # TODO: generalize
             continue
 
         path = os.path.abspath(os.path.join(os.path.dirname(lisdf_path), obj_xml.uri.cdata))
@@ -24,12 +29,14 @@ def load_lisdf(lisdf_dir, scene_scale=1., robots=False):
             is_fixed = obj_xml.static.cdata == "true"
         else:
             is_fixed = False
-        print(f"Name: {name} | Fixed: {is_fixed} | Scale: {scale:.3f} | Path: {path}")
+        if verbose:
+            print(f"Name: {name} | Fixed: {is_fixed} | Scale: {scale:.3f} | Path: {path}")
 
         pose_data = np.array(obj_xml.pose.cdata.split(" ")).astype(float)
         position = scene_scale * pose_data[:3]
         euler = pose_data[3:]
-        pose = transformations.translation_matrix(position) @ transformations.euler_matrix(*euler)
+        pose = transformations.translation_matrix(position) @ \
+               transformations.euler_matrix(*euler)
 
         yield name, path, scale, is_fixed, pose
 

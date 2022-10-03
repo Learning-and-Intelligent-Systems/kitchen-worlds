@@ -17,7 +17,7 @@ from lisdf_tools.lisdf_loader import load_lisdf_pybullet
 import json
 import shutil
 from os import listdir
-from os.path import join, isdir, isfile, dirname, getmtime
+from os.path import join, isdir, isfile, dirname, getmtime, basename
 import time
 import pybullet as p
 from tqdm import tqdm
@@ -29,10 +29,13 @@ from utils import load_lisdf_synthesizer
 N_PX = 224
 NEW_KEY = 'meraki'
 ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb']
+DEFAULT_TASK = 'tt_one_fridge_pick'
+# DEFAULT_TASK = 'fault'
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-p', action='store_true', default=False)
-parser.add_argument('-t', type=str, default='one_fridge_pick_pr2')  ## 'one_fridge_pick_pr2_tmp'
+parser.add_argument('-t', type=str, default=DEFAULT_TASK)  ## 'one_fridge_pick_pr2_tmp'
 args = parser.parse_args()
 
 
@@ -112,7 +115,7 @@ def fix_planning_config(viz_dir):
 
 def render_segmentation_mask(test_dir, viz_dir, camera_pose,
                              width=1280, height=960, fx=800, crop=False):
-    world = load_lisdf_pybullet(test_dir, width=width, height=height, verbose=True)
+    world = load_lisdf_pybullet(test_dir, width=width, height=height, verbose=False)
     remove_body(world.robot.body)
     # width = 1960
     # height = 1470
@@ -350,9 +353,10 @@ def check_key_same(viz_dir):
     return config['version_key'] in ACCEPTED_KEYS
 
 
-def process(subdir):
+def process(viz_dir):
     # if not isdir(join(dataset_dir, subdir)): return
-    viz_dir = join(dataset_dir, subdir)
+    # viz_dir = join(dataset_dir, subdir)
+    subdir = basename(viz_dir)
 
     ## need to temporarily move the dir to the test_cases folder for asset paths to be found
     test_dir = join(EXP_PATH, f"{task_name}_{subdir}")
@@ -393,9 +397,10 @@ def process(subdir):
     camera_pose = (x, y, z + 1), quat_from_euler((r - 0.3, p, w))
     # print('camera_pose', nice(camera_pose))
 
+    # redo = True
     if not check_key_same(viz_dir) or redo:
-        if isdir(rgb_dir):
-            shutil.rmtree(rgb_dir)
+        # if isdir(rgb_dir):
+        #     shutil.rmtree(rgb_dir)
         if isdir(seg_dir):
             shutil.rmtree(seg_dir)
         if isdir(crop_dir):
@@ -405,17 +410,17 @@ def process(subdir):
     # render_rgb_image(test_dir, viz_dir, camera_pose)
     # render_transparent_doors(test_dir, viz_dir, camera_pose)
 
-    if not isdir(rgb_dir):
-        print(viz_dir, 'rgbing ...')
-        render_segmented_rgb_images(test_dir, viz_dir, camera_pose, robot=False)
-        reset_simulation()
+    # if not isdir(rgb_dir):
+    #     print(viz_dir, 'rgbing ...')
+    #     render_segmented_rgb_images(test_dir, viz_dir, camera_pose, robot=False)
+    #     reset_simulation()
 
     ## Pybullet segmentation mask
     num_imgs = len(get_indices(viz_dir)) + 1
-    if not isdir(seg_dir) or len(listdir(seg_dir)) < num_imgs:
-        print(viz_dir, 'segmenting ...')
-        render_segmentation_mask(test_dir, viz_dir, camera_pose)
-        reset_simulation()
+    # if not isdir(seg_dir) or len(listdir(seg_dir)) < num_imgs:
+    #     print(viz_dir, 'segmenting ...')
+    #     render_segmentation_mask(test_dir, viz_dir, camera_pose)
+    #     reset_simulation()
 
     if not isdir(crop_dir) or len(listdir(crop_dir)) < num_imgs:
         print(viz_dir, 'cropping ...')
@@ -428,31 +433,35 @@ def process(subdir):
 
 
 if __name__ == "__main__":
+
     task_name = args.t
-    dataset_dir = join('/home/zhutiany/Documents/mamao-data/', task_name)
+    if task_name == 'tt':
+        task_names = ['tt_one_fridge_pick', 'tt_one_fridge_table_in', 'tt_two_fridge_in']
+    else:
+        task_names = [task_name]
 
-    # dataset_dir = '/home/zhutiany/Documents/mamao-data/'
-    # task_name = dataset_dir[dataset_dir.rfind('/')+1:]
-
-    # organize_dataset(task_name)
-
-    subdirs = listdir(dataset_dir)
-    subdirs.sort()
-    # subdirs = ['2102']
-    parallel = args.p
-
-    if parallel:
+    all_subdirs = []
+    for task_name in task_names:
+        dataset_dir = join('/home/zhutiany/Documents/mamao-data/', task_name)
+        # organize_dataset(task_name)
+        subdirs = listdir(dataset_dir)
+        subdirs.sort()
+        # subdirs = ['2102']
+        subdirs = [join(dataset_dir, s) for s in subdirs if isdir(join(dataset_dir, s))]
+        all_subdirs += subdirs
+    
+    if args.p:
         import multiprocessing
         from multiprocessing import Pool
 
         max_cpus = 24
         num_cpus = min(multiprocessing.cpu_count(), max_cpus)
-        print(f'using {num_cpus} cpus')
+        print(f'using {num_cpus} cpus for {len(all_subdirs)} subdirs')
         with Pool(processes=num_cpus) as pool:
-            for result in pool.imap_unordered(process, subdirs):
+            for result in pool.imap_unordered(process, all_subdirs):
                 pass
 
     else:
-        for subdir in subdirs:
+        for subdir in all_subdirs:
             process(subdir)
             # break

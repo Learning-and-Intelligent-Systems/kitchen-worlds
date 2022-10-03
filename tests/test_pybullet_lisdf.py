@@ -47,4 +47,5 @@ def load_dataset_cases(task_name='one_fridge_pick_pr2'):
 
 
 if __name__ == "__main__":
-    load_dataset_cases(task_name='one_fridge_pick_pr2')
+    task_name='one_fridge_pick_pr2'
+    load_dataset_cases(task_name)

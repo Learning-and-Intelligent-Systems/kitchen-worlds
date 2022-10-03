@@ -43,35 +43,49 @@ cd kitchen-worlds
 git submodule update --init --recursive
 ```
 
-2. Build FastDownward, used by PDDLStream planner
-
+2. Install dependencies
 ```shell
-cd pddlstream
-./downward/build.py
+conda env create -f environment.yml
+conda activate kitchen
+sudo apt-get install graphviz graphviz-dev  ## on Ubuntu
 ```
 
-3. Checkout the right branch of lisdf paerse
+3. Build FastDownward, used by PDDLStream planner
 
 ```shell
-cd ../lisdf
-git checkout main
+## sudo apt install cmake g++ git make python3
+(cd pddlstream; ./downward/build.py)
 ```
 
-4Install dependencies, in a virtual environment if you'd like. Have been tested on Python 3.7 and 3.8, on MacOS and on Ubuntu.
+4. Build IK solvers
+
+IKFast solver for PR2 arm planning:
 
 ```shell
-pip install virtualenv  ## if you haven't install
-python3 -m virtualenv venv/kitchen
-source venv/kitchen/bin/activate
-
-cd kitchen-worlds
-pip install -r requirements.txt
-sudo apt-get install graphviz graphviz-dev  ## on Ubuntue
+## sudo apt-get install python-dev
+(cd pybullet_planning/pybullet_tools/ikfast/pr2; python setup.py)
 ```
+
+TracIK for PR2 base, torso, and arm planning:
+
+```shell
+cd ..
+sudo apt-get install libeigen3-dev liborocos-kdl-dev libkdl-parser-dev liburdfdom-dev libnlopt-dev libnlopt-cxx-dev swig
+git clone https://github.com/mjd3/tracikpy.git
+pip install tracikpy/
+```
+
 
 [graphviz](https://pygraphviz.github.io/documentation/latest/install.html)
 
 ## Examples
+
+### Test planner for MALAO project
+
+```
+(cd tests; ./rerun.sh)
+```
+
 
 ### LISDF parser testing
 

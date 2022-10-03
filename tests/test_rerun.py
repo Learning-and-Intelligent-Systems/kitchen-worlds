@@ -7,10 +7,12 @@ import pickle
 import shutil
 from os import listdir
 from os.path import join, abspath, dirname, isdir, isfile
+from tabnanny import verbose
 from config import EXP_PATH
 import numpy as np
 import random
 import time
+import argparse
 
 from pybullet_tools.pr2_utils import get_group_conf
 from pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, wait_if_gui, \
@@ -40,13 +42,27 @@ from world_builder.actions import apply_actions
 from mamao_tools.utils import get_feasibility_checker
 
 
-TASK_NAME = 'one_fridge_pick_pr2_tmp'  ## 'one_fridge_pick_pr2_20_parallel_1'
-DATABASE_DIR = join('..', '..', 'mamao-data', TASK_NAME)
+SKIP_IF_SOLVED = False
+SKIP_IF_SOLVED_RECENTLY = True
+
+TASK_NAME = 'tt_one_fridge_pick'
+TASK_NAME = 'tt_one_fridge_table_in'
+TASK_NAME = 'tt_two_fridge_in'
 
 PARALLEL = False
-FEASIBILITY_CHECKER = 'oracle'
-SKIP_IF_SOLVED = False
+FEASIBILITY_CHECKER = 'None'  ## None | oracle
 
+parser = argparse.ArgumentParser()
+parser.add_argument('-t', type=str, default=TASK_NAME)
+parser.add_argument('-f', type=str, default=FEASIBILITY_CHECKER)
+parser.add_argument('-p', action='store_true', default=PARALLEL)
+args = parser.parse_args()
+
+TASK_NAME = args.t
+PARALLEL = args.p
+FEASIBILITY_CHECKER = args.f
+
+DATABASE_DIR = join('..', '..', 'mamao-data', TASK_NAME)
 
 def init_experiment(exp_dir):
     if isfile(TXT_FILE):
@@ -54,48 +70,25 @@ def init_experiment(exp_dir):
 
 #####################################
 
-#
-# def solve_one(pddlstream_problem, stream_info, fc):
-#     with Profiler():
-#         with LockRenderer(lock=True):
-#             solution = solve(pddlstream_problem, algorithm=DEFAULT_ALGORITHM, unit_costs=False,
-#                              stream_info=stream_info, success_cost=INF, verbose=True, debug=False,
-#                              feasibility_checker=fc)
-#     return solution
-#
-#
-# def solve_multiple(problem, stream_info={}, lock=True):
-#     reset_globals()
-#     profiler = Profiler(field='tottime', num=25) ## , enable=profile # cumtime | tottime
-#     profiler.save()
-#
-#     temp_dir = '/tmp/pddlstream-{}/'.format(os.getpid())
-#     print(f'\n\n\n\nsolve_multiple at temp dir {temp_dir} \n\n\n\n')
-#     safe_remove(temp_dir)
-#     ensure_dir(temp_dir)
-#     cwd_saver = TmpCWD(temp_cwd=temp_dir)  # TODO: multithread
-#     cwd_saver.save()  # TODO: move to the constructor
-#     lock_saver = LockRenderer(lock=lock)
-#
-#     try:
-#         solution = solve(problem, algorithm=DEFAULT_ALGORITHM, unit_costs=False, visualize=False,
-#                          stream_info=stream_info, success_cost=INF, verbose=True, debug=False)
-#     finally:
-#         lock_saver.restore()
-#         cwd_saver.restore()
-#         safe_remove(temp_dir)
-#
-#     profiler.restore()
-#     return solution
 
-
-def run_one(run_dir, PARALLEL=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
+def run_one(run_dir, parallel=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     ori_dir = run_dir ## join(DATABASE_DIR, run_dir)
-    if SKIP_IF_SOLVED and isfile(join(ori_dir, f'plan_rerun_{FEASIBILITY_CHECKER}.json')): return
+    file = join(ori_dir, f'plan_rerun_fc={FEASIBILITY_CHECKER}.json')
+    if isfile(file):
+        if SKIP_IF_SOLVED:
+            print('skipping solved problem', run_dir)
+            return
+        elif SKIP_IF_SOLVED_RECENTLY:
+            last_modified = os.path.getmtime(file)
+            if time.time() - last_modified < 60 * 60 * 24:
+                print('skipping recently solved problem', run_dir)
+                return
 
     print(f'\n\n\n--------------------------\n    rerun {ori_dir} \n------------------------\n\n\n')
     run_name = os.path.basename(ori_dir)
     exp_dir = join(EXP_PATH, f"{task_name}_{run_name}")
+    if isdir(exp_dir):
+        shutil.rmtree(exp_dir)
     if not isdir(exp_dir):
         shutil.copytree(ori_dir, exp_dir)
 
@@ -103,7 +96,7 @@ def run_one(run_dir, PARALLEL=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
         from utils import load_lisdf_synthesizer
         scene = load_lisdf_synthesizer(exp_dir)
 
-    world = load_lisdf_pybullet(exp_dir, width=720, height=560)
+    world = load_lisdf_pybullet(exp_dir, width=720, height=560, verbose=False)
     saver = WorldSaver()
     problem = Problem(world)
 
@@ -124,7 +117,7 @@ def run_one(run_dir, PARALLEL=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
     fc = get_feasibility_checker(ori_dir, mode=FEASIBILITY_CHECKER)
 
     start = time.time()
-    if PARALLEL:
+    if parallel:
         solution = solve_multiple(pddlstream_problem, stream_info)
     else:
         solution = solve_one(pddlstream_problem, stream_info, fc)
@@ -144,14 +137,14 @@ def run_one(run_dir, PARALLEL=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
         saver.restore()
 
     """ log plan, planning stats, and commands """
-    with open(join(ori_dir, f'plan_rerun_{FEASIBILITY_CHECKER}.json'), 'w') as f:
+    with open(join(ori_dir, f'plan_rerun_fc={FEASIBILITY_CHECKER}.json'), 'w') as f:
         data = {
             'planning_time': planning_time,
             'plan': [[str(a.name)]+[str(v) for v in a.args] for a in plan],
             'datatime': get_datetime(),
         }
         json.dump(data, f, indent=3)
-    with open(join(ori_dir, f'commands_rerun_{FEASIBILITY_CHECKER}.txt'), 'w') as f:
+    with open(join(ori_dir, f'commands_rerun_fc={FEASIBILITY_CHECKER}.txt'), 'w') as f:
         f.write('\n'.join([str(n) for n in commands]))
     # with open(join(ori_dir, 'commands_rerun.pkl'), 'wb') as f:
     #     pickle.dump(commands, f, pickle.HIGHEST_PROTOCOL)
@@ -164,20 +157,23 @@ def run_one(run_dir, PARALLEL=False, task_name=TASK_NAME, SKIP_IF_SOLVED=SKIP_IF
     shutil.rmtree(exp_dir)
 
 
-def process(index, PARALLEL=True):
+def process(index, parallel=True):
     np.random.seed(int(time.time()))
     random.seed(time.time())
-    return run_one(str(index), PARALLEL=PARALLEL)
+    return run_one(str(index), parallel=parallel)
 
 
-def main(PARALLEL=True):
+def main(parallel=True):
     if isdir('visualizations'):
         shutil.rmtree('visualizations')
 
     start_time = time.time()
     cases = [join(DATABASE_DIR, f) for f in listdir(DATABASE_DIR) if isdir(join(DATABASE_DIR, f))]
+    cases.sort()
+    # cases = [f for f in cases if '/6' in f or '/7' in f or '/8' in f or '/9' in f]
+
     num_cases = len(cases)
-    if PARALLEL:
+    if parallel:
         import multiprocessing
         from multiprocessing import Pool
 
@@ -193,10 +189,10 @@ def main(PARALLEL=True):
     else:
         for i in range(num_cases):
             # if i in [0, 1]: continue
-            process(cases[i], PARALLEL=False)
+            process(cases[i], parallel=False)
 
-    print(f'solved {num_cases} problems (parallel={PARALLEL}) in {round(time.time() - start_time, 3)} sec')
+    print(f'solved {num_cases} problems (parallel={parallel}) in {round(time.time() - start_time, 3)} sec')
 
 
 if __name__ == '__main__':
-    main(PARALLEL=PARALLEL)
+    main(parallel=PARALLEL)
