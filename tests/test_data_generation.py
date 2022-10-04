@@ -2,47 +2,44 @@
 
 from __future__ import print_function
 import shutil
-
+import pickle
 import os
+import time
+import random
 import json
 from os.path import join, abspath, dirname, isdir, isfile, basename
 from config import EXP_PATH, OUTPUT_PATH
 
-from pybullet_tools.pr2_utils import get_group_conf
-from pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, wait_if_gui, \
-    SEPARATOR, get_aabb, wait_for_duration
-from pybullet_tools.bullet_utils import summarize_facts, print_goal, nice, get_datetime
-from pybullet_tools.pr2_agent import solve_multiple, post_process, move_cost_fn
-from pybullet_tools.logging import TXT_FILE
-
-from pybullet_tools.pr2_primitives import get_group_joints, Conf, get_base_custom_limits, Pose, Conf, \
-    get_ik_ir_gen, get_motion_gen, get_cfree_approach_pose_test, get_cfree_pose_pose_test, get_cfree_traj_pose_test, \
-    get_grasp_gen, Attach, Detach, Clean, Cook, control_commands, Command, \
-    get_gripper_joints, GripperCommand, State
-from pybullet_tools.flying_gripper_agent import get_stream_map
-
-from pddlstream.language.generator import from_gen_fn, from_list_fn, from_fn, fn_from_constant, empty_gen, from_test
 from pddlstream.language.constants import Equal, AND, print_solution, PDDLProblem
-from pddlstream.utils import read, INF, get_file_path, find_unique, Profiler, str_from_object
 from pddlstream.algorithms.meta import solve, create_parser
-from pddlstream.algorithms.focused import solve_focused
 
-from pybullet_planning.lisdf_tools.lisdf_loader import load_lisdf_pybullet, pddlstream_from_dir
-from pybullet_planning.lisdf_tools.lisdf_planning import pddl_to_init_goal, Problem
+from pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, wait_if_gui, \
+    SEPARATOR, get_aabb, wait_for_duration, has_gui, reset_simulation, set_random_seed, \
+    set_numpy_seed, set_renderer
+from pybullet_tools.bullet_utils import summarize_facts, print_goal, nice, get_datetime
+from pybullet_tools.pr2_agent import solve_multiple, post_process, pddlstream_from_state_goal, \
+    create_cwd_saver
+from pybullet_tools.pr2_primitives import control_commands, State, apply_commands
+from pybullet_tools.logging import parallel_print, myprint
+
+from lisdf_tools.lisdf_loader import pddl_files_from_dir
 
 from world_builder.actions import apply_actions
+from world_builder.world_generator import save_to_outputs_folder
 
 from test_utils import parallel_processing
 from test_world_builder import create_pybullet_world
 
 
-DEFAULT_TEST = 'test_fridges_tables'
+DEFAULT_TEST = 'test_fridges_tables' ## 'test_one_fridge' | 'test_fridge_table' | 'test_fridges_tables'
 PARALLEL = False
 DIVERSE = False
+USE_GUI = True
+SEED = None
 
 
 def get_args(test_name=DEFAULT_TEST, output_name='one_fridge_pick_pr2', n_problems=2,
-             parallel=PARALLEL, diverse=DIVERSE):
+             parallel=PARALLEL, diverse=DIVERSE, use_gui=USE_GUI, seed=SEED):
 
     parser = create_parser()
     parser.add_argument('-test', type=str, default=test_name,
@@ -51,19 +48,28 @@ def get_args(test_name=DEFAULT_TEST, output_name='one_fridge_pick_pr2', n_proble
                         help='Name of the output folder inside outputs/')
     parser.add_argument('-n_problems', type=int, default=n_problems,
                         help='Number of sampled problems (scene & goal)')
-    parser.add_argument('-p', action='store_true', default=parallel)
-    parser.add_argument('-d', action='store_true', default=diverse)
+    parser.add_argument('-p', '--parallel', action='store_true', default=parallel)
+    parser.add_argument('-d', '--diverse', action='store_true', default=diverse)
 
-    parser.add_argument('-v', '--viewer', action='store_true', help='')
+    parser.add_argument('-v', '--viewer', action='store_true', default=use_gui)
     parser.add_argument('-t', '--time_step', type=float, default=4e-0)
-    parser.add_argument('-s', '--seed', type=int, default=None, help='')
+    parser.add_argument('-s', '--seed', type=int, default=seed, help='')
     parser.add_argument('-cam', '--camera', action='store_true', default=True, help='')
+    parser.add_argument('-seg', '--segment', action='store_true', default=False, help='')
     parser.add_argument('-cfree', action='store_true', help='Disables collisions during planning')
     parser.add_argument('-enable', action='store_true', help='Enables rendering during planning')
     parser.add_argument('-teleport', action='store_true', help='Teleports between configurations')
+    parser.add_argument('-simulate', action='store_true', help='Simulates the system')
     # parser.add_argument('-simulate', action='store_true', help='Simulates the system')
+
     args = parser.parse_args()
-    print('Arguments:', args)
+    seed = args.seed
+    if seed is None:
+        seed = random.randint(0, 10 ** 6 - 1)
+    set_random_seed(seed)
+    set_numpy_seed(seed)
+    args.seed = seed
+    print('Seed:', seed)
     return args
 
 
@@ -73,18 +79,18 @@ args = get_args()
 def init_data_run(test_name, data_name):
     """ inside each data folder, to be generated:
         - before planning:
-            - scene.lisdf
-            - problem.pddl
-            - planning_config.json
-            - log.txt (generated before planning)
+            [x] scene.lisdf
+            [x] problem.pddl
+            [x] planning_config.json
+            [x] log.txt (generated before planning)
         - after planning:
-            - plan.json
-            - commands.pkl
-            - log.json (generated by pddlstream)
+            [x] plan.json
+            [x] commands.pkl
+            [x] log.json (generated by pddlstream)
         - before training (optional):
-            - crop_images
-            - diverse_plans.json
-            - features.txt
+            [ ] crop_images
+            [ ] diverse_plans.json
+            [ ] features.txt
     """
     testcase_dir = join(EXP_PATH, test_name)
     output_dir = join(OUTPUT_PATH, data_name)
@@ -107,70 +113,109 @@ def get_builder(test_name):
 #####################################
 
 
-def process(output_dir):
+def process(exp_dir):
     """ exist a version in cognitive-architectures for generating mini-datasets (single process),
         run in kitchen-worlds for parallelization, but no reliable planning time data """
 
-    """ STEP 0 -- INITIATE THE EXPERIMENT """
+    """ STEP 0 -- COPY PDDL FILES """
     # init_data_run(args.test, output_dir)
+    print(exp_dir)
 
     """ STEP 1 -- GENERATE SCENES """
-    file, state, goal = create_pybullet_world(args, get_builder(args.test), world_name=basename(output_dir),
-                                              template_name=args.test, out_dir=output_dir, verbose=False,
-                                              SAVE_LISDF=False, SAVE_TESTCASE=True, to_plan=True)
+    state, goal, file = create_pybullet_world(
+        args, get_builder(args.test), world_name=basename(exp_dir), SAMPLING=False,
+        template_name=args.test, out_dir=exp_dir, DEPTH_IMAGES=False,
+        SAVE_LISDF=False, SAVE_TESTCASE=True, root_dir=EXP_PATH)
     world = state.world
     saver = WorldSaver()
-    problem = Problem()
 
-    pddlstream_problem = pddlstream_from_dir(problem, exp_dir=output_dir, collisions=not args.cfree,
-                                             teleport=args.teleport)
-    _, _, _, stream_map, init, goal = pddlstream_problem
-    world.summarize_all_objects(init)
+    domain_path, stream_path, config_path = pddl_files_from_dir(exp_dir, replace_pddl=False)
+    cwd_saver = create_cwd_saver()
+    print_fn = parallel_print ## if args.parallel else myprint
+    print_fn(args)
 
-    # stream_info = get_stream_info(partial=False, defer=False)  ## problem
-    summarize_facts(init, world=world)
-    print_goal(goal)
-    print(SEPARATOR)
-
+    pddlstream_problem = pddlstream_from_state_goal(
+        state, goal, domain_pddl=domain_path, stream_pddl=stream_path,
+        custom_limits=world.robot.custom_limits, collisions=not args.cfree,
+        teleport=args.teleport, print_fn=print_fn)
     stream_info = world.robot.get_stream_info(partial=False, defer=False)
 
-    kwargs = dict()
+    kwargs = {'visualize': True}
     if args.diverse:
-        kwargs = dict(
-            diverse=True,
-            downward_time=20,  ## max time to get 100, 10 sec, 30 sec for 300
-            evaluation_time=60,  ## on each skeleton
-            max_plans=200,  ## number of skeletons
-        )
-    solution, tmp_dir = solve_multiple(pddlstream_problem, stream_info, lock=not args.enable, **kwargs)
+        kwargs.update(dict(
+                diverse=True,
+                downward_time=20,  ## max time to get 100, 10 sec, 30 sec for 300
+                evaluation_time=60,  ## on each skeleton
+                max_plans=200,  ## number of skeletons
+        ))
+    start = time.time()
+    solution, tmp_dir = solve_multiple(pddlstream_problem, stream_info, lock=not args.enable,
+                                       cwd_saver=cwd_saver, **kwargs)
 
     print_solution(solution)
     plan, cost, evaluations = solution
+
+    """ =============== log plan and planning time =============== """
+    t = None if args.parallel else round(time.time() - start, 3)
+    if plan is None:
+        plan_log = None
+        plan_len = None
+        init = None
+    else:
+        plan_log = [str(a) for a in plan]
+        plan_len = len(plan)
+        init = [[str(a) for a in f] for f in evaluations.preimage_facts]
+    time_log = [{
+        'planning_time': t, 'plan': plan_log, 'plan_len': plan_len, 'init': init
+    }, {'total_planning': t}]
+    with open(join(exp_dir, f'plan.json'), 'w') as f:
+        json.dump(time_log, f, indent=4)
+
+    """ =============== save planing log =============== """
+    txt_file = join(tmp_dir, 'txt_file.txt')
+    if isfile(txt_file):
+        shutil.move(txt_file, join(exp_dir, f"log.txt"))
+    txt_file = join(tmp_dir, 'visualizations', 'log.json')
+    if isfile(txt_file):
+        shutil.move(txt_file, join(exp_dir, f"log.json"))
+    cwd_saver.restore()
+
+    """ =============== visualize the plan =============== """
     if (plan is None) or not has_gui():
-        disconnect()
+        end_process(exp_dir, args.output_dir)
         return
 
-    print(SEPARATOR)
+    """ =============== save commands for replay =============== """
     with LockRenderer(lock=not args.enable):
-        commands = post_process(problem, plan)
-        problem.remove_gripper()
+        commands = post_process(state, plan, use_commands=False)
+        state.remove_gripper()
         saver.restore()
+    with open(join(exp_dir, f"commands.pkl"), 'wb') as f:
+        pickle.dump(commands, f)
 
+    print(SEPARATOR)
     saver.restore()
-    wait_if_gui('Execute?')
+    # wait_if_gui('Execute?')
     if args.simulate:  ## real physics
         control_commands(commands)
     else:
-        # apply_commands(State(), commands, time_step=0.01)
-        apply_actions(problem, commands, time_step=0.1)
-    wait_if_gui('Finish?')
+        set_renderer(True)
+        apply_actions(state, commands, time_step=1e-2, verbose=False)
+    # wait_if_gui('Finish?')
+    end_process(exp_dir, args.output_dir)
+
+
+def end_process(exp_dir, output_dir):
+    print(SEPARATOR)
+    shutil.move(exp_dir, join(OUTPUT_PATH, output_dir, basename(exp_dir)))
+    reset_simulation()
     disconnect()
 
 
 def collect_for_fastamp():
     start = get_datetime()
-    output_dirs = [join(args.output_dir, f'{start}_{i}') for i in range(args.n_problems)]
-    parallel_processing(process, output_dirs, parallel=args.p)
+    exp_dirs = [join(EXP_PATH, f'{args.output_dir}_{start}_{i}') for i in range(args.n_problems)]
+    parallel_processing(process, exp_dirs, parallel=args.parallel)
 
 
 if __name__ == '__main__':

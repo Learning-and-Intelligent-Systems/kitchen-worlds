@@ -53,24 +53,24 @@ PREFIX = 'diverse_' if DIVERSE else ''
 RERUN_SUBDIR = 'rerun_2'
 
 SKIP_IF_SOLVED = False and not GENERATE_SKELETONS
-SKIP_IF_SOLVED_RECENTLY = True and not GENERATE_SKELETONS
+SKIP_IF_SOLVED_RECENTLY = False and not GENERATE_SKELETONS
 RETRY_IF_FAILED = True
 check_time = 1664833785  ## 1664833785 for pick, 1664750094 for in
 
 # TASK_NAME = 'tt_one_fridge_pick'
-# TASK_NAME = 'tt_one_fridge_table_pick'
+TASK_NAME = 'tt_one_fridge_table_pick'
 # TASK_NAME = 'tt_one_fridge_table_in'
-TASK_NAME = 'tt_two_fridge_pick'
+# TASK_NAME = 'tt_two_fridge_pick'
 # TASK_NAME = 'tt_two_fridge_in'
 # TASK_NAME = 'mm_two_fridge_in'
 # TASK_NAME = 'tt'
 # TASK_NAME = 'mm'
 
 CASES = None
-# CASES = ['20']
+CASES = ['0']
 
 PARALLEL = GENERATE_SKELETONS
-FEASIBILITY_CHECKER = 'pvt-task'  ## None | oracle | pvt | pvt* | binary | shuffle
+FEASIBILITY_CHECKER = 'oracle'  ## None | oracle | pvt | pvt* | binary | shuffle
 if GENERATE_SKELETONS:
     FEASIBILITY_CHECKER = 'oracle'
 
@@ -243,8 +243,10 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
             print('Commands:', commands)
             problem.remove_gripper()
             saver.restore()
-        with open(join(ori_dir, f'{PREFIX}commands_rerun_fc={FEASIBILITY_CHECKER}.txt'), 'w') as f:
-            f.write('\n'.join([str(n) for n in commands]))
+        # with open(join(ori_dir, f'{PREFIX}commands_rerun_fc={FEASIBILITY_CHECKER}.txt'), 'w') as f:
+        #     f.write('\n'.join([str(n) for n in commands]))
+        with open(join(ori_dir, f'{PREFIX}commands_rerun_fc={FEASIBILITY_CHECKER}.pkl'), 'wb') as f:
+            pickle.dump(commands, f)
         if has_gui():
             saver.restore()
             input('Begin?')

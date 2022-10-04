@@ -30,14 +30,14 @@ from pybullet_tools.pr2_primitives import Trajectory, Command
 from mamao_tools.utils import get_feasibility_checker, get_plan
 
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
-from test_gym import load_lisdf_isaacgym, update_gym_world
 
 USE_GYM = False
 SAVE_MP4 = False
 AUTO_PLAY = False
 EVALUATE_QUALITY = True
 
-GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/one_fridge_pick_pr2/one_fridge_pr2_0921_220304'
+GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/one_fridge_pick_pr2/one_fridge_pick_pr2_1004_01:00_0'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data/tt_one_fridge_table_pick/0/rerun_2/diverse_commands_rerun_fc=oracle.pkl'
 TASK_NAME = 'one_fridge_pick_pr2'
 
 # TASK_NAME = 'mm_one_fridge_table_in'
@@ -95,6 +95,13 @@ def query_yes_no(question, default="no"):
 
 
 def run_one(run_dir, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, height=1120):
+    pkl_file = 'commands.pkl'
+    if run_dir.endswith('.pkl'):
+        pkl_file = basename(run_dir)
+        run_dir = run_dir[:-len(pkl_file)-1]
+        rerun_dir = basename(run_dir)
+        run_dir = run_dir[:-len(rerun_dir)-1]
+        pkl_file = join(rerun_dir, pkl_file)
     run_name = basename(run_dir)
     exp_dir = copy_dir_for_process(run_dir, tag='replaying')
     plan = get_plan(run_dir)
@@ -102,9 +109,10 @@ def run_one(run_dir, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, height=
     world = load_lisdf_pybullet(exp_dir, use_gui=not USE_GYM, width=width, height=height, verbose=False)
     problem = Problem(world)
 
-    commands = pickle.load(open(join(exp_dir, 'commands.pkl'), "rb"))
+    commands = pickle.load(open(join(exp_dir, pkl_file), "rb"))
 
     if USE_GYM:
+        from test_gym import load_lisdf_isaacgym
         gym_world = load_lisdf_isaacgym(os.path.abspath(exp_dir),
                                         camera_width=1280, camera_height=800)
         img_dir = join(exp_dir, 'gym_images')
@@ -147,6 +155,7 @@ def run_one(run_dir, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, height=
 def record_actions_in_gym(problem, actions, gym_world, img_dir=None, gif_name='gym_replay.gif',
                           time_step=0.5, verbose=False, plan=None):
     """ act out the whole plan and event in the world without observation/replanning """
+    from test_gym import update_gym_world
     if actions is None:
         return
     state_event = State(problem.world)
@@ -223,5 +232,5 @@ def mp4_to_gif(mp4_file, frame_folder='output'):
 
 
 if __name__ == '__main__':
-    process_all_tasks(process, args.t, cases=CASES)
-    # process_all_tasks(process, args.t, path=GIVEN_PATH)
+    # process_all_tasks(process, args.t, cases=CASES)
+    process_all_tasks(process, args.t, path=GIVEN_PATH)

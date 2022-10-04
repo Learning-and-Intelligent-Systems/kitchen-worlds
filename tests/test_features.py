@@ -297,6 +297,7 @@ def process(viz_dir):
     # load_lisdf_synthesizer(test_dir)
     # adjust_table_scale(test_dir, viz_dir)
     add_features(test_dir, viz_dir)
+    shutil.rmtree(test_dir)
 
 
 def duplicate_baseline(viz_dir, old_dir, new_dir):
