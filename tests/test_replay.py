@@ -32,7 +32,7 @@ from mamao_tools.utils import get_feasibility_checker, get_plan
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 from test_gym import load_lisdf_isaacgym, update_gym_world
 
-USE_GYM = True
+USE_GYM = False
 SAVE_MP4 = False
 AUTO_PLAY = False
 EVALUATE_QUALITY = True
@@ -40,7 +40,6 @@ EVALUATE_QUALITY = True
 GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/one_fridge_pick_pr2/one_fridge_pr2_0921_220304'
 TASK_NAME = 'one_fridge_pick_pr2'
 
-TASK_NAME = 'tt_two_fridge_in'
 # TASK_NAME = 'mm_one_fridge_table_in'
 # TASK_NAME = 'mm_one_fridge_table_on'
 # TASK_NAME = 'mm_one_fridge_table_pick'
@@ -49,13 +48,14 @@ TASK_NAME = 'tt_two_fridge_in'
 
 # TASK_NAME = 'tt_one_fridge_pick'
 # TASK_NAME = 'tt_one_fridge_table_in'
-# TASK_NAME = 'tt_two_fridge_in'
+TASK_NAME = 'tt_two_fridge_in'
+TASK_NAME = 'ff_one_fridge_table_pick'
 
 # TASK_NAME = '_examples'
 # TASK_NAME = 'elsewhere'
 # TASK_NAME = 'discarded'
 
-CASES = ['4']  ## None
+CASES = ['31']  ## None
 
 parser = get_base_parser(task_name=TASK_NAME, parallel=False, use_viewer=True)
 args = parser.parse_args()

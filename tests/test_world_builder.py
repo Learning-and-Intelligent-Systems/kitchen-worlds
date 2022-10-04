@@ -29,19 +29,21 @@ from world_builder.entities import Object, Region, Environment, Robot, Camera, F
     Surface, Moveable, Supporter, Steerable, Door
 from world_builder.world_generator import to_lisdf, save_to_test_cases
 
-from world_builder.builders import test_pick, test_exist_omelette, test_kitchen_oven, test_feg_pick, test_one_fridge
+from world_builder.builders import test_pick, test_exist_omelette, test_kitchen_oven, test_feg_pick, \
+    test_one_fridge, create_pybullet_world
 
 import argparse
 from datetime import datetime
 
-DEFAULT_TEST = test_one_fridge  ## test_one_fridge | test_feg_pick | test_kitchen_oven | test_exist_omelette
+DEFAULT_TEST = test_kitchen_oven  ## test_one_fridge | test_feg_pick | test_kitchen_oven | test_exist_omelette
 USE_GUI = True
 
-def get_parser():
+
+def get_parser(use_gui=USE_GUI):
     parser = argparse.ArgumentParser()
 
     ## -------- simulation related
-    parser.add_argument('-v', '--viewer', action='store_true', help='')
+    parser.add_argument('-v', '--viewer', action='store_true', default=use_gui, help='')
     parser.add_argument('-d', '--drive', action='store_true', help='')
     parser.add_argument('-t', '--time_step', type=float, default=4e-0)
     parser.add_argument('--teleport', action='store_true', help='')
@@ -53,47 +55,50 @@ def get_parser():
     args = parser.parse_args()  # TODO: flag to save a video
     set_random_seed(args.seed)
     return args
-
-
-def create_pybullet_world(args, builder, world_name='test_scene', SAVE_LISDF=False, EXIT=True,
-                          SAVE_TESTCASE=False, template_name=None, out_dir=None, verbose=False):
-    if template_name is None:
-        template_name = builder.__name__
-
-    """ ============== initiate simulator ==================== """
-
-    ## for viewing, not the size of depth image
-    connect(use_gui=USE_GUI, shadows=False, width=1980, height=1238)
-
-    # set_camera_pose(camera_point=[2.5, 0., 3.5], target_point=[1., 0, 1.])
-    if args.camera:
-        enable_preview()
-        p.configureDebugVisualizer(p.COV_ENABLE_SEGMENTATION_MARK_PREVIEW, False)
-    draw_pose(unit_pose(), length=1.)
-
-    """ ============== sample world configuration ==================== """
-
-    world = World(args, time_step=args.time_step)
-    floorplan, goal = builder(world, verbose=verbose)
-
-    ## no gravity once simulation starts
-    set_all_static()
-    if verbose: world.summarize_all_objects()
-
-    """ ============== save world configuration ==================== """
-
-    state = State(world)
-    file = None
-    if SAVE_LISDF:   ## only lisdf files
-        init = state.get_facts(verbose=verbose)
-        file = to_lisdf(state.world, init, floorplan=floorplan, world_name=world_name, verbose=verbose)
-    if SAVE_TESTCASE and out_dir is not None:
-        file = save_to_test_cases(state, goal, template_name, floorplan, out_dir, verbose=verbose, DEPTH_IMAGES=True)
-
-    if EXIT:
-        wait_if_gui('exit?')
-    reset_simulation()
-    return file
+#
+#
+# def create_pybullet_world(args, builder, world_name='test_scene', SAVE_LISDF=False, EXIT=True,
+#                           SAVE_TESTCASE=False, template_name=None, out_dir=None, verbose=False, to_plan=False):
+#     if template_name is None:
+#         template_name = builder.__name__
+#
+#     """ ============== initiate simulator ==================== """
+#
+#     ## for viewing, not the size of depth image
+#     connect(use_gui=USE_GUI, shadows=False, width=1980, height=1238)
+#
+#     # set_camera_pose(camera_point=[2.5, 0., 3.5], target_point=[1., 0, 1.])
+#     if args.camera:
+#         enable_preview()
+#         p.configureDebugVisualizer(p.COV_ENABLE_SEGMENTATION_MARK_PREVIEW, False)
+#     draw_pose(unit_pose(), length=1.)
+#
+#     """ ============== sample world configuration ==================== """
+#
+#     world = World(args, time_step=args.time_step)
+#     floorplan, goal = builder(world, verbose=verbose)
+#
+#     ## no gravity once simulation starts
+#     set_all_static()
+#     if verbose: world.summarize_all_objects()
+#
+#     """ ============== save world configuration ==================== """
+#
+#     state = State(world)
+#     file = None
+#     if SAVE_LISDF:   ## only lisdf files
+#         init = state.get_facts(verbose=verbose)
+#         file = to_lisdf(state.world, init, floorplan=floorplan, world_name=world_name, verbose=verbose)
+#     if SAVE_TESTCASE and out_dir is not None:
+#         file = save_to_test_cases(state, goal, template_name, floorplan, out_dir, verbose=verbose, DEPTH_IMAGES=True)
+#
+#     if to_plan:
+#         return file, state, goal
+#
+#     if EXIT:
+#         wait_if_gui('exit?')
+#     reset_simulation()
+#     return file
 
 
 if __name__ == '__main__':
@@ -107,7 +112,8 @@ if __name__ == '__main__':
     def process(index):
         np.random.seed(index)
         random.seed(index)
-        return create_pybullet_world(args, builder, out_dir=out_dir, SAVE_TESTCASE=True, EXIT=False, verbose=False)
+        return create_pybullet_world(args, builder, out_dir=out_dir, SAVE_TESTCASE=True,
+                                     EXIT=False, RESET=True, verbose=False)
 
     start_time = time.time()
     if parallel:

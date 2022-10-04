@@ -92,18 +92,9 @@ def get_run_dirs(task_name):
     return all_subdirs
 
 
-def process_all_tasks(process, task_name, parallel=False, cases=None, path=None):
-    clear_pddlstream_cache()
+def parallel_processing(process, inputs, parallel):
     start_time = time.time()
-
-    if path is not None:
-        cases = [path]
-    elif cases is not None and len(cases) > 0:
-        cases = [join(MAMAO_DATA_PATH, task_name, case) for case in cases]
-    else:
-        cases = get_run_dirs(task_name)
-
-    num_cases = len(cases)
+    num_cases = len(inputs)
 
     if parallel:
         import multiprocessing
@@ -113,10 +104,63 @@ def process_all_tasks(process, task_name, parallel=False, cases=None, path=None)
         num_cpus = min(multiprocessing.cpu_count(), max_cpus)
         print(f'using {num_cpus} cpus')
         with Pool(processes=num_cpus) as pool:
-            pool.map(process, cases)
+            pool.map(process, inputs)
 
     else:
         for i in range(num_cases):
-            process(cases[i])
+            process(inputs[i])
 
     print(f'went through {num_cases} run_dirs (parallel={parallel}) in {round(time.time() - start_time, 3)} sec')
+
+
+def process_all_tasks(process, task_name, parallel=False, cases=None, path=None):
+    clear_pddlstream_cache()
+
+    if path is not None:
+        cases = [path]
+    elif cases is not None and len(cases) > 0:
+        cases = [join(MAMAO_DATA_PATH, task_name, case) for case in cases]
+    else:
+        cases = get_run_dirs(task_name)
+
+    parallel_processing(process, cases, parallel)
+
+
+def find_duplicate_worlds(d1, d2):
+    from config import MAMAO_DATA_PATH
+
+    def find_duplicate(found):
+        dup1 = len(set(found)) != len(found)
+        if dup1:
+            seen = []
+            dup = []
+            for f in found:
+                if f not in seen:
+                    seen.append(f)
+                else:
+                    dup.append(f)
+            print(f'{t} has duplicate {(len(dup))}, {dup}')
+
+    t1 = get_task_names(d1)
+    t2 = get_task_names(d2)
+    n1 = []
+    for t in t1:
+        found = open(join(MAMAO_DATA_PATH, f'{t}.txt')).read().splitlines()
+        find_duplicate(found)
+        n1.extend(found)
+    n2 = []
+    for t in t2:
+        found = open(join(MAMAO_DATA_PATH, f'{t}.txt')).read().splitlines()
+        find_duplicate(found)
+        n2.extend(found)
+    dup1 = len(set(n1)) != len(n1)
+    dup2 = len(set(n2)) != len(n2)
+    inter = len(list(set(n1) & set(n2))) > 0
+    print(f'\nt1: {d1}, t2: {d2}, dup1: {dup1}, dup2: {dup2}, inter: {inter}'
+          f'\n----------------------------------------------------------\n')
+
+
+if __name__ == '__main__':
+    find_duplicate_worlds('mm', 'ww')
+    find_duplicate_worlds('mm', 'ff')
+    find_duplicate_worlds('ww', 'ff')

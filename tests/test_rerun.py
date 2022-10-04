@@ -55,7 +55,7 @@ RERUN_SUBDIR = 'rerun_2'
 SKIP_IF_SOLVED = False and not GENERATE_SKELETONS
 SKIP_IF_SOLVED_RECENTLY = True and not GENERATE_SKELETONS
 RETRY_IF_FAILED = True
-check_time = 1664755683  ## 1664755683 for pick, 1664750094 for in
+check_time = 1664833785  ## 1664833785 for pick, 1664750094 for in
 
 # TASK_NAME = 'tt_one_fridge_pick'
 # TASK_NAME = 'tt_one_fridge_table_pick'
@@ -67,7 +67,7 @@ TASK_NAME = 'tt_two_fridge_pick'
 # TASK_NAME = 'mm'
 
 CASES = None
-# CASES = ['24']
+# CASES = ['20']
 
 PARALLEL = GENERATE_SKELETONS
 FEASIBILITY_CHECKER = 'pvt-task'  ## None | oracle | pvt | pvt* | binary | shuffle
@@ -193,9 +193,13 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
             diverse=DIVERSE,
             downward_time=20,  ## max time to get 100, 10 sec, 30 sec for 300
             evaluation_time=60,  ## on each skeleton
+            max_plans=200,  ## number of skeletons
         )
         if GENERATE_SKELETONS:
             kwargs['evaluation_time'] = -0.5
+        if '_in/' in run_dir:
+            kwargs['downward_time'] = 10
+            kwargs['max_plans'] = 100
     else:
         kwargs = dict()
 
