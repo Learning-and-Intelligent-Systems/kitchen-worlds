@@ -46,7 +46,7 @@ from mamao_tools.data_utils import get_instance_info, exist_instance
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 
 
-GENERATE_SKELETONS = False
+GENERATE_SKELETONS = True
 USE_VIEWER = False
 DIVERSE = True
 PREFIX = 'diverse_' if DIVERSE else ''
@@ -58,18 +58,18 @@ RETRY_IF_FAILED = True
 check_time = 1664833785  ## 1664833785 for pick, 1664750094 for in
 
 # TASK_NAME = 'tt_one_fridge_pick'
-TASK_NAME = 'tt_one_fridge_table_pick'
+# TASK_NAME = 'tt_one_fridge_table_pick'
 # TASK_NAME = 'tt_one_fridge_table_in'
 # TASK_NAME = 'tt_two_fridge_pick'
 # TASK_NAME = 'tt_two_fridge_in'
 # TASK_NAME = 'mm_two_fridge_in'
 # TASK_NAME = 'tt'
-# TASK_NAME = 'mm'
+TASK_NAME = 'mm'
 
 CASES = None
-CASES = ['0']
+# CASES = ['0']
 
-PARALLEL = GENERATE_SKELETONS
+PARALLEL = GENERATE_SKELETONS ## and False
 FEASIBILITY_CHECKER = 'oracle'  ## None | oracle | pvt | pvt* | binary | shuffle
 if GENERATE_SKELETONS:
     FEASIBILITY_CHECKER = 'oracle'
@@ -124,30 +124,30 @@ def clear_all_rerun_results(run_dir, **kwargs):
 
 
 def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
-    ori_dir = join(run_dir, RERUN_SUBDIR) ## join(DATABASE_DIR, run_dir)
-    if not isdir(ori_dir):
-        os.mkdir(ori_dir)
-
-    file = join(ori_dir, f'{PREFIX}plan_rerun_fc={FEASIBILITY_CHECKER}.json')
-    if isfile(file): ## and not '/11' in ori_dir
-        failed = False
-        if RETRY_IF_FAILED:
-            failed = json.load(open(file, 'r'))['plan'] is None
-
-        if not RETRY_IF_FAILED or not failed:
-            if SKIP_IF_SOLVED:
-                print('skipping solved problem', run_dir)
-                return
-            elif SKIP_IF_SOLVED_RECENTLY:
-                last_modified = os.path.getmtime(file)
-                if last_modified > check_time:
-                    print('skipping recently solved problem', run_dir)
-                    return
-
     if GENERATE_SKELETONS:
         file = join(run_dir, f'diverse_plans.json')
         if isfile(file):
             return
+
+    else:
+        ori_dir = join(run_dir, RERUN_SUBDIR)  ## join(DATABASE_DIR, run_dir)
+        if not isdir(ori_dir):
+            os.mkdir(ori_dir)
+        file = join(ori_dir, f'{PREFIX}plan_rerun_fc={FEASIBILITY_CHECKER}.json')
+        if isfile(file):  ## and not '/11' in ori_dir
+            failed = False
+            if RETRY_IF_FAILED:
+                failed = json.load(open(file, 'r'))['plan'] is None
+
+            if not RETRY_IF_FAILED or not failed:
+                if SKIP_IF_SOLVED:
+                    print('skipping solved problem', run_dir)
+                    return
+                elif SKIP_IF_SOLVED_RECENTLY:
+                    last_modified = os.path.getmtime(file)
+                    if last_modified > check_time:
+                        print('skipping recently solved problem', run_dir)
+                        return
 
     exp_dir = copy_dir_for_process(run_dir, tag='replaying')
 
@@ -210,6 +210,10 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
 
     ## just to get all diverse plans as labels
     if GENERATE_SKELETONS:
+        ori_dir = join(run_dir, 'rerun_1')  ## join(DATABASE_DIR, run_dir)
+        if isdir(ori_dir) and len(listdir(ori_dir)) == 0:
+            shutil.rmtree(ori_dir)
+
         fc.dump_log(join(run_dir, f'diverse_plans.json'), plans_only=True)
         reset_simulation()
         shutil.rmtree(exp_dir)

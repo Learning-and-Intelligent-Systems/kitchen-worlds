@@ -30,15 +30,15 @@ from world_builder.world_generator import save_to_outputs_folder
 from test_utils import parallel_processing
 from test_world_builder import create_pybullet_world
 
-
+NUM_PROBLEMS = 300
 DEFAULT_TEST = 'test_fridges_tables' ## 'test_one_fridge' | 'test_fridge_table' | 'test_fridges_tables'
-PARALLEL = True
+PARALLEL = False
 DIVERSE = False
-USE_GUI = True
-SEED = 502702
+USE_GUI = False
+SEED = None
 
 
-def get_args(test_name=DEFAULT_TEST, output_name='one_fridge_pick_pr2', n_problems=2,
+def get_args(test_name=DEFAULT_TEST, output_name='one_fridge_pick_pr2', n_problems=NUM_PROBLEMS,
              parallel=PARALLEL, diverse=DIVERSE, use_gui=USE_GUI, seed=SEED):
 
     parser = create_parser()
@@ -123,7 +123,7 @@ def process(exp_dir):
 
     """ STEP 1 -- GENERATE SCENES """
     state, goal, file = create_pybullet_world(
-        args, get_builder(args.test), world_name=basename(exp_dir), SAMPLING=False,
+        args, get_builder(args.test), world_name=basename(exp_dir), SAMPLING=True,
         template_name=args.test, out_dir=exp_dir, DEPTH_IMAGES=False,
         SAVE_LISDF=False, SAVE_TESTCASE=True, root_dir=EXP_PATH)
     world = state.world
@@ -166,7 +166,7 @@ def process(exp_dir):
         plan_len = len(plan)
         init = [[str(a) for a in f] for f in evaluations.preimage_facts]
     time_log = [{
-        'planning_time': t, 'plan': plan_log, 'plan_len': plan_len, 'init': init
+        'planning': t, 'plan': plan_log, 'plan_len': plan_len, 'init': init
     }, {'total_planning': t}]
     with open(join(exp_dir, f'plan.json'), 'w') as f:
         json.dump(time_log, f, indent=4)
@@ -180,11 +180,6 @@ def process(exp_dir):
         shutil.move(txt_file, join(exp_dir, f"log.json"))
     cwd_saver.restore()
 
-    """ =============== visualize the plan =============== """
-    if (plan is None) or not has_gui():
-        end_process(exp_dir, args.output_dir)
-        return
-
     """ =============== save commands for replay =============== """
     with LockRenderer(lock=not args.enable):
         commands = post_process(state, plan)
@@ -192,6 +187,11 @@ def process(exp_dir):
         saver.restore()
     with open(join(exp_dir, f"commands.pkl"), 'wb') as f:
         pickle.dump(commands, f)
+
+    """ =============== visualize the plan =============== """
+    if (plan is None) or not has_gui():
+        end_process(exp_dir, args.output_dir)
+        return
 
     print(SEPARATOR)
     saver.restore()
