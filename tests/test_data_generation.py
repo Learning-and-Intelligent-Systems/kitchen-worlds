@@ -30,7 +30,7 @@ from world_builder.world_generator import save_to_outputs_folder
 from test_utils import parallel_processing
 from test_world_builder import create_pybullet_world
 
-NUM_PROBLEMS = 300
+NUM_PROBLEMS = 1
 DEFAULT_TEST = 'test_fridges_tables' ## 'test_one_fridge' | 'test_fridge_table' | 'test_fridges_tables'
 PARALLEL = False
 DIVERSE = False
