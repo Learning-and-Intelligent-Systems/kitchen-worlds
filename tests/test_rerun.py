@@ -235,26 +235,19 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
 
     fc.dump_log(join(ori_dir, f'{PREFIX}fc_log={FEASIBILITY_CHECKER}.json'))
 
-    use_commands = True
     if plan is not None:
         print(SEPARATOR)
         with LockRenderer(lock=True):
-            commands = post_process(problem, plan, use_commands=use_commands)
+            commands = post_process(problem, plan)
             print('Commands:', commands)
             problem.remove_gripper()
             saver.restore()
-        # with open(join(ori_dir, f'{PREFIX}commands_rerun_fc={FEASIBILITY_CHECKER}.txt'), 'w') as f:
-        #     f.write('\n'.join([str(n) for n in commands]))
         with open(join(ori_dir, f'{PREFIX}commands_rerun_fc={FEASIBILITY_CHECKER}.pkl'), 'wb') as f:
             pickle.dump(commands, f)
         if has_gui():
             saver.restore()
             input('Begin?')
-            if use_commands:
-                state = State(attachments={})
-                apply_commands(state, commands, time_step=1e-2, pause=False) ## , update_fn=update_fn
-            else:
-                apply_actions(problem, commands, time_step=5e-2, verbose=False)
+            apply_actions(problem, commands, time_step=5e-2, verbose=False)
             input('End?')
 
     # disconnect()

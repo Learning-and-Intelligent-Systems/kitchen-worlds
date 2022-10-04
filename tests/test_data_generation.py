@@ -32,10 +32,10 @@ from test_world_builder import create_pybullet_world
 
 
 DEFAULT_TEST = 'test_fridges_tables' ## 'test_one_fridge' | 'test_fridge_table' | 'test_fridges_tables'
-PARALLEL = False
+PARALLEL = True
 DIVERSE = False
 USE_GUI = True
-SEED = None
+SEED = 502702
 
 
 def get_args(test_name=DEFAULT_TEST, output_name='one_fridge_pick_pr2', n_problems=2,
@@ -187,7 +187,7 @@ def process(exp_dir):
 
     """ =============== save commands for replay =============== """
     with LockRenderer(lock=not args.enable):
-        commands = post_process(state, plan, use_commands=False)
+        commands = post_process(state, plan)
         state.remove_gripper()
         saver.restore()
     with open(join(exp_dir, f"commands.pkl"), 'wb') as f:

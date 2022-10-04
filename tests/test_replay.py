@@ -33,10 +33,10 @@ from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 
 USE_GYM = False
 SAVE_MP4 = False
-AUTO_PLAY = False
+AUTO_PLAY = True
 EVALUATE_QUALITY = True
 
-GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/one_fridge_pick_pr2/one_fridge_pick_pr2_1004_01:00_0'
+GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/one_fridge_pick_pr2/one_fridge_pick_pr2_1004_01:29_1'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data/tt_one_fridge_table_pick/0/rerun_2/diverse_commands_rerun_fc=oracle.pkl'
 TASK_NAME = 'one_fridge_pick_pr2'
 
@@ -130,13 +130,14 @@ def run_one(run_dir, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, height=
         print('saved to', abspath(video_path))
 
     else:
-        wait_unlocked()
-        # wait_if_gui(f'start replay {run_name}?')
+        if not AUTO_PLAY:
+            wait_unlocked()
+            # wait_if_gui(f'start replay {run_name}?')
         answer = True
         if not AUTO_PLAY:
             answer = query_yes_no(f"start replay {run_name}?", default='yes')
         if answer:
-            apply_actions(problem, commands, time_step=0.05, verbose=False, plan=plan)
+            apply_actions(problem, commands, time_step=0.02, verbose=False, plan=plan)
 
         if EVALUATE_QUALITY:
             answer = query_yes_no(f"delete this run {run_name}?", default='no')
