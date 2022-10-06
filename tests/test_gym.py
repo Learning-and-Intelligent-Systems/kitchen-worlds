@@ -1,9 +1,8 @@
 import os.path
 import sys
 
-from config import ASSET_PATH
-sys.path.append('/home/yang/Documents/srl_stream/src')
-print(sys.path)
+from config import ASSET_PATH  ## necessaty
+sys.path.append('/home/yang/Documents/playground/srl_stream/src')
 
 from srl_stream.gym_world import create_single_world, default_arguments
 
