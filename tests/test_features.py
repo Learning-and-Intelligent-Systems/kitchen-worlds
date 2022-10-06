@@ -35,8 +35,8 @@ from tqdm import tqdm
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 
 # DEFAULT_TASK = 'mm'
-# DEFAULT_TASK = 'tt'
-DEFAULT_TASK = 'ff'
+DEFAULT_TASK = 'tt'
+# DEFAULT_TASK = 'ff'
 # DEFAULT_TASK = 'ww_two_fridge_in'
 
 CASES = None  ## ['0'] | None
