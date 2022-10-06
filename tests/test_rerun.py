@@ -52,26 +52,29 @@ DIVERSE = True
 PREFIX = 'diverse_' if DIVERSE else ''
 RERUN_SUBDIR = 'rerun_2'
 
-SKIP_IF_SOLVED = True and not GENERATE_SKELETONS
+SKIP_IF_SOLVED = False and not GENERATE_SKELETONS
 SKIP_IF_SOLVED_RECENTLY = True and not GENERATE_SKELETONS
 RETRY_IF_FAILED = True
-check_time = 1664833785  ## 1664833785 for pick, 1664750094 for in
+check_time = 1665010453  ## 1664908130, 1664976972 for pick, 1664750094 for in
 
 # TASK_NAME = 'tt_one_fridge_pick'
-# TASK_NAME = 'tt_one_fridge_table_pick'
+TASK_NAME = 'tt_one_fridge_table_pick'
 # TASK_NAME = 'tt_one_fridge_table_in'
 TASK_NAME = 'tt_two_fridge_pick'
-TASK_NAME = 'tt_two_fridge_in'
-# TASK_NAME = 'tt'
+# TASK_NAME = 'tt_two_fridge_in'
+TASK_NAME = 'tt'
 
 # TASK_NAME = 'mm_two_fridge_in'
 # TASK_NAME = 'mm'
 
 CASES = None
-# CASES = ['0']
+# CASES = ['11']
+if CASES is not None:
+    SKIP_IF_SOLVED = False
+    SKIP_IF_SOLVED_RECENTLY = False
 
 PARALLEL = GENERATE_SKELETONS ## and False
-FEASIBILITY_CHECKER = 'pvt-task'  ## None | oracle | pvt | pvt* | binary | shuffle
+FEASIBILITY_CHECKER = 'pvt-124'  ## None | oracle | pvt | pvt* | binary | shuffle
 if GENERATE_SKELETONS:
     FEASIBILITY_CHECKER = 'oracle'
 
@@ -192,9 +195,9 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     if DIVERSE:
         kwargs = dict(
             diverse=DIVERSE,
-            downward_time=20,  ## max time to get 100, 10 sec, 30 sec for 300
+            downward_time=10,  ## max time to get 100, 10 sec, 30 sec for 300
             evaluation_time=60,  ## on each skeleton
-            max_plans=200,  ## number of skeletons
+            max_plans=100,  ## number of skeletons
         )
         if GENERATE_SKELETONS:
             kwargs['evaluation_time'] = -0.5
