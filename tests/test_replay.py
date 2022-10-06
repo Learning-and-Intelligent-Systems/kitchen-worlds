@@ -43,12 +43,12 @@ TASK_NAME = 'one_fridge_pick_pr2'
 # TASK_NAME = 'mm_one_fridge_table_in'
 # TASK_NAME = 'mm_one_fridge_table_on'
 # TASK_NAME = 'mm_one_fridge_table_pick'
-TASK_NAME = 'mm_two_fridge_pick'
+# TASK_NAME = 'mm_two_fridge_pick'
 # TASK_NAME = 'mm_two_fridge_in'
 
 # TASK_NAME = 'tt_one_fridge_pick'
 # TASK_NAME = 'tt_one_fridge_table_in'
-# TASK_NAME = 'tt_two_fridge_pick'
+TASK_NAME = 'tt_two_fridge_pick'
 # TASK_NAME = 'tt_two_fridge_in'
 
 # TASK_NAME = 'ff_one_fridge_table_pick'
@@ -58,8 +58,8 @@ TASK_NAME = 'mm_two_fridge_pick'
 # TASK_NAME = 'elsewhere'
 # TASK_NAME = 'discarded'
 
-CASES = ['31']  ## None
-CASES = ['182']
+CASES = None
+CASES = ['5']
 
 parser = get_base_parser(task_name=TASK_NAME, parallel=False, use_viewer=True)
 args = parser.parse_args()
