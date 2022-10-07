@@ -230,9 +230,9 @@ def test_grasps(categories=[], robot='feg'):
             outputs = funk(body)
             if isinstance(outputs, list):
                 print(f'grasps on body {body}:', outputs)
-            # set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.8)
             visualize_grasps(problem, outputs, body_pose, RETAIN_ALL=True)
             set_renderer(True)
+            set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.8)
 
             wait_unlocked()
 
@@ -690,8 +690,8 @@ if __name__ == '__main__':
 
 
     ## --- grasps related ---
-    robot = 'feg' ## 'feg' | 'pr2'
-    test_grasps(['Food'], robot)
+    robot = 'pr2' ## 'feg' | 'pr2'
+    test_grasps(['Stapler'], robot)
     ## 'Bottle', 'Stapler', 'Camera', 'Glasses', 'Food', 'MiniFridge', 'KitchenCounter'
     # test_handle_grasps_counter()
     # test_handle_grasps(robot, category='MiniFridge')

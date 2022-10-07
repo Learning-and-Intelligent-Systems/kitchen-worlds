@@ -55,14 +55,14 @@ RERUN_SUBDIR = 'rerun_2'
 SKIP_IF_SOLVED = False and not GENERATE_SKELETONS
 SKIP_IF_SOLVED_RECENTLY = True and not GENERATE_SKELETONS
 RETRY_IF_FAILED = True
-check_time = 1665010453  ## 1664908130, 1664976972 for pick, 1664750094 for in
+check_time = 1665148299  ## 1664908130, 1664976972 for pick, 1664750094 for in
 
 # TASK_NAME = 'tt_one_fridge_pick'
 TASK_NAME = 'tt_one_fridge_table_pick'
 # TASK_NAME = 'tt_one_fridge_table_in'
 TASK_NAME = 'tt_two_fridge_pick'
 # TASK_NAME = 'tt_two_fridge_in'
-TASK_NAME = 'tt'
+# TASK_NAME = 'tt'
 
 # TASK_NAME = 'mm_two_fridge_in'
 # TASK_NAME = 'mm'
