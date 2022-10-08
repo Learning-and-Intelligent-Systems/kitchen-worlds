@@ -63,18 +63,21 @@ TASK_NAME = 'tt_one_fridge_table_pick'
 TASK_NAME = 'tt_two_fridge_pick'
 # TASK_NAME = 'tt_two_fridge_in'
 # TASK_NAME = 'tt'
+TASK_NAME = 'zz'
+# TASK_NAME = 'ss_two_fridge_pick'
+TASK_NAME = 'ss_two_fridge_in'
 
 # TASK_NAME = 'mm_two_fridge_in'
 # TASK_NAME = 'mm'
 
 CASES = None
-# CASES = ['11']
+CASES = ['18']
 if CASES is not None:
     SKIP_IF_SOLVED = False
     SKIP_IF_SOLVED_RECENTLY = False
 
 PARALLEL = GENERATE_SKELETONS ## and False
-FEASIBILITY_CHECKER = 'pvt-124'  ## None | oracle | pvt | pvt* | binary | shuffle
+FEASIBILITY_CHECKER = 'oracle'  ## None | oracle | pvt | pvt* | binary | shuffle
 if GENERATE_SKELETONS:
     FEASIBILITY_CHECKER = 'oracle'
 

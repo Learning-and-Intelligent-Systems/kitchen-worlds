@@ -81,7 +81,7 @@ def get_instances(category):
 def get_test_world(robot='feg', semantic_world=False, DRAW_BASE_LIMITS=False):
     args = get_args() ## exp_name
     connect(use_gui=True, shadows=False, width=1980, height=1238)  ##  , width=360, height=270
-    draw_pose(unit_pose(), length=.5)
+    # draw_pose(unit_pose(), length=.5)
     set_caching(cache=False)
     # import ipdb; ipdb.set_trace()
     # create_floor()
@@ -177,7 +177,7 @@ def get_gap(category):
     gap = 1
     if category == 'MiniFridge':
         gap = 2
-    if category == 'Food':
+    if category in ['Food', 'Stapler']:
         gap = 0.5
     return gap
 
@@ -234,7 +234,7 @@ def test_grasps(categories=[], robot='feg'):
             set_renderer(True)
             set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.8)
 
-            wait_unlocked()
+            # wait_unlocked()
 
         if len(categories) > 1:
             wait_if_gui(f'------------- Next object category? finished ({i+1}/{len(categories)})')
@@ -243,6 +243,10 @@ def test_grasps(categories=[], robot='feg'):
             set_camera_pose((3, 7, 2), (0, 7, 1))
         elif cat == 'Food':
             set_camera_pose((3, 3, 2), (0, 3, 1))
+        elif cat == 'Stapler':
+            set_camera_pose((3, 1.5, 2), (0, 1.5, 1))
+
+    remove_body(robot)
 
     # set_camera_target_body(body, dx=0.5, dy=0.5, dz=0.5)
     set_renderer(True)
@@ -691,7 +695,7 @@ if __name__ == '__main__':
 
     ## --- grasps related ---
     robot = 'pr2' ## 'feg' | 'pr2'
-    test_grasps(['Stapler'], robot)
+    test_grasps(['Food'], robot)
     ## 'Bottle', 'Stapler', 'Camera', 'Glasses', 'Food', 'MiniFridge', 'KitchenCounter'
     # test_handle_grasps_counter()
     # test_handle_grasps(robot, category='MiniFridge')

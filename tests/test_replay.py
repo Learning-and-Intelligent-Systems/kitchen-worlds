@@ -31,13 +31,13 @@ from mamao_tools.utils import get_feasibility_checker, get_plan
 
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 
-USE_GYM = False
+USE_GYM = True
 SAVE_MP4 = False
 AUTO_PLAY = True
 EVALUATE_QUALITY = True
 
-GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/one_fridge_pick_pr2/one_fridge_pick_pr2_1004_01:29_1'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data/tt_one_fridge_table_pick/0/rerun_2/diverse_commands_rerun_fc=oracle.pkl'
+# GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/one_fridge_pick_pr2/one_fridge_pick_pr2_1004_01:29_1'
+GIVEN_PATH = '/home/yang/Documents/fastamp-data/_examples/5/rerun_2/diverse_commands_rerun_fc=pvt-all.pkl'
 TASK_NAME = 'one_fridge_pick_pr2'
 
 # TASK_NAME = 'mm_one_fridge_table_in'
@@ -108,7 +108,11 @@ def run_one(run_dir, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, height=
         pkl_file = join(rerun_dir, pkl_file)
     run_name = basename(run_dir)
     exp_dir = copy_dir_for_process(run_dir, tag='replaying')
-    plan = get_plan(run_dir)
+    if 'rerun' in pkl_file:
+        plan_json = join(run_dir, pkl_file).replace('commands', 'plan').replace('.pkl', '.json')
+        plan = get_plan(run_dir, plan_json=plan_json)
+    else:
+        plan = get_plan(run_dir)
 
     world = load_lisdf_pybullet(exp_dir, use_gui=not USE_GYM, width=width, height=height, verbose=False)
     problem = Problem(world)
@@ -237,5 +241,5 @@ def mp4_to_gif(mp4_file, frame_folder='output'):
 
 
 if __name__ == '__main__':
-    process_all_tasks(process, args.t, cases=CASES)
-    # process_all_tasks(process, args.t, path=GIVEN_PATH)
+    # process_all_tasks(process, args.t, cases=CASES)
+    process_all_tasks(process, args.t, path=GIVEN_PATH)

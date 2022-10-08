@@ -45,6 +45,7 @@ def copy_dir_for_process(viz_dir, tag=None):
     ## temporarily move the dir to the test_cases folder for asset paths to be found
     test_dir = join(EXP_PATH, f"{task_name}_{subdir}")
     if isdir(test_dir):
+        print('copy_dir_for_process | removing', test_dir)
         shutil.rmtree(test_dir)
     if not isdir(test_dir):
         shutil.copytree(viz_dir, test_dir)
@@ -75,7 +76,7 @@ def get_task_names(task_name):
                       'bb_one_fridge_table_pick', 'bb_one_fridge_table_in', 'bb_one_fridge_table_on',
                       'bb_two_fridge_in', 'bb_two_fridge_pick']
     elif task_name == 'zz':
-        task_names = ['zz_three_fridge', 'zz_three_table']
+        task_names = ['zz_three_fridge', 'ss_two_fridge_pick', 'ss_two_fridge_in']
     else:
         task_names = [task_name]
     return task_names
