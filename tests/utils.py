@@ -10,10 +10,17 @@ def test_is_robot(name, robots=["pr2"]):
         return True
     return any(name.startswith(prefix) for prefix in robots)
 
+
 def load_lisdf(lisdf_dir, scene_scale=1., robots=False, skip=[], verbose=True):
     # TODO: apply within load_lisdf_synthesizer
     lisdf_path = os.path.join(lisdf_dir, 'scene.lisdf')
     world_xml = untangle.parse(lisdf_path).sdf.world
+
+    model_states = {}
+    if len(world_xml.state) > 0:
+        model_states = world_xml.state.model
+        model_states = {s['name']: {j['name']: eval(j.angle.cdata) for j in s.joint} for s in model_states}
+
     for obj_xml in world_xml.include:
         name = obj_xml._attributes["name"]
         if (name in skip) or (not robots and test_is_robot(name)): # TODO: generalize
@@ -37,7 +44,9 @@ def load_lisdf(lisdf_dir, scene_scale=1., robots=False, skip=[], verbose=True):
         pose = transformations.translation_matrix(position) @ \
                transformations.euler_matrix(*euler)
 
-        yield name, path, scale, is_fixed, pose
+        positions = model_states[name] if name in model_states else {}
+
+        yield name, path, scale, is_fixed, pose, positions
 
 ##################################################
 
