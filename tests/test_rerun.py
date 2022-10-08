@@ -52,7 +52,7 @@ DIVERSE = True
 PREFIX = 'diverse_' if DIVERSE else ''
 RERUN_SUBDIR = 'rerun_2'
 
-SKIP_IF_SOLVED = False and not GENERATE_SKELETONS
+SKIP_IF_SOLVED = True and not GENERATE_SKELETONS
 SKIP_IF_SOLVED_RECENTLY = True and not GENERATE_SKELETONS
 RETRY_IF_FAILED = True
 check_time = 1665148299  ## 1664908130, 1664976972 for pick, 1664750094 for in
@@ -60,21 +60,24 @@ check_time = 1665148299  ## 1664908130, 1664976972 for pick, 1664750094 for in
 # TASK_NAME = 'tt_one_fridge_pick'
 TASK_NAME = 'tt_one_fridge_table_pick'
 # TASK_NAME = 'tt_one_fridge_table_in'
-TASK_NAME = 'tt_two_fridge_pick'
-# TASK_NAME = 'tt_two_fridge_in'
+# TASK_NAME = 'tt_two_fridge_pick'
+TASK_NAME = 'tt_two_fridge_in'
 # TASK_NAME = 'tt'
+TASK_NAME = 'ss_two_fridge_pick'
+# TASK_NAME = 'ss_two_fridge_in'
+TASK_NAME = '_examples'
 
 # TASK_NAME = 'mm_two_fridge_in'
 # TASK_NAME = 'mm'
 
 CASES = None
-# CASES = ['11']
+CASES = ['5']
 if CASES is not None:
     SKIP_IF_SOLVED = False
     SKIP_IF_SOLVED_RECENTLY = False
 
 PARALLEL = GENERATE_SKELETONS ## and False
-FEASIBILITY_CHECKER = 'pvt-124'  ## None | oracle | pvt | pvt* | binary | shuffle
+FEASIBILITY_CHECKER = 'pvt-all'  ## None | oracle | pvt | pvt* | binary | shuffle
 if GENERATE_SKELETONS:
     FEASIBILITY_CHECKER = 'oracle'
 
