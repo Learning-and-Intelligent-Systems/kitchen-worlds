@@ -44,6 +44,7 @@ DEFAULT_TASK = 'tt'
 # DEFAULT_TASK = 'ww'
 DEFAULT_TASK = 'zz'
 DEFAULT_TASK = '_examples'
+DEFAULT_TASK = 'ff_two_fridge_goals'
 
 MODIFIED_TIME = 1663895681.8584874
 PARALLEL = True
