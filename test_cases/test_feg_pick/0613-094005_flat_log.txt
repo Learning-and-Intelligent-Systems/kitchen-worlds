@@ -1,0 +1,198 @@
+----------------
+PART I: world objects | moveable(3), surface(5), door(1),  | obstacles(7) = [2, 3, 7, 8, 9, 10, 11]
+----------------
+feg0      |  FEGripper: feg0    |  Pose: (0, 0, 0, 0, 0, 0)
+1      |  Floor: floor1    |  Pose: (2.3, 4.7, -0.002, 0, 0, 0)
+2      |  Object: counter#1    |  Pose: (0.5, 7.6, 1.394, 0, 0, 0)
+(2, None, 4)      |  Surface: counter#1::front_left_stove    |  Pose: (0.567, 7.872, 0.773, 0, 0, 0)
+(2, None, 35)      |  Surface: counter#1::indigo_tmp    |  Pose: (0.603, 8.452, 0.829, 0, 0, 0)
+3      |  Object: braiserbody#1    |  Pose: (0.567, 8.18, 0.818, 0, 0, 2.148)
+(3, None, 1)      |  Surface: braiserbody#1::braiser_bottom    |  Pose: (0.567, 8.18, 0.818, 1.571, 0.0, 0.577)
+4      |  Object: braiserlid#1    |  Pose: (0.569, 8.163, 0.821, 0, 0, 1.564)
+5      |  Object: meatturkeyleg#1    |  Pose: (0.467, 8.756, 0.844, 0, 0, 1.618)
+6      |  Object: veggiecabbage#1    |  Pose: (0.464, 4.794, 0.838, 0, 0, 1.077)
+7      |  Object: oven#1    |  Pose: (0.6, 8, 0.602, 0, 0, 3.142)
+(7, 4)      |  Knob: oven#1::knob_joint_2    |  Handle: link_2    |  Pose: 0
+8      |  Object: dishwasher#1    |  Pose: (0.7, 6.4, 0.366, 0, 0, 3.142)
+9      |  Object: basin#1    |  Pose: (0.5, 5.6, 0.364, 0, 0, 3.142)
+(9, None, 3)      |  Surface: basin#1::basin_bottom    |  Pose: (0.537, 5.6, 0.785, 1.571, 0, 1.571)
+10      |  Object: faucet#1    |  Pose: (0.3, 5.6, 0.985, 0, 0, 3.142)
+(10, 3)      |  Knob: faucet#1::joint_faucet_0    |  Handle: link_nob_0    |  Pose: 0
+(10, 5)      |  Knob: faucet#1::joint_faucet_1    |  Handle: link_nob_1    |  Pose: 0
+11      |  Object: fridge#1    |  Pose: (0.5, 4.8, 1.031, 0, 0, 3.142)
+(11, 1)      |  Door: fridge#1::fridge_door    |  Handle: fridge_door_handle    |  Pose: 1.5
+(11, None, 7)      |  Surface: fridge#1::shelf_bottom    |  Pose: (0.5, 4.8, 1.031, 1.571, 0, 1.571)
+----------------
+pr2_agent.pddlstream_from_state_goal(
+    domain = feg_kitchen.pddl, 
+    stream = feg_stream_kitchen.pddl, custom_limits = {0: (0, 4), 1: (3, 12), 2: (0, 2)}
+----------------
+Facts extracted from observation (90)
+  = [2] : ['=', ('pickcost',), 1], ['=', ('placecost',), 1]
+  arm [1] : ['arm', 'hand']
+  atpose [3] : ['atpose', 'braiserlid#1|4', p0=(0.569, 8.163, 0.821, 0, 0, 1.564)], ['atpose', 'meatturkeyleg#1|5', p1=(0.467, 8.756, 0.844, 0, 0, 1.618)], ['atpose', 'veggiecabbage#1|6', p2=(0.464, 4.794, 0.838, 0, 0, 1.077)]
+  atposition [4] : ['atposition', 'faucet#1::joint_faucet_0|(10, 3)', pstn3=0], ['atposition', 'faucet#1::joint_faucet_1|(10, 5)', pstn2=0], ['atposition', 'fridge#1::fridge_door|(11, 1)', pstn0=1.5], ['atposition', 'oven#1::knob_joint_2|(7, 4)', pstn1=0]
+  atseconf [1] : ['atseconf', q168=(0.9, 8, 0.7, 0, -1.571, 0)]
+  basin [1] : ['basin', 'basin#1|9']
+  braiserbody [1] : ['braiserbody', 'braiserbody#1|3']
+  braiserlid [1] : ['braiserlid', 'braiserlid#1|4']
+  canmove [1] : ['canmove']
+  canpull [1] : ['canpull']
+  cleaned [1] : ['cleaned', 'meatturkeyleg#1|5']
+  cleaningsurface [1] : ['cleaningsurface', 'basin#1::basin_bottom|(9, none, 3)']
+  controllable [1] : ['controllable', 'hand']
+  controlledby [2] : ['controlledby', 'basin#1::basin_bottom|(9, none, 3)', 'faucet#1::joint_faucet_0|(10, 3)'], ['controlledby', 'braiserbody#1::braiser_bottom|(3, none, 1)', 'oven#1::knob_joint_2|(7, 4)']
+  counter [1] : ['counter', 'counter#1|2']
+  dishwasher [1] : ['dishwasher', 'dishwasher#1|8']
+  door [1] : ['door', 'fridge#1::fridge_door|(11, 1)']
+  edible [2] : ['edible', 'meatturkeyleg#1|5'], ['edible', 'veggiecabbage#1|6']
+  faucet [1] : ['faucet', 'faucet#1|10']
+  floor [1] : ['floor', 'floor1|1']
+  fridge [1] : ['fridge', 'fridge#1|11']
+  graspable [3] : ['graspable', 'braiserlid#1|4'], ['graspable', 'meatturkeyleg#1|5'], ['graspable', 'veggiecabbage#1|6']
+  handempty [1] : ['handempty', 'hand']
+  heatingsurface [1] : ['heatingsurface', 'braiserbody#1::braiser_bottom|(3, none, 1)']
+  inwconf [1] : ['inwconf', wconf312]
+  isclosedposition [4] : ['isclosedposition', 'faucet#1::joint_faucet_0|(10, 3)', pstn3=0], ['isclosedposition', 'faucet#1::joint_faucet_1|(10, 5)', pstn2=0], ['isclosedposition', 'fridge#1::fridge_door|(11, 1)', pstn0=1.5], ['isclosedposition', 'oven#1::knob_joint_2|(7, 4)', pstn1=0]
+  isjointto [4] : ['isjointto', 'faucet#1::joint_faucet_0|(10, 3)', 'faucet#1|10'], ['isjointto', 'faucet#1::joint_faucet_1|(10, 5)', 'faucet#1|10'], ['isjointto', 'fridge#1::fridge_door|(11, 1)', 'fridge#1|11'], ['isjointto', 'oven#1::knob_joint_2|(7, 4)', 'oven#1|7']
+  isopenedposition [1] : ['isopenedposition', 'fridge#1::fridge_door|(11, 1)', pstn6=1.756]
+  joint [3] : ['joint', 'faucet#1::joint_faucet_0|(10, 3)'], ['joint', 'faucet#1::joint_faucet_1|(10, 5)'], ['joint', 'oven#1::knob_joint_2|(7, 4)']
+  knob [3] : ['knob', 'faucet#1::joint_faucet_0|(10, 3)'], ['knob', 'faucet#1::joint_faucet_1|(10, 5)'], ['knob', 'oven#1::knob_joint_2|(7, 4)']
+  meatturkeyleg [1] : ['meatturkeyleg', 'meatturkeyleg#1|5']
+  newwconfpst [1] : ['newwconfpst', wconf312, 'fridge#1::fridge_door|(11, 1)', pstn6=1.756, wconf80]
+  oftype [2] : ['oftype', 'meatturkeyleg#1|5', '@edible'], ['oftype', 'veggiecabbage#1|6', '@edible']
+  originalseconf [1] : ['originalseconf', q168=(0.9, 8, 0.7, 0, -1.571, 0)]
+  oven [1] : ['oven', 'oven#1|7']
+  pose [3] : ['pose', 'braiserlid#1|4', p0=(0.569, 8.163, 0.821, 0, 0, 1.564)], ['pose', 'meatturkeyleg#1|5', p1=(0.467, 8.756, 0.844, 0, 0, 1.618)], ['pose', 'veggiecabbage#1|6', p2=(0.464, 4.794, 0.838, 0, 0, 1.077)]
+  position [5] : ['position', 'faucet#1::joint_faucet_0|(10, 3)', pstn3=0], ['position', 'faucet#1::joint_faucet_1|(10, 5)', pstn2=0], ['position', 'fridge#1::fridge_door|(11, 1)', pstn0=1.5], ['position', 'fridge#1::fridge_door|(11, 1)', pstn6=1.756], ['position', 'oven#1::knob_joint_2|(7, 4)', pstn1=0]
+  seconf [1] : ['seconf', q168=(0.9, 8, 0.7, 0, -1.571, 0)]
+  stackable [15] : ['stackable', 'braiserlid#1|4', 'basin#1::basin_bottom|(9, none, 3)'], ['stackable', 'braiserlid#1|4', 'braiserbody#1::braiser_bottom|(3, none, 1)'], ['stackable', 'braiserlid#1|4', 'counter#1::front_left_stove|(2, none, 4)'], ['stackable', 'braiserlid#1|4', 'counter#1::indigo_tmp|(2, none, 35)'], ['stackable', 'braiserlid#1|4', 'fridge#1::shelf_bottom|(11, none, 7)'], ['stackable', 'meatturkeyleg#1|5', 'basin#1::basin_bottom|(9, none, 3)'], ['stackable', 'meatturkeyleg#1|5', 'braiserbody#1::braiser_bottom|(3, none, 1)'], ['stackable', 'meatturkeyleg#1|5', 'counter#1::front_left_stove|(2, none, 4)'], ['stackable', 'meatturkeyleg#1|5', 'counter#1::indigo_tmp|(2, none, 35)'], ['stackable', 'meatturkeyleg#1|5', 'fridge#1::shelf_bottom|(11, none, 7)'], ['stackable', 'veggiecabbage#1|6', 'basin#1::basin_bottom|(9, none, 3)'], ['stackable', 'veggiecabbage#1|6', 'braiserbody#1::braiser_bottom|(3, none, 1)'], ['stackable', 'veggiecabbage#1|6', 'counter#1::front_left_stove|(2, none, 4)'], ['stackable', 'veggiecabbage#1|6', 'counter#1::indigo_tmp|(2, none, 35)'], ['stackable', 'veggiecabbage#1|6', 'fridge#1::shelf_bottom|(11, none, 7)']
+  supported [2] : ['supported', 'meatturkeyleg#1|5', p1=(0.467, 8.756, 0.844, 0, 0, 1.618), 'counter#1::indigo_tmp|(2, none, 35)'], ['supported', 'veggiecabbage#1|6', p2=(0.464, 4.794, 0.838, 0, 0, 1.077), 'fridge#1::shelf_bottom|(11, none, 7)']
+  surface [5] : ['surface', 'basin#1::basin_bottom|(9, none, 3)'], ['surface', 'braiserbody#1::braiser_bottom|(3, none, 1)'], ['surface', 'counter#1::front_left_stove|(2, none, 4)'], ['surface', 'counter#1::indigo_tmp|(2, none, 35)'], ['surface', 'fridge#1::shelf_bottom|(11, none, 7)']
+  veggiecabbage [1] : ['veggiecabbage', 'veggiecabbage#1|6']
+  wconf [2] : ['wconf', wconf312], ['wconf', wconf80]
+----------------
+Goal (1): (and
+   ('Cleaned', 6),
+)
+
+--------------------------------------------------
+
+
+Local External Statistics
+External: sample-pose-on | n: 1 | p_success: 1.000 | mean overhead: 0.001 | overhead: 0.001
+External: sample-grasp | n: 1 | p_success: 1.000 | mean overhead: 7.485 | overhead: 7.485
+External: inverse-kinematics-hand | n: 2 | p_success: 1.000 | mean overhead: 0.177 | overhead: 0.354
+External: plan-free-motion-hand | n: 3 | p_success: 1.000 | mean overhead: 1.162 | overhead: 3.486
+External: test-cfree-pose-pose | n: 2 | p_success: 1.000 | mean overhead: 0.000 | overhead: 0.000
+External: test-cfree-approach-pose | n: 4 | p_success: 1.000 | mean overhead: 0.018 | overhead: 0.073
+External: test-cfree-traj-pose | n: 8 | p_success: 1.000 | mean overhead: 0.003 | overhead: 0.022
+External: get-joint-position-open | n: 1 | p_success: 1.000 | mean overhead: 0.000 | overhead: 0.000
+External: sample-handle-grasp | n: 1 | p_success: 1.000 | mean overhead: 4.442 | overhead: 4.442
+External: inverse-kinematics-grasp-handle | n: 2 | p_success: 1.000 | mean overhead: 0.177 | overhead: 0.353
+External: plan-base-pull-door-handle | n: 1 | p_success: 1.000 | mean overhead: 1.308 | overhead: 1.308
+External: update-wconf-pst | n: 1 | p_success: 1.000 | mean overhead: 0.000 | overhead: 0.000
+External: test-reachable-pose | n: 2 | p_success: 1.000 | mean overhead: 1.219 | overhead: 2.437
+Overall calls: 29 | Overall overhead: 19.961
+Wrote: statistics/py3/fe-gripper-tamp.pkl
+Solved: True
+Cost: 9.000
+Plan:
+ 1) move_cartesian q168=(0.9, 8, 0.7, 0, -1.571, 0) q184=(0.449, 4.766, 1.015, 0.0, -3.142, 0.494) c392=t(6, 95) wconf312
+ 2) pick_hand hand veggiecabbage#1|6 p2=(0.464, 4.794, 0.838, 0, 0, 1.077) g984=(0.0, 0.134, 0.032, -1.571, 0.0, 3.142) q184=(0.449, 4.766, 1.015, 0.0, -3.142, 0.494) q168=(0.449, 4.766, 0.972, 0.0, -3.142, 0.494) c824=t(6, 2) wconf312
+ 3) move_cartesian q184=(0.449, 4.766, 1.015, 0.0, -3.142, 0.494) q696=(0.669, 5.572, 1.0, -0.0, -3.142, -1.542) c352=t(6, 95) wconf312
+ 4) place_hand hand veggiecabbage#1|6 p31=(0.638, 5.573, 0.823, 0, 0, 3.113) g984=(0.0, 0.134, 0.032, -1.571, 0.0, 3.142) q696=(0.669, 5.572, 1.0, -0.0, -3.142, -1.542) q824=(0.669, 5.572, 0.957, -0.0, -3.142, -1.542) c624=t(6, 2) wconf312
+ 5) move_cartesian q696=(0.669, 5.572, 1.0, -0.0, -3.142, -1.542) q424=(0.281, 5.451, 1.108, -0.0, -3.142, -1.571) c256=t(6, 10) wconf312
+ 6) grasp_handle_hand hand faucet#1::joint_faucet_0|(10, 3) pstn3=0 hg88=(-0.029, 0.079, -0.0, -1.571, 0.0, 3.142) q424=(0.281, 5.451, 1.108, -0.0, -3.142, -1.571) q720=(0.281, 5.451, 1.064, -0.0, -3.142, -1.571) c424=t(6, 2) wconf312
+ 7) pull_articulated_handle_wconf hand faucet#1::joint_faucet_0|(10, 3) pstn3=0 pstn8=1.571 hg88=(-0.029, 0.079, -0.0, -1.571, 0.0, 3.142) q168=(0.9, 8, 0.7, 0, -1.571, 0) q416=(0.31, 5.481, 1.064, 0.0, -3.142, -3.142) c248=t(6, 12) wconf312 wconf512
+ 8) ungrasp_handle_hand hand faucet#1::joint_faucet_0|(10, 3) pstn8=1.571 hg88=(-0.029, 0.079, -0.0, -1.571, 0.0, 3.142) q136=(0.31, 5.481, 1.108, -0.0, -3.142, -3.141) q632=(0.31, 5.481, 1.064, -0.0, -3.142, -3.141) c696=t(6, 2) wconf512
+ 9) wait-clean veggiecabbage#1|6 basin#1::basin_bottom|(9, None, 3) faucet#1::joint_faucet_0|(10, 3)
+
+----------------
+Preimage generated by PDDLStream (70)
+  atpose [1] : ['atpose', 'veggiecabbage#1|6', p2=(0.464, 4.794, 0.838, 0, 0, 1.077)]
+  atposition [1] : ['atposition', 'faucet#1::joint_faucet_0|(10, 3)', pstn3=0]
+  atseconf [1] : ['atseconf', q168=(0.9, 8, 0.7, 0, -1.571, 0)]
+  canmove [1] : ['canmove']
+  cfreeapproachpose [4] : ['cfreeapproachpose', 'veggiecabbage#1|6', p2=(0.464, 4.794, 0.838, 0, 0, 1.077), g984=(0.0, 0.134, 0.032, -1.571, 0.0, 3.142), 'braiserlid#1|4', p0=(0.569, 8.163, 0.821, 0, 0, 1.564)], ['cfreeapproachpose', 'veggiecabbage#1|6', p2=(0.464, 4.794, 0.838, 0, 0, 1.077), g984=(0.0, 0.134, 0.032, -1.571, 0.0, 3.142), 'meatturkeyleg#1|5', p1=(0.467, 8.756, 0.844, 0, 0, 1.618)], ['cfreeapproachpose', 'veggiecabbage#1|6', p31=(0.638, 5.573, 0.823, 0, 0, 3.113), g984=(0.0, 0.134, 0.032, -1.571, 0.0, 3.142), 'braiserlid#1|4', p0=(0.569, 8.163, 0.821, 0, 0, 1.564)], ['cfreeapproachpose', 'veggiecabbage#1|6', p31=(0.638, 5.573, 0.823, 0, 0, 3.113), g984=(0.0, 0.134, 0.032, -1.571, 0.0, 3.142), 'meatturkeyleg#1|5', p1=(0.467, 8.756, 0.844, 0, 0, 1.618)]
+  cfreeposepose [2] : ['cfreeposepose', 'veggiecabbage#1|6', p31=(0.638, 5.573, 0.823, 0, 0, 3.113), 'braiserlid#1|4', p0=(0.569, 8.163, 0.821, 0, 0, 1.564)], ['cfreeposepose', 'veggiecabbage#1|6', p31=(0.638, 5.573, 0.823, 0, 0, 3.113), 'meatturkeyleg#1|5', p1=(0.467, 8.756, 0.844, 0, 0, 1.618)]
+  cfreetrajpose [8] : ['cfreetrajpose', c256=t(6, 10), 'braiserlid#1|4', p0=(0.569, 8.163, 0.821, 0, 0, 1.564)], ['cfreetrajpose', c256=t(6, 10), 'meatturkeyleg#1|5', p1=(0.467, 8.756, 0.844, 0, 0, 1.618)], ['cfreetrajpose', c256=t(6, 10), 'veggiecabbage#1|6', p31=(0.638, 5.573, 0.823, 0, 0, 3.113)], ['cfreetrajpose', c352=t(6, 95), 'braiserlid#1|4', p0=(0.569, 8.163, 0.821, 0, 0, 1.564)], ['cfreetrajpose', c352=t(6, 95), 'meatturkeyleg#1|5', p1=(0.467, 8.756, 0.844, 0, 0, 1.618)], ['cfreetrajpose', c392=t(6, 95), 'braiserlid#1|4', p0=(0.569, 8.163, 0.821, 0, 0, 1.564)], ['cfreetrajpose', c392=t(6, 95), 'meatturkeyleg#1|5', p1=(0.467, 8.756, 0.844, 0, 0, 1.618)], ['cfreetrajpose', c392=t(6, 95), 'veggiecabbage#1|6', p2=(0.464, 4.794, 0.838, 0, 0, 1.077)]
+  cleaningsurface [1] : ['cleaningsurface', 'basin#1::basin_bottom|(9, none, 3)']
+  controllable [1] : ['controllable', 'hand']
+  controlledby [1] : ['controlledby', 'basin#1::basin_bottom|(9, none, 3)', 'faucet#1::joint_faucet_0|(10, 3)']
+  edible [1] : ['edible', 'veggiecabbage#1|6']
+  freemotionwconf [3] : ['freemotionwconf', q168=(0.9, 8, 0.7, 0, -1.571, 0), c392=t(6, 95), q184=(0.449, 4.766, 1.015, 0.0, -3.142, 0.494), wconf312], ['freemotionwconf', q184=(0.449, 4.766, 1.015, 0.0, -3.142, 0.494), c352=t(6, 95), q696=(0.669, 5.572, 1.0, -0.0, -3.142, -1.542), wconf312], ['freemotionwconf', q696=(0.669, 5.572, 1.0, -0.0, -3.142, -1.542), c256=t(6, 10), q424=(0.281, 5.451, 1.108, -0.0, -3.142, -1.571), wconf312]
+  grasp [1] : ['grasp', 'veggiecabbage#1|6', g984=(0.0, 0.134, 0.032, -1.571, 0.0, 3.142)]
+  graspable [1] : ['graspable', 'veggiecabbage#1|6']
+  handempty [1] : ['handempty', 'hand']
+  handlegrasp [1] : ['handlegrasp', 'faucet#1::joint_faucet_0|(10, 3)', hg88=(-0.029, 0.079, -0.0, -1.571, 0.0, 3.142)]
+  inwconf [1] : ['inwconf', wconf312]
+  isclosedposition [1] : ['isclosedposition', 'faucet#1::joint_faucet_0|(10, 3)', pstn3=0]
+  isopenedposition [1] : ['isopenedposition', 'faucet#1::joint_faucet_0|(10, 3)', pstn8=1.571]
+  joint [1] : ['joint', 'faucet#1::joint_faucet_0|(10, 3)']
+  kingrasphandle [2] : ['kingrasphandle', 'hand', 'faucet#1::joint_faucet_0|(10, 3)', pstn3=0, hg88=(-0.029, 0.079, -0.0, -1.571, 0.0, 3.142), q424=(0.281, 5.451, 1.108, -0.0, -3.142, -1.571), q720=(0.281, 5.451, 1.064, -0.0, -3.142, -1.571), c424=t(6, 2), wconf312], ['kingrasphandle', 'hand', 'faucet#1::joint_faucet_0|(10, 3)', pstn8=1.571, hg88=(-0.029, 0.079, -0.0, -1.571, 0.0, 3.142), q136=(0.31, 5.481, 1.108, -0.0, -3.142, -3.141), q632=(0.31, 5.481, 1.064, -0.0, -3.142, -3.141), c696=t(6, 2), wconf512]
+  kinpulldoorhandle [1] : ['kinpulldoorhandle', 'hand', 'faucet#1::joint_faucet_0|(10, 3)', pstn3=0, pstn8=1.571, hg88=(-0.029, 0.079, -0.0, -1.571, 0.0, 3.142), q168=(0.9, 8, 0.7, 0, -1.571, 0), q416=(0.31, 5.481, 1.064, 0.0, -3.142, -3.142), c248=t(6, 12), wconf312]
+  kinwconf [2] : ['kinwconf', 'hand', 'veggiecabbage#1|6', p2=(0.464, 4.794, 0.838, 0, 0, 1.077), g984=(0.0, 0.134, 0.032, -1.571, 0.0, 3.142), q184=(0.449, 4.766, 1.015, 0.0, -3.142, 0.494), q168=(0.449, 4.766, 0.972, 0.0, -3.142, 0.494), c824=t(6, 2), wconf312], ['kinwconf', 'hand', 'veggiecabbage#1|6', p31=(0.638, 5.573, 0.823, 0, 0, 3.113), g984=(0.0, 0.134, 0.032, -1.571, 0.0, 3.142), q696=(0.669, 5.572, 1.0, -0.0, -3.142, -1.542), q824=(0.669, 5.572, 0.957, -0.0, -3.142, -1.542), c624=t(6, 2), wconf312]
+  newwconfpst [1] : ['newwconfpst', wconf312, 'faucet#1::joint_faucet_0|(10, 3)', pstn8=1.571, wconf512]
+  originalseconf [1] : ['originalseconf', q168=(0.9, 8, 0.7, 0, -1.571, 0)]
+  pose [4] : ['pose', 'braiserlid#1|4', p0=(0.569, 8.163, 0.821, 0, 0, 1.564)], ['pose', 'meatturkeyleg#1|5', p1=(0.467, 8.756, 0.844, 0, 0, 1.618)], ['pose', 'veggiecabbage#1|6', p2=(0.464, 4.794, 0.838, 0, 0, 1.077)], ['pose', 'veggiecabbage#1|6', p31=(0.638, 5.573, 0.823, 0, 0, 3.113)]
+  position [2] : ['position', 'faucet#1::joint_faucet_0|(10, 3)', pstn3=0], ['position', 'faucet#1::joint_faucet_0|(10, 3)', pstn8=1.571]
+  reachablemovable [2] : ['reachablemovable', 'veggiecabbage#1|6', p2=(0.464, 4.794, 0.838, 0, 0, 1.077), g984=(0.0, 0.134, 0.032, -1.571, 0.0, 3.142), q168=(0.9, 8, 0.7, 0, -1.571, 0), wconf312], ['reachablemovable', 'veggiecabbage#1|6', p31=(0.638, 5.573, 0.823, 0, 0, 3.113), g984=(0.0, 0.134, 0.032, -1.571, 0.0, 3.142), q168=(0.9, 8, 0.7, 0, -1.571, 0), wconf312]
+  seconf [10] : ['seconf', q136=(0.31, 5.481, 1.108, -0.0, -3.142, -3.141)], ['seconf', q168=(0.449, 4.766, 0.972, 0.0, -3.142, 0.494)], ['seconf', q168=(0.9, 8, 0.7, 0, -1.571, 0)], ['seconf', q184=(0.449, 4.766, 1.015, 0.0, -3.142, 0.494)], ['seconf', q416=(0.31, 5.481, 1.064, 0.0, -3.142, -3.142)], ['seconf', q424=(0.281, 5.451, 1.108, -0.0, -3.142, -1.571)], ['seconf', q632=(0.31, 5.481, 1.064, -0.0, -3.142, -3.141)], ['seconf', q696=(0.669, 5.572, 1.0, -0.0, -3.142, -1.542)], ['seconf', q720=(0.281, 5.451, 1.064, -0.0, -3.142, -1.571)], ['seconf', q824=(0.669, 5.572, 0.957, -0.0, -3.142, -1.542)]
+  stackable [1] : ['stackable', 'veggiecabbage#1|6', 'basin#1::basin_bottom|(9, none, 3)']
+  supported [1] : ['supported', 'veggiecabbage#1|6', p31=(0.638, 5.573, 0.823, 0, 0, 3.113), 'basin#1::basin_bottom|(9, none, 3)']
+  traj [8] : ['traj', c248=t(6, 12)], ['traj', c256=t(6, 10)], ['traj', c352=t(6, 95)], ['traj', c392=t(6, 95)], ['traj', c424=t(6, 2)], ['traj', c624=t(6, 2)], ['traj', c696=t(6, 2)], ['traj', c824=t(6, 2)]
+  wconf [2] : ['wconf', wconf312], ['wconf', wconf512]
+----------------
+0 Action(name='move_cartesian', args=[q168=(0.9, 8, 0.7, 0, -1.571, 0), q184=(0.449, 4.766, 1.015, 0.0, -3.142, 0.494), c392=t(6, 95), wconf312])
+    added: [('not', ('unsafetraj', c392=t(6, 95))), ('atseconf', q184=(0.449, 4.766, 1.015, 0.0, -3.142, 0.494))]
+    deled: [('canmove',), ('=', ('PlaceCost',), 1), ('=', ('PickCost',), 1), ('atseconf', q168=(0.9, 8, 0.7, 0, -1.571, 0))]
+1 MoveArmAction{conf: q376=(0.893, 7.954, 0.705, -0.001, -1.592, 0.007)}
+1 Action(name='pick_hand', args=('hand', 6, p2=(0.464, 4.794, 0.838, 0, 0, 1.077), g984=(0.0, 0.134, 0.032, -1.571, 0.0, 3.142), q184=(0.449, 4.766, 1.015, 0.0, -3.142, 0.494), q168=(0.449, 4.766, 0.972, 0.0, -3.142, 0.494), c824=t(6, 2), wconf312))
+    added: [('canmove',), ('reachablepose', 6, p2=(0.464, 4.794, 0.838, 0, 0, 1.077), wconf312), ('atgrasp', 'hand', 6, g984=(0.0, 0.134, 0.032, -1.571, 0.0, 3.142)), ('not', ('unsafeapproach', 6, p2=(0.464, 4.794, 0.838, 0, 0, 1.077), g984=(0.0, 0.134, 0.032, -1.571, 0.0, 3.142)))]
+    deled: [('handempty', 'hand'), ('atpose', 6, p2=(0.464, 4.794, 0.838, 0, 0, 1.077))]
+2 MoveArmAction{conf: q184=(0.449, 4.766, 1.015, 0.0, -3.142, 0.494)}
+2 GripperAction{arm: hand, extent: None, position: 0.0, teleport: False}
+2 AttachObjectAction{arm: hand, grasp: g984=(0.0, 0.134, 0.032, -1.571, 0.0, 3.142), object: 6}
+2 MoveArmAction{conf: q168=(0.449, 4.766, 0.972, 0.0, -3.142, 0.494)}
+2 Action(name='move_cartesian', args=[q184=(0.449, 4.766, 1.015, 0.0, -3.142, 0.494), q696=(0.669, 5.572, 1.0, -0.0, -3.142, -1.542), c352=t(6, 95), wconf312])
+    added: [('not', ('unsafetraj', c352=t(6, 95))), ('atseconf', q696=(0.669, 5.572, 1.0, -0.0, -3.142, -1.542))]
+    deled: [('canmove',), ('atseconf', q184=(0.449, 4.766, 1.015, 0.0, -3.142, 0.494))]
+3 MoveArmAction{conf: q72=(0.477, 4.748, 1.015, 0.005, -3.115, 0.464)}
+3 Action(name='place_hand', args=('hand', 6, p31=(0.638, 5.573, 0.823, 0, 0, 3.113), g984=(0.0, 0.134, 0.032, -1.571, 0.0, 3.142), q696=(0.669, 5.572, 1.0, -0.0, -3.142, -1.542), q824=(0.669, 5.572, 0.957, -0.0, -3.142, -1.542), c624=t(6, 2), wconf312))
+    added: [('handempty', 'hand'), ('not', ('unsafeapproach', 6, p31=(0.638, 5.573, 0.823, 0, 0, 3.113), g984=(0.0, 0.134, 0.032, -1.571, 0.0, 3.142))), ('canmove',), ('atpose', 6, p31=(0.638, 5.573, 0.823, 0, 0, 3.113)), ('reachablepose', 6, p31=(0.638, 5.573, 0.823, 0, 0, 3.113), wconf312), ('not', ('unsafepose', 6, p31=(0.638, 5.573, 0.823, 0, 0, 3.113)))]
+    deled: [('atgrasp', 'hand', 6, g984=(0.0, 0.134, 0.032, -1.571, 0.0, 3.142))]
+4 MoveArmAction{conf: q696=(0.669, 5.572, 1.0, -0.0, -3.142, -1.542)}
+4 DetachObjectAction{arm: hand, object: 6}
+4 GripperAction{arm: hand, extent: 1, position: None, teleport: False}
+4 MoveArmAction{conf: q824=(0.669, 5.572, 0.957, -0.0, -3.142, -1.542)}
+4 Action(name='move_cartesian', args=[q696=(0.669, 5.572, 1.0, -0.0, -3.142, -1.542), q424=(0.281, 5.451, 1.108, -0.0, -3.142, -1.571), c256=t(6, 10), wconf312])
+    added: [('not', ('unsafetraj', c256=t(6, 10))), ('atseconf', q424=(0.281, 5.451, 1.108, -0.0, -3.142, -1.571))]
+    deled: [('canmove',), ('atseconf', q696=(0.669, 5.572, 1.0, -0.0, -3.142, -1.542))]
+5 MoveArmAction{conf: q456=(0.669, 5.572, 1.0, -0.0, -3.142, -1.542)}
+5 Action(name='grasp_handle_hand', args=('hand', (10, 3), pstn3=0, hg88=(-0.029, 0.079, -0.0, -1.571, 0.0, 3.142), q424=(0.281, 5.451, 1.108, -0.0, -3.142, -1.571), q720=(0.281, 5.451, 1.064, -0.0, -3.142, -1.571), c424=t(6, 2), wconf312))
+    added: [('debug1',), ('athandlegrasp', 'hand', (10, 3), hg88=(-0.029, 0.079, -0.0, -1.571, 0.0, 3.142))]
+    deled: [('handempty', 'hand'), ('atseconf', q424=(0.281, 5.451, 1.108, -0.0, -3.142, -1.571))]
+6 MoveArmAction{conf: q424=(0.281, 5.451, 1.108, -0.0, -3.142, -1.571)}
+6 GripperAction{arm: hand, extent: None, position: 0.0, teleport: False}
+6 AttachObjectAction{arm: hand, grasp: hg88=(-0.029, 0.079, -0.0, -1.571, 0.0, 3.142), object: (10, 3)}
+6 Action(name='pull_articulated_handle_wconf', args=('hand', (10, 3), pstn3=0, pstn8=1.571, hg88=(-0.029, 0.079, -0.0, -1.571, 0.0, 3.142), q168=(0.9, 8, 0.7, 0, -1.571, 0), q416=(0.31, 5.481, 1.064, 0.0, -3.142, -3.142), c248=t(6, 12), wconf312, wconf512))
+    added: [('canungrasp',), ('inwconf', wconf512), ('atposition', (10, 3), pstn8=1.571), ('debug2',)]
+    deled: [('canpull',), ('inwconf', wconf312), ('atposition', (10, 3), pstn3=0)]
+7 MoveArmAction{conf: q176=(0.284, 5.451, 1.064, -0.0, -3.142, -1.702)}
+7 CreateCylinderEvent{body: None, color: RGBA(red=0.537254902, green=0.811764706, blue=0.941176471, alpha=1.0), height: 0.05, pose: ((0.4302127239853144, 5.601006215075031, 1.0678141807250758), (0, 0, 0, 1)), radius: 0.005}
+7 ChangeLinkColorEvent{body: 9, color: RGBA(red=0.537254902, green=0.811764706, blue=0.941176471, alpha=1.0), link: 3}
+7 Action(name='ungrasp_handle_hand', args=('hand', (10, 3), pstn8=1.571, hg88=(-0.029, 0.079, -0.0, -1.571, 0.0, 3.142), q136=(0.31, 5.481, 1.108, -0.0, -3.142, -3.141), q632=(0.31, 5.481, 1.064, -0.0, -3.142, -3.141), c696=t(6, 2), wconf512))
+    added: [('handempty', 'hand'), ('graspedhandle', (10, 3)), ('atseconf', q136=(0.31, 5.481, 1.108, -0.0, -3.142, -3.141)), ('canmove',)]
+    deled: [('athandlegrasp', 'hand', (10, 3), hg88=(-0.029, 0.079, -0.0, -1.571, 0.0, 3.142))]
+8 DetachObjectAction{arm: hand, object: (10, 3)}
+8 GripperAction{arm: hand, extent: 1, position: None, teleport: False}
+8 MoveArmAction{conf: q632=(0.31, 5.481, 1.064, -0.0, -3.142, -3.141)}
+8 Action(name='wait-clean', args=(6, (9, None, 3), (10, 3)))
+    added: [('on', 6, (9, None, 3)), ('cleaned', 6)]
+    deled: []
+9 JustClean{body: 6}
+
+
+finished executing plan
+

@@ -15,7 +15,9 @@ test_cases/
 !test_cases/test_blocks_kitchen
 !test_cases/test_pr2_kitchen
 !test_cases/test_feg_pick
-!test_cases/test_feg_cabinets
+!test_cases/test_feg_cabinets_rearrange
+!test_cases/test_feg_clean_only
+!test_cases/test_feg_clean_after_open
 _test_cases/
 
 */statistics/
@@ -28,4 +30,3 @@ tests/vhacd/
 outputs/
 !outputs/data_demo.html
 !outputs/style.css
-!outputs/test_feg_pick_1/220627-16:25/

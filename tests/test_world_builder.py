@@ -52,7 +52,7 @@ def get_parser(use_gui=USE_GUI):
     parser.add_argument('-seg', '--segment', action='store_true', default=False, help='')
     parser.add_argument('-mon', '--monitoring', action='store_true', default=False)
 
-    args = parser.parse_args()  # TODO: flag to save a video
+    args = parser.parse_args()
     set_random_seed(args.seed)
     return args
 
