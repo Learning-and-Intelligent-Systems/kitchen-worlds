@@ -41,12 +41,13 @@ from world_builder.actions import apply_actions
 
 from mamao_tools.utils import get_feasibility_checker
 from mamao_tools.feasibility_checkers import Shuffler
-from mamao_tools.data_utils import get_instance_info, exist_instance
+from mamao_tools.data_utils import get_instance_info, exist_instance, get_indices, \
+    get_plan_skeleton, get_successful_plan
 
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 
 
-GENERATE_SKELETONS = False
+GENERATE_SKELETONS = True
 USE_VIEWER = False
 DIVERSE = True
 PREFIX = 'diverse_' if DIVERSE else ''
@@ -68,17 +69,18 @@ TASK_NAME = '_examples'
 TASK_NAME = 'zz'
 # TASK_NAME = 'ss_two_fridge_pick'
 TASK_NAME = 'ss_two_fridge_in'
+TASK_NAME = 'mm_two_fridge_goals'
 
 # TASK_NAME = 'mm_two_fridge_in'
 # TASK_NAME = 'mm'
 
 CASES = None
-CASES = ['18']
+# CASES = ['18']
 if CASES is not None:
     SKIP_IF_SOLVED = False
     SKIP_IF_SOLVED_RECENTLY = False
 
-PARALLEL = GENERATE_SKELETONS ## and False
+PARALLEL = GENERATE_SKELETONS # and False
 FEASIBILITY_CHECKER = 'oracle'  ## None | oracle | pvt | pvt* | binary | shuffle
 if GENERATE_SKELETONS:
     FEASIBILITY_CHECKER = 'oracle'
@@ -135,8 +137,15 @@ def clear_all_rerun_results(run_dir, **kwargs):
 def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     if GENERATE_SKELETONS:
         file = join(run_dir, f'diverse_plans.json')
+        MORE_PLANS = False
         if isfile(file):
-            return
+            skeletons = [p[0] for p in json.load(open(file, 'r'))['checks']]
+            indices = get_indices(run_dir)
+            successful_plan = get_successful_plan(run_dir, indices)[0]
+            successful_skeleton = get_plan_skeleton(successful_plan, indices)
+            if successful_skeleton in skeletons:
+                return
+            MORE_PLANS = True
 
     else:
         ori_dir = join(run_dir, RERUN_SUBDIR)  ## join(DATABASE_DIR, run_dir)
@@ -206,9 +215,9 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
         )
         if GENERATE_SKELETONS:
             kwargs['evaluation_time'] = -0.5
-        if '_in/' in run_dir:
-            kwargs['downward_time'] = 10
-            kwargs['max_plans'] = 100
+            if MORE_PLANS:
+                kwargs['downward_time'] = 30
+                kwargs['max_plans'] = 300
     else:
         kwargs = dict()
 
