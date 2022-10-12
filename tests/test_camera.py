@@ -4,38 +4,55 @@ import os
 import PIL.Image
 import numpy as np
 import argparse
+import sys
 
 from config import EXP_PATH
 from pybullet_tools.utils import quat_from_euler, reset_simulation, remove_body, AABB, \
     get_aabb_extent, get_aabb_center, get_joint_name, get_link_name, euler_from_quat, \
-    set_color, apply_alpha, YELLOW, WHITE
+    set_color, apply_alpha, YELLOW, WHITE, get_aabb, get_point, wait_unlocked, \
+    get_joint_positions, GREEN, get_pose
 from pybullet_tools.bullet_utils import get_segmask, get_door_links, nice, \
-    get_partnet_doors
+    get_partnet_doors, collided
+from pybullet_tools.general_streams import get_contain_list_gen
+from pybullet_planning.pybullet_tools.general_streams import get_grasp_list_gen
+from pybullet_tools.flying_gripper_utils import get_cloned_se3_conf, plan_se3_motion, \
+    set_cloned_se3_conf
 
-from mamao_tools.data_utils import get_indices
-from lisdf_tools.lisdf_loader import load_lisdf_pybullet
+from world_builder.world import State
+from mamao_tools.utils import organize_dataset
+from mamao_tools.data_utils import get_indices, exist_instance, get_init_tuples
+from lisdf_tools.lisdf_loader import load_lisdf_pybullet, get_depth_images, create_gripper_robot
 import json
 import shutil
 from os import listdir
 from os.path import join, isdir, isfile, dirname, getmtime, basename
 import time
+import math
 import pybullet as p
 from tqdm import tqdm
-from lisdf_tools.lisdf_loader import get_depth_images
-from mamao_tools.utils import organize_dataset
 
-from utils import load_lisdf_synthesizer
+# from utils import load_lisdf_synthesizer
+from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 
 N_PX = 224
 NEW_KEY = 'meraki'
-ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb']
-DEFAULT_TASK = 'tt_one_fridge_pick'
-# DEFAULT_TASK = 'fault'
+ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb', 'meraki']
+DEFAULT_TASK = 'tt_two_fridge_in'
+DEFAULT_TASK = 'tt'
+# DEFAULT_TASK = 'ff'
+# DEFAULT_TASK = 'ww_two_fridge_in'
+# DEFAULT_TASK = 'ww'
+DEFAULT_TASK = 'zz'
+DEFAULT_TASK = '_examples'
+DEFAULT_TASK = 'ff_two_fridge_goals'
+
+MODIFIED_TIME = 1663895681
+PARALLEL = True
+USE_VIEWER = True
+REDO = False
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument('-p', action='store_true', default=False)
-parser.add_argument('-t', type=str, default=DEFAULT_TASK)  ## 'one_fridge_pick_pr2_tmp'
+parser = get_base_parser(task_name=DEFAULT_TASK, parallel=PARALLEL, use_viewer=USE_VIEWER)
 args = parser.parse_args()
 
 
@@ -107,8 +124,8 @@ def fix_planning_config(viz_dir):
             new_body_to_name[str(k)] = v
         if changed:
             config['body_to_name'] = new_body_to_name
-            tmp_config_file = join(viz_dir, 'planning_config_tmp.json')
-            shutil.move(config_file, tmp_config_file)
+            # tmp_config_file = join(viz_dir, 'planning_config_tmp.json')
+            # shutil.move(config_file, tmp_config_file)
             with open(config_file, 'w') as f:
                 json.dump(config, f, indent=3)
 
@@ -261,67 +278,6 @@ def make_image_background(old_arr):
     return new_arr
 
 
-# def render_masked_rgb_images(viz_dir):
-#     import numpy as np
-#
-#     new_key = 'masked_rgb'
-#     out_dir = join(viz_dir, f"{new_key}s")
-#     if not isdir(out_dir): os.mkdir(out_dir)
-#
-#     # crops = { 'rgb': (50, 50, 562, 413), 'depth': (49, 30, 446, 398) }
-#
-#     def load_rgbd(rgb_image_name):
-#         depth_image_name = rgb_image_name.replace('rgb', 'depth')
-#         rgb_img = np.asarray(PIL.Image.open(rgb_image_name).convert('RGB')) ## .crop(crops['rgb']))
-#         depth_img = np.asarray(PIL.Image.open(depth_image_name)) ## .crop(crops['rgb']))
-#         return rgb_img, depth_img
-#
-#     def mask_from_rgb_image(arr):
-#         background = make_image_background(arr)
-#         i = np.where(np.sum(np.abs(arr - background), axis=2) > 5)
-#         mask = np.zeros_like(arr[:, :, 0])
-#         mask[i] = 1
-#         return expand_mask(mask)
-#
-#     def mask_from_depth_image(arr):
-#         i = np.where(arr != 0)
-#         mask = np.zeros_like(arr)
-#         mask[i] = 1
-#         return mask
-#
-#     def get_visibility_mask(obj, scene, mask):
-#         visibility_mask = np.zeros_like(obj)
-#         i = np.where(obj*mask == scene*mask)
-#         visibility_mask[i] = 1
-#         return expand_mask(visibility_mask*mask)
-#
-#     ## ----- step 1: read the instance rgb and depth images
-#     rgb_dir = join(viz_dir, 'rgbs')
-#     rgb_files = [f for f in listdir(rgb_dir)]
-#     rgb_scene = [join(rgb_dir, f) for f in rgb_files if 'scene' in f][0]
-#     rgb_scene_img, depth_scene_img = load_rgbd(rgb_scene)
-#     shutil.copy(rgb_scene, rgb_scene.replace('rgb', new_key))
-#
-#     ## ----- step 2: render the masked out version of the scene rgb if the depth values are the same
-#     rgb_files.sort()
-#     for f in rgb_files:
-#         if 'scene' in f: continue
-#         rgb_obj = join(rgb_dir, f)
-#         rgb_obj_img, depth_obj_img = load_rgbd(rgb_obj)
-#
-#         rgb_mask = mask_from_rgb_image(rgb_obj_img)
-#         depth_mask = mask_from_depth_image(depth_obj_img)
-#
-#         visibility_mask = get_visibility_mask(depth_obj_img, depth_scene_img, depth_mask)
-#
-#         background = make_image_background(rgb_obj_img)  ## background color [178, 178, 204] in png image
-#         foreground = np.zeros_like(background) + rgb_scene_img * rgb_mask * visibility_mask
-#         background[np.where(foreground!=0)] = 0
-#         background += foreground
-#         im = PIL.Image.fromarray(background)
-#         im.save(rgb_obj.replace('rgb', new_key))
-
-
 def add_key(viz_dir):
     config_file = join(viz_dir, 'planning_config.json')
     config = json.load(open(config_file, 'r'))
@@ -353,18 +309,8 @@ def check_key_same(viz_dir):
     return config['version_key'] in ACCEPTED_KEYS
 
 
-def process(viz_dir):
-    # if not isdir(join(dataset_dir, subdir)): return
-    # viz_dir = join(dataset_dir, subdir)
-    subdir = basename(viz_dir)
-
-    ## need to temporarily move the dir to the test_cases folder for asset paths to be found
-    test_dir = join(EXP_PATH, f"{task_name}_{subdir}")
-    if isdir(test_dir):
-        shutil.rmtree(test_dir)
-    if not isdir(test_dir):
-        shutil.copytree(viz_dir, test_dir)
-    print(viz_dir, end='\r')
+def process(viz_dir, redo=REDO):
+    test_dir = copy_dir_for_process(viz_dir)
 
     # load_lisdf_synthesizer(test_dir)
 
@@ -384,10 +330,11 @@ def process(viz_dir):
     crop_dir = join(viz_dir, 'crop_images')
     tmp_file = join(viz_dir, 'planning_config_tmp.json')
 
+    if isdir(rgb_dir):
+        shutil.rmtree(rgb_dir)
     if isfile(tmp_file):
         os.remove(tmp_file)
 
-    redo = False
     camera_pose = get_camera_pose(viz_dir)
     (x, y, z), quat = camera_pose
     (r, p, w) = euler_from_quat(quat)
@@ -397,7 +344,10 @@ def process(viz_dir):
     camera_pose = (x, y, z + 1), quat_from_euler((r - 0.3, p, w))
     # print('camera_pose', nice(camera_pose))
 
-    # redo = True
+    check_file = join(crop_dir, 'crop_image_scene.png')
+    if isfile(check_file) and os.path.getmtime(check_file) > MODIFIED_TIME:
+        redo = False
+
     if not check_key_same(viz_dir) or redo:
         # if isdir(rgb_dir):
         #     shutil.rmtree(rgb_dir)
@@ -433,35 +383,4 @@ def process(viz_dir):
 
 
 if __name__ == "__main__":
-
-    task_name = args.t
-    if task_name == 'tt':
-        task_names = ['tt_one_fridge_pick', 'tt_one_fridge_table_in', 'tt_two_fridge_in']
-    else:
-        task_names = [task_name]
-
-    all_subdirs = []
-    for task_name in task_names:
-        dataset_dir = join('/home/zhutiany/Documents/mamao-data/', task_name)
-        # organize_dataset(task_name)
-        subdirs = listdir(dataset_dir)
-        subdirs.sort()
-        # subdirs = ['2102']
-        subdirs = [join(dataset_dir, s) for s in subdirs if isdir(join(dataset_dir, s))]
-        all_subdirs += subdirs
-    
-    if args.p:
-        import multiprocessing
-        from multiprocessing import Pool
-
-        max_cpus = 24
-        num_cpus = min(multiprocessing.cpu_count(), max_cpus)
-        print(f'using {num_cpus} cpus for {len(all_subdirs)} subdirs')
-        with Pool(processes=num_cpus) as pool:
-            for result in pool.imap_unordered(process, all_subdirs):
-                pass
-
-    else:
-        for subdir in all_subdirs:
-            process(subdir)
-            # break
+    process_all_tasks(process, args.t, parallel=args.p)

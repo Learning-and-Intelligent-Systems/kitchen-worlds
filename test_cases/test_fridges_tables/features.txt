@@ -1,0 +1,30 @@
+reachable veggietomato
+reachable meatturkeyleg
+reachable minifridge::link_3
+reachable cabinet::link_3
+aabby veggietomato 0.139
+aabby meatturkeyleg 0.173
+aabby minifridge::link_3 1.4
+aabby cabinet::link_3 1.4
+aabby minifridge::joint_0 0.454
+aabby cabinet::joint_2 0.074
+aabby cabinet::joint_0 0.454
+aabby minifridge::joint_1 0.336
+aabby cabinet::joint_1 0.454
+aabby minifridge::joint_2 0.454
+distancey veggietomato minifridge::link_3 0.119
+distancey veggietomato cabinet::link_3 -1.801
+distancey veggietomato minifridge::joint_0 -0.327
+distancey veggietomato cabinet::joint_2 -1.114
+distancey veggietomato cabinet::joint_0 -2.247
+distancey veggietomato minifridge::joint_1 0.189
+distancey veggietomato cabinet::joint_1 -1.801
+distancey veggietomato minifridge::joint_2 0.565
+distancey meatturkeyleg minifridge::link_3 -0.236
+distancey meatturkeyleg cabinet::link_3 -2.156
+distancey meatturkeyleg minifridge::joint_0 -0.683
+distancey meatturkeyleg cabinet::joint_2 -1.47
+distancey meatturkeyleg cabinet::joint_0 -2.603
+distancey meatturkeyleg minifridge::joint_1 -0.167
+distancey meatturkeyleg cabinet::joint_1 -2.157
+distancey meatturkeyleg minifridge::joint_2 0.21

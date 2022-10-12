@@ -13,22 +13,37 @@ from pybullet_tools.utils import set_random_seed, connect, enable_preview, \
     set_camera_pose, add_line, get_point, BLACK, get_name, CLIENTS, get_client, link_from_name, \
     get_link_subtree, clone_body, set_all_color, GREEN, BROWN, invert, multiply, set_pose, VideoSaver, reset_simulation
 from pybullet_tools.bullet_utils import get_datetime
+from pybullet_tools.utils import apply_alpha, get_camera_matrix, LockRenderer, HideOutput, load_model, TURTLEBOT_URDF, \
+    set_all_color, dump_body, draw_base_limits, multiply, Pose, Euler, PI, draw_pose, unit_pose, create_box, TAN, Point, \
+    GREEN, create_cylinder, INF, BLACK, WHITE, RGBA, GREY, YELLOW, BLUE, BROWN, RED, stable_z, set_point, set_camera_pose, \
+    set_all_static, get_model_info, load_pybullet, remove_body, get_aabb, set_pose, wait_if_gui, get_joint_names, \
+    get_min_limit, get_max_limit, set_joint_position, set_joint_position, get_joints, get_joint_info, get_moving_links, \
+    get_pose, get_joint_position, enable_gravity, enable_real_time, get_links, set_color, dump_link, draw_link_name, \
+    get_link_pose, get_aabb, get_link_name, sample_aabb, aabb_contains_aabb, aabb2d_from_aabb, sample_placement, \
+    aabb_overlap, get_links, get_collision_data, get_visual_data, link_from_name, body_collision, get_closest_points, \
+    load_pybullet, FLOOR_URDF, pairwise_collision, is_movable, get_bodies, get_aabb_center, draw_aabb
+from pybullet_tools.pr2_primitives import get_group_joints, Conf
 
-from world_builder.builders import create_pybullet_world, test_pick, test_exist_omelette, test_kitchen_oven, \
-    test_feg_pick, test_one_fridge
+from world_builder.world import World, State
+from world_builder.entities import Object, Region, Environment, Robot, Camera, Floor, Stove,\
+    Surface, Moveable, Supporter, Steerable, Door
+from world_builder.world_generator import to_lisdf, save_to_test_cases
+
+from world_builder.builders import test_pick, test_exist_omelette, test_kitchen_oven, test_feg_pick, \
+    test_one_fridge, create_pybullet_world
 
 import argparse
 from datetime import datetime
 
-DEFAULT_TEST = test_one_fridge  ## test_one_fridge | test_feg_pick | test_kitchen_oven | test_exist_omelette
+DEFAULT_TEST = test_feg_pick  ## test_one_fridge | test_feg_pick | test_kitchen_oven | test_exist_omelette
 USE_GUI = True
 
 
-def get_parser():
+def get_parser(use_gui=USE_GUI):
     parser = argparse.ArgumentParser()
 
     ## -------- simulation related
-    parser.add_argument('-v', '--viewer', action='store_true', help='')
+    parser.add_argument('-v', '--viewer', action='store_true', default=use_gui, help='')
     parser.add_argument('-d', '--drive', action='store_true', help='')
     parser.add_argument('-t', '--time_step', type=float, default=4e-0)
     parser.add_argument('--teleport', action='store_true', help='')
@@ -47,14 +62,15 @@ if __name__ == '__main__':
     parallel = False
     num_cases = 4
     builder = DEFAULT_TEST
-    out_dir = f'{builder.__name__}_{get_datetime()}'
-    os.makedirs(out_dir, exist_ok=True)
+    out_name = f'{builder.__name__}_{get_datetime()}'
 
     def process(index):
         np.random.seed(index)
         random.seed(index)
+        out_dir = f"{out_name}_{index}"
+        os.makedirs(out_dir, exist_ok=True)
         return create_pybullet_world(args, builder, out_dir=out_dir, SAVE_TESTCASE=True,
-                                     EXIT=False, USE_GUI=USE_GUI, verbose=False)
+                                     EXIT=False, RESET=True, verbose=False)
 
     start_time = time.time()
     if parallel:

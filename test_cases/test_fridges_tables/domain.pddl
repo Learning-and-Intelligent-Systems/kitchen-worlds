@@ -66,6 +66,7 @@
     (cfreeposepose ?o ?p ?o2 ?p2)
     (cfreeapproachpose ?o ?p ?g ?o2 ?p2)
     (cfreetrajpose ?t ?o2 ?p2)
+    (cfreetrajposition ?t ?o2 ?p2)
     (isclosedposition ?o ?p)  ;;
     (isopenposition ?o ?p)  ;;
 
@@ -108,13 +109,20 @@
     (debug1)
     (debug2)
     (debug3)
+
+    (identical ?v1 ?v2)
+
+    (picked ?o)
+    (placed ?o)
+    (pulled ?o)
+    (enabled)
   
-    (isjointto ?x ?y)
-    (defaultconf ?x ?y)
-    (object ?x)
-    (supporter ?x)
-    (food ?x)
     (space ?x)
+    (isjointto ?x ?y)
+    (food ?x)
+    (supporter ?x)
     (floor ?x)
+    (object ?x)
+    (defaultconf ?x ?y)
   )
 )

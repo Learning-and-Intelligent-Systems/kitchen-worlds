@@ -1,5 +1,10 @@
 (define (domain pr2-tamp)
   (:requirements :strips :equality)
+
+  (:constants
+    @movable @bottle @edible
+  )
+
   (:predicates
     (arm ?a)
     (sink ?o)
@@ -61,6 +66,7 @@
     (cfreeposepose ?o ?p ?o2 ?p2)
     (cfreeapproachpose ?o ?p ?g ?o2 ?p2)
     (cfreetrajpose ?t ?o2 ?p2)
+    (cfreetrajposition ?t ?o2 ?p2)
     (isclosedposition ?o ?p)  ;;
     (isopenposition ?o ?p)  ;;
 
@@ -103,22 +109,21 @@
     (debug1)
     (debug2)
     (debug3)
+
+    (identical ?v1 ?v2)
+
+    (picked ?o)
+    (placed ?o)
+    (pulled ?o)
+    (enabled)
   
-    (defaultconf ?x ?y)
+    (food ?x)
     (isjointto ?x ?y)
+    (defaultconf ?x ?y)
+    (object ?x)
     (floor ?x)
-    (counter ?x)
+    (space ?x)
     (surface ?x)
-    (braiserbody ?x)
-    (microwave ?x)
-    (braiserlid ?x)
-    (meatturkeyleg ?x)
-    (oven ?x)
-    (dishwasher ?x)
-    (basin ?x)
-    (faucet ?x)
-    (fridge ?x)
-    (veggiecabbage ?x)
-    (milkbottle ?x)
+    (supporter ?x)
   )
 )

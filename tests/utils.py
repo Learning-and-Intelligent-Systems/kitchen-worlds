@@ -1,7 +1,6 @@
 import os.path
 
 import numpy as np
-import scene_synthesizer as synth
 import trimesh
 import untangle
 from trimesh import transformations
@@ -11,13 +10,20 @@ def test_is_robot(name, robots=["pr2"]):
         return True
     return any(name.startswith(prefix) for prefix in robots)
 
-def load_lisdf(lisdf_dir, scene_scale=1., robots=False, verbose=True):
+
+def load_lisdf(lisdf_dir, scene_scale=1., robots=False, skip=[], verbose=True):
     # TODO: apply within load_lisdf_synthesizer
     lisdf_path = os.path.join(lisdf_dir, 'scene.lisdf')
     world_xml = untangle.parse(lisdf_path).sdf.world
+
+    model_states = {}
+    if len(world_xml.state) > 0:
+        model_states = world_xml.state.model
+        model_states = {s['name']: {j['name']: eval(j.angle.cdata) for j in s.joint} for s in model_states}
+
     for obj_xml in world_xml.include:
         name = obj_xml._attributes["name"]
-        if not robots and test_is_robot(name): # TODO: generalize
+        if (name in skip) or (not robots and test_is_robot(name)): # TODO: generalize
             continue
 
         path = os.path.abspath(os.path.join(os.path.dirname(lisdf_path), obj_xml.uri.cdata))
@@ -38,7 +44,9 @@ def load_lisdf(lisdf_dir, scene_scale=1., robots=False, verbose=True):
         pose = transformations.translation_matrix(position) @ \
                transformations.euler_matrix(*euler)
 
-        yield name, path, scale, is_fixed, pose
+        positions = model_states[name] if name in model_states else {}
+
+        yield name, path, scale, is_fixed, pose, positions
 
 ##################################################
 
@@ -55,6 +63,7 @@ def look_at_scene(scene, pose=None, use_aabb=False):
     return scene.camera_transform
 
 def load_lisdf_synthesizer(lisdf_dir, scene_scale=1., robots=False, surfaces=False, texture=True, display=True):
+    import scene_synthesizer as synth
     lisdf_path = os.path.join(lisdf_dir, 'scene.lisdf')
 
     scene = synth.Scene()

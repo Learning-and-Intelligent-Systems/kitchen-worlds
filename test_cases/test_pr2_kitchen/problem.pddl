@@ -38,31 +38,16 @@
 	(arm left)
 	(arm right)
 
-	(oven oven#1)
-
 	(floor floor1)
-
-	(basin basin#1)
 
 	(handempty left)
 	(handempty right)
 
-	(faucet faucet#1)
-	(fridge fridge#1)
-
 	(controllable left)
-	(counter counter#1)
-
-	(microwave microwave#1)
 
 	(edible veggiecabbage#1)
 	(edible meatturkeyleg#1)
 
-	(braiserlid braiserlid#1)
-	(dishwasher dishwasher#1)
-	(milkbottle milkbottle#1)
-
-	(braiserbody braiserbody#1)
 	(graspable veggiecabbage#1)
 	(graspable braiserlid#1)
 	(graspable meatturkeyleg#1)
@@ -80,13 +65,11 @@
 
 	(atbconf q440=(2.5, 6, 3.142))
 
-	(meatturkeyleg meatturkeyleg#1)
 	(surface basin#1::basin_bottom)
 	(surface fridge#1::shelf_bottom)
 	(surface counter#1::front_left_stove)
 	(surface braiserbody#1::braiser_bottom)
 	(surface counter#1::indigo_tmp)
-	(veggiecabbage veggiecabbage#1)
 
 	(cleaningsurface basin#1::basin_bottom)
 
