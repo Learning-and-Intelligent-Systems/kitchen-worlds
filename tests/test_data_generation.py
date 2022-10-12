@@ -31,7 +31,7 @@ from test_utils import parallel_processing
 from test_world_builder import create_pybullet_world
 
 NUM_PROBLEMS = 200
-DEFAULT_TEST = 'test_two_fridge_goals'
+DEFAULT_TEST = 'test_fridges_tables'
 ## 'test_one_fridge' | 'test_fridge_table' | 'test_fridges_tables' | 'test_two_fridge_goals'
 PARALLEL = False
 DIVERSE = False

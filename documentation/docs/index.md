@@ -112,8 +112,9 @@ python test_parse_pddl.py
 To solve some test problems wih PDDLStream, `-test` takes the name of subdirectory inside `test_cases` folder.
 
 ```commandline
-python test_pddlstream.py -test test_pr2_kitchen
-python test_floating_gripper.py -test test_feg_clean_only
+cd pybullet_planning/tests
+python test_pddlstream.py -test test_fridges_tables
+python test_floating_gripper.py -test test_feg_pick
 ```
 
 Some test cases (verified that they can run on Ubuntu with Python 3.7/3.8):
