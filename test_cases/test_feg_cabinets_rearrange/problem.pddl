@@ -39,8 +39,6 @@
 
 	(arm hand)
 
-	(oven oven#1)
-
 	(floor floor1)
 
 	(handempty hand)
@@ -53,35 +51,21 @@
 	(inwconf wconf776)
 
 	(controllable hand)
-	(counter counter#1)
 
-	(oilbottle oilbottle#1)
-
-	(bottle vinegarbottle#1)
-	(bottle oilbottle#1)
-	(edible meatturkeyleg#1)
-	(edible veggiecabbage#1)
 	(graspable braiserlid#1)
 	(graspable veggiecabbage#1)
 	(graspable oilbottle#1)
 	(graspable meatturkeyleg#1)
 	(graspable vinegarbottle#1)
 
-	(braiserlid braiserlid#1)
-
 	(space counter#1::sektion)
 	(space counter#1::hitman_drawer_top)
 	(space counter#1::dagger)
 
-	(braiserbody braiserbody#1)
-
-	(meatturkeyleg meatturkeyleg#1)
 	(surface counter#1::indigo_tmp)
 	(surface counter#1::front_left_stove)
 	(surface counter#1::hitman_tmp)
 	(surface braiserbody#1::braiser_bottom)
-	(veggiecabbage veggiecabbage#1)
-	(vinegarbottle vinegarbottle#1)
 
 	(oftype veggiecabbage#1 @edible)
 	(oftype oilbottle#1 @bottle)

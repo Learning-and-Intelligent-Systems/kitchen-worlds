@@ -19,19 +19,19 @@
 
     <model name="floor1">
       <static>true</static>
-      <pose>2.3 4.7 -0.002 0.0 -0.0 0.0</pose>
+      <pose>2.3 6.7 -0.002 0.0 -0.0 0.0</pose>
       <link name="box">
         <collision name="box_collision">
           <geometry>
             <box>
-              <size>4.7 9.4 0.001</size>
+              <size>4.7 13.4 0.001</size>
             </box>
           </geometry>
         </collision>
         <visual name="box_visual">
           <geometry>
             <box>
-              <size>4.7 9.4 0.001</size>
+              <size>4.7 13.4 0.001</size>
             </box>
           </geometry>
           <material>

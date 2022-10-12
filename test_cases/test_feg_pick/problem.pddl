@@ -1,6 +1,6 @@
 
 (define
-  (problem test_feg_clean_only)
+  (problem test_feg_pick)
   (:domain domain)
 
   (:objects
@@ -154,4 +154,3 @@
     (holding hand veggiecabbage#1)
   ))
 )
-        
