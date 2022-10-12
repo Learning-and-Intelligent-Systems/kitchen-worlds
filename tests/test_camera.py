@@ -44,8 +44,9 @@ DEFAULT_TASK = 'tt'
 # DEFAULT_TASK = 'ww'
 DEFAULT_TASK = 'zz'
 DEFAULT_TASK = '_examples'
+DEFAULT_TASK = 'ff_two_fridge_goals'
 
-MODIFIED_TIME = 1663895681.8584874
+MODIFIED_TIME = 1663895681
 PARALLEL = True
 USE_VIEWER = True
 REDO = False
@@ -123,8 +124,8 @@ def fix_planning_config(viz_dir):
             new_body_to_name[str(k)] = v
         if changed:
             config['body_to_name'] = new_body_to_name
-            tmp_config_file = join(viz_dir, 'planning_config_tmp.json')
-            shutil.move(config_file, tmp_config_file)
+            # tmp_config_file = join(viz_dir, 'planning_config_tmp.json')
+            # shutil.move(config_file, tmp_config_file)
             with open(config_file, 'w') as f:
                 json.dump(config, f, indent=3)
 

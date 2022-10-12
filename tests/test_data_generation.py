@@ -30,8 +30,9 @@ from world_builder.world_generator import save_to_outputs_folder
 from test_utils import parallel_processing
 from test_world_builder import create_pybullet_world
 
-NUM_PROBLEMS = 1
-DEFAULT_TEST = 'test_fridges_tables' ## 'test_one_fridge' | 'test_fridge_table' | 'test_fridges_tables'
+NUM_PROBLEMS = 200
+DEFAULT_TEST = 'test_two_fridge_goals'
+## 'test_one_fridge' | 'test_fridge_table' | 'test_fridges_tables' | 'test_two_fridge_goals'
 PARALLEL = False
 DIVERSE = False
 USE_GUI = False
@@ -108,6 +109,8 @@ def get_builder(test_name):
         from world_builder.builders import test_fridge_table as test_scene
     elif test_name == 'test_fridges_tables':
         from world_builder.builders import test_fridges_tables as test_scene
+    elif test_name == 'test_two_fridge_goals':
+        from world_builder.builders import test_fridges_tables_conjunctive as test_scene
     return test_scene
 
 #####################################
