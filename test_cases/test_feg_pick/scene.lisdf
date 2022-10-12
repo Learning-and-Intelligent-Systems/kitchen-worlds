@@ -116,7 +116,7 @@
       <model name="feg0">
         <joint name="x"><angle>1.2</angle></joint>
         <joint name="y"><angle>8.0</angle></joint>
-        <joint name="z"><angle>0.7</angle></joint>
+        <joint name="z"><angle>1.2</angle></joint>
         <joint name="roll"><angle>0.0</angle></joint>
         <joint name="pitch"><angle>-1.571</angle></joint>
         <joint name="yaw"><angle>0.0</angle></joint>
