@@ -59,16 +59,17 @@ RETRY_IF_FAILED = True
 check_time = 1665148299  ## 1664908130, 1664976972 for pick, 1664750094 for in
 
 # TASK_NAME = 'tt_one_fridge_pick'
-TASK_NAME = 'tt_one_fridge_table_pick'
+# TASK_NAME = 'tt_one_fridge_table_pick'
 # TASK_NAME = 'tt_one_fridge_table_in'
 # TASK_NAME = 'tt_two_fridge_pick'
-TASK_NAME = 'tt_two_fridge_in'
+# TASK_NAME = 'tt_two_fridge_in'
+TASK_NAME = 'tt_two_fridge_goals'
 # TASK_NAME = 'tt'
 
-TASK_NAME = '_examples'
-TASK_NAME = 'zz'
+# TASK_NAME = '_examples'
+# TASK_NAME = 'zz'
 # TASK_NAME = 'ss_two_fridge_pick'
-TASK_NAME = 'ss_two_fridge_in'
+# TASK_NAME = 'ss_two_fridge_in'
 # TASK_NAME = 'mm_two_fridge_goals'
 
 # TASK_NAME = 'mm_two_fridge_in'
@@ -81,7 +82,7 @@ if CASES is not None:
     SKIP_IF_SOLVED_RECENTLY = False
 
 PARALLEL = GENERATE_SKELETONS # and False
-FEASIBILITY_CHECKER = 'pvt-all'  ## None | oracle | pvt | pvt* | pvt-all | binary | shuffle
+FEASIBILITY_CHECKER = 'pvt-task'  ## None | oracle | pvt | pvt* | pvt-all | binary | shuffle
 if GENERATE_SKELETONS:
     FEASIBILITY_CHECKER = 'oracle'
 
