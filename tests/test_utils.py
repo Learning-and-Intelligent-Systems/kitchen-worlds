@@ -61,10 +61,10 @@ def get_task_names(task_name):
     if task_name == 'mm':
         task_names = ['mm_one_fridge_pick',
                       'mm_one_fridge_table_pick', 'mm_one_fridge_table_in', 'mm_one_fridge_table_on',
-                      'mm_two_fridge_in', 'mm_two_fridge_pick']
+                      'mm_two_fridge_in', 'mm_two_fridge_pick', 'mm_two_fridge_goals']
     elif task_name == 'tt':
         task_names = ['tt_one_fridge_table_pick', 'tt_one_fridge_table_in',
-                      'tt_two_fridge_pick', 'tt_two_fridge_in']  ##
+                      'tt_two_fridge_pick', 'tt_two_fridge_in', 'tt_two_fridge_goals']  ##
     elif task_name == 'ff':
         task_names = ['ff_one_fridge_table_pick', 'ff_one_fridge_table_in',
                       'ff_two_fridge_in', 'ff_two_fridge_pick']

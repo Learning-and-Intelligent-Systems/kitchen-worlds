@@ -11,25 +11,14 @@ from pybullet_tools.utils import quat_from_euler, reset_simulation, remove_body,
     get_aabb_extent, get_aabb_center, get_joint_name, get_link_name, euler_from_quat, \
     set_color, apply_alpha, YELLOW, WHITE, get_aabb, get_point, wait_unlocked, \
     get_joint_positions, GREEN, get_pose
-from pybullet_tools.bullet_utils import get_segmask, get_door_links, nice, \
-    get_partnet_doors, collided
-from pybullet_tools.general_streams import get_contain_list_gen
-from pybullet_planning.pybullet_tools.general_streams import get_grasp_list_gen
-from pybullet_tools.flying_gripper_utils import get_cloned_se3_conf, plan_se3_motion, \
-    set_cloned_se3_conf
+from pybullet_tools.bullet_utils import get_segmask, get_door_links, adjust_segmask
 
-from world_builder.world import State
-from mamao_tools.utils import organize_dataset
 from mamao_tools.data_utils import get_indices, exist_instance, get_init_tuples
 from lisdf_tools.lisdf_loader import load_lisdf_pybullet, get_depth_images, create_gripper_robot
 import json
 import shutil
 from os import listdir
 from os.path import join, isdir, isfile, dirname, getmtime, basename
-import time
-import math
-import pybullet as p
-from tqdm import tqdm
 
 # from utils import load_lisdf_synthesizer
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
@@ -37,14 +26,17 @@ from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 N_PX = 224
 NEW_KEY = 'meraki'
 ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb', 'meraki']
-DEFAULT_TASK = 'tt_two_fridge_in'
-DEFAULT_TASK = 'tt'
+DEFAULT_TASK = 'tt_two_fridge_pick'
+# DEFAULT_TASK = 'tt_two_fridge_in'
+# DEFAULT_TASK = 'tt'
+# DEFAULT_TASK = 'mm'
+# DEFAULT_TASK = 'mm_two_fridge_pick'
 # DEFAULT_TASK = 'ff'
 # DEFAULT_TASK = 'ww_two_fridge_in'
 # DEFAULT_TASK = 'ww'
-DEFAULT_TASK = 'zz'
-DEFAULT_TASK = '_examples'
-DEFAULT_TASK = 'ff_two_fridge_goals'
+# DEFAULT_TASK = 'zz'
+# DEFAULT_TASK = '_examples'
+# DEFAULT_TASK = 'ff_two_fridge_goals'
 
 MODIFIED_TIME = 1663895681
 PARALLEL = True
@@ -56,13 +48,30 @@ parser = get_base_parser(task_name=DEFAULT_TASK, parallel=PARALLEL, use_viewer=U
 args = parser.parse_args()
 
 
-def get_camera_pose(viz_dir):
-    camera_pose = json.load(open(join(viz_dir, 'planning_config.json')))["obs_camera_pose"]
+def get_camera_pose(viz_dir, key="obs_camera_pose"):
+    camera_pose = json.load(open(join(viz_dir, 'planning_config.json')))[key]
     if len(camera_pose) == 6:
         point = camera_pose[:3]
         euler = camera_pose[3:]
         camera_pose = (point, quat_from_euler(euler))
     return camera_pose
+
+
+def record_camera_pose(viz_dir, camera_pose, key='img_camera_pose'):
+    config_file = join(viz_dir, 'planning_config.json')
+    config = json.load(open(config_file))
+    config[key] = camera_pose
+    with open(config_file, 'w') as f:
+        json.dump(config, f, indent=3)
+
+
+def create_doorless_lisdf(test_dir):
+    lisdf_file = join(test_dir, 'scene.lisdf')
+    text = open(lisdf_file).read().replace('MiniFridge', 'MiniFridgeDoorless')
+    doorless_lisdf = join(test_dir, 'scene_dooless.lisdf')
+    with open(doorless_lisdf, 'w') as f:
+        f.write(text)
+    return doorless_lisdf
 
 
 def render_transparent_doors(test_dir, viz_dir, camera_pose):
@@ -130,50 +139,81 @@ def fix_planning_config(viz_dir):
                 json.dump(config, f, indent=3)
 
 
-def render_segmentation_mask(test_dir, viz_dir, camera_pose,
-                             width=1280, height=960, fx=800, crop=False):
+def render_segmentation_mask(test_dir, viz_dir, camera_pose, crop=False, transparent=False,
+                             width=1280, height=960, fx=800, pairs=None):
+    ## width = 1960, height = 1470, fx = 800
     world = load_lisdf_pybullet(test_dir, width=width, height=height, verbose=False)
     remove_body(world.robot.body)
-    # width = 1960
-    # height = 1470
-    # fx = 800
-    if crop:
-        world.add_camera(camera_pose, viz_dir, width=width, height=height, fx=fx)
-    else:
-        world.add_camera(camera_pose, viz_dir, width=width, height=height, fx=fx)
-    imgs = world.camera.get_image(segment=True, segment_links=True)
-    rgb = imgs.rgbPixels[:, :, :3]
+    if transparent:
+        world.make_doors_transparent()
+        doorless_lisdf = create_doorless_lisdf(test_dir)
+    world.add_camera(camera_pose, viz_dir, width=width, height=height, fx=fx)
 
     ## a fix for previous wrong lisdf names in planning_config[name_to_body]
     fix_planning_config(viz_dir)
 
     new_key = 'seg_image' if not crop else 'crop_image'
+    new_key = 'transp_image' if transparent else new_key
     rgb_dir = join(viz_dir, f"{new_key}s")
     os.makedirs(rgb_dir, exist_ok=True)
 
+    ## get the scene image
+    imgs = world.camera.get_image(segment=True, segment_links=True)
+    rgb = imgs.rgbPixels[:, :, :3]
     im = PIL.Image.fromarray(rgb)
     im.save(join(rgb_dir, f'{new_key}_scene.png'))
     im_name = new_key+"_[{index}]_{name}.png"
 
+    """ get segmask with opaque doors """
     seg = imgs.segmentationMaskBuffer
     # seg = imgs.segmentationMaskBuffer[:, :, 0].astype('int32')
     unique = get_segmask(seg)
+
+    """ find the door links """
     indices = get_indices(viz_dir)
+    obj_keys = {}
     for k, v in indices.items():
-        file_name = join(rgb_dir, im_name.format(index=str(k), name=v))
-        if isfile(file_name): continue
-        k = eval(k)
         keys = []
-        if isinstance(k, int): ##  and (k, 0) in unique
+        k = eval(k)
+        if isinstance(k, int):  ##  and (k, 0) in unique
             keys = [u for u in unique if u[0] == k]
-            # print('viz_dir', viz_dir, k, keys)
+            if len(keys) == 0:
+                keys = [(k, 0)]
         elif isinstance(k, tuple) and len(k) == 3:
             keys = [(k[0], k[2])]
         elif isinstance(k, tuple) and len(k) == 2:
             keys = [(k[0], l) for l in get_door_links(k[0], k[1])]
-        # else:
-        #     print('theres nothing to do with this key:', k)
+        obj_keys[v] = keys
 
+    """ get segmask with transparent doors """
+    if transparent:
+        reset_simulation()
+        world = load_lisdf_pybullet(doorless_lisdf, width=width, height=height,
+                                    verbose=False, jointless=True)
+        remove_body(world.robot.body)
+        world.add_camera(camera_pose, viz_dir, width=width, height=height, fx=fx)
+        unique = adjust_segmask(unique, world)
+
+    """ get pairs of objects to render """
+    if pairs is not None:
+        inv_indices = {v: k for k, v in indices.items()}
+        indices.update({'+'.join([str(inv_indices[n]) for n in p]): p for p in pairs})
+
+    """ render cropped images """
+    for k, v in indices.items():
+        if '+' not in k:  ## single object/part
+            keys = obj_keys[v]
+        else:
+            keys = []
+            for vv in v:
+                keys.extend(obj_keys[vv])
+            v = '+'.join([n for n in v])
+
+        ## skip generation if already exists
+        file_name = join(rgb_dir, im_name.format(index=str(k), name=v))
+        if isfile(file_name): continue
+
+        ## generate image
         mask = np.zeros_like(rgb[:, :, 0])
         background = make_image_background(rgb)
         for k in keys:
@@ -187,6 +227,8 @@ def render_segmentation_mask(test_dir, viz_dir, camera_pose,
         new_image = foreground + background
 
         im = PIL.Image.fromarray(new_image)
+
+        ## crop image with object bounding box centered
         if crop:
             bb = get_mask_bb(mask)
             # if bb is not None:
@@ -309,6 +351,22 @@ def check_key_same(viz_dir):
     return config['version_key'] in ACCEPTED_KEYS
 
 
+def get_num_images(viz_dir, pairwise=False):
+    indices = get_indices(viz_dir)
+    objs = list(indices.values())
+    num_images = len(indices) + 1
+    pairs = []
+    if pairwise:
+        init = get_init_tuples(viz_dir)
+        for f in init:
+            oo = [i for i in f if i in objs]
+            if len(oo) >= 2:
+                # print(f)
+                pairs.append(oo)
+    num_images += len(pairs)
+    return num_images, pairs
+
+
 def process(viz_dir, redo=REDO):
     test_dir = copy_dir_for_process(viz_dir)
 
@@ -328,6 +386,7 @@ def process(viz_dir, redo=REDO):
     seg_dir = join(viz_dir, 'seg_images')
     rgb_dir = join(viz_dir, 'rgb_images')
     crop_dir = join(viz_dir, 'crop_images')
+    transp_dir = join(viz_dir, 'transp_images')
     tmp_file = join(viz_dir, 'planning_config_tmp.json')
 
     if isdir(rgb_dir):
@@ -343,18 +402,22 @@ def process(viz_dir, redo=REDO):
         # redo = True
     camera_pose = (x, y, z + 1), quat_from_euler((r - 0.3, p, w))
     # print('camera_pose', nice(camera_pose))
+    record_camera_pose(viz_dir, camera_pose, key='img_camera_pose')
 
-    check_file = join(crop_dir, 'crop_image_scene.png')
+    check_file = join(transp_dir, 'crop_image_scene.png')
     if isfile(check_file) and os.path.getmtime(check_file) > MODIFIED_TIME:
         redo = False
 
+    redo = False
     if not check_key_same(viz_dir) or redo:
         # if isdir(rgb_dir):
         #     shutil.rmtree(rgb_dir)
         if isdir(seg_dir):
             shutil.rmtree(seg_dir)
-        if isdir(crop_dir):
-            shutil.rmtree(crop_dir)
+        # if isdir(crop_dir):
+        #     shutil.rmtree(crop_dir)
+        if isdir(transp_dir):
+            shutil.rmtree(transp_dir)
 
     ## ------------- visualization function to test -------------------
     # render_rgb_image(test_dir, viz_dir, camera_pose)
@@ -366,15 +429,22 @@ def process(viz_dir, redo=REDO):
     #     reset_simulation()
 
     ## Pybullet segmentation mask
-    num_imgs = len(get_indices(viz_dir)) + 1
+    num_imgs, pairs = get_num_images(viz_dir, pairwise=True)
+
     # if not isdir(seg_dir) or len(listdir(seg_dir)) < num_imgs:
     #     print(viz_dir, 'segmenting ...')
     #     render_segmentation_mask(test_dir, viz_dir, camera_pose)
     #     reset_simulation()
 
-    if not isdir(crop_dir) or len(listdir(crop_dir)) < num_imgs:
-        print(viz_dir, 'cropping ...')
-        render_segmentation_mask(test_dir, viz_dir, camera_pose, crop=True)
+    # if not isdir(crop_dir) or len(listdir(crop_dir)) < num_imgs:
+    #     print(viz_dir, 'cropping ...')
+    #     render_segmentation_mask(test_dir, viz_dir, camera_pose, crop=True, pairs=pairs)
+    #     reset_simulation()
+
+    if not isdir(transp_dir) or len(listdir(transp_dir)) < num_imgs:
+        print(viz_dir, 'cropping with transparent doors ...')
+        render_segmentation_mask(test_dir, viz_dir, camera_pose, crop=True,
+                                 transparent=True, pairs=pairs)
         reset_simulation()
 
     ## ----------------------------------------------------------------

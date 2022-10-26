@@ -46,17 +46,19 @@ from mamao_tools.data_utils import get_instance_info, exist_instance, get_indice
 
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 
-
+## special modes
+GENERATE_MULTIPLE_SOLUTIONS = False
 GENERATE_SKELETONS = False
+
 USE_VIEWER = False
 DIVERSE = True
 PREFIX = 'diverse_' if DIVERSE else ''
 RERUN_SUBDIR = 'rerun_2'
 
-SKIP_IF_SOLVED = False and not GENERATE_SKELETONS
-SKIP_IF_SOLVED_RECENTLY = False and not GENERATE_SKELETONS
+SKIP_IF_SOLVED = True and not GENERATE_SKELETONS
+SKIP_IF_SOLVED_RECENTLY = True and not GENERATE_SKELETONS
 RETRY_IF_FAILED = True
-check_time = 1665148299  ## 1664908130, 1664976972 for pick, 1664750094 for in
+check_time = 1666297068  ## 1665768219 for goals, 1664750094 for in, 1666297068 for goals
 
 # TASK_NAME = 'tt_one_fridge_pick'
 # TASK_NAME = 'tt_one_fridge_table_pick'
@@ -64,13 +66,14 @@ check_time = 1665148299  ## 1664908130, 1664976972 for pick, 1664750094 for in
 # TASK_NAME = 'tt_two_fridge_pick'
 # TASK_NAME = 'tt_two_fridge_in'
 TASK_NAME = 'tt_two_fridge_goals'
-# TASK_NAME = 'tt'
+TASK_NAME = 'tt'
 
 # TASK_NAME = '_examples'
 # TASK_NAME = 'zz'
 # TASK_NAME = 'ss_two_fridge_pick'
 # TASK_NAME = 'ss_two_fridge_in'
 # TASK_NAME = 'mm_two_fridge_goals'
+# TASK_NAME = 'mm_test'
 
 # TASK_NAME = 'mm_two_fridge_in'
 # TASK_NAME = 'mm'
@@ -82,7 +85,8 @@ if CASES is not None:
     SKIP_IF_SOLVED_RECENTLY = False
 
 PARALLEL = GENERATE_SKELETONS # and False
-FEASIBILITY_CHECKER = 'pvt-task'  ## None | oracle | pvt | pvt* | pvt-all | binary | shuffle
+FEASIBILITY_CHECKER = 'binary' ## 'pvt-3-trans'
+## None | oracle | pvt | pvt* | pvt-task | pvt-all | binary | shuffle
 if GENERATE_SKELETONS:
     FEASIBILITY_CHECKER = 'oracle'
 
@@ -135,7 +139,8 @@ def clear_all_rerun_results(run_dir, **kwargs):
     #     shutil.rmtree(run_dir)
 
 
-def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
+def check_if_skip(run_dir, **kwargs):
+    skip = False
     if GENERATE_SKELETONS:
         file = join(run_dir, f'diverse_plans.json')
         MORE_PLANS = False
@@ -145,13 +150,16 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
             successful_plan = get_successful_plan(run_dir, indices)[0]
             successful_skeleton = get_plan_skeleton(successful_plan, indices)
             if successful_skeleton in skeletons:
-                return
+                skip = True
             MORE_PLANS = True
 
+    elif GENERATE_MULTIPLE_SOLUTIONS:
+        file = join(run_dir, f'multiple_solutions.json')
+        if (SKIP_IF_SOLVED or SKIP_IF_SOLVED_RECENTLY) and isfile(file):
+            skip = True
+
     else:
-        ori_dir = join(run_dir, RERUN_SUBDIR)  ## join(DATABASE_DIR, run_dir)
-        if not isdir(ori_dir):
-            os.mkdir(ori_dir)
+        ori_dir = join(run_dir, RERUN_SUBDIR)
         file = join(ori_dir, f'{PREFIX}plan_rerun_fc={FEASIBILITY_CHECKER}.json')
         if isfile(file):  ## and not '/11' in ori_dir
             failed = False
@@ -161,12 +169,21 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
             if not RETRY_IF_FAILED or not failed:
                 if SKIP_IF_SOLVED:
                     print('skipping solved problem', run_dir)
-                    return
+                    skip = True
                 elif SKIP_IF_SOLVED_RECENTLY:
                     last_modified = os.path.getmtime(file)
                     if last_modified > check_time:
                         print('skipping recently solved problem', run_dir)
-                        return
+                        skip = True
+    return skip
+
+
+def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
+    ori_dir = join(run_dir, RERUN_SUBDIR)
+    if not isdir(ori_dir):
+        os.mkdir(ori_dir)
+    if check_if_skip(run_dir):
+        return
 
     exp_dir = copy_dir_for_process(run_dir, tag='replaying')
 
@@ -207,6 +224,7 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     # fc = Shuffler()
 
     start = time.time()
+    collect_dataset = False
     if DIVERSE:
         kwargs = dict(
             diverse=DIVERSE,
@@ -218,14 +236,25 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
             kwargs['evaluation_time'] = -0.5
             if MORE_PLANS:
                 kwargs['downward_time'] = 30
-                kwargs['max_plans'] = 300
+                # kwargs['max_plans'] = 300
+        if GENERATE_MULTIPLE_SOLUTIONS:
+            kwargs['max_solutions'] = 4
+            kwargs['collect_dataset'] = True
     else:
         kwargs = dict()
 
+    cwd = os.getcwd()
     if parallel:
         solution = solve_multiple(pddlstream_problem, stream_info, fc=fc, lock=not args.unlock, **kwargs)
+        solution, cwd = solution
     else:
         solution = solve_one(pddlstream_problem, stream_info, fc=fc, lock=not args.unlock, **kwargs)
+
+    if GENERATE_MULTIPLE_SOLUTIONS:
+        from mamao_tools.data_utils import save_multiple_solutions
+        solution, plan_dataset = solution
+        file_path = join(run_dir, 'multiple_solutions.json')
+        solution = save_multiple_solutions(plan_dataset, run_dir=run_dir, file_path=file_path)
 
     ## just to get all diverse plans as labels
     if GENERATE_SKELETONS:
@@ -284,41 +313,6 @@ def process(index):
     np.random.seed(t)
     random.seed(t)
     return run_one(str(index), parallel=PARALLEL)
-
-
-# def main(parallel=True, cases=None):
-#     if isdir('visualizations'):
-#         shutil.rmtree('visualizations')
-#
-#     start_time = time.time()
-#     if cases is None:
-#         cases = [join(DATABASE_DIR, f) for f in listdir(DATABASE_DIR) if isdir(join(DATABASE_DIR, f))]
-#         cases.sort()
-#     else:
-#         cases = [join(DATABASE_DIR, c) for c in cases]
-#     print('Cases:', cases)
-#
-#     num_cases = len(cases)
-#     if parallel:
-#         import multiprocessing
-#         from multiprocessing import Pool
-#
-#         max_cpus = 24
-#         num_cpus = min(multiprocessing.cpu_count(), max_cpus)
-#         print(f'using {num_cpus} cpus')
-#         with Pool(processes=num_cpus) as pool:
-#             # for result in pool.imap_unordered(process, range(num_cases)):
-#             #     pass
-#             pool.map(process, cases)
-#             # pool.map(process, range(num_cases))
-#
-#     else:
-#         for i in range(num_cases):
-#             # if i in [0, 1]: continue
-#             # if '/11' not in cases[i]: continue
-#             process(cases[i], parallel=False)
-#
-#     print(f'solved {num_cases} problems (parallel={parallel}) in {round(time.time() - start_time, 3)} sec')
 
 
 if __name__ == '__main__':
