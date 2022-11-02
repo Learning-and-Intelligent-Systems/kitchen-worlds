@@ -1,0 +1,5 @@
+{
+  "base_limits": {"0": [0, 4], "1": [3, 12], "2": [0, 2]},
+  "robot_name": "feg",
+  "robot_builder": "build_fridge_domain_robot"
+}

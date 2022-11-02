@@ -1,0 +1,70 @@
+{
+    "base_limits": {
+        "0": [
+            0,
+            4
+        ],
+        "1": [
+            3,
+            12
+        ],
+        "2": [
+            0,
+            2
+        ]
+    },
+    "robot_name": "feg",
+    "robot_builder": "build_fridge_domain_robot",
+    "body_to_name": {
+        "(16, 1)": "bottle#1::joint_2",
+        "(17, 1)": "bottle#2::joint_2",
+        "(18, 1)": "bottle#3::joint_2",
+        "(3, 1)": "object#1::joint_0",
+        "(3, 3)": "object#1::joint_1",
+        "(4, 1)": "object#2::dishwasher_door",
+        "(5, 1)": "object#3::joint_0",
+        "(5, 3)": "object#3::joint_1",
+        "(6, 1)": "object#4::joint_0",
+        "(6, 2)": "object#4::knob_joint_1",
+        "(6, 4)": "object#4::knob_joint_2",
+        "(6, 5)": "object#4::knob_joint_3",
+        "(8, 1)": "microwave#1::joint_0",
+        "(9, 1)": "kitchenpot#1::joint_0",
+        "0": "feg0",
+        "1": "floor1",
+        "10": "supporter#3",
+        "11": "meatturkeyleg",
+        "12": "meatturkeyleg#1",
+        "13": "meatturkeyleg#2",
+        "14": "meatturkeyleg#3",
+        "15": "meatturkeyleg#4",
+        "16": "bottle#1",
+        "17": "bottle#2",
+        "18": "bottle#3",
+        "2": "supporter#1",
+        "3": "object#1",
+        "4": "object#2",
+        "5": "object#3",
+        "6": "object#4",
+        "7": "supporter#2",
+        "8": "microwave#1",
+        "9": "kitchenpot#1"
+    },
+    "system": "Linux",
+    "obs_camera_pose": [
+        [
+            4.2,
+            0.0,
+            2.5
+        ],
+        [
+            0.5879378012096794,
+            -0.5879378012096793,
+            -0.3928474791935511,
+            0.3928474791935512
+        ]
+    ],
+    "domain_full": "/home/yang/Documents/kitchen-worlds/test_cases/test_feg_kitchen/domain_full.pddl",
+    "domain": "/home/yang/Documents/kitchen-worlds/test_cases/test_feg_kitchen/domain.pddl",
+    "stream": "/home/yang/Documents/kitchen-worlds/test_cases/test_feg_kitchen/stream.pddl"
+}
