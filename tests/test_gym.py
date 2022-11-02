@@ -2,6 +2,7 @@ import os.path
 import sys
 from os.path import join, isdir
 from os import listdir
+import random
 
 import numpy as np
 
@@ -96,7 +97,7 @@ def update_gym_world(gym_world, pb_world, pause=False, verbose=False):
         gym_world.wait_if_gui()
 
 
-def load_task_isaacgym(task_dir, robots=True, pause=False,
+def load_envs_isaacgym(ori_dirs, robots=True, pause=False,
                         camera_width=2560, camera_height=1600, **kwargs):
     sys.path.append('/home/yang/Documents/playground/srl_stream/src')
     from srl_stream.gym_world import create_single_world, default_arguments
@@ -112,8 +113,6 @@ def load_task_isaacgym(task_dir, robots=True, pause=False,
     world_size = 6
     num_worlds = num_rows * num_cols - 1  ## 24 is the limit
 
-    ori_dirs = [join(task_dir, f) for f in listdir(task_dir) if isdir(join(task_dir, f))]
-    ori_dirs.sort()
     for i in range(num_worlds):
         ori_dir = ori_dirs[i]
         print('------------------\n', ori_dir, '\n\n')
@@ -134,13 +133,36 @@ def load_task_isaacgym(task_dir, robots=True, pause=False,
     return gym_world
 
 
+def get_envs_from_task(task_dir = '/home/yang/Documents/fastamp-data/tt_two_fridge_pick'):
+    ori_dirs = [join(task_dir, f) for f in listdir(task_dir) if isdir(join(task_dir, f))]
+    ori_dirs.sort()
+    return ori_dirs
+
+
+def get_sample_envs_for_corl():
+    task_scenes = {
+        'mm_one_fridge_pick': ['5', '226', '229', '232', '311'],
+        'mm_one_fridge_table_in': ['7', '88', '97', '202', '305', '394', '419', '466'],
+        'mm_two_fridge_in': ['36', '104', '186', '294', '346', '405', '473', '493', '498', '502'],
+        'mm_two_fridge_pick': ['222', '347', '472']
+    }
+    dirs = []
+    for k, v in task_scenes.items():
+        for i in v:
+            dirs.append(join('/home/yang/Documents/fastamp-data', k, i))
+    random.shuffle(dirs)
+    return dirs
+
+
 if __name__ == "__main__":
     # lisdf_dir = '/home/caelan/Programs/interns/yang/kitchen-worlds/test_cases/tt_one_fridge_pick_2'
     # lisdf_dir = '/home/yang/Documents/fastamp-data/tt_two_fridge_in/4'
     # world = load_lisdf_isaacgym(os.path.abspath(lisdf_dir), pause=True)
 
-    lisdf_dir = '/home/yang/Documents/fastamp-data/tt_two_fridge_pick'
-    world = load_task_isaacgym(os.path.abspath(lisdf_dir), pause=True)
+    # ori_dirs = get_envs_from_task()
+    ori_dirs = get_sample_envs_for_corl()
+
+    world = load_envs_isaacgym(ori_dirs, pause=True)
 
     # for name, path, scale, is_fixed, pose, positions in load_lisdf(lisdf_dir, robots=True):
     #     print(name, positions)
