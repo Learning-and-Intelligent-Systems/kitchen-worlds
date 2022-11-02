@@ -31,11 +31,11 @@ from test_utils import parallel_processing
 from test_world_builder import create_pybullet_world
 
 NUM_PROBLEMS = 200
-DEFAULT_TEST = 'test_fridges_tables'
+DEFAULT_TEST = 'test_feg_kitchen' ## 'test_fridges_tables'
 ## 'test_one_fridge' | 'test_fridge_table' | 'test_fridges_tables' | 'test_two_fridge_goals'
 PARALLEL = False
 DIVERSE = False
-USE_GUI = False
+USE_GUI = True
 SEED = None
 
 
@@ -111,6 +111,8 @@ def get_builder(test_name):
         from world_builder.builders import test_fridges_tables as test_scene
     elif test_name == 'test_two_fridge_goals':
         from world_builder.builders import test_fridges_tables_conjunctive as test_scene
+    elif test_name == 'test_feg_kitchen':
+        from test_counter_world import test_feg_kitchen as test_scene
     return test_scene
 
 #####################################
@@ -141,7 +143,7 @@ def process(exp_dir):
         state, goal, domain_pddl=domain_path, stream_pddl=stream_path,
         custom_limits=world.robot.custom_limits, collisions=not args.cfree,
         teleport=args.teleport, print_fn=print_fn)
-    stream_info = world.robot.get_stream_info(partial=False, defer=False)
+    stream_info = world.robot.get_stream_info()
 
     kwargs = {'visualize': True}
     if args.diverse:

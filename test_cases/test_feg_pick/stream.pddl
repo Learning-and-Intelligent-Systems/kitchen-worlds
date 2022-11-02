@@ -19,16 +19,16 @@
     :certified (Grasp ?o ?g)
   )
   (:stream inverse-kinematics-hand
-    :inputs (?a ?o ?p ?g ?w)
-    :domain (and (Controllable ?a) (Pose ?o ?p) (Grasp ?o ?g) (WConf ?w))
+    :inputs (?a ?o ?p ?g)
+    :domain (and (Controllable ?a) (Pose ?o ?p) (Grasp ?o ?g))
     :outputs (?q1 ?q2 ?t)
-    :certified (and (SEConf ?q1) (SEConf ?q2) (Traj ?t) (KinWConf ?a ?o ?p ?g ?q1 ?q2 ?t ?w))
+    :certified (and (SEConf ?q1) (SEConf ?q2) (Traj ?t) (Kin ?a ?o ?p ?g ?q1 ?q2 ?t))
   )
   (:stream plan-free-motion-hand
-    :inputs (?q1 ?q2 ?w)
-    :domain (and (SEConf ?q1) (SEConf ?q2) (WConf ?w))
+    :inputs (?q1 ?q2)
+    :domain (and (SEConf ?q1) (SEConf ?q2))
     :outputs (?t)
-    :certified (and (Traj ?t) (FreeMotionWConf ?q1 ?t ?q2 ?w))
+    :certified (and (Traj ?t) (FreeMotion ?q1 ?t ?q2))
   )
   (:stream test-cfree-pose-pose
     :inputs (?o1 ?p1 ?o2 ?p2)
@@ -59,46 +59,30 @@
       :certified (HandleGrasp ?o ?g)
     )
     (:stream inverse-kinematics-grasp-handle
-      :inputs (?a ?o ?p ?g ?w)
-      :domain (and (Controllable ?a) (Position ?o ?p) (HandleGrasp ?o ?g) (WConf ?w))
+      :inputs (?a ?o ?p ?g)
+      :domain (and (Controllable ?a) (Position ?o ?p) (HandleGrasp ?o ?g))
       :outputs (?q1 ?q2 ?t)
-      :certified (and (SEConf ?q1) (SEConf ?q2) (Traj ?t) (KinGraspHandle ?a ?o ?p ?g ?q1 ?q2 ?t ?w))
+      :certified (and (SEConf ?q1) (SEConf ?q2) (Traj ?t) (KinGraspHandle ?a ?o ?p ?g ?q1 ?q2 ?t))
     )
     (:stream plan-base-pull-door-handle
-      :inputs (?a ?o ?pst1 ?pst2 ?g ?q1 ?w)
-      :domain (and (Controllable ?a) (Joint ?o) (Position ?o ?pst1) (Position ?o ?pst2) (HandleGrasp ?o ?g) (SEConf ?q1) (IsClosedPosition ?o ?pst1) (IsOpenedPosition ?o ?pst2) (WConf ?w))
+      :inputs (?a ?o ?pst1 ?pst2 ?g ?q1)
+      :domain (and (Controllable ?a) (Joint ?o) (Position ?o ?pst1) (Position ?o ?pst2) (HandleGrasp ?o ?g) (SEConf ?q1) (IsClosedPosition ?o ?pst1) (IsOpenedPosition ?o ?pst2))
       :outputs (?q2 ?t)
-      :certified (and (SEConf ?q2) (Traj ?t) (KinPullDoorHandle ?a ?o ?pst1 ?pst2 ?g ?q1 ?q2 ?t ?w))
+      :certified (and (SEConf ?q2) (Traj ?t) (KinPullDoorHandle ?a ?o ?pst1 ?pst2 ?g ?q1 ?q2 ?t))
     )
-
-    ;; -------- already put those possible w2 in init -----------
-    (:stream update-wconf-pst
-      :inputs (?w1 ?o ?pst)
-      :domain (and (WConf ?w1) (Position ?o ?pst))
-      :outputs (?w2)
-      :certified (and (WConf ?w2) (NewWConfPst ?w1 ?o ?pst ?w2))
-    )
-    ;; ----------------------------------------------------------
 
   (:stream test-reachable-pose
-    :inputs (?o ?p ?g ?q ?w)
-    :domain (and (Pose ?o ?p) (Grasp ?o ?g) (SEConf ?q) (WConf ?w))
-    :certified (ReachableMovable ?o ?p ?g ?q ?w)
+    :inputs (?o ?p ?g ?q)
+    :domain (and (Pose ?o ?p) (Grasp ?o ?g) (SEConf ?q))
+    :certified (ReachableMovable ?o ?p ?g ?q)
   )
-
-    ;(:stream update-wconf-pst-for-reachability
-    ;  :inputs (?w1 ?o ?p ?q ?g)
-    ;  :domain (and (WConf ?w1) (Pose ?o ?p) (OriginalSEConf ?q) (Grasp ?o ?g))
-    ;  :outputs (?j ?pst ?w2)
-    ;  :certified (and (Position ?j ?pst) (WConf ?w2) (NewWConfPst ?w1 ?o ?pst ?w2) (ReachableWConf ?o ?p ?w2))
-    ;)
 
   ;; -------- already put those possible NewPoseFromAttachment in init -----------
   ;(:stream get-pose-from-attachment
-  ;  :inputs (?o ?w)
-  ;  :domain (and (Graspable ?o) (WConf ?w))
+  ;  :inputs (?o)
+  ;  :domain (and (Graspable ?o))
   ;  :outputs (?p)
-  ;  :certified (and (Pose ?o ?p) (NewPoseFromAttachment ?o ?p ?w))
+  ;  :certified (and (Pose ?o ?p) (NewPoseFromAttachment ?o ?p))
   ;)
   ;; ----------------------------------------------------------
 
