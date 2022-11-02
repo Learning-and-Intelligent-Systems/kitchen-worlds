@@ -47,7 +47,7 @@ from mamao_tools.data_utils import get_instance_info, exist_instance, get_indice
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 
 ## special modes
-GENERATE_MULTIPLE_SOLUTIONS = False
+GENERATE_MULTIPLE_SOLUTIONS = True
 GENERATE_SKELETONS = False
 
 USE_VIEWER = False
@@ -65,14 +65,14 @@ check_time = 1666297068  ## 1665768219 for goals, 1664750094 for in, 1666297068 
 # TASK_NAME = 'tt_one_fridge_table_in'
 # TASK_NAME = 'tt_two_fridge_pick'
 # TASK_NAME = 'tt_two_fridge_in'
-TASK_NAME = 'tt_two_fridge_goals'
-TASK_NAME = 'tt'
+# TASK_NAME = 'tt_two_fridge_goals'
+# TASK_NAME = 'tt'
 
 # TASK_NAME = '_examples'
 # TASK_NAME = 'zz'
 # TASK_NAME = 'ss_two_fridge_pick'
 # TASK_NAME = 'ss_two_fridge_in'
-# TASK_NAME = 'mm_two_fridge_goals'
+TASK_NAME = 'mm_two_fridge_goals'
 # TASK_NAME = 'mm_test'
 
 # TASK_NAME = 'mm_two_fridge_in'
@@ -85,7 +85,7 @@ if CASES is not None:
     SKIP_IF_SOLVED_RECENTLY = False
 
 PARALLEL = GENERATE_SKELETONS # and False
-FEASIBILITY_CHECKER = 'binary' ## 'pvt-3-trans'
+FEASIBILITY_CHECKER = 'None' ## 'pvt-3-trans'
 ## None | oracle | pvt | pvt* | pvt-task | pvt-all | binary | shuffle
 if GENERATE_SKELETONS:
     FEASIBILITY_CHECKER = 'oracle'
