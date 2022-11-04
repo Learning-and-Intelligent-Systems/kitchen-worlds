@@ -1,15 +1,21 @@
 import sys
 from os.path import join, abspath, dirname, isdir, isfile
-sys.path.append(join('..'))
-sys.path.append(join('..', 'lisdf'))
-sys.path.append(join('..', 'pddlstream'))
-sys.path.append(join('..', 'pybullet_planning'))
-sys.path.append(join('..', 'pybullet_planning', 'fastamp'))
+
+
+def absjoin(*args):
+    return abspath(join(*args))
+
+
+sys.path.append(absjoin('..'))
+sys.path.append(absjoin('..', 'lisdf'))
+sys.path.append(absjoin('..', 'pddlstream'))
+sys.path.append(absjoin('..', 'pybullet_planning'))
 
 import warnings
 warnings.filterwarnings('ignore')
 
-ASSET_PATH = join(dirname(__file__), '..', 'assets')
-EXP_PATH = join(dirname(__file__), '..', 'test_cases')
-OUTPUT_PATH = join(dirname(__file__), '..', 'outputs')
-MAMAO_DATA_PATH = join(dirname(__file__), '..', '..', 'fastamp-data')
+PROJECT_DIR = absjoin(dirname(__file__), '..')
+ASSET_PATH = absjoin(PROJECT_DIR, 'assets')
+EXP_PATH = absjoin(PROJECT_DIR, 'test_cases')
+OUTPUT_PATH = absjoin(PROJECT_DIR, 'outputs')
+MAMAO_DATA_PATH = absjoin(PROJECT_DIR, '..', 'fastamp-data')

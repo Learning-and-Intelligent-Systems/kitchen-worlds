@@ -43,7 +43,7 @@ def copy_dir_for_process(viz_dir, tag=None):
     task_name = basename(viz_dir.replace(f"/{subdir}", ''))
 
     ## temporarily move the dir to the test_cases folder for asset paths to be found
-    test_dir = join(EXP_PATH, f"{task_name}_{subdir}")
+    test_dir = join(EXP_PATH, f"temp_{task_name}_{subdir}")
     if isdir(test_dir):
         print('copy_dir_for_process | removing', test_dir)
         shutil.rmtree(test_dir)
@@ -161,6 +161,68 @@ def find_duplicate_worlds(d1, d2):
     inter = len(list(set(n1) & set(n2))) > 0
     print(f'\nt1: {d1}, t2: {d2}, dup1: {dup1}, dup2: {dup2}, inter: {inter}'
           f'\n----------------------------------------------------------\n')
+
+
+def mp4_to_gif(mp4_file, frame_folder='output'):
+    import cv2
+    def convert_mp4_to_jpgs(path):
+        video_capture = cv2.VideoCapture(path)
+        still_reading, image = video_capture.read()
+        frame_count = 0
+        while still_reading:
+            cv2.imwrite(f"{frame_folder}/frame_{frame_count:03d}.jpg", image)
+
+            # read next image
+            still_reading, image = video_capture.read()
+            frame_count += 1
+
+    import glob
+    from PIL import Image
+
+    def make_gif():
+        images = glob.glob(f"{frame_folder}/*.jpg")
+        images.sort()
+        frames = [Image.open(image) for image in images]
+        frame_one = frames[0]
+        output_file = mp4_file.replace('.mp4', '.gif')
+        frame_one.save(output_file, format="GIF", append_images=frames,
+                       save_all=True, duration=50, loop=0)
+        return output_file
+
+    convert_mp4_to_jpgs(mp4_file)
+    output_file = make_gif()
+    print('converted mp4 to', output_file)
+
+
+def query_yes_no(question, default="no"):
+    """Ask a yes/no question via raw_input() and return their answer.
+
+    "question" is a string that is presented to the user.
+    "default" is the presumed answer if the user just hits <Enter>.
+            It must be "yes" (the default), "no" or None (meaning
+            an answer is required of the user).
+
+    The "answer" return value is True for "yes" or False for "no".
+    """
+    valid = {"yes": True, "y": True, "ye": True, "no": False, "n": False}
+    if default is None:
+        prompt = " [y/n] "
+    elif default == "yes":
+        prompt = " [Y/n] "
+    elif default == "no":
+        prompt = " [y/N] "
+    else:
+        raise ValueError("invalid default answer: '%s'" % default)
+
+    while True:
+        sys.stdout.write(question + prompt)
+        choice = input().lower()
+        if default is not None and choice == "":
+            return valid[default]
+        elif choice in valid:
+            return valid[choice]
+        else:
+            sys.stdout.write("Please respond with 'yes' or 'no' " "(or 'y' or 'n').\n")
 
 
 if __name__ == '__main__':
