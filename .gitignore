@@ -4,6 +4,7 @@ __pycache__/
 assets/tmp/*
 *.lisdf~
 *.pyc
+*.gif
 
 documentation/
 !documentation/docs/index.md

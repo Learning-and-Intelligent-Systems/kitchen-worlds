@@ -139,22 +139,24 @@ def process(index):
 
 
 def merge_all_wconfs(all_wconfs):
-    longest_command = max(all_wconfs, key=len)
+    longest_command = max([len(wconf) for wconf in all_wconfs])
     whole_wconfs = []
     for i in range(longest_command):
         whole_wconf = {}
         for j in range(len(all_wconfs)):
             if i < len(all_wconfs[j]):
                 whole_wconf.update(all_wconfs[j][i])
+        whole_wconfs.append(whole_wconf)
     return whole_wconfs
 
 
-def replay_all_in_gym(width=1440, height=1120):
+def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, frame_gap=5):
     from test_gym import get_sample_envs_for_corl
-    from isaac_tools.gym_utils import load_envs_isaacgym, record_actions_in_gym
+    from isaac_tools.gym_utils import load_envs_isaacgym, record_actions_in_gym, \
+        update_gym_world_by_wconf, images_to_gif
 
     img_dir = join('gym_images')
-    gif_name = 'gym_replay.gif'
+    gif_name = 'gym_replay_batch_gym.gif'
     if isdir(img_dir):
         shutil.rmtree(img_dir)
     os.mkdir(img_dir)
@@ -162,29 +164,33 @@ def replay_all_in_gym(width=1440, height=1120):
     ## load all dirs
     ori_dirs = get_sample_envs_for_corl()
     lisdf_dirs = [copy_dir_for_process(ori_dir) for ori_dir in ori_dirs]
+    num_worlds = min([len(lisdf_dirs), num_rows * num_cols])
 
     ## translate commands into world_confs
     all_wconfs = []
-    for i in range(len(lisdf_dirs)):
+    for i in range(num_worlds):
         exp_dir, run_dir, commands, plan = get_pkl_run(lisdf_dirs[i])
         world = load_lisdf_pybullet(exp_dir, use_gui=not USE_GYM, width=width, height=height, verbose=False)
         problem = Problem(world)
         wconfs = record_actions_in_gym(problem, commands, plan=plan, return_wconf=True, world_index=i)
         all_wconfs.append(wconfs)
+        reset_simulation()
     all_wconfs = merge_all_wconfs(all_wconfs)
+    print('\n\nreplay all num of frames', len(all_wconfs))
 
     ## load all scenes in gym
-    gym_world, offsets = load_envs_isaacgym(lisdf_dirs, num_rows=2, num_cols=2,
-                                            camera_point=(12, 6, 10), camera_target=(0, 6, 0))
+    gym_world, offsets = load_envs_isaacgym(lisdf_dirs, num_rows=num_rows, num_cols=num_cols,
+                                            camera_point=(45, 15, 10), camera_target=(0, 15, 0))
 
-    ## update all scenes
+    ## update all scenes for each frame
+    filenames = []
     for i in range(len(all_wconfs)):
-        for j in range(len(all_wconfs)):
-            problem, commands, plan = all_wconfs[j]
-            gif_name = record_actions_in_gym(problem, commands, gym_world, img_dir=img_dir,
-                                             gif_name=gif_name, time_step=0, verbose=False, plan=plan)
-        gym_world.simulator.update_viewer()
+        update_gym_world_by_wconf(gym_world, all_wconfs[i], offsets=offsets)
+        if i % frame_gap == 0:
+            img_file = gym_world.get_rgba_image(gym_world.cameras[0])
+            filenames.append(img_file)
 
+    images_to_gif(img_dir, gif_name, filenames)
     print('created gif {}'.format(gif_name))
 
 
