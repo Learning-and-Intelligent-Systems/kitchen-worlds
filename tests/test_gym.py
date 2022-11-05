@@ -14,7 +14,8 @@ def get_envs_from_task(task_dir = '/home/yang/Documents/fastamp-data/tt_two_frid
 
 def get_sample_envs_for_corl():
     task_scenes = {
-        'mm_one_fridge_pick': ['5', '226', '229', '232', '311'],
+        'mm_one_fridge_pick': ['5', '226', '229', '232', '288', '295', '311'],
+        'mm_one_fridge_table_on': ['48', '69', '168', '248', '296', '325', '313'],
         'mm_one_fridge_table_in': ['7', '88', '97', '202', '305', '394', '419', '466'],
         'mm_two_fridge_in': ['36', '104', '186', '294', '346', '405', '473', '493', '498', '502'],
         'mm_two_fridge_pick': ['222', '347', '472']
@@ -49,7 +50,7 @@ def test_load_multiple():
     # ori_dirs = get_envs_from_task()
     ori_dirs = get_sample_envs_for_corl()
     lisdf_dirs = [copy_dir_for_process(ori_dir) for ori_dir in ori_dirs]
-    world = load_envs_isaacgym(lisdf_dirs, pause=True)
+    world = load_envs_isaacgym(lisdf_dirs, camera_point=(34, 15, 10), camera_target=(0, 15, 0), pause=True)
     print('test_load_multiple | to remove', len(lisdf_dirs))
     for lisdf_dir in lisdf_dirs:
         shutil.rmtree(lisdf_dir)
