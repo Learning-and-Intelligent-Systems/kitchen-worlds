@@ -30,12 +30,12 @@ from world_builder.entities import Object, Region, Environment, Robot, Camera, F
 from world_builder.world_generator import to_lisdf, save_to_test_cases
 
 from world_builder.builders import test_pick, test_exist_omelette, test_kitchen_oven, test_feg_pick, \
-    test_one_fridge, create_pybullet_world
+    test_one_fridge, create_pybullet_world,  test_feg_kitchen_mini
 
 import argparse
 from datetime import datetime
 
-DEFAULT_TEST = test_feg_pick  ## test_one_fridge | test_feg_pick | test_kitchen_oven | test_exist_omelette
+DEFAULT_TEST = test_feg_kitchen_mini  ## test_one_fridge | test_feg_pick | test_kitchen_oven | test_exist_omelette
 USE_GUI = True
 
 
@@ -68,8 +68,7 @@ if __name__ == '__main__':
         np.random.seed(index)
         random.seed(index)
         out_dir = f"{out_name}_{index}"
-        os.makedirs(out_dir, exist_ok=True)
-        return create_pybullet_world(args, builder, out_dir=out_dir, SAVE_TESTCASE=True,
+        return create_pybullet_world(args, builder, out_dir=out_dir, SAVE_TESTCASE=True, SAVE_RGB=True,
                                      EXIT=False, RESET=True, verbose=False)
 
     start_time = time.time()
