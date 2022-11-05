@@ -16,8 +16,7 @@ test_cases/
 !test_cases/test_pr2_kitchen
 !test_cases/test_feg_pick
 !test_cases/test_feg_cabinets_rearrange
-!test_cases/test_feg_clean_only
-!test_cases/test_feg_clean_after_open
+!test_cases/test_cases/test_feg_closed_doors
 _test_cases/
 
 */statistics/
