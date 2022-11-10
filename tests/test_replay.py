@@ -150,7 +150,7 @@ def merge_all_wconfs(all_wconfs):
     return whole_wconfs
 
 
-def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, frame_gap=5):
+def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, frame_gap=6, debug=False):
     from test_gym import get_sample_envs_for_corl
     from isaac_tools.gym_utils import load_envs_isaacgym, record_actions_in_gym, \
         update_gym_world_by_wconf, images_to_gif
@@ -170,11 +170,14 @@ def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, frame_gap
     all_wconfs = []
     for i in range(num_worlds):
         exp_dir, run_dir, commands, plan = get_pkl_run(lisdf_dirs[i])
-        world = load_lisdf_pybullet(exp_dir, use_gui=not USE_GYM, width=width, height=height, verbose=False)
+        world = load_lisdf_pybullet(exp_dir, use_gui=not USE_GYM or debug,
+                                    width=width, height=height, verbose=False)
         problem = Problem(world)
         wconfs = record_actions_in_gym(problem, commands, plan=plan, return_wconf=True, world_index=i)
         all_wconfs.append(wconfs)
         reset_simulation()
+        if debug:
+            wait_unlocked()
     all_wconfs = merge_all_wconfs(all_wconfs)
     print('\n\nreplay all num of frames', len(all_wconfs))
 
