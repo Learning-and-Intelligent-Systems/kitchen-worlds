@@ -127,11 +127,11 @@ def process(exp_dir):
     print(exp_dir)
 
     """ STEP 1 -- GENERATE SCENES """
-    state, goal, file = create_pybullet_world(
+    template_dir = join(EXP_PATH, args.test)
+    world, goal = create_pybullet_world(
         args, get_builder(args.test), world_name=basename(exp_dir), SAMPLING=True,
-        template_name=args.test, out_dir=exp_dir, DEPTH_IMAGES=False,
-        SAVE_LISDF=False, SAVE_TESTCASE=True, root_dir=EXP_PATH)
-    world = state.world
+        template_dir=template_dir, out_dir=exp_dir, DEPTH_IMAGES=False,
+        SAVE_LISDF=False, SAVE_TESTCASE=True)
     saver = WorldSaver()
 
     domain_path, stream_path, config_path = pddl_files_from_dir(exp_dir, replace_pddl=False)
@@ -139,6 +139,7 @@ def process(exp_dir):
     print_fn = parallel_print ## if args.parallel else myprint
     print_fn(args)
 
+    state = State(world)
     pddlstream_problem = pddlstream_from_state_goal(
         state, goal, domain_pddl=domain_path, stream_pddl=stream_path,
         custom_limits=world.robot.custom_limits, collisions=not args.cfree,
