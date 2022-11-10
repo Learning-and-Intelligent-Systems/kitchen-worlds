@@ -129,7 +129,7 @@ def process(exp_dir):
     """ STEP 1 -- GENERATE SCENES """
     template_dir = join(EXP_PATH, args.test)
     world, goal = create_pybullet_world(
-        args, get_builder(args.test), world_name=basename(exp_dir), SAMPLING=True,
+        args, get_builder(args.test), SAMPLING=True,
         template_dir=template_dir, out_dir=exp_dir, DEPTH_IMAGES=False,
         SAVE_LISDF=False, SAVE_TESTCASE=True)
     saver = WorldSaver()
