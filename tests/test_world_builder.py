@@ -10,11 +10,12 @@ import numpy as np
 
 from pybullet_tools.utils import set_random_seed, disconnect
 from pybullet_tools.bullet_utils import get_datetime
-from world_builder.builders import create_pybullet_world,  test_feg_kitchen_mini
+from world_builder.builders import create_pybullet_world, test_feg_kitchen_mini, test_kitchen_clean
 
 import argparse
 
-DEFAULT_TEST = test_feg_kitchen_mini  ## test_one_fridge | test_feg_pick | test_kitchen_oven | test_exist_omelette
+DEFAULT_TEST = test_kitchen_clean
+## test_feg_kitchen_mini  ## test_one_fridge | test_feg_pick | test_kitchen_oven | test_exist_omelette
 USE_GUI = True
 DEFAULT_YAML = 'kitchen_mini_feg.yaml'
 
