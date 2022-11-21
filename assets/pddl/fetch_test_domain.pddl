@@ -1,5 +1,5 @@
 (define
-  (domain panda_table_domain)
+  (domain fetch_test_domain)
 
   (:predicates
     ;; discrete facts (e.g. types, affordances)
@@ -25,9 +25,14 @@
     (ataconf ?x ?y)
     (defaultconf ?x ?y)
 
+    (bconf ?x)
+    (atbconf ?x)
+
     (stackable ?x ?y)
     (supported ?x ?xc ?y)
     (on ?x ?y)
+
+    (workspace ?lo ?hi)
 
   )
 )

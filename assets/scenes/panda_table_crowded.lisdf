@@ -48,7 +48,7 @@
 
     <model name="steak">
       <static>true</static>
-      <pose>0.35 0.2 0.05 0 0 0</pose>
+      <pose>0.4 0.15 0.05 0 0 0</pose>
       <link name="steak_link">
 	<collision name="steak_collision">
 	  <geometry>
@@ -68,7 +68,7 @@
 
     <model name="cabbage">
       <static>true</static>
-      <pose>0.3 0.0 0.05 0 0 -0.2</pose>
+      <pose>0.3 0.0 0.05 0 0 0</pose>
       <link name="cabbage_link">
 	<collision name="cabbage_collision">
 	  <geometry>
@@ -88,7 +88,7 @@
     
     <model name="salt">
       <static>true</static>
-      <pose>0.25 0.20 0.1 0 0 -0.1</pose>
+      <pose>0.3 0.15 0.1 0 0 0</pose>
       <link name="salt_link">
 	<collision name="salt_collision">
 	  <geometry>
@@ -108,7 +108,7 @@
 
     <model name="pepper">
       <static>true</static>
-      <pose>0.4 -0.3 0.1 0 0 0.5</pose>
+      <pose>0.4 -0.3 0.1 0 0 0</pose>
       <link name="pepper_link">
 	<collision name="pepper_collision">
 	  <geometry>
@@ -145,6 +145,52 @@
 	</visual>
       </link>
     </model>
+    <!--
+		<model name="banana">
+		  <static>false</static>
+			<pose>0.2 0.1 0.005 0 0 1.5</pose>
+			<link name="banana">
+				<collision name="banana_collision">
+					<geometry>
+					  <mesh>
+					    <uri>../models/011_banana/textured.obj</uri>
+					    <scale>1.0 1.0 1.0</scale>
+					  </mesh>
+					</geometry>
+				</collision>
+				<visual name="banana_visual">
+					<geometry>
+					  <mesh>
+					    <uri>../models/011_banana/textured.obj</uri>
+					    <scale>1.0 1.0 1.0</scale>
+					  </mesh>
+					</geometry>
+				</visual>
+				</link>
+		</model>
+				-->
+		<model name="sugar_box">
+		  <static>false</static>
+		        <pose>0.2 0.35 0.001 0.0 0 0.75</pose>
+			<link name="sugar_box">
+				<collision name="sugar_box_collision">
+					<geometry>
+					  <mesh>
+					    <uri>../models/004_sugar_box/textured.obj</uri>
+					    <scale>1.0 1.0 1.0</scale>
+					  </mesh>
+					</geometry>
+				</collision>
+				<visual name="sugar_box_visual">
+					<geometry>
+					  <mesh>
+					    <uri>../models/004_sugar_box/textured.obj</uri>
+					    <scale>1.0 1.0 1.0</scale>
+					  </mesh>
+					</geometry>
+				</visual>
+			</link>
+		</model>
     
   </world>
 </sdf>

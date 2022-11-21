@@ -5,3 +5,5 @@ assets/tmp/*
 *.pyc
 *.pddl~
 *.obj~
+*.DS_Store
+

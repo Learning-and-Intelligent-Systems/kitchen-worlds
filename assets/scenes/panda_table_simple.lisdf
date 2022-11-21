@@ -1,0 +1,70 @@
+<?xml version="1.0" ?>
+<!-- Based on a M0M test run -->
+<sdf version="1.9">
+  <world name="PandaTable">
+    <!-- <include name="panda"> -->
+    <!--   <uri>models/franka_description/robots/panda_arm_hand.urdf</uri> -->
+    <!--   <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose> -->
+    <!-- </include> -->
+    
+    <model name="floor">
+      <link name="floor">
+	<pose>0.0 0.0 -0.01 0 0 0</pose>
+	<collision name="floor_collision">
+	  <geometry>
+	    <box> <size>3 3 0.001</size> </box>
+	  </geometry>
+	</collision>
+	<visual name="floor_visual">
+	  <geometry>
+	    <box> <size>3 3 0.001</size> </box>
+	  </geometry>
+	  <material>
+	    <ambient>0.4 0.4 0.4 1</ambient>
+	  </material>
+	</visual>
+      </link>
+    </model>
+
+    <model name="table">
+      <static>true</static>
+      <pose>0.0 0.0 -0.005 0 0 0</pose>
+      <link name="table_link">
+	<collision name="table_collision">
+	  <geometry>
+	    <box><size>1. 1. 0.001</size></box>
+	  </geometry>
+	</collision>
+	<visual name="table_visual">
+	  <geometry>
+	    <box> <size>1. 1. 0.001</size> </box>
+	  </geometry>
+	  <material>
+	    <ambient>0.8 0.8 0.8 1</ambient>
+	  </material>
+	</visual>
+      </link>
+    </model>
+
+    <model name="grape">
+      <static>true</static>
+      <pose>0.2 -0.3 0.015 0 0 0</pose>
+      <link name="grape_link">
+	<collision name="grape_collision">
+	  <geometry>
+	    <box><size>0.02 0.02 0.02</size></box>
+	  </geometry>
+	</collision>
+	<visual name="grape_visual">
+	  <geometry>
+	    <box> <size>0.02 0.02 0.02</size> </box>
+	  </geometry>
+	  <material>
+	    <ambient>0.5 0.001 0.5 1</ambient>
+	  </material>
+	</visual>
+      </link>
+    </model>
+    
+  </world>
+</sdf>

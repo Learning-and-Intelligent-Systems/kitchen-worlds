@@ -9,19 +9,28 @@
   (:init
     ;; discrete facts (e.g. types, affordances)
     (arm right)
+
     (controllable right)
     (handempty right)
 
     (floor floor)
+    (surface table)
 
-    (graspable steak)
+    (pushable steak)
+    (pushtool steak right)
+    ;(graspable steak)
     (graspable cabbage)
     (graspable salt)
     (graspable pepper)
+    (graspable grape)
 
-    (surface table)
+    (atpose steak p0=(0.2, -0.3, 0.05, 0))
+    (atpose pepper p0=(0.75, -0.3, 0.05, 0))
+    (atpose cabbage p0=(0.3, 0.0, 0.05, 0))
+    (atpose grape p0=(0.42, 0.2, 0.015, 0))
 
  )
-  (:goal (and (on steak pepper) (on salt steak) (on cabbage salt)))
+  (:goal (and (on steak table) (atpose steak p0=(0.3, 0.1, 0.05, 0))))
+  ; (:goal (and (atpose cabbage p0=(0.42, 0.2, 0.05, 0))))
 )
 

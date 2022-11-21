@@ -10,7 +10,7 @@
     
     <model name="floor">
       <link name="floor">
-	<pose>0.0 0.0 0 0 0 0</pose>
+	<pose>0.0 0.0 -0.01 0 0 0</pose>
 	<collision name="floor_collision">
 	  <geometry>
 	    <box> <size>3 3 0.001</size> </box>
@@ -21,7 +21,7 @@
 	    <box> <size>3 3 0.001</size> </box>
 	  </geometry>
 	  <material>
-	    <ambient>0.4 0.4 0.4 1</ambient>
+	    <ambient>0.6 0.6 0.6 1</ambient>
 	  </material>
 	</visual>
       </link>
