@@ -27,7 +27,7 @@ from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser,
     query_yes_no
 
 USE_GYM = True
-SAVE_MP4 = False
+SAVE_MP4 = True
 AUTO_PLAY = True
 EVALUATE_QUALITY = True
 
@@ -56,7 +56,7 @@ TASK_NAME = 'tt_two_fridge_pick'
 # TASK_NAME = 'discarded'
 
 CASES = None
-CASES = ['5']
+CASES = ['222', '347', '472']
 
 parser = get_base_parser(task_name=TASK_NAME, parallel=False, use_viewer=True)
 args = parser.parse_args()
@@ -198,5 +198,5 @@ def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, frame_gap
 
 
 if __name__ == '__main__':
-    replay_all_in_gym()
-    # process_all_tasks(process, args.t, cases=CASES, path=GIVEN_PATH)
+    # replay_all_in_gym()
+    process_all_tasks(process, args.t, cases=CASES, path=GIVEN_PATH)
