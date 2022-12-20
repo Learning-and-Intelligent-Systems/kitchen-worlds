@@ -3,13 +3,32 @@ from os import listdir
 import shutil
 import random
 from config import *
-from test_utils import copy_dir_for_process
+from test_utils import copy_dir_for_process, get_task_names
+from isaac_tools.gym_utils import images_to_gif
 
 
-def get_envs_from_task(task_dir = '/home/yang/Documents/fastamp-data/tt_two_fridge_pick'):
+MAMAO_DATA_PATH = '/home/yang/Documents/fastamp-data'
+
+
+def get_envs_from_task(task_dir = join(MAMAO_DATA_PATH, 'tt_two_fridge_pick')):
     ori_dirs = [join(task_dir, f) for f in listdir(task_dir) if isdir(join(task_dir, f))]
     ori_dirs.sort()
     return ori_dirs
+
+
+def get_sample_envs_200():
+    dirs = get_sample_envs_for_corl()
+    new_dirs = []
+    for subdir in get_task_names('mm'):
+        if subdir == 'mm_one_fridge_pick':
+            continue
+        path = join(MAMAO_DATA_PATH, subdir)
+        names = [join(path, f) for f in listdir(path) if isdir(join(path, f))]
+        new_dirs.extend(random.choices(names, k=40))
+    new_dirs = [n for n in new_dirs if n not in dirs]
+    random.shuffle(new_dirs)
+    dirs.extend(new_dirs[:200-len(dirs)])
+    return dirs
 
 
 def get_sample_envs_for_corl():
@@ -23,14 +42,14 @@ def get_sample_envs_for_corl():
     dirs = []
     for k, v in task_scenes.items():
         for i in v:
-            dirs.append(join('/home/yang/Documents/fastamp-data', k, i))
+            dirs.append(join(MAMAO_DATA_PATH, k, i))
     random.shuffle(dirs)
     return dirs
 
 
 def test_load_lisdf():
     from isaac_tools.gym_utils import load_lisdf
-    ori_dir = '/home/yang/Documents/fastamp-data/tt_two_fridge_in/4'
+    ori_dir = join(MAMAO_DATA_PATH, 'tt_two_fridge_in/4')
     lisdf_dir = copy_dir_for_process(ori_dir)
     for name, path, scale, is_fixed, pose, positions in load_lisdf(lisdf_dir, robots=True):
         print(name, positions)
@@ -39,18 +58,48 @@ def test_load_lisdf():
 def test_load_one():
     from isaac_tools.gym_utils import load_lisdf_isaacgym
     ori_dir = '/home/caelan/Programs/interns/yang/kitchen-worlds/test_cases/tt_one_fridge_pick_2'
-    ori_dir = '/home/yang/Documents/fastamp-data/tt_two_fridge_in/4'
+    ori_dir = join(MAMAO_DATA_PATH, 'tt_two_fridge_in/4')
     lisdf_dir = copy_dir_for_process(ori_dir)
     world = load_lisdf_isaacgym(abspath(lisdf_dir), pause=True)
     shutil.rmtree(lisdf_dir)
 
 
-def test_load_multiple():
+def test_load_multiple(test_camera_pose=False):
     from isaac_tools.gym_utils import load_envs_isaacgym
     # ori_dirs = get_envs_from_task()
-    ori_dirs = get_sample_envs_for_corl()
+    # ori_dirs = get_sample_envs_for_corl()
+    ori_dirs = get_sample_envs_200()
     lisdf_dirs = [copy_dir_for_process(ori_dir) for ori_dir in ori_dirs]
-    world = load_envs_isaacgym(lisdf_dirs, camera_point=(34, 15, 10), camera_target=(0, 15, 0), pause=True)
+    kwargs = dict()
+    if len(ori_dirs) == 25:
+        camera_point_begin = (34, 15, 10)
+        camera_point_final = (34, 15, 10)
+        camera_target = (0, 15, 0)
+        kwargs.update(dict(
+            pause=True
+        ))
+    elif len(ori_dirs) == 200:
+        ## 14 * 6 = 84
+        y = 42 + 3
+        camera_point_begin = (67, y, 3)
+        camera_point_final = (102, y, 24)
+        camera_target = (62, y, 0)
+        kwargs.update(dict(
+            num_rows=14, num_cols=14, test_camera_pose=test_camera_pose
+        ))
+
+    world, _ = load_envs_isaacgym(lisdf_dirs, camera_point=camera_point_begin, camera_target=camera_target, **kwargs)
+
+    imgs = []
+    imgs.append(world.get_rgba_image(world.cameras[0]))
+    if camera_point_final != camera_point_begin:
+        world.set_camera_target(world.cameras[0], camera_point_final, camera_target)
+        imgs.append(world.get_rgba_image(world.cameras[0]))
+
+    img_dir = join('gym_images')
+    gif_name = 'test_gym_camera_pose.gif'
+    images_to_gif(img_dir, gif_name, imgs)
+
     print('test_load_multiple | to remove', len(lisdf_dirs))
     for lisdf_dir in lisdf_dirs:
         shutil.rmtree(lisdf_dir)
@@ -87,7 +136,7 @@ def test_load_objects():
 if __name__ == "__main__":
     # test_load_lisdf()
     # test_load_one()
-    # test_load_multiple()
-    test_load_objects()
+    test_load_multiple(test_camera_pose=True)
+    # test_load_objects()
 
 

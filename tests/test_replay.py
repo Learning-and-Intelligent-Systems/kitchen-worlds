@@ -41,11 +41,11 @@ TASK_NAME = 'one_fridge_pick_pr2'
 # TASK_NAME = 'mm_one_fridge_table_on'
 # TASK_NAME = 'mm_one_fridge_table_pick'
 # TASK_NAME = 'mm_two_fridge_pick'
-# TASK_NAME = 'mm_two_fridge_in'
+TASK_NAME = 'mm_two_fridge_in'
 
 # TASK_NAME = 'tt_one_fridge_pick'
 # TASK_NAME = 'tt_one_fridge_table_in'
-TASK_NAME = 'tt_two_fridge_pick'
+# TASK_NAME = 'tt_two_fridge_pick'
 # TASK_NAME = 'tt_two_fridge_in'
 
 # TASK_NAME = 'ff_one_fridge_table_pick'
@@ -56,7 +56,7 @@ TASK_NAME = 'tt_two_fridge_pick'
 # TASK_NAME = 'discarded'
 
 CASES = None
-CASES = ['222', '347', '472']
+CASES = ['104', '186']
 
 parser = get_base_parser(task_name=TASK_NAME, parallel=False, use_viewer=True)
 args = parser.parse_args()
@@ -151,7 +151,7 @@ def merge_all_wconfs(all_wconfs):
 
 
 def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, frame_gap=6, debug=False):
-    from test_gym import get_sample_envs_for_corl
+    from test_gym import get_sample_envs_for_corl, get_sample_envs_200
     from isaac_tools.gym_utils import load_envs_isaacgym, record_actions_in_gym, \
         update_gym_world_by_wconf, images_to_gif
 
@@ -162,7 +162,20 @@ def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, frame_gap
     os.mkdir(img_dir)
 
     ## load all dirs
-    ori_dirs = get_sample_envs_for_corl()
+    mid = num_rows * 6 // 2
+    if num_rows==5 and num_cols==5:
+        ori_dirs = get_sample_envs_for_corl()
+        camera_point = (45, 15, 10)
+        camera_target = (0, 15, 0)
+        camera_point_final = (mid+35, 15, 14)
+        camera_point_begin = (mid+9, 15, 4)
+        camera_target = (mid, 15, 0)
+    elif num_rows==14 and num_cols==14:
+        ori_dirs = get_sample_envs_200()
+        y = 42 + 3
+        camera_point_begin = (67, y, 3)
+        camera_point_final = (102, y, 24)
+        camera_target = (62, y, 0)
     lisdf_dirs = [copy_dir_for_process(ori_dir) for ori_dir in ori_dirs]
     num_worlds = min([len(lisdf_dirs), num_rows * num_cols])
 
@@ -183,11 +196,15 @@ def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, frame_gap
 
     ## load all scenes in gym
     gym_world, offsets = load_envs_isaacgym(lisdf_dirs, num_rows=num_rows, num_cols=num_cols,
-                                            camera_point=(45, 15, 10), camera_target=(0, 15, 0))
+                                            camera_point=camera_point_begin, camera_target=camera_target)
 
     ## update all scenes for each frame
     filenames = []
     for i in range(len(all_wconfs)):
+        if camera_point_final != camera_point_begin:
+            camera_point = tuple([camera_point_begin[j] + (camera_point_final[j] - camera_point_begin[j]) * i / len(all_wconfs)
+                                  for j in range(3)])
+            gym_world.set_camera_target(gym_world.cameras[0], camera_point, camera_target)
         update_gym_world_by_wconf(gym_world, all_wconfs[i], offsets=offsets)
         if i % frame_gap == 0:
             img_file = gym_world.get_rgba_image(gym_world.cameras[0])
@@ -198,5 +215,5 @@ def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, frame_gap
 
 
 if __name__ == '__main__':
-    # replay_all_in_gym()
-    process_all_tasks(process, args.t, cases=CASES, path=GIVEN_PATH)
+    replay_all_in_gym(num_rows=14, num_cols=14)
+    # process_all_tasks(process, args.t, cases=CASES, path=GIVEN_PATH)
