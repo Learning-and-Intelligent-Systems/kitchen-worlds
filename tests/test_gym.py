@@ -1,9 +1,11 @@
 from os.path import join, isdir, getsize
 from os import listdir
+import numpy as np
 import shutil
 import random
 from config import *
 from test_utils import copy_dir_for_process, get_task_names
+from pybullet_tools.utils import connect
 from isaac_tools.gym_utils import images_to_gif
 
 
@@ -108,35 +110,58 @@ def test_load_multiple(test_camera_pose=False):
 def test_load_objects():
     sys.path.append('/home/yang/Documents/playground/srl_stream/src')
     from srl_stream.gym_world import create_single_world, default_arguments
-    from pybullet_tools.bullet_utils import get_scale_by_category
     from pybullet_tools.utils import pose_from_tform
     from trimesh import transformations
+    from world_builder.partnet_scales import MODEL_SCALES, MODEL_HEIGHTS
+    from world_builder.utils import get_instances, get_scale_by_category
 
+    connect(use_gui=False, shadows=False, width=1980, height=1238)
     gym_world = create_single_world(args=default_arguments(use_gpu=False), spacing=5.)
-    gym_world.set_viewer_target((1, 1, 1), target=(0, 0, 0))
+    gym_world.set_viewer_target((3, 3, 3), target=(0, 0, 0))
 
-    ids = ['MeatTurkeyLeg', 'VeggieGreenPepper', 'VeggieTomato']  ## 'VeggieSweetPotato', 'MeatTurkeyLeg', 'VeggieTomato',
-    for i in range(len(ids)):
-        idx = ids[i]
-        path = f'/home/yang/Documents/jupyter-worlds/assets/models/Food/{idx}/mobility.urdf'
-        print('isfile', isfile(path), f"{round(getsize(path), 1)/1024} kb")
-        asset = gym_world.simulator.load_asset(
-            asset_file=path, root=None, fixed_base=True,
-            gravity_comp=False, collapse=False, vhacd=False)
-        scale = get_scale_by_category(file=path, category='Food')
-        actor = gym_world.create_actor(asset, name=idx, scale=scale)
-        pose = transformations.translation_matrix([0, 0.5*i, 0.1]) @ \
-               transformations.euler_matrix(*[0, 0, 0,])
-        pose = pose_from_tform(pose)
-        gym_world.set_pose(actor, pose)
+    ## test all categories
+    unwanted = ['Cart']
+    skip_till = 'OvenCounter'
+    problematic = []
+    categories = list(MODEL_SCALES.keys()) + list(MODEL_HEIGHTS.keys())
+    categories = [c for c in categories if c not in unwanted and c != c.lower()]
+    if skip_till is not None:
+        categories = categories[categories.index(skip_till):]
+
+    ## test specific categories
+    ids = None
+    # categories = ['Food']
+    # ids = ['MeatTurkeyLeg', 'VeggieGreenPepper', 'VeggieTomato']  ## 'VeggieSweetPotato', 'MeatTurkeyLeg', 'VeggieTomato',
+
+    for i in range(len(categories)):
+        cat = categories[i]
+        instances = list(get_instances(category=cat)) if ids is None else ids
+        print('test_load_objects | category:', cat, 'instances:', instances)
+        for j in range(len(instances)):
+            idx = instances[j]
+            if idx in problematic:
+                continue
+            path = join(ASSET_PATH, 'models', cat, idx, 'mobility.urdf')
+            print(f'     isfile({(cat, idx)})', isfile(path), f"{round(getsize(path)/(1024**2), 4)} mb")
+            asset = gym_world.simulator.load_asset(
+                asset_file=path, root=None, fixed_base=True,
+                gravity_comp=False, collapse=False, vhacd=False)
+            scale = get_scale_by_category(file=path, category=cat)
+            actor = gym_world.create_actor(asset, name=idx, scale=scale)
+            pose = transformations.translation_matrix([i, j, 0.1]) @ \
+                   transformations.euler_matrix(*[0, 0, np.pi,])
+            pose = pose_from_tform(pose)
+            gym_world.set_pose(actor, pose)
         gym_world.simulator.update_viewer()
+        gym_world.set_viewer_target((3+i, 3+j, 3), target=(i, j, 0))
+        gym_world.wait_if_gui()
     gym_world.wait_if_gui()
 
 
 if __name__ == "__main__":
     # test_load_lisdf()
     # test_load_one()
-    test_load_multiple(test_camera_pose=True)
-    # test_load_objects()
+    # test_load_multiple(test_camera_pose=True)
+    test_load_objects()
 
 

@@ -34,7 +34,7 @@ EVALUATE_QUALITY = True
 GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/one_fridge_pick_pr2/one_fridge_pick_pr2_1004_01:29_1'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data/_examples/5/rerun_2/diverse_commands_rerun_fc=pvt-all.pkl'
-GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/1222-105144_original'
+GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/1227-204626_original'
 
 TASK_NAME = 'one_fridge_pick_pr2'
 
