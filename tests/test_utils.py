@@ -116,10 +116,13 @@ def parallel_processing(process, inputs, parallel):
     print(f'went through {num_cases} run_dirs (parallel={parallel}) in {round(time.time() - start_time, 3)} sec')
 
 
-def process_all_tasks(process, task_name, parallel=False, cases=None, path=None):
+def process_all_tasks(process, task_name, parallel=False, cases=None, path=None, dir=None):
     clear_pddlstream_cache()
 
-    if path is not None:
+    if dir is not None:
+        cases = [join(dir, c) for c in listdir(dir)]
+        cases = [c for c in cases if isdir(c) and not isfile(join(c, 'gym_replay.gif'))]
+    elif path is not None:
         cases = [path]
     elif cases is not None and len(cases) > 0:
         cases = [join(MAMAO_DATA_PATH, task_name, case) for case in cases]

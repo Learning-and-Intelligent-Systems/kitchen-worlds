@@ -26,7 +26,7 @@ from mamao_tools.utils import get_plan
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser, \
     query_yes_no
 
-USE_GYM = True
+USE_GYM = False
 SAVE_MP4 = True
 AUTO_PLAY = True
 EVALUATE_QUALITY = True
@@ -34,7 +34,9 @@ EVALUATE_QUALITY = True
 GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/one_fridge_pick_pr2/one_fridge_pick_pr2_1004_01:29_1'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data/_examples/5/rerun_2/diverse_commands_rerun_fc=pvt-all.pkl'
-GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/1227-204626_original'
+GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/1230-100250_original'
+
+GIVEN_DIR = None ## '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen'
 
 TASK_NAME = 'one_fridge_pick_pr2'
 
@@ -84,15 +86,23 @@ def get_pkl_run(run_dir):
     return exp_dir, run_dir, commands, plan
 
 
-def run_one(run_dir, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, height=1120):
+def run_one(run_dir, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, height=1120,
+            camera_point=(8.5, 2.5, 3), camera_target=(0, 2.5, 0)):
+
+    if 'full_kitchen' in run_dir:
+        camera_point = (4, 4, 8)
+        camera_target = (0, 4, 0)
+
     exp_dir, run_dir, commands, plan = get_pkl_run(run_dir)
 
     world = load_lisdf_pybullet(exp_dir, use_gui=not USE_GYM, width=width, height=height, verbose=False)
     problem = Problem(world)
+    world.summarize_all_objects()
 
     if USE_GYM:
         from isaac_tools.gym_utils import load_lisdf_isaacgym, record_actions_in_gym
-        gym_world = load_lisdf_isaacgym(abspath(exp_dir), camera_width=1280, camera_height=800)
+        gym_world = load_lisdf_isaacgym(abspath(exp_dir), camera_width=1280, camera_height=800,
+                                        camera_point=camera_point, camera_target=camera_target)
         img_dir = join(exp_dir, 'gym_images')
         gif_name = 'gym_replay.gif'
         os.mkdir(img_dir)
@@ -217,4 +227,4 @@ def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, frame_gap
 
 if __name__ == '__main__':
     # replay_all_in_gym(num_rows=14, num_cols=14)
-    process_all_tasks(process, args.t, cases=CASES, path=GIVEN_PATH)
+    process_all_tasks(process, args.t, cases=CASES, path=GIVEN_PATH, dir=GIVEN_DIR)
