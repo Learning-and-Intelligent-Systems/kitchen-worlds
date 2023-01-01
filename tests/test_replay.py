@@ -15,6 +15,7 @@ import random
 import time
 import sys
 
+from pybullet_tools.bullet_utils import get_datetime
 from pybullet_tools.utils import reset_simulation, VideoSaver, wait_unlocked
 from lisdf_tools.lisdf_loader import load_lisdf_pybullet, pddlstream_from_dir
 from lisdf_tools.lisdf_planning import pddl_to_init_goal, Problem
@@ -37,7 +38,7 @@ GIVEN_PATH = None
 GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/1231-093847_original_2'
 
 GIVEN_DIR = None
-# GIVEN_DIR = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen_bad'
+GIVEN_DIR = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen_100'
 
 TASK_NAME = 'one_fridge_pick_pr2'
 
@@ -156,26 +157,27 @@ def process(index):
 def merge_all_wconfs(all_wconfs):
     longest_command = max([len(wconf) for wconf in all_wconfs])
     whole_wconfs = []
-    for i in range(longest_command):
+    for t in range(longest_command):
         whole_wconf = {}
-        for j in range(len(all_wconfs)):
-            if i < len(all_wconfs[j]):
-                whole_wconf.update(all_wconfs[j][i])
+        for num in range(len(all_wconfs)):
+            if t < len(all_wconfs[num]):
+                whole_wconf.update(all_wconfs[num][t])
         whole_wconfs.append(whole_wconf)
     return whole_wconfs
 
 
-def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, world_size=(6, 6),
+def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, world_size=(6, 6), verbose=False,
                       frame_gap=6, debug=False, loading_effect=False, save_gif=True, save_mp4=False):
     from test_gym import get_dirs_camera
     from isaac_tools.gym_utils import load_envs_isaacgym, record_actions_in_gym, \
         update_gym_world_by_wconf, images_to_gif, images_to_mp4
+    from tqdm import tqdm
 
     img_dir = join('gym_images')
     gif_name = 'gym_replay_batch_gym.gif'
-    if isdir(img_dir):
-        shutil.rmtree(img_dir)
-    os.mkdir(img_dir)
+    # if isdir(img_dir):
+    #     shutil.rmtree(img_dir)
+    # os.mkdir(img_dir)
 
     ori_dirs, camera_point_begin, camera_point_final, camera_target = get_dirs_camera(num_rows, num_cols, world_size)
     lisdf_dirs = [copy_dir_for_process(ori_dir) for ori_dir in ori_dirs]
@@ -187,8 +189,8 @@ def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, world_siz
     if loading_effect:
         ### load all gym_worlds and return all wconfs
         gym_world, offsets, all_wconfs = load_envs_isaacgym(lisdf_dirs, num_rows=num_rows, num_cols=num_cols,
-                                                         camera_point=camera_point_begin, camera_target=camera_target,
-                                                         loading_effect=True)
+                                                            world_size=world_size, loading_effect=True, verbose=verbose,
+                                                            camera_point=camera_point_begin, camera_target=camera_target)
     else:
         for i in range(num_worlds):
             exp_dir, run_dir, commands, plan = get_pkl_run(lisdf_dirs[i])
@@ -206,11 +208,11 @@ def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, world_siz
                                                 camera_point=camera_point_begin, camera_target=camera_target)
 
     all_wconfs = merge_all_wconfs(all_wconfs)
-    print('\n\nreplay all num of frames', len(all_wconfs))
+    print(f'\n\nrendering all {len(all_wconfs)} frames')
 
     ## update all scenes for each frame
     filenames = []
-    for i in range(len(all_wconfs)):
+    for i in tqdm(range(len(all_wconfs))):
         if camera_point_final != camera_point_begin:
             camera_point = tuple([camera_point_begin[j] + (camera_point_final[j] - camera_point_begin[j]) * i / len(all_wconfs)
                                   for j in range(3)])
@@ -224,13 +226,13 @@ def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, world_siz
         images_to_gif(img_dir, gif_name, filenames)
         print('created gif {}'.format(join(img_dir, gif_name)))
     if save_mp4:
-        mp4_name = join(img_dir, gif_name.replace('.gif', '.mp4'))
+        mp4_name = join(img_dir, gif_name.replace('.gif', f'_{get_datetime()}.mp4'))
         images_to_mp4(filenames, mp4_name=mp4_name)
         print('created mp4 {} with {} frames'.format(mp4_name, len(filenames)))
 
 
 if __name__ == '__main__':
     # replay_all_in_gym(num_rows=14, num_cols=14, world_size=(6, 6), save_gif=True)
-    replay_all_in_gym(num_rows=4, num_cols=4, world_size=(4, 8), loading_effect=True,
-                      frame_gap=1, save_mp4=True, save_gif=False)
+    replay_all_in_gym(num_rows=32, num_cols=8, world_size=(4, 8), loading_effect=True,
+                      frame_gap=1, save_mp4=True, save_gif=False, verbose=False)
     # process_all_tasks(process, args.t, cases=CASES, path=GIVEN_PATH, dir=GIVEN_DIR)

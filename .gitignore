@@ -26,6 +26,7 @@ tests/txt_file.txt
 tests/visualizations/
 tests/statistics/
 tests/vhacd/
+tests/gym_images/
 
 outputs/
 !outputs/data_demo.html

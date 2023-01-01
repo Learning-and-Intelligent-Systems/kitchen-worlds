@@ -23,21 +23,24 @@ def get_dirs_camera(num_rows=5, num_cols=5, world_size=(6, 6)):
         if world_size == (4, 8):
             camera_point = (6, 4, 6)
             camera_target = (0, 4, 0)
-            camera_point_begin = camera_point_final = camera_point
+            camera_point_begin = (6, 4, 6)
+            camera_point_final = (12, 4, 12)
 
-    elif num_rows == 2 and num_cols == 2:
+    elif num_rows == 2 and num_cols == 1:
 
         if world_size == (4, 8):
-            camera_point = (8, 8, 10)
-            camera_target = (0, 8, 0)
-            camera_point_begin = camera_point_final = camera_point
+            camera_point = (24, 4, 10)
+            camera_target = (0, 4, 0)
+            camera_point_begin = (16, 4, 6)
+            camera_point_final = (24, 4, 10)
 
     elif num_rows == 4 and num_cols == 4:
 
         if world_size == (4, 8):
-            camera_point = (24, 16, 10)
-            camera_target = (0, 16, 0)
-            camera_point_begin = camera_point_final = camera_point
+            camera_point = (32, 8, 10)
+            camera_target = (0, 24, 0)
+            camera_point_begin = (16, 16, 2)
+            camera_point_final = (32, 16, 10)
 
     elif num_rows == 5 and num_cols == 5:
         ori_dirs = get_sample_envs_for_corl()
@@ -50,6 +53,14 @@ def get_dirs_camera(num_rows=5, num_cols=5, world_size=(6, 6)):
             camera_point_begin = (mid + 9, 15, 4)
             camera_target = (mid, 15, 0)
 
+    elif num_rows == 10 and num_cols == 10:
+
+        if world_size == (4, 8):
+            ## bad
+            camera_target = (0, 48, 0)
+            camera_point_begin = (16, 40, 6)
+            camera_point_final = (40, 32, 16)
+
     elif num_rows == 14 and num_cols == 14:
         ori_dirs = get_sample_envs_200()
 
@@ -58,6 +69,20 @@ def get_dirs_camera(num_rows=5, num_cols=5, world_size=(6, 6)):
             camera_point_begin = (67, y, 3)
             camera_point_final = (102, y, 24)
             camera_target = (62, y, 0)
+
+    elif num_rows == 16 and num_cols == 16:
+
+        if world_size == (4, 8):
+            camera_target = (5*11, 8*4-4, 0)
+            camera_point_begin = (5*13-1, 8*4-6, 2)
+            camera_point_final = (5*16, 8*2, 12)
+
+    elif num_rows == 32 and num_cols == 8:
+
+        if world_size == (4, 8):
+            camera_target = (5*(11+16), 8*4-4, 0)
+            camera_point_begin = (5*(12+16), 8*4-6, 2)
+            camera_point_final = (5*(16+16), 8*2, 12)
 
     return ori_dirs, camera_point_begin, camera_point_final, camera_target
 
@@ -103,7 +128,7 @@ def get_sample_envs_for_corl():
 
 
 def get_sample_envs_full_kitchen(count=4):
-    data_dir = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen_bad'
+    data_dir = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen_100'
     dirs = [join(data_dir, f) for f in listdir(data_dir) if isdir(join(data_dir, f))]
     random.shuffle(dirs)
     if count <= len(dirs):
@@ -187,12 +212,12 @@ def test_load_objects():
     from world_builder.utils import get_instances, get_scale_by_category
 
     connect(use_gui=False, shadows=False, width=1980, height=1238)
-    gym_world = create_single_world(args=default_arguments(use_gpu=False), spacing=5.)
+    gym_world = create_single_world(args=default_arguments(use_gpu=True), spacing=5.)
     gym_world.set_viewer_target((3, 3, 3), target=(0, 0, 0))
 
     ## test all categories
     unwanted = ['Cart']
-    skip_till = 'OvenCounter'
+    skip_till = None ## 'OvenCounter'
     problematic = []
     categories = list(MODEL_SCALES.keys()) + list(MODEL_HEIGHTS.keys())
     categories = [c for c in categories if c not in unwanted and c != c.lower()]
@@ -204,35 +229,43 @@ def test_load_objects():
     # categories = ['Food']
     # ids = ['MeatTurkeyLeg', 'VeggieGreenPepper', 'VeggieTomato']  ## 'VeggieSweetPotato', 'MeatTurkeyLeg', 'VeggieTomato',
 
-    for i in range(len(categories)):
-        cat = categories[i]
-        instances = list(get_instances(category=cat)) if ids is None else ids
-        print('test_load_objects | category:', cat, 'instances:', instances)
-        for j in range(len(instances)):
-            idx = instances[j]
-            if idx in problematic:
-                continue
-            path = join(ASSET_PATH, 'models', cat, idx, 'mobility.urdf')
-            print(f'     isfile({(cat, idx)})', isfile(path), f"{round(getsize(path)/(1024**2), 4)} mb")
-            asset = gym_world.simulator.load_asset(
-                asset_file=path, root=None, fixed_base=True,
-                gravity_comp=False, collapse=False, vhacd=False)
-            scale = get_scale_by_category(file=path, category=cat)
-            actor = gym_world.create_actor(asset, name=idx, scale=scale)
-            pose = transformations.translation_matrix([i, j, 0.1]) @ \
-                   transformations.euler_matrix(*[0, 0, np.pi,])
-            pose = pose_from_tform(pose)
-            gym_world.set_pose(actor, pose)
-        gym_world.simulator.update_viewer()
-        gym_world.set_viewer_target((3+i, 3+j, 3), target=(i, j, 0))
-        gym_world.wait_if_gui()
+    assets = {}
+    count = 0
+    for k in range(2):
+        for i in range(len(categories)):
+            cat = categories[i]
+            instances = list(get_instances(category=cat)) if ids is None else ids
+            print('test_load_objects | category:', cat, 'instances:', instances)
+            for j in range(len(instances)):
+                count += 1
+                idx = instances[j]
+                if idx in problematic:
+                    continue
+                path = join(ASSET_PATH, 'models', cat, idx, 'mobility.urdf')
+                print(f'    {count} | isfile({(cat, idx)})', f"{round(getsize(path)/(1024**2), 4)} mb")
+                if (cat, idx) not in assets:
+                    asset = gym_world.simulator.load_asset(
+                        asset_file=path, root=None, fixed_base=True,
+                        gravity_comp=False, collapse=False, vhacd=False)
+                    assets[(cat, idx)] = asset
+                else:
+                    asset = assets[(cat, idx)]
+                scale = get_scale_by_category(file=path, category=cat)
+                actor = gym_world.create_actor(asset, name=idx, scale=scale)
+                pose = transformations.translation_matrix([i, j+12*k, 0.1]) @ \
+                       transformations.euler_matrix(*[0, 0, np.pi,])
+                pose = pose_from_tform(pose)
+                gym_world.set_pose(actor, pose)
+            gym_world.simulator.update_viewer()
+            gym_world.set_viewer_target((3+i, 3+j+12*k, 3), target=(i, j+12*k, 0))
+        # gym_world.wait_if_gui()
     gym_world.wait_if_gui()
 
 
 if __name__ == "__main__":
     # test_load_lisdf()
-    test_load_one(loading_effect=True)
+    # test_load_one(loading_effect=True)
     # test_load_multiple(test_camera_pose=True)
-    # test_load_objects()
+    test_load_objects()
 
 
