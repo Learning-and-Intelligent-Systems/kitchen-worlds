@@ -18,25 +18,26 @@ import sys
 from pybullet_tools.utils import reset_simulation, VideoSaver, wait_unlocked
 from lisdf_tools.lisdf_loader import load_lisdf_pybullet, pddlstream_from_dir
 from lisdf_tools.lisdf_planning import pddl_to_init_goal, Problem
-
 from world_builder.actions import apply_actions
 
 from mamao_tools.utils import get_plan
 
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser, \
-    query_yes_no
+    query_yes_no, get_body_map
 
 USE_GYM = False
-SAVE_MP4 = True
+SAVE_MP4 = False
+STEP_BY_STEP = False
 AUTO_PLAY = True
 EVALUATE_QUALITY = True
 
 GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/one_fridge_pick_pr2/one_fridge_pick_pr2_1004_01:29_1'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data/_examples/5/rerun_2/diverse_commands_rerun_fc=pvt-all.pkl'
-GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/1230-100250_original'
+GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/1231-093847_original_2'
 
-GIVEN_DIR = None ## '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen'
+GIVEN_DIR = None
+# GIVEN_DIR = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen_bad'
 
 TASK_NAME = 'one_fridge_pick_pr2'
 
@@ -108,6 +109,7 @@ def run_one(run_dir, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, height=
         os.mkdir(img_dir)
         gif_name = record_actions_in_gym(problem, commands, gym_world, img_dir=img_dir,
                                          gif_name=gif_name, time_step=0, verbose=False, plan=plan)
+        gym_world.wait_if_gui()
         shutil.copy(join(exp_dir, gif_name), join(run_dir, gif_name))
         print('moved gif to {}'.format(join(run_dir, gif_name)))
 
@@ -127,7 +129,9 @@ def run_one(run_dir, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, height=
         if not AUTO_PLAY:
             answer = query_yes_no(f"start replay {run_name}?", default='yes')
         if answer:
-            apply_actions(problem, commands, time_step=0.02, verbose=False, plan=plan)
+            time_step = 0.02 if not STEP_BY_STEP else None
+            apply_actions(problem, commands, time_step=time_step, verbose=True, \
+                          plan=plan, body_map=get_body_map(run_dir, world))
 
         if EVALUATE_QUALITY:
             answer = query_yes_no(f"delete this run {run_name}?", default='no')
@@ -161,10 +165,11 @@ def merge_all_wconfs(all_wconfs):
     return whole_wconfs
 
 
-def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, frame_gap=6, debug=False):
-    from test_gym import get_sample_envs_for_corl, get_sample_envs_200
+def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, world_size=(6, 6),
+                      frame_gap=6, debug=False, loading_effect=False, save_gif=True, save_mp4=False):
+    from test_gym import get_dirs_camera
     from isaac_tools.gym_utils import load_envs_isaacgym, record_actions_in_gym, \
-        update_gym_world_by_wconf, images_to_gif
+        update_gym_world_by_wconf, images_to_gif, images_to_mp4
 
     img_dir = join('gym_images')
     gif_name = 'gym_replay_batch_gym.gif'
@@ -172,42 +177,36 @@ def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, frame_gap
         shutil.rmtree(img_dir)
     os.mkdir(img_dir)
 
-    ## load all dirs
-    mid = num_rows * 6 // 2
-    if num_rows==5 and num_cols==5:
-        ori_dirs = get_sample_envs_for_corl()
-        camera_point = (45, 15, 10)
-        camera_target = (0, 15, 0)
-        camera_point_final = (mid+35, 15, 14)
-        camera_point_begin = (mid+9, 15, 4)
-        camera_target = (mid, 15, 0)
-    elif num_rows==14 and num_cols==14:
-        ori_dirs = get_sample_envs_200()
-        y = 42 + 3
-        camera_point_begin = (67, y, 3)
-        camera_point_final = (102, y, 24)
-        camera_target = (62, y, 0)
+    ori_dirs, camera_point_begin, camera_point_final, camera_target = get_dirs_camera(num_rows, num_cols, world_size)
     lisdf_dirs = [copy_dir_for_process(ori_dir) for ori_dir in ori_dirs]
     num_worlds = min([len(lisdf_dirs), num_rows * num_cols])
 
     ## translate commands into world_confs
     all_wconfs = []
-    for i in range(num_worlds):
-        exp_dir, run_dir, commands, plan = get_pkl_run(lisdf_dirs[i])
-        world = load_lisdf_pybullet(exp_dir, use_gui=not USE_GYM or debug,
-                                    width=width, height=height, verbose=False)
-        problem = Problem(world)
-        wconfs = record_actions_in_gym(problem, commands, plan=plan, return_wconf=True, world_index=i)
-        all_wconfs.append(wconfs)
-        reset_simulation()
-        if debug:
-            wait_unlocked()
+
+    if loading_effect:
+        ### load all gym_worlds and return all wconfs
+        gym_world, offsets, all_wconfs = load_envs_isaacgym(lisdf_dirs, num_rows=num_rows, num_cols=num_cols,
+                                                         camera_point=camera_point_begin, camera_target=camera_target,
+                                                         loading_effect=True)
+    else:
+        for i in range(num_worlds):
+            exp_dir, run_dir, commands, plan = get_pkl_run(lisdf_dirs[i])
+            world = load_lisdf_pybullet(exp_dir, use_gui=not USE_GYM or debug,
+                                        width=width, height=height, verbose=False)
+            problem = Problem(world)
+            wconfs = record_actions_in_gym(problem, commands, plan=plan, return_wconf=True, world_index=i)
+            all_wconfs.append(wconfs)
+            reset_simulation()
+            if debug:
+                wait_unlocked()
+
+        ## load all scenes in gym
+        gym_world, offsets = load_envs_isaacgym(lisdf_dirs, num_rows=num_rows, num_cols=num_cols, world_size=world_size,
+                                                camera_point=camera_point_begin, camera_target=camera_target)
+
     all_wconfs = merge_all_wconfs(all_wconfs)
     print('\n\nreplay all num of frames', len(all_wconfs))
-
-    ## load all scenes in gym
-    gym_world, offsets = load_envs_isaacgym(lisdf_dirs, num_rows=num_rows, num_cols=num_cols,
-                                            camera_point=camera_point_begin, camera_target=camera_target)
 
     ## update all scenes for each frame
     filenames = []
@@ -221,10 +220,17 @@ def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, frame_gap
             img_file = gym_world.get_rgba_image(gym_world.cameras[0])
             filenames.append(img_file)
 
-    images_to_gif(img_dir, gif_name, filenames)
-    print('created gif {}'.format(gif_name))
+    if save_gif:
+        images_to_gif(img_dir, gif_name, filenames)
+        print('created gif {}'.format(join(img_dir, gif_name)))
+    if save_mp4:
+        mp4_name = join(img_dir, gif_name.replace('.gif', '.mp4'))
+        images_to_mp4(filenames, mp4_name=mp4_name)
+        print('created mp4 {} with {} frames'.format(mp4_name, len(filenames)))
 
 
 if __name__ == '__main__':
-    # replay_all_in_gym(num_rows=14, num_cols=14)
-    process_all_tasks(process, args.t, cases=CASES, path=GIVEN_PATH, dir=GIVEN_DIR)
+    # replay_all_in_gym(num_rows=14, num_cols=14, world_size=(6, 6), save_gif=True)
+    replay_all_in_gym(num_rows=4, num_cols=4, world_size=(4, 8), loading_effect=True,
+                      frame_gap=1, save_mp4=True, save_gif=False)
+    # process_all_tasks(process, args.t, cases=CASES, path=GIVEN_PATH, dir=GIVEN_DIR)

@@ -228,6 +228,12 @@ def query_yes_no(question, default="no"):
             sys.stdout.write("Please respond with 'yes' or 'no' " "(or 'y' or 'n').\n")
 
 
+def get_body_map(run_dir, world):
+    body_to_name = json.load(open(join(run_dir, 'planning_config.json'), 'r'))['body_to_name']
+    body_to_new = {eval(k): world.name_to_body[v] for k, v in body_to_name.items()}
+    return body_to_new
+
+
 if __name__ == '__main__':
     find_duplicate_worlds('mm', 'ww')
     find_duplicate_worlds('mm', 'ff')

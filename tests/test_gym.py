@@ -12,6 +12,59 @@ from isaac_tools.gym_utils import images_to_gif
 MAMAO_DATA_PATH = '/home/yang/Documents/fastamp-data'
 
 
+def get_dirs_camera(num_rows=5, num_cols=5, world_size=(6, 6)):
+    ## load all dirs
+    ori_dirs = []
+    if world_size == (4, 8):
+        ori_dirs = get_sample_envs_full_kitchen(num_rows * num_cols)
+
+    if num_rows == 1 and num_cols == 1:
+
+        if world_size == (4, 8):
+            camera_point = (6, 4, 6)
+            camera_target = (0, 4, 0)
+            camera_point_begin = camera_point_final = camera_point
+
+    elif num_rows == 2 and num_cols == 2:
+
+        if world_size == (4, 8):
+            camera_point = (8, 8, 10)
+            camera_target = (0, 8, 0)
+            camera_point_begin = camera_point_final = camera_point
+
+    elif num_rows == 4 and num_cols == 4:
+
+        if world_size == (4, 8):
+            camera_point = (24, 16, 10)
+            camera_target = (0, 16, 0)
+            camera_point_begin = camera_point_final = camera_point
+
+    elif num_rows == 5 and num_cols == 5:
+        ori_dirs = get_sample_envs_for_corl()
+
+        if world_size == (6, 6):
+            mid = num_rows * 6 // 2
+            camera_point = (45, 15, 10)
+            camera_target = (0, 15, 0)
+            camera_point_final = (mid + 35, 15, 14)
+            camera_point_begin = (mid + 9, 15, 4)
+            camera_target = (mid, 15, 0)
+
+    elif num_rows == 14 and num_cols == 14:
+        ori_dirs = get_sample_envs_200()
+
+        if world_size == (6, 6):
+            y = 42 + 3
+            camera_point_begin = (67, y, 3)
+            camera_point_final = (102, y, 24)
+            camera_target = (62, y, 0)
+
+    return ori_dirs, camera_point_begin, camera_point_final, camera_target
+
+
+##################################################################################
+
+
 def get_envs_from_task(task_dir = join(MAMAO_DATA_PATH, 'tt_two_fridge_pick')):
     ori_dirs = [join(task_dir, f) for f in listdir(task_dir) if isdir(join(task_dir, f))]
     ori_dirs.sort()
@@ -49,6 +102,20 @@ def get_sample_envs_for_corl():
     return dirs
 
 
+def get_sample_envs_full_kitchen(count=4):
+    data_dir = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen_bad'
+    dirs = [join(data_dir, f) for f in listdir(data_dir) if isdir(join(data_dir, f))]
+    random.shuffle(dirs)
+    if count <= len(dirs):
+        dirs = dirs[:count]
+    else:
+        dirs = random.choices(dirs, k=count)
+    return dirs
+
+
+###########################################################################
+
+
 def test_load_lisdf():
     from isaac_tools.gym_utils import load_lisdf
     ori_dir = join(MAMAO_DATA_PATH, 'tt_two_fridge_in/4')
@@ -57,12 +124,16 @@ def test_load_lisdf():
         print(name, positions)
 
 
-def test_load_one():
+def test_load_one(loading_effect=False):
     from isaac_tools.gym_utils import load_lisdf_isaacgym
     ori_dir = '/home/caelan/Programs/interns/yang/kitchen-worlds/test_cases/tt_one_fridge_pick_2'
     ori_dir = join(MAMAO_DATA_PATH, 'tt_two_fridge_in/4')
+    ori_dir = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/1231-093847_original_2'
+    ori_dir = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/1230-134950_original_1'
     lisdf_dir = copy_dir_for_process(ori_dir)
-    world = load_lisdf_isaacgym(abspath(lisdf_dir), pause=True)
+    world = load_lisdf_isaacgym(abspath(lisdf_dir), pause=True, loading_effect=loading_effect)
+    if loading_effect:
+        shutil.move(join(lisdf_dir, world), join(ori_dir, world))
     shutil.rmtree(lisdf_dir)
 
 
@@ -160,8 +231,8 @@ def test_load_objects():
 
 if __name__ == "__main__":
     # test_load_lisdf()
-    # test_load_one()
+    test_load_one(loading_effect=True)
     # test_load_multiple(test_camera_pose=True)
-    test_load_objects()
+    # test_load_objects()
 
 
