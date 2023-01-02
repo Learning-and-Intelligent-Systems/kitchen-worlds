@@ -38,21 +38,23 @@ def clear_pddlstream_cache():
         shutil.rmtree('temp')
 
 
-def copy_dir_for_process(viz_dir, tag=None):
+def copy_dir_for_process(viz_dir, tag=None, verbose=True):
     subdir = basename(viz_dir)
     task_name = basename(viz_dir.replace(f"/{subdir}", ''))
 
     ## temporarily move the dir to the test_cases folder for asset paths to be found
     test_dir = join(EXP_PATH, f"temp_{task_name}_{subdir}")
     if isdir(test_dir):
-        print('copy_dir_for_process | removing', test_dir)
+        if verbose:
+            print('copy_dir_for_process | removing', test_dir)
         shutil.rmtree(test_dir)
     if not isdir(test_dir):
         shutil.copytree(viz_dir, test_dir)
-    if tag is None:
-        print(viz_dir, end='\r')
-    else:
-        print(f'\n\n\n--------------------------\n    {tag} {viz_dir} \n------------------------\n\n\n')
+    if verbose:
+        if tag is None:
+            print(viz_dir, end='\r')
+        else:
+            print(f'\n\n\n--------------------------\n    {tag} {viz_dir} \n------------------------\n\n\n')
 
     return test_dir
 

@@ -12,11 +12,11 @@ from isaac_tools.gym_utils import images_to_gif
 MAMAO_DATA_PATH = '/home/yang/Documents/fastamp-data'
 
 
-def get_dirs_camera(num_rows=5, num_cols=5, world_size=(6, 6)):
+def get_dirs_camera(num_rows=5, num_cols=5, world_size=(6, 6), data_dir=None):
     ## load all dirs
     ori_dirs = []
     if world_size == (4, 8):
-        ori_dirs = get_sample_envs_full_kitchen(num_rows * num_cols)
+        ori_dirs = get_sample_envs_full_kitchen(num_rows * num_cols, data_dir=data_dir)
 
     if num_rows == 1 and num_cols == 1:
 
@@ -52,6 +52,17 @@ def get_dirs_camera(num_rows=5, num_cols=5, world_size=(6, 6)):
             camera_point_final = (mid + 35, 15, 14)
             camera_point_begin = (mid + 9, 15, 4)
             camera_target = (mid, 15, 0)
+
+    elif num_rows == 8 and num_cols == 3:
+
+        if world_size == (4, 8):
+            camera_target = (4*6, 8*2, 0)
+            camera_point_begin = (4*8-1.5, 8*3-4, 2)
+            camera_point_final = (4*8+3, 8*3, 4)
+
+            camera_target = (4*4, 8*1.5, 1)
+            camera_point_begin = (4*4, 8*1.5, 2.5)
+            camera_point_final = 3.5
 
     elif num_rows == 10 and num_cols == 10:
 
@@ -127,8 +138,8 @@ def get_sample_envs_for_corl():
     return dirs
 
 
-def get_sample_envs_full_kitchen(count=4):
-    data_dir = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen_100'
+def get_sample_envs_full_kitchen(count=4, data_dir='test_full_kitchen_100'):
+    data_dir = join('/home/yang/Documents/kitchen-worlds/outputs', data_dir)
     dirs = [join(data_dir, f) for f in listdir(data_dir) if isdir(join(data_dir, f))]
     random.shuffle(dirs)
     if count <= len(dirs):
