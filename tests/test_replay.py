@@ -170,7 +170,8 @@ def merge_all_wconfs(all_wconfs):
 
 
 def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, world_size=(6, 6), verbose=False,
-                      frame_gap=6, debug=False, loading_effect=False, save_gif=True, save_mp4=False):
+                      frame_gap=6, debug=False, loading_effect=False, save_gif=True, save_mp4=False,
+                      camera_motion=None):
     from test_gym import get_dirs_camera
     from isaac_tools.gym_utils import load_envs_isaacgym, record_actions_in_gym, \
         update_gym_world_by_wconf, images_to_gif, images_to_mp4
@@ -183,8 +184,8 @@ def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, world_siz
     # os.mkdir(img_dir)
 
     data_dir = 'test_full_kitchen_100' if loading_effect else 'test_full_kitchen_sink'
-    ori_dirs, camera_point_begin, camera_point_final, camera_target = get_dirs_camera(num_rows, num_cols, 
-        world_size, data_dir=data_dir)
+    ori_dirs, camera_point_begin, camera_point_final, camera_target = get_dirs_camera(
+        num_rows, num_cols, world_size, data_dir=data_dir, camera_motion=camera_motion)
     lisdf_dirs = [copy_dir_for_process(ori_dir, verbose=verbose) for ori_dir in ori_dirs]
     num_worlds = min([len(lisdf_dirs), num_rows * num_cols])
 
@@ -251,8 +252,8 @@ if __name__ == '__main__':
 
     ## record 1 : 250+ worlds
     replay_all_in_gym(num_rows=32, num_cols=8, world_size=(4, 8), loading_effect=True,
-                      frame_gap=1, save_mp4=True, save_gif=False, verbose=False)
+                      frame_gap=1, save_mp4=True, save_gif=False, verbose=False, camera_motion='zoom')
 
     ## record 2 : robot execution
     # replay_all_in_gym(num_rows=8, num_cols=3, world_size=(4, 8), loading_effect=False,
-    #                   frame_gap=2, save_mp4=True, save_gif=False, verbose=False)
+    #                   frame_gap=2, save_mp4=True, save_gif=False, verbose=False, camera_motion='splotlight')
