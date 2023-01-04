@@ -27,7 +27,7 @@ from mamao_tools.utils import get_plan
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser, \
     query_yes_no, get_body_map
 
-USE_GYM = True
+USE_GYM = False
 SAVE_MP4 = False
 STEP_BY_STEP = False
 AUTO_PLAY = True
@@ -36,7 +36,7 @@ EVALUATE_QUALITY = True
 GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/one_fridge_pick_pr2/one_fridge_pick_pr2_1004_01:29_1'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data/_examples/5/rerun_2/diverse_commands_rerun_fc=pvt-all.pkl'
-GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen_sink/0101_202517_original_2'
+GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/0103_154919_original_4'
 
 GIVEN_DIR = None
 # GIVEN_DIR = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen_100'
@@ -248,11 +248,11 @@ def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, world_siz
 
 if __name__ == '__main__':
     # replay_all_in_gym(num_rows=14, num_cols=14, world_size=(6, 6), save_gif=True)
-    # process_all_tasks(process, args.t, cases=CASES, path=GIVEN_PATH, dir=GIVEN_DIR)
+    process_all_tasks(process, args.t, cases=CASES, path=GIVEN_PATH, dir=GIVEN_DIR)
 
     ## record 1 : 250+ worlds
-    replay_all_in_gym(num_rows=32, num_cols=8, world_size=(4, 8), loading_effect=True,
-                      frame_gap=1, save_mp4=True, save_gif=False, verbose=False, camera_motion='zoom')
+    # replay_all_in_gym(num_rows=32, num_cols=8, world_size=(4, 8), loading_effect=True,
+    #                   frame_gap=1, save_mp4=True, save_gif=False, verbose=False, camera_motion='zoom')
 
     ## record 2 : robot execution
     # replay_all_in_gym(num_rows=8, num_cols=3, world_size=(4, 8), loading_effect=False,
