@@ -67,7 +67,7 @@
     </include>
 
     <include name="meatturkeyleg#1">
-      <uri>../models/MeatTurkeyLeg/00001/mobility.urdf</uri>
+      <uri>../models/Food/_/MeatTurkeyLeg/mobility.urdf</uri>
       <static>true</static>
       <scale>0.00049</scale>
       <pose>0.7 8.673 0.844 0.0 -0.0 1.801</pose>
@@ -109,7 +109,7 @@
     </include>
 
     <include name="veggiecabbage#1">
-      <uri>../models/VeggieCabbage/00001/mobility.urdf</uri>
+      <uri>../models/Food/VeggieCabbage/mobility.urdf</uri>
       <static>true</static>
       <scale>0.0034999999999999996</scale>
       <pose>0.7 4.8 0.838 0.0 -0.0 1.443</pose>

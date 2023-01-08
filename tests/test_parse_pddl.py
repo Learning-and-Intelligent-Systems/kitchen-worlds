@@ -5,14 +5,20 @@ from lisdf.parsing import load_all
 
 verbose = False
 
+
 def get_name(f):
     return f[f.rfind('/')+1:]
+
 
 if __name__ == '__main__':
 
     lisdf_file = join(ASSET_PATH, 'scenes/kitchen_lunch.lisdf')
     domain_file = join(ASSET_PATH, 'pddl/test_kitchen_lunch_domain.pddl')
     problem_file = join(ASSET_PATH, 'pddl/test_kitchen_lunch.pddl')
+
+    lisdf_file = join(ASSET_PATH, 'scenes/scene.lisdf')
+    domain_file = join(ASSET_PATH, 'pddl/domain.pddl')
+    problem_file = join(ASSET_PATH, 'pddl/problem.pddl')
 
     lisdf, domain, problem = load_all(lisdf_file, domain_file, problem_file)
 

@@ -16,23 +16,13 @@ import argparse
 
 from pybullet_tools.pr2_utils import get_group_conf
 from pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, wait_if_gui, \
-    SEPARATOR, get_aabb, wait_for_duration, safe_remove, ensure_dir, reset_simulation
+    SEPARATOR, get_aabb, wait_for_duration, safe_remove, ensure_dir, reset_simulation, timeout
 from pybullet_tools.bullet_utils import summarize_facts, print_goal, nice, get_datetime
 from pybullet_tools.pr2_agent import get_stream_info, post_process, move_cost_fn, \
     get_stream_map, solve_multiple, solve_one
 from pybullet_tools.logging import TXT_FILE
 
-from pybullet_tools.pr2_primitives import get_group_joints, Conf, get_base_custom_limits, Pose, Conf, \
-    get_ik_ir_gen, get_motion_gen, get_cfree_approach_pose_test, get_cfree_pose_pose_test, get_cfree_traj_pose_test, \
-    get_grasp_gen, Attach, Detach, Clean, Cook, control_commands, Command, \
-    get_gripper_joints, GripperCommand, State, apply_commands
-
-from pddlstream.language.constants import Equal, AND, print_solution, PDDLProblem
-from pddlstream.algorithms.meta import solve, DEFAULT_ALGORITHM
-from pddlstream.algorithms.constraints import PlanConstraints
-from pddlstream.algorithms.algorithm import reset_globals
-from pddlstream.algorithms.common import SOLUTIONS
-from pddlstream.utils import read, INF, get_file_path, find_unique, Profiler, str_from_object, TmpCWD
+from pddlstream.language.constants import Equal, AND, print_solution
 
 from lisdf_tools.lisdf_loader import load_lisdf_pybullet, pddlstream_from_dir
 from lisdf_tools.lisdf_planning import pddl_to_init_goal, Problem
@@ -44,21 +34,24 @@ from mamao_tools.feasibility_checkers import Shuffler
 from mamao_tools.data_utils import get_instance_info, exist_instance, get_indices, \
     get_plan_skeleton, get_successful_plan
 
-from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
+from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser, get_body_map
 
 ## special modes
-GENERATE_MULTIPLE_SOLUTIONS = True
+GENERATE_MULTIPLE_SOLUTIONS = False
 GENERATE_SKELETONS = False
 
-USE_VIEWER = False
+USE_VIEWER = True
+LOCK_VIEWER = True
 DIVERSE = True
 PREFIX = 'diverse_' if DIVERSE else ''
-RERUN_SUBDIR = 'rerun_2'
+RERUN_SUBDIR = 'rerun'
 
 SKIP_IF_SOLVED = True and not GENERATE_SKELETONS
 SKIP_IF_SOLVED_RECENTLY = True and not GENERATE_SKELETONS
 RETRY_IF_FAILED = True
 check_time = 1666297068  ## 1665768219 for goals, 1664750094 for in, 1666297068 for goals
+
+#########################################
 
 # TASK_NAME = 'tt_one_fridge_pick'
 # TASK_NAME = 'tt_one_fridge_table_pick'
@@ -72,20 +65,25 @@ check_time = 1666297068  ## 1665768219 for goals, 1664750094 for in, 1666297068 
 # TASK_NAME = 'zz'
 # TASK_NAME = 'ss_two_fridge_pick'
 # TASK_NAME = 'ss_two_fridge_in'
-TASK_NAME = 'mm_two_fridge_goals'
+# TASK_NAME = 'mm_two_fridge_goals'
 # TASK_NAME = 'mm_test'
 
 # TASK_NAME = 'mm_two_fridge_in'
 # TASK_NAME = 'mm'
 
+##########################################
+
+TASK_NAME = 'mm_storage'
+TASK_NAME = '_test'
+
 CASES = None
-# CASES = ['18']
+CASES = ['1']
 if CASES is not None:
     SKIP_IF_SOLVED = False
     SKIP_IF_SOLVED_RECENTLY = False
 
 PARALLEL = GENERATE_SKELETONS # and False
-FEASIBILITY_CHECKER = 'None' ## 'pvt-3-trans'
+FEASIBILITY_CHECKER = 'None'
 ## None | oracle | pvt | pvt* | pvt-task | pvt-all | binary | shuffle
 if GENERATE_SKELETONS:
     FEASIBILITY_CHECKER = 'oracle'
@@ -95,8 +93,8 @@ if GENERATE_SKELETONS:
 parser = get_base_parser(task_name=TASK_NAME, parallel=PARALLEL, use_viewer=USE_VIEWER)
 parser.add_argument('-d', type=str, default=DIVERSE)
 parser.add_argument('-f', type=str, default=FEASIBILITY_CHECKER)
-parser.add_argument('-u', '--unlock', action='store_true',
-                    help='When enabled, unlocks the PyBullet viewer.')
+parser.add_argument('-l', '--lock', action='store_true',
+                    help='When enabled, locks the PyBullet viewer.', default=LOCK_VIEWER)
 parser.add_argument('-c', '--cfree', action='store_true',
                     help='When enabled, disables collision checking.')
 parser.add_argument('-i', '--index', type=int, default=0,
@@ -211,7 +209,6 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
 
     pddlstream_problem = pddlstream_from_dir(problem, exp_dir=exp_dir, replace_pddl=True,
                                              collisions=not args.cfree, teleport=False)
-    world.summarize_all_objects(pddlstream_problem.init)
 
     stream_info = world.robot.get_stream_info(partial=False, defer=False)
     _, _, _, stream_map, init, goal = pddlstream_problem
@@ -225,13 +222,14 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
 
     start = time.time()
     collect_dataset = False
+    kwargs = dict(fc=fc, lock=args.lock)
     if DIVERSE:
-        kwargs = dict(
+        kwargs.update(dict(
             diverse=DIVERSE,
             downward_time=10,  ## max time to get 100, 10 sec, 30 sec for 300
             evaluation_time=60,  ## on each skeleton
             max_plans=100,  ## number of skeletons
-        )
+        ))
         if GENERATE_SKELETONS:
             kwargs['evaluation_time'] = -0.5
             if MORE_PLANS:
@@ -240,15 +238,19 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
         if GENERATE_MULTIPLE_SOLUTIONS:
             kwargs['max_solutions'] = 4
             kwargs['collect_dataset'] = True
-    else:
-        kwargs = dict()
 
     cwd = os.getcwd()
-    if parallel:
-        solution = solve_multiple(pddlstream_problem, stream_info, fc=fc, lock=not args.unlock, **kwargs)
-        solution, cwd = solution
-    else:
-        solution = solve_one(pddlstream_problem, stream_info, fc=fc, lock=not args.unlock, **kwargs)
+    max_time = 8 * 60
+    solution = 'failed'
+    with timeout(duration=max_time):
+        if parallel:
+            solution = solve_multiple(pddlstream_problem, stream_info, **kwargs)
+            solution, cwd = solution
+        else:
+            solution = solve_one(pddlstream_problem, stream_info, **kwargs)
+    if solution == 'failed':
+        reset_simulation()
+        shutil.rmtree(exp_dir)
 
     if GENERATE_MULTIPLE_SOLUTIONS:
         from mamao_tools.data_utils import save_multiple_solutions
@@ -299,7 +301,8 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
         if has_gui():
             saver.restore()
             input('Begin?')
-            apply_actions(problem, commands, time_step=5e-2, verbose=False)
+            body_map = get_body_map(run_dir, world)
+            apply_actions(problem, commands, body_map=body_map, time_step=5e-2, verbose=False)
             input('End?')
 
     # disconnect()
