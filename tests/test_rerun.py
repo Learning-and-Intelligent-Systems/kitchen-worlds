@@ -73,11 +73,11 @@ check_time = 1666297068  ## 1665768219 for goals, 1664750094 for in, 1666297068 
 
 ##########################################
 
-TASK_NAME = 'mm_storage'
-TASK_NAME = '_test'
+TASK_NAME = 'mm_sink'
+# TASK_NAME = '_test'
 
 CASES = None
-CASES = ['1']
+CASES = ['25']
 if CASES is not None:
     SKIP_IF_SOLVED = False
     SKIP_IF_SOLVED_RECENTLY = False
@@ -301,8 +301,7 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
         if has_gui():
             saver.restore()
             input('Begin?')
-            body_map = get_body_map(run_dir, world)
-            apply_actions(problem, commands, body_map=body_map, time_step=5e-2, verbose=False)
+            apply_actions(problem, commands, time_step=5e-2, verbose=False)
             input('End?')
 
     # disconnect()
