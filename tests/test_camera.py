@@ -5,7 +5,7 @@ import PIL.Image
 import numpy as np
 import argparse
 import sys
-
+import time
 from config import EXP_PATH
 from pybullet_tools.utils import quat_from_euler, reset_simulation, remove_body, AABB, \
     get_aabb_extent, get_aabb_center, get_joint_name, get_link_name, euler_from_quat, \
@@ -150,7 +150,7 @@ def render_segmentation_mask(test_dir, viz_dir, camera_pose, crop=False, transpa
     world.add_camera(camera_pose, viz_dir, width=width, height=height, fx=fx)
 
     ## a fix for previous wrong lisdf names in planning_config[name_to_body]
-    fix_planning_config(viz_dir)
+    # fix_planning_config(viz_dir)
 
     new_key = 'seg_image' if not crop else 'crop_image'
     new_key = 'transp_image' if transparent else new_key

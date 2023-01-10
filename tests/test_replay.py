@@ -15,6 +15,7 @@ import numpy as np
 import random
 import time
 import sys
+from PIL import Image
 
 from pybullet_tools.bullet_utils import get_datetime
 from pybullet_tools.utils import reset_simulation, VideoSaver, wait_unlocked
@@ -28,11 +29,12 @@ from mamao_tools.data_utils import get_plan
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser, \
     query_yes_no, get_body_map
 
-USE_GYM = True
-SAVE_MP4 = True
+USE_GYM = False
+SAVE_JPG = True
+SAVE_MP4 = False
 STEP_BY_STEP = False
 AUTO_PLAY = True
-EVALUATE_QUALITY = True
+EVALUATE_QUALITY = False
 
 GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/one_fridge_pick_pr2/one_fridge_pick_pr2_1004_01:29_1'
@@ -42,6 +44,7 @@ GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/1649'
 
 GIVEN_DIR = None
 # GIVEN_DIR = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen_100'
+GIVEN_DIR ='/home/yang/Documents/fastamp-data-rss/' + 'mm_sink'
 
 TASK_NAME = 'one_fridge_pick_pr2'
 
@@ -66,7 +69,7 @@ TASK_NAME = 'mm_two_fridge_in'
 CASES = None
 CASES = ['104', '186']
 
-parser = get_base_parser(task_name=TASK_NAME, parallel=False, use_viewer=True)
+parser = get_base_parser(task_name=TASK_NAME, parallel=SAVE_JPG, use_viewer=True)
 args = parser.parse_args()
 
 #####################################
@@ -91,19 +94,31 @@ def get_pkl_run(run_dir, verbose=True):
     return exp_dir, run_dir, commands, plan
 
 
-def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, height=1120,
+def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, height=1120, fx=800,
             camera_point=(8.5, 2.5, 3), camera_target=(0, 2.5, 0)):
+
+    verbose = not SAVE_JPG
 
     if 'full_kitchen' in run_dir_ori:
         camera_point = (4, 4, 8)
         camera_target = (0, 4, 0)
 
-    exp_dir, run_dir, commands, plan = get_pkl_run(run_dir_ori)
+    exp_dir, run_dir, commands, plan = get_pkl_run(run_dir_ori, verbose=verbose)
 
     world = load_lisdf_pybullet(exp_dir, use_gui=not USE_GYM, width=width, height=height, verbose=False)
     problem = Problem(world)
-    world.summarize_all_objects()
+    if verbose:
+        world.summarize_all_objects()
     body_map = get_body_map(run_dir, world) if 'rerun' not in run_dir_ori else None
+
+    ## save the initial scene image in pybullet
+    if SAVE_JPG:
+        viz_dir = join(run_dir_ori, 'zoomin')
+        world.add_camera(viz_dir, width=width, height=height, fx=fx, img_dir=viz_dir)
+        world.visualize_image(index='initial', rgb=True, **world.camera_kwargs)
+        # rgb = world.camera.get_image(**world.camera_kwargs).rgbPixels[:, :, :3]
+        # im = Image.fromarray(rgb)
+        # im.save(join(viz_dir, f'initial.png'))
 
     if USE_GYM:
         from isaac_tools.gym_utils import load_lisdf_isaacgym, record_actions_in_gym, set_camera_target_body
@@ -137,8 +152,12 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, hei
             answer = query_yes_no(f"start replay {run_name}?", default='yes')
         if answer:
             time_step = 0.02 if not STEP_BY_STEP else None
-            apply_actions(problem, commands, time_step=time_step, verbose=True,
+            time_step = 2e-5 if SAVE_JPG else time_step
+            apply_actions(problem, commands, time_step=time_step, verbose=verbose,
                           plan=plan, body_map=body_map)
+
+        if SAVE_JPG:
+            world.visualize_image(index='final', rgb=True, **world.camera_kwargs)
 
         if EVALUATE_QUALITY:
             answer = query_yes_no(f"delete this run {run_name}?", default='no')
@@ -245,7 +264,7 @@ def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, world_siz
 
 if __name__ == '__main__':
     # replay_all_in_gym(num_rows=14, num_cols=14, world_size=(6, 6), save_gif=True)
-    process_all_tasks(process, args.t, cases=CASES, path=GIVEN_PATH, dir=GIVEN_DIR)
+    process_all_tasks(process, args.t, parallel=args.p, cases=CASES, path=GIVEN_PATH, dir=GIVEN_DIR)
 
     ## record 1 : 250+ worlds
     # replay_all_in_gym(num_rows=32, num_cols=8, world_size=(4, 8), loading_effect=True,
