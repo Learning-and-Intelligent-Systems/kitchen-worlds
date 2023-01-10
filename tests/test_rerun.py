@@ -17,10 +17,10 @@ import argparse
 from pybullet_tools.pr2_utils import get_group_conf
 from pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, wait_if_gui, \
     SEPARATOR, get_aabb, wait_for_duration, safe_remove, ensure_dir, reset_simulation, timeout
-from pybullet_tools.bullet_utils import summarize_facts, print_goal, nice, get_datetime
+from pybullet_tools.bullet_utils import summarize_facts, print_goal, nice, get_datetime, \
+    initialize_logs
 from pybullet_tools.pr2_agent import get_stream_info, post_process, move_cost_fn, \
     get_stream_map, solve_multiple, solve_one
-from pybullet_tools.logging import TXT_FILE
 
 from pddlstream.language.constants import Equal, AND, print_solution
 
@@ -29,18 +29,18 @@ from lisdf_tools.lisdf_planning import pddl_to_init_goal, Problem
 
 from world_builder.actions import apply_actions
 
-from mamao_tools.utils import get_feasibility_checker
 from mamao_tools.feasibility_checkers import Shuffler
 from mamao_tools.data_utils import get_instance_info, exist_instance, get_indices, \
-    get_plan_skeleton, get_successful_plan
+    get_plan_skeleton, get_successful_plan, get_feasibility_checker, get_plan
 
-from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser, get_body_map
+from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser, get_body_map, \
+    modify_plan_with_body_map
 
 ## special modes
 GENERATE_MULTIPLE_SOLUTIONS = False
 GENERATE_SKELETONS = False
 
-USE_VIEWER = True
+USE_VIEWER = False
 LOCK_VIEWER = True
 DIVERSE = True
 PREFIX = 'diverse_' if DIVERSE else ''
@@ -73,11 +73,16 @@ check_time = 1666297068  ## 1665768219 for goals, 1664750094 for in, 1666297068 
 
 ##########################################
 
-TASK_NAME = 'mm_sink'
+TASK_NAME = 'mm_storage'
+# TASK_NAME = 'mm_sink'
+# TASK_NAME = 'mm_braiser'
 # TASK_NAME = '_test'
 
 CASES = None
-CASES = ['25']
+CASES = ['150', '395', '399', '404', '406', '418', '424', '428', '430', '435', '438', '439', '444', '453', '455', '466', '475', '479', '484', '489', '494', '539', '540', '547', '548', '553', '802', '804', '810', '815', '818', '823', '831', '833', '838', '839', '848', '858', '860', '862']
+# CASES = ['1514', '1566', '1612', '1649', '1812', '2053', '2110', '2125', '2456', '2534', '2535', '2576', '2613']
+# CASES = ['688', '810', '813', '814', '816', '824', '825', '830', '831', '915', '917', '927', '931', '939', '948', '949', '950', '1099', '1100', '1101', '1102', '1107', '1108', '1109', '1110', '1115', '1116', '1118', '1120', '1125', '1127', '1132', '1143', '1144', '1151', '1152']
+
 if CASES is not None:
     SKIP_IF_SOLVED = False
     SKIP_IF_SOLVED_RECENTLY = False
@@ -108,10 +113,6 @@ FEASIBILITY_CHECKER = args.f
 
 # DATABASE_DIR = abspath(join(MAMAO_DATA_PATH, TASK_NAME))
 
-
-def init_experiment(exp_dir):
-    if isfile(TXT_FILE):
-        os.remove(TXT_FILE)
 
 #####################################
 
@@ -177,12 +178,14 @@ def check_if_skip(run_dir, **kwargs):
 
 
 def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
+    from pybullet_tools.logging import myprint as print
     ori_dir = join(run_dir, RERUN_SUBDIR)
     if not isdir(ori_dir):
         os.mkdir(ori_dir)
     if check_if_skip(run_dir):
         return
 
+    initialize_logs()
     exp_dir = copy_dir_for_process(run_dir, tag='replaying')
 
     if False:
@@ -197,16 +200,6 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
         from utils import load_lisdf_nvisii
         scene = load_lisdf_nvisii(exp_dir)
 
-    update_fn = None
-    if False:
-        #from test_gym import load_lisdf_isaacgym
-        from test_gym import update_gym_world
-        gym_world = load_lisdf_isaacgym(exp_dir) #, skip=['meatturkeyleg'])
-        #world.gym_world = gym_world
-        update_fn = lambda pause=False: update_gym_world(gym_world, pb_world=world, pause=pause)
-        update_fn(pause=True)
-        #gym_world.wait_if_gui()
-
     pddlstream_problem = pddlstream_from_dir(problem, exp_dir=exp_dir, replace_pddl=True,
                                              collisions=not args.cfree, teleport=False)
 
@@ -215,7 +208,6 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     summarize_facts(init, world=world)
     print_goal(goal)
     print(SEPARATOR)
-    init_experiment(exp_dir)
 
     fc = get_feasibility_checker(run_dir, mode=FEASIBILITY_CHECKER, diverse=DIVERSE)
     # fc = Shuffler()
@@ -301,8 +293,33 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
         if has_gui():
             saver.restore()
             input('Begin?')
-            apply_actions(problem, commands, time_step=5e-2, verbose=False)
+            apply_actions(problem, commands, time_step=5e-3, verbose=False)
             input('End?')
+
+        ## maybe generate a multiple_solutions.json file
+        if 'fastamp-data' and '/mm_' in run_dir:
+            old_plan = get_plan(run_dir)[0]
+            indices = get_indices(run_dir)
+            # indices.update({eval(k): v for k, v in indices.items()})
+            skeleton_kargs = dict(indices=indices, include_movable=True, include_joint=True)
+            rerun_dir = join(run_dir, f"rerun_{get_datetime(TO_LISDF=True)}")
+            shutil.move(join(run_dir, ori_dir), rerun_dir)
+            if len(old_plan) > len(plan):
+                new_plan = modify_plan_with_body_map(plan, get_body_map(run_dir, world, inv=True))
+                new_plan = [[a.name] + [str(s) for s in a.args] for a in new_plan]
+                multiple_solutions = [{
+                    'plan': new_plan,
+                    'skeleton': get_plan_skeleton(new_plan, **skeleton_kargs),
+                    'score': 1.0,
+                    'rerun_dir': rerun_dir
+                }, {
+                    'plan': old_plan,
+                    'skeleton': get_plan_skeleton(old_plan, **skeleton_kargs),
+                    'score': len(plan)/len(old_plan)
+                }]
+                solutions_file = join(run_dir, 'multiple_solutions.json')
+                json.dump(multiple_solutions, open(solutions_file, 'w'), indent=3)
+                print('Saved multiple solutions to', solutions_file)
 
     # disconnect()
     reset_simulation()

@@ -19,8 +19,7 @@ from pybullet_tools.flying_gripper_utils import get_cloned_se3_conf, plan_se3_mo
     set_cloned_se3_conf
 
 from world_builder.world import State
-from mamao_tools.utils import organize_dataset
-from mamao_tools.data_utils import get_indices, exist_instance, get_init_tuples
+from mamao_tools.data_utils import organize_dataset, get_indices, exist_instance, get_init_tuples
 from lisdf_tools.lisdf_loader import load_lisdf_pybullet, get_depth_images, create_gripper_robot
 import json
 import shutil

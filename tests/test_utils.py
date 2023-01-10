@@ -38,7 +38,9 @@ def clear_pddlstream_cache():
         shutil.rmtree('temp')
 
 
-def copy_dir_for_process(viz_dir, tag=None, verbose=True):
+def copy_dir_for_process(viz_dir, tag=None, verbose=True, print_fn=None):
+    if print_fn is None:
+        from pybullet_tools.logging import myprint as print_fn
     subdir = basename(viz_dir)
     task_name = basename(viz_dir.replace(f"/{subdir}", ''))
 
@@ -46,15 +48,15 @@ def copy_dir_for_process(viz_dir, tag=None, verbose=True):
     test_dir = join(EXP_PATH, f"temp_{task_name}_{subdir}")
     if isdir(test_dir):
         if verbose:
-            print('copy_dir_for_process | removing', test_dir)
+            print_fn('copy_dir_for_process | removing', test_dir)
         shutil.rmtree(test_dir)
     if not isdir(test_dir):
         shutil.copytree(viz_dir, test_dir)
     if verbose:
         if tag is None:
-            print(viz_dir, end='\r')
+            print_fn(viz_dir, end='\r')
         else:
-            print(f'\n\n\n--------------------------\n    {tag} {viz_dir} \n------------------------\n\n\n')
+            print_fn(f'\n\n\n--------------------------\n    {tag} {viz_dir} \n------------------------\n\n\n')
 
     return test_dir
 
@@ -230,10 +232,29 @@ def query_yes_no(question, default="no"):
             sys.stdout.write("Please respond with 'yes' or 'no' " "(or 'y' or 'n').\n")
 
 
-def get_body_map(run_dir, world):
+def get_body_map(run_dir, world, inv=False):
     body_to_name = json.load(open(join(run_dir, 'planning_config.json'), 'r'))['body_to_name']
     body_to_new = {eval(k): world.name_to_body[v] for k, v in body_to_name.items()}
+    if inv:
+        return {v: k for k, v in body_to_new.items()}
     return body_to_new
+
+
+def modify_plan_with_body_map(plan, body_map):
+    from pddlstream.language.constants import Action
+    new_plan = []
+    for action in plan:
+        new_args = []
+        for a in action.args:
+            if a in body_map:
+                new_args.append(body_map[a])
+            else:
+                if hasattr(a, 'body') and a in body_map:
+                    a.body = body_map[a]
+                new_args.append(a)
+        new_plan.append(Action(action.name, new_args))
+    return new_plan
+
 
 
 if __name__ == '__main__':

@@ -20,24 +20,25 @@ from pybullet_tools.bullet_utils import get_datetime
 from pybullet_tools.utils import reset_simulation, VideoSaver, wait_unlocked
 from lisdf_tools.lisdf_loader import load_lisdf_pybullet, pddlstream_from_dir
 from lisdf_tools.lisdf_planning import pddl_to_init_goal, Problem
+from isaac_tools.gym_utils import save_gym_run
 from world_builder.actions import apply_actions
 
-from mamao_tools.utils import get_plan
+from mamao_tools.data_utils import get_plan
 
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser, \
     query_yes_no, get_body_map
 
-USE_GYM = False
-SAVE_MP4 = False
+USE_GYM = True
+SAVE_MP4 = True
 STEP_BY_STEP = False
 AUTO_PLAY = True
 EVALUATE_QUALITY = True
 
 GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/one_fridge_pick_pr2/one_fridge_pick_pr2_1004_01:29_1'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data/_examples/5/rerun_2/diverse_commands_rerun_fc=pvt-all.pkl'
 GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/0104_094417_original_1'
-GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/25'
+GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/1649'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/1998/' + 'rerun/diverse_commands_rerun_fc=None.pkl'
 
 GIVEN_DIR = None
 # GIVEN_DIR = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen_100'
@@ -90,24 +91,25 @@ def get_pkl_run(run_dir, verbose=True):
     return exp_dir, run_dir, commands, plan
 
 
-def run_one(run_dir, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, height=1120,
+def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, height=1120,
             camera_point=(8.5, 2.5, 3), camera_target=(0, 2.5, 0)):
 
-    if 'full_kitchen' in run_dir:
+    if 'full_kitchen' in run_dir_ori:
         camera_point = (4, 4, 8)
         camera_target = (0, 4, 0)
 
-    exp_dir, run_dir, commands, plan = get_pkl_run(run_dir)
+    exp_dir, run_dir, commands, plan = get_pkl_run(run_dir_ori)
 
     world = load_lisdf_pybullet(exp_dir, use_gui=not USE_GYM, width=width, height=height, verbose=False)
     problem = Problem(world)
     world.summarize_all_objects()
-    body_map = get_body_map(run_dir, world)
+    body_map = get_body_map(run_dir, world) if 'rerun' not in run_dir_ori else None
 
     if USE_GYM:
-        from isaac_tools.gym_utils import load_lisdf_isaacgym, record_actions_in_gym
+        from isaac_tools.gym_utils import load_lisdf_isaacgym, record_actions_in_gym, set_camera_target_body
         gym_world = load_lisdf_isaacgym(abspath(exp_dir), camera_width=1280, camera_height=800,
                                         camera_point=camera_point, camera_target=camera_target)
+        set_camera_target_body(gym_world, run_dir)
         img_dir = join(exp_dir, 'gym_images')
         gif_name = 'gym_replay.gif'
         os.mkdir(img_dir)
@@ -238,13 +240,7 @@ def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, world_siz
             img_file = gym_world.get_rgba_image(gym_world.cameras[0])
             filenames.append(img_file)
 
-    if save_gif:
-        images_to_gif(img_dir, gif_name, filenames)
-        print('created gif {}'.format(join(img_dir, gif_name)))
-    if save_mp4:
-        mp4_name = join(img_dir, gif_name.replace('.gif', f'_{get_datetime()}.mp4'))
-        images_to_mp4(filenames, mp4_name=mp4_name)
-        print('created mp4 {} with {} frames'.format(mp4_name, len(filenames)))
+    save_gym_run(img_dir, gif_name, filenames, save_gif=save_gif, save_mp4=save_mp4)
 
 
 if __name__ == '__main__':
