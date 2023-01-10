@@ -55,10 +55,13 @@ def copy_dir_for_process(viz_dir, tag=None, verbose=True, print_fn=None):
     if not isdir(test_dir):
         shutil.copytree(viz_dir, test_dir)
 
-    if tag is None or not verbose:
-        print_fn(viz_dir, end='\r')
-    elif verbose:
-        print_fn(f'\n\n\n--------------------------\n    {tag} {viz_dir} \n------------------------\n\n\n')
+    if not verbose:
+        print_fn(viz_dir)
+    else:
+        if tag is None:
+            print_fn(viz_dir, end='\r')
+        elif verbose:
+            print_fn(f'\n\n\n--------------------------\n    {tag} {viz_dir} \n------------------------\n\n\n')
 
     return test_dir
 

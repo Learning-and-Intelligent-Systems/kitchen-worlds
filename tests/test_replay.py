@@ -35,6 +35,7 @@ SAVE_MP4 = False
 STEP_BY_STEP = False
 AUTO_PLAY = True
 EVALUATE_QUALITY = False
+PARALLEL = SAVE_JPG
 
 GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/one_fridge_pick_pr2/one_fridge_pick_pr2_1004_01:29_1'
@@ -69,7 +70,7 @@ TASK_NAME = 'mm_two_fridge_in'
 CASES = None
 CASES = ['104', '186']
 
-parser = get_base_parser(task_name=TASK_NAME, parallel=SAVE_JPG, use_viewer=True)
+parser = get_base_parser(task_name=TASK_NAME, parallel=PARALLEL, use_viewer=True)
 args = parser.parse_args()
 
 #####################################
@@ -103,6 +104,11 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, hei
         camera_point = (4, 4, 8)
         camera_target = (0, 4, 0)
 
+    if SAVE_JPG:
+        viz_dir = join(run_dir_ori, 'zoomin')
+        if isdir(viz_dir) and len([a for a in listdir(viz_dir) if '.png' in a]) > 1:
+            return
+
     exp_dir, run_dir, commands, plan = get_pkl_run(run_dir_ori, verbose=verbose)
 
     world = load_lisdf_pybullet(exp_dir, use_gui=not USE_GYM, width=width, height=height, verbose=False)
@@ -114,7 +120,7 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, hei
     ## save the initial scene image in pybullet
     if SAVE_JPG:
         viz_dir = join(run_dir_ori, 'zoomin')
-        world.add_camera(viz_dir, width=width, height=height, fx=fx, img_dir=viz_dir)
+        world.add_camera(viz_dir, width=width//4, height=height//4, fx=fx, img_dir=viz_dir)
         world.visualize_image(index='initial', rgb=True, **world.camera_kwargs)
         # rgb = world.camera.get_image(**world.camera_kwargs).rgbPixels[:, :, :3]
         # im = Image.fromarray(rgb)
