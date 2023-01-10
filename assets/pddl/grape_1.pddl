@@ -17,6 +17,7 @@
     (surface table)
 
     (graspable small_cap)
+    (graspable large_cap)    
     (graspable grape)
 
     (atpose grape p0=(0.3, 0.0, 0.01, 0))
