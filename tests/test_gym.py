@@ -228,6 +228,7 @@ def test_load_objects():
     gym_world.set_viewer_target((3, 3, 3), target=(0, 0, 0))
 
     ## test all categories
+    wanted = ['Food']  ## None
     unwanted = ['Cart']
     skip_till = None ## 'OvenCounter'
     problematic = []
@@ -246,6 +247,8 @@ def test_load_objects():
     for k in range(2):
         for i in range(len(categories)):
             cat = categories[i]
+            if cat in unwanted or (wanted is not None and cat not in wanted):
+                continue
             instances = list(get_instances(category=cat)) if ids is None else ids
             print('test_load_objects | category:', cat, 'instances:', instances)
             for j in range(len(instances)):
