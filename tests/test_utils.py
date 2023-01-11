@@ -39,7 +39,9 @@ def clear_pddlstream_cache():
 
 
 def copy_dir_for_process(viz_dir, tag=None, verbose=True, print_fn=None):
-    if print_fn is None:
+    if not verbose:
+        print_fn = print
+    elif print_fn is None:
         from pybullet_tools.logging import myprint as print_fn
     subdir = basename(viz_dir)
     task_name = basename(viz_dir.replace(f"/{subdir}", ''))
@@ -52,10 +54,13 @@ def copy_dir_for_process(viz_dir, tag=None, verbose=True, print_fn=None):
         shutil.rmtree(test_dir)
     if not isdir(test_dir):
         shutil.copytree(viz_dir, test_dir)
-    if verbose:
+
+    if not verbose:
+        print_fn(viz_dir)
+    else:
         if tag is None:
             print_fn(viz_dir, end='\r')
-        else:
+        elif verbose:
             print_fn(f'\n\n\n--------------------------\n    {tag} {viz_dir} \n------------------------\n\n\n')
 
     return test_dir
@@ -126,6 +131,7 @@ def process_all_tasks(process, task_name, parallel=False, cases=None, path=None,
     if dir is not None:
         cases = [join(dir, c) for c in listdir(dir)]
         cases = [c for c in cases if isdir(c) and not isfile(join(c, 'gym_replay.gif'))]
+        cases = sorted(cases, key=lambda x: eval(x.split('/')[-1]))
     elif path is not None:
         cases = [path]
     elif cases is not None and len(cases) > 0:
@@ -254,7 +260,6 @@ def modify_plan_with_body_map(plan, body_map):
                 new_args.append(a)
         new_plan.append(Action(action.name, new_args))
     return new_plan
-
 
 
 if __name__ == '__main__':
