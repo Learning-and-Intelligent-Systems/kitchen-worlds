@@ -35,17 +35,17 @@ SAVE_MP4 = False
 STEP_BY_STEP = False
 AUTO_PLAY = True
 EVALUATE_QUALITY = False
-PARALLEL = SAVE_JPG
+PARALLEL = SAVE_JPG and False
 
 GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/one_fridge_pick_pr2/one_fridge_pick_pr2_1004_01:29_1'
 GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/0104_094417_original_1'
-GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/1649'
+GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/2'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/1998/' + 'rerun/diverse_commands_rerun_fc=None.pkl'
 
 GIVEN_DIR = None
 # GIVEN_DIR = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen_100'
-GIVEN_DIR ='/home/yang/Documents/fastamp-data-rss/' + 'mm_sink'
+# GIVEN_DIR ='/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser'
 
 TASK_NAME = 'one_fridge_pick_pr2'
 
@@ -103,11 +103,6 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, hei
     if 'full_kitchen' in run_dir_ori:
         camera_point = (4, 4, 8)
         camera_target = (0, 4, 0)
-
-    if SAVE_JPG:
-        viz_dir = join(run_dir_ori, 'zoomin')
-        if isdir(viz_dir) and len([a for a in listdir(viz_dir) if '.png' in a]) > 1:
-            return
 
     exp_dir, run_dir, commands, plan = get_pkl_run(run_dir_ori, verbose=verbose)
 
@@ -268,9 +263,20 @@ def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, world_siz
     save_gym_run(img_dir, gif_name, filenames, save_gif=save_gif, save_mp4=save_mp4)
 
 
+def case_filter(run_dir_ori):
+    if SAVE_JPG:
+        viz_dir = join(run_dir_ori, 'zoomin')
+        if isdir(viz_dir) and len([a for a in listdir(viz_dir) if '.png' in a]) > 1:
+            return False
+    return True
+
+
 if __name__ == '__main__':
+    case_filter = None
+    process_all_tasks(process, args.t, parallel=args.p, cases=CASES, path=GIVEN_PATH, dir=GIVEN_DIR,
+                      case_filter=case_filter)
+
     # replay_all_in_gym(num_rows=14, num_cols=14, world_size=(6, 6), save_gif=True)
-    process_all_tasks(process, args.t, parallel=args.p, cases=CASES, path=GIVEN_PATH, dir=GIVEN_DIR)
 
     ## record 1 : 250+ worlds
     # replay_all_in_gym(num_rows=32, num_cols=8, world_size=(4, 8), loading_effect=True,

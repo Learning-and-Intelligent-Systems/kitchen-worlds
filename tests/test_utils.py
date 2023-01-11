@@ -125,7 +125,8 @@ def parallel_processing(process, inputs, parallel):
     print(f'went through {num_cases} run_dirs (parallel={parallel}) in {round(time.time() - start_time, 3)} sec')
 
 
-def process_all_tasks(process, task_name, parallel=False, cases=None, path=None, dir=None):
+def process_all_tasks(process, task_name, parallel=False, cases=None, path=None,
+                      dir=None, case_filter=None):
     clear_pddlstream_cache()
 
     if dir is not None:
@@ -138,6 +139,9 @@ def process_all_tasks(process, task_name, parallel=False, cases=None, path=None,
         cases = [join(MAMAO_DATA_PATH, task_name, case) for case in cases]
     else:
         cases = get_run_dirs(task_name)
+
+    if case_filter is not None:
+        cases = [c for c in cases if case_filter(c)]
 
     parallel_processing(process, cases, parallel)
 
