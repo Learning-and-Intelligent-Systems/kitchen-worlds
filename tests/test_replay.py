@@ -45,7 +45,7 @@ GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/40'
 
 GIVEN_DIR = None
 # GIVEN_DIR = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen_100'
-GIVEN_DIR ='/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser'
+GIVEN_DIR ='/home/yang/Documents/fastamp-data-rss/' + 'mm_sink'
 
 TASK_NAME = 'one_fridge_pick_pr2'
 
@@ -100,7 +100,7 @@ def swap_microwave(run_dir, verbose=False):
     world = load_lisdf_pybullet(exp_dir, use_gui=not USE_GYM, verbose=False)
 
 
-def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, height=1120, fx=800,
+def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, height=1120, fx=600,
             camera_point=(8.5, 2.5, 3), camera_target=(0, 2.5, 0)):
 
     verbose = not SAVE_JPG
@@ -120,7 +120,7 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, hei
     ## save the initial scene image in pybullet
     if SAVE_JPG:
         viz_dir = join(run_dir_ori, 'zoomin')
-        world.add_camera(viz_dir, width=width//4, height=height//4, fx=fx, img_dir=viz_dir)
+        world.add_camera(viz_dir, width=width//4, height=height//4, fx=fx//2, img_dir=viz_dir)
         world.visualize_image(index='initial', rgb=True, **world.camera_kwargs)
         # rgb = world.camera.get_image(**world.camera_kwargs).rgbPixels[:, :, :3]
         # im = Image.fromarray(rgb)
@@ -271,7 +271,7 @@ def case_filter(run_dir_ori):
 
 
 if __name__ == '__main__':
-    process = run_one  ## run_one  ## swap_microwave
+    process = run_one  ## run_one | swap_microwave
     case_filter = None
     process_all_tasks(process, args.t, parallel=args.p, cases=CASES, path=GIVEN_PATH, dir=GIVEN_DIR,
                       case_filter=case_filter)

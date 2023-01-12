@@ -133,6 +133,7 @@ def process_all_tasks(process, task_name, parallel=False, cases=None, path=None,
         cases = [join(dir, c) for c in listdir(dir)]
         cases = [c for c in cases if isdir(c) and not isfile(join(c, 'gym_replay.gif'))]
         cases = sorted(cases, key=lambda x: eval(x.split('/')[-1]))
+        # cases = cases[:1]
     elif path is not None:
         cases = [path]
     elif cases is not None and len(cases) > 0:
