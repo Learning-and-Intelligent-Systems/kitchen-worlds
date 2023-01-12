@@ -35,17 +35,17 @@ SAVE_MP4 = False
 STEP_BY_STEP = False
 AUTO_PLAY = True
 EVALUATE_QUALITY = False
-PARALLEL = SAVE_JPG and False
+PARALLEL = SAVE_JPG
 
 GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/one_fridge_pick_pr2/one_fridge_pick_pr2_1004_01:29_1'
 GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/0104_094417_original_1'
-GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/2'
+GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/40'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/1998/' + 'rerun/diverse_commands_rerun_fc=None.pkl'
 
 GIVEN_DIR = None
 # GIVEN_DIR = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen_100'
-# GIVEN_DIR ='/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser'
+GIVEN_DIR ='/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser'
 
 TASK_NAME = 'one_fridge_pick_pr2'
 
@@ -93,6 +93,11 @@ def get_pkl_run(run_dir, verbose=True):
         plan = get_plan(run_dir)
     commands = pickle.load(open(join(exp_dir, pkl_file), "rb"))
     return exp_dir, run_dir, commands, plan
+
+
+def swap_microwave(run_dir, verbose=False):
+    exp_dir = copy_dir_for_process(run_dir, tag='swapping microwave', verbose=verbose)
+    world = load_lisdf_pybullet(exp_dir, use_gui=not USE_GYM, verbose=False)
 
 
 def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, height=1120, fx=800,
@@ -172,12 +177,6 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, hei
     # disconnect()
     reset_simulation()
     shutil.rmtree(exp_dir)
-
-
-def process(index):
-    np.random.seed(int(time.time()))
-    random.seed(time.time())
-    return run_one(str(index))
 
 
 def merge_all_wconfs(all_wconfs):
@@ -272,6 +271,7 @@ def case_filter(run_dir_ori):
 
 
 if __name__ == '__main__':
+    process = run_one  ## run_one  ## swap_microwave
     case_filter = None
     process_all_tasks(process, args.t, parallel=args.p, cases=CASES, path=GIVEN_PATH, dir=GIVEN_DIR,
                       case_filter=case_filter)
