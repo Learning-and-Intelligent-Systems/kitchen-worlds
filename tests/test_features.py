@@ -104,35 +104,12 @@ def add_features(test_dir, viz_dir, verbose=False):
     lines = []
 
     """ ============== reachability of movable objects ============= """
-    funk = get_grasp_list_gen(problem, collisions=True, visualize=False,
-                              RETAIN_ALL=False, top_grasp_tolerance=math.pi / 4)
     for body in movable:
         name = world.body_to_name[body]
         # if name in data[REACHABILITY]:
         #     lines.append(' '.join([data[REACHABILITY][name], name]))
         #     continue
-        result = False
-        body_pose = get_pose(body)
-        outputs = funk(body)
-        for output in outputs:
-            grasp = output[0]
-            w = grasp.grasp_width
-            gripper_grasp = robot.visualize_grasp(body_pose, grasp.value, body=grasp.body,
-                                                  color=GREEN, width=w)
-            end_q = get_cloned_se3_conf(robot, gripper_grasp)
-            if not collided(gripper_grasp, obstacles, verbose=True, tag='check reachability of movable'):
-                if verbose: print('\n... check reachability from', nice(init_q), 'to', nice(end_q))
-                path = plan_se3_motion(robot, init_q, end_q, obstacles=obstacles,
-                                       custom_limits=robot.custom_limits)
-                if path is not None:
-                    if verbose: print('... path found of length', len(path))
-                    result = True
-                    break
-                else:
-                    if verbose: print('... no path found', nice(end_q))
-            else:
-                if verbose: print('... collided', nice(end_q))
-            remove_body(gripper_grasp)
+        result = robot.check_reachability(body, problem, obstacles=obstacles)
 
         if result:
             lines.append(REACHABLE_OBJ.format(object=name))
@@ -140,7 +117,7 @@ def add_features(test_dir, viz_dir, verbose=False):
             lines.append(UNREACHABLE_OBJ.format(object=name))
 
     """ ============== reachability of spaces ============= """
-    funk = get_contain_list_gen(problem)
+
     names = {
         'minifridge': 'minifridge::fridgestorage',
         'cabinet': 'cabinet::cabinetstorage',
@@ -150,34 +127,12 @@ def add_features(test_dir, viz_dir, verbose=False):
         # if space in data[REACHABILITY]:
         #     lines.append(' '.join([data[REACHABILITY][space], space]))
         #     continue
-        result = False
         body_link = indices_inv[space]
         if space not in world.name_to_body:
             body_name = names[space[:space.index('::')]]
             world.add_body(body_link, body_name)
-        marker = robot.create_gripper(color=YELLOW)
-        set_cloned_se3_conf(robot.body, marker, [0] * 6)
-        gen = funk(marker, body_link)
-        count = 4
-        for output in gen:
-            p = output[0].value
-            (x, y, z), quat = p
-            end_q = list([x, y, z+0.1]) + list(euler_from_quat(quat))
-            path = plan_se3_motion(robot, init_q, end_q, obstacles=obstacles,
-                                   custom_limits=robot.custom_limits)
-            if verbose: print('\n... check reachability from', nice(init_q), 'to space', nice(end_q))
-            if path is not None:
-                if verbose: print('... path found of length', len(path))
-                result = True
-                break
-            else:
-                if verbose: print('... no path found', nice(end_q))
 
-            if count == 0:
-                break
-            count -= 1
-
-        remove_body(marker)
+        result = robot.check_reachability_space(body_link, problem, obstacles=obstacles)
         if result:
             lines.append(REACHABLE_SPACE.format(space=space))
         else:

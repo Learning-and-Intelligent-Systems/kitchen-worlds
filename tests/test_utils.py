@@ -267,6 +267,169 @@ def modify_plan_with_body_map(plan, body_map):
     return new_plan
 
 
+##########################################################################
+
+
+def get_dirs_camera(num_rows=5, num_cols=5, world_size=(6, 6), data_dir=None, camera_motion=None):
+    ## load all dirs
+    ori_dirs = []
+    if world_size == (4, 8):
+        ori_dirs = get_sample_envs_full_kitchen(num_rows * num_cols, data_dir=data_dir)
+
+    if num_rows == 1 and num_cols == 1:
+
+        if world_size == (4, 8):
+            camera_point = (6, 4, 6)
+            camera_target = (0, 4, 0)
+            camera_point_begin = (6, 4, 6)
+            camera_point_final = (12, 4, 12)
+
+    elif num_rows == 2 and num_cols == 1:
+
+        if world_size == (4, 8):
+            camera_point = (24, 4, 10)
+            camera_target = (0, 4, 0)
+            camera_point_begin = (16, 4, 6)
+            camera_point_final = (24, 4, 10)
+
+    elif num_rows == 4 and num_cols == 4:
+
+        if world_size == (4, 8):
+            camera_point = (32, 8, 10)
+            camera_target = (0, 24, 0)
+            camera_point_begin = (16, 16, 2)
+            camera_point_final = (32, 16, 10)
+
+    elif num_rows == 5 and num_cols == 5:
+        ori_dirs = get_sample_envs_for_corl()
+
+        if world_size == (6, 6):
+            mid = num_rows * 6 // 2
+            camera_point = (45, 15, 10)
+            camera_target = (0, 15, 0)
+            camera_point_final = (mid + 35, 15, 14)
+            camera_point_begin = (mid + 9, 15, 4)
+            camera_target = (mid, 15, 0)
+
+    elif num_rows == 8 and num_cols == 3:
+
+        if world_size == (4, 8):
+            if camera_motion == 'zoom':
+                camera_target = (4*6, 8*2, 0)
+                camera_point_begin = (4*8-1.5, 8*3-4, 2)
+                camera_point_final = (4*8+3, 8*3, 4)
+            elif camera_motion == 'spotlight':
+                camera_target = (4*4, 8*1.5, 1)
+                camera_point_begin = (4*4, 8*1.5, 2.5)
+                camera_point_final = 3.5
+
+    elif num_rows == 10 and num_cols == 10:
+
+        if world_size == (4, 8):
+            ## bad
+            camera_target = (0, 48, 0)
+            camera_point_begin = (16, 40, 6)
+            camera_point_final = (40, 32, 16)
+
+    elif num_rows == 14 and num_cols == 14:
+        ori_dirs = get_sample_envs_200()
+
+        if world_size == (6, 6):
+            y = 42 + 3
+            camera_point_begin = (67, y, 3)
+            camera_point_final = (102, y, 24)
+            camera_target = (62, y, 0)
+
+    elif num_rows == 16 and num_cols == 16:
+
+        if world_size == (4, 8):
+            camera_target = (5*11, 8*4-4, 0)
+            camera_point_begin = (5*13-1, 8*4-6, 2)
+            camera_point_final = (5*16, 8*2, 12)
+
+    elif num_rows == 32 and num_cols == 8:
+
+        if world_size == (4, 8):
+            camera_target = (5*(11+16), 8*4-4, 0)
+            camera_point_begin = (5*(12+16), 8*4-6, 2)
+            camera_point_final = (5*(16+16), 8*2, 12)
+
+    return ori_dirs, camera_point_begin, camera_point_final, camera_target
+
+
+##################################################################################
+
+
+def get_envs_from_task(task_dir = join(MAMAO_DATA_PATH, 'tt_two_fridge_pick')):
+    ori_dirs = [join(task_dir, f) for f in listdir(task_dir) if isdir(join(task_dir, f))]
+    ori_dirs.sort()
+    return ori_dirs
+
+
+def get_sample_envs_200():
+    dirs = get_sample_envs_for_corl()
+    new_dirs = []
+    for subdir in get_task_names('mm'):
+        if subdir == 'mm_one_fridge_pick':
+            continue
+        path = join(MAMAO_DATA_PATH, subdir)
+        names = [join(path, f) for f in listdir(path) if isdir(join(path, f))]
+        new_dirs.extend(random.choices(names, k=40))
+    new_dirs = [n for n in new_dirs if n not in dirs]
+    random.shuffle(new_dirs)
+    dirs.extend(new_dirs[:200-len(dirs)])
+    return dirs
+
+
+def get_sample_envs_for_corl():
+    task_scenes = {
+        'mm_one_fridge_pick': ['5', '226', '229', '232', '288', '295', '311'],
+        'mm_one_fridge_table_on': ['48', '69', '168', '248', '296', '325', '313'],
+        'mm_one_fridge_table_in': ['7', '88', '97', '202', '305', '394', '419', '466'],
+        'mm_two_fridge_in': ['36', '104', '186', '294', '346', '405', '473', '493', '498', '502'],
+        'mm_two_fridge_pick': ['222', '347', '472']
+    }
+    dirs = []
+    for k, v in task_scenes.items():
+        for i in v:
+            dirs.append(join(MAMAO_DATA_PATH, k, i))
+    random.shuffle(dirs)
+    return dirs
+
+
+def get_sample_envs_for_rss(task_name=None, count=None):
+    task_scenes = {
+        'mm_storage': ['1085', '1097', '1098', '1105', '1110', '1182', '1218', '1232', '1234', '1253', '1257'],
+        'mm_sink': ['1514', '1566', '1612', '1649', '1812', '2053', '2110', '2125', '2456', '2534', '2535', '2576', '2613'],
+        'mm_braiser': ['688', '810', '813', '814', '816', '824', '825', '830', '831', '915', '917', '927', '931', '939', '948', '949', '950', '1099', '1100', '1101', '1102', '1107', '1108', '1109', '1110', '1115', '1116', '1118', '1120', '1125', '1127', '1132', '1143', '1144', '1151', '1152'],
+        'mm_storage_long': ['0', '2', '3', '9', '19', '26', '31', '40', '42', '44', '47'],
+    }
+    dirs = []
+    if task_name is not None:
+        task_scenes = {task_name: task_scenes[task_name]}
+    for k, v in task_scenes.items():
+        for i in v:
+            dirs.append(join(MAMAO_DATA_PATH, k, i))
+    return make_count(dirs, count)
+
+
+def get_sample_envs_full_kitchen(count=4, data_dir='test_full_kitchen_100'):
+    data_dir = join('/home/yang/Documents/kitchen-worlds/outputs', data_dir)
+    dirs = [join(data_dir, f) for f in listdir(data_dir) if isdir(join(data_dir, f))]
+    return make_count(dirs, count)
+
+
+def make_count(dirs, count=None):
+    random.shuffle(dirs)
+    if count is None:
+        return dirs
+    if count <= len(dirs):
+        dirs = dirs[:count]
+    else:
+        dirs = random.choices(dirs, k=count)
+    return dirs
+
+
 if __name__ == '__main__':
     find_duplicate_worlds('mm', 'ww')
     find_duplicate_worlds('mm', 'ff')

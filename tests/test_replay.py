@@ -27,25 +27,27 @@ from world_builder.actions import apply_actions
 from mamao_tools.data_utils import get_plan
 
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser, \
-    query_yes_no, get_body_map
+    query_yes_no, get_body_map, get_sample_envs_for_rss
 
 USE_GYM = False
 SAVE_JPG = True
 SAVE_MP4 = False
-STEP_BY_STEP = False
+STEP_BY_STEP = True
 AUTO_PLAY = True
 EVALUATE_QUALITY = False
-PARALLEL = SAVE_JPG
+PARALLEL = SAVE_JPG and False
 
 GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/one_fridge_pick_pr2/one_fridge_pick_pr2_1004_01:29_1'
-GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/0104_094417_original_1'
-GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/40'
+# GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/0104_094417_original_1'
+GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/1168'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/1998/' + 'rerun/diverse_commands_rerun_fc=None.pkl'
 
 GIVEN_DIR = None
 # GIVEN_DIR = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen_100'
-GIVEN_DIR ='/home/yang/Documents/fastamp-data-rss/' + 'mm_sink'
+# GIVEN_DIR ='/home/yang/Documents/fastamp-data-rss/' + 'mm_sink'
+
+#####################################################################
 
 TASK_NAME = 'one_fridge_pick_pr2'
 
@@ -67,8 +69,14 @@ TASK_NAME = 'mm_two_fridge_in'
 # TASK_NAME = 'elsewhere'
 # TASK_NAME = 'discarded'
 
+#####################################################################
+
+TASK_NAME = 'mm_sink'
+# TASK_NAME = 'mm_sink'
+# TASK_NAME = 'mm_braiser'
+
 CASES = None
-CASES = ['104', '186']
+CASES = get_sample_envs_for_rss(task_name=TASK_NAME, count=None)
 
 parser = get_base_parser(task_name=TASK_NAME, parallel=PARALLEL, use_viewer=True)
 args = parser.parse_args()
@@ -116,6 +124,7 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, hei
     if verbose:
         world.summarize_all_objects()
     body_map = get_body_map(run_dir, world) if 'rerun' not in run_dir_ori else None
+    # wait_unlocked()
 
     ## save the initial scene image in pybullet
     if SAVE_JPG:
@@ -136,9 +145,13 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, hei
         os.mkdir(img_dir)
         gif_name = record_actions_in_gym(problem, commands, gym_world, img_dir=img_dir, body_map=body_map,
                                          gif_name=gif_name, time_step=0, verbose=False, plan=plan)
-        gym_world.wait_if_gui()
+        # gym_world.wait_if_gui()
         shutil.copy(join(exp_dir, gif_name), join(run_dir, gif_name))
         print('moved gif to {}'.format(join(run_dir, gif_name)))
+
+        new_file = join('gym_images', basename(exp_dir).replace('temp_', '')+'.gif')
+        shutil.move(join(exp_dir, gif_name), new_file)
+        del(gym_world.simulator)
 
     elif save_mp4:
         video_path = join(run_dir, 'replay.mp4')
@@ -157,8 +170,8 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, hei
         if not AUTO_PLAY:
             answer = query_yes_no(f"start replay {run_name}?", default='yes')
         if answer:
-            time_step = 0.02 if not STEP_BY_STEP else None
-            time_step = 2e-5 if SAVE_JPG else time_step
+            time_step = 2e-5 if SAVE_JPG else 0.02
+            time_step = None if STEP_BY_STEP else time_step
             apply_actions(problem, commands, time_step=time_step, verbose=verbose,
                           plan=plan, body_map=body_map)
 
@@ -194,7 +207,7 @@ def merge_all_wconfs(all_wconfs):
 def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, world_size=(6, 6), verbose=False,
                       frame_gap=6, debug=False, loading_effect=False, save_gif=True, save_mp4=False,
                       camera_motion=None):
-    from test_gym import get_dirs_camera
+    from test_utils import get_dirs_camera
     from isaac_tools.gym_utils import load_envs_isaacgym, record_actions_in_gym, \
         update_gym_world_by_wconf, images_to_gif, images_to_mp4
     from tqdm import tqdm
