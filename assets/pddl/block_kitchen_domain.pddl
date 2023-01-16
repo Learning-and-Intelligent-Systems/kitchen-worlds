@@ -31,6 +31,7 @@
     (on ?x ?y)
 
     (workspace ?lo ?hi)
+    (grasp ?obj ?hand ?g)
 
   )
 )

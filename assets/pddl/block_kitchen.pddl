@@ -3,7 +3,7 @@
   (:domain block_kitchen_domain)
 
   (:objects
-    ;left
+    left
     right
   )
 
@@ -33,6 +33,8 @@
     ;(graspable m10)
     ;(graspable m11)
     ;(graspable m12)
+
+    ;(grasp m9 right 1)
 
     (bconf q=(-0.6, 0.0, 0.0))
     (atbconf q=(-0.6, 0.0, 0.0))
