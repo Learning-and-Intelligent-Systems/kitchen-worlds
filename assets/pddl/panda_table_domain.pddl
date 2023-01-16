@@ -29,6 +29,8 @@
     (supported ?x ?xc ?y)
     (on ?x ?y)
 
+    (grasp ?obj ?hand ?g)
+
   )
 )
 
