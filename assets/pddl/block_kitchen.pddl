@@ -3,7 +3,7 @@
   (:domain block_kitchen_domain)
 
   (:objects
-    ;left
+    left
     right
   )
 

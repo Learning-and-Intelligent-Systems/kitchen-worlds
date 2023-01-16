@@ -123,7 +123,7 @@
 		</model>
 		<model name="other_small_cap">
 			<static>false</static>
-			<pose>0.42 0.0 -0.03 0 3.14159 0</pose>
+			<pose>0.42 0.1 0.03 0 3.14159 0</pose>
 			<link name="other_small_cap_link">
 				<collision name="other_small_cap_collision">
 					<geometry>
