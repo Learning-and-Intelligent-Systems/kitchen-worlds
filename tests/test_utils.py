@@ -67,25 +67,31 @@ def copy_dir_for_process(viz_dir, tag=None, verbose=True, print_fn=None):
 
 
 def get_task_names(task_name):
+    # if task_name == 'mm':
+    #     task_names = ['mm_one_fridge_pick',
+    #                   'mm_one_fridge_table_pick', 'mm_one_fridge_table_in', 'mm_one_fridge_table_on',
+    #                   'mm_two_fridge_in', 'mm_two_fridge_pick'] ## , 'mm_two_fridge_goals'
+    # elif task_name == 'tt':
+    #     task_names = ['tt_one_fridge_table_pick', 'tt_one_fridge_table_in',
+    #                   'tt_two_fridge_pick', 'tt_two_fridge_in', 'tt_two_fridge_goals']  ##
+    # elif task_name == 'ff':
+    #     task_names = ['ff_one_fridge_table_pick', 'ff_one_fridge_table_in',
+    #                   'ff_two_fridge_in', 'ff_two_fridge_pick']
+    # elif task_name == 'ww':
+    #     task_names = ['ww_one_fridge_table_pick', 'ww_one_fridge_table_in',
+    #                   'ww_two_fridge_in', 'ww_two_fridge_pick']
+    # elif task_name == 'bb':
+    #     task_names = ['bb_one_fridge_pick',
+    #                   'bb_one_fridge_table_pick', 'bb_one_fridge_table_in', 'bb_one_fridge_table_on',
+    #                   'bb_two_fridge_in', 'bb_two_fridge_pick']
+    # elif task_name == 'zz':
+    #     task_names = ['zz_three_fridge', 'ss_two_fridge_pick', 'ss_two_fridge_in']
+
+    mm_task_names = ['mm_storage', 'mm_sink', 'mm_braiser', 'mm_storage_long']
     if task_name == 'mm':
-        task_names = ['mm_one_fridge_pick',
-                      'mm_one_fridge_table_pick', 'mm_one_fridge_table_in', 'mm_one_fridge_table_on',
-                      'mm_two_fridge_in', 'mm_two_fridge_pick'] ## , 'mm_two_fridge_goals'
+        task_names = mm_task_names
     elif task_name == 'tt':
-        task_names = ['tt_one_fridge_table_pick', 'tt_one_fridge_table_in',
-                      'tt_two_fridge_pick', 'tt_two_fridge_in', 'tt_two_fridge_goals']  ##
-    elif task_name == 'ff':
-        task_names = ['ff_one_fridge_table_pick', 'ff_one_fridge_table_in',
-                      'ff_two_fridge_in', 'ff_two_fridge_pick']
-    elif task_name == 'ww':
-        task_names = ['ww_one_fridge_table_pick', 'ww_one_fridge_table_in',
-                      'ww_two_fridge_in', 'ww_two_fridge_pick']
-    elif task_name == 'bb':
-        task_names = ['bb_one_fridge_pick',
-                      'bb_one_fridge_table_pick', 'bb_one_fridge_table_in', 'bb_one_fridge_table_on',
-                      'bb_two_fridge_in', 'bb_two_fridge_pick']
-    elif task_name == 'zz':
-        task_names = ['zz_three_fridge', 'ss_two_fridge_pick', 'ss_two_fridge_in']
+        task_names = [t.replace('mm_', 'tt_') for t in mm_task_names]
     else:
         task_names = [task_name]
     return task_names
@@ -95,7 +101,7 @@ def get_run_dirs(task_name):
     task_names = get_task_names(task_name)
     all_subdirs = []
     for task_name in task_names:
-        dataset_dir = join('/home/yang/Documents/fastamp-data/', task_name)
+        dataset_dir = join('/home/yang/Documents/fastamp-data-rss/', task_name)
         # organize_dataset(task_name)
         subdirs = listdir(dataset_dir)
         subdirs.sort()
@@ -112,7 +118,7 @@ def parallel_processing(process, inputs, parallel):
         import multiprocessing
         from multiprocessing import Pool
 
-        max_cpus = 12
+        max_cpus = 9
         num_cpus = min(multiprocessing.cpu_count(), max_cpus)
         print(f'using {num_cpus} cpus')
         with Pool(processes=num_cpus) as pool:
@@ -132,7 +138,6 @@ def process_all_tasks(process, task_name, parallel=False, cases=None, path=None,
     if dir is not None:
         cases = [join(dir, c) for c in listdir(dir)]
         cases = [c for c in cases if isdir(c) and not isfile(join(c, 'gym_replay.gif'))]
-        cases = sorted(cases, key=lambda x: eval(x.split('/')[-1]))
         # cases = cases[:1]
     elif path is not None:
         cases = [path]
@@ -140,6 +145,9 @@ def process_all_tasks(process, task_name, parallel=False, cases=None, path=None,
         cases = [join(MAMAO_DATA_PATH, task_name, case) for case in cases]
     else:
         cases = get_run_dirs(task_name)
+
+    if len(cases) > 1:
+        cases = sorted(cases, key=lambda x: eval(x.split('/')[-1]))
 
     if case_filter is not None:
         cases = [c for c in cases if case_filter(c)]
@@ -210,45 +218,6 @@ def mp4_to_gif(mp4_file, frame_folder='output'):
     convert_mp4_to_jpgs(mp4_file)
     output_file = make_gif()
     print('converted mp4 to', output_file)
-
-
-def query_yes_no(question, default="no"):
-    """Ask a yes/no question via raw_input() and return their answer.
-
-    "question" is a string that is presented to the user.
-    "default" is the presumed answer if the user just hits <Enter>.
-            It must be "yes" (the default), "no" or None (meaning
-            an answer is required of the user).
-
-    The "answer" return value is True for "yes" or False for "no".
-    """
-    valid = {"yes": True, "y": True, "ye": True, "no": False, "n": False}
-    if default is None:
-        prompt = " [y/n] "
-    elif default == "yes":
-        prompt = " [Y/n] "
-    elif default == "no":
-        prompt = " [y/N] "
-    else:
-        raise ValueError("invalid default answer: '%s'" % default)
-
-    while True:
-        sys.stdout.write(question + prompt)
-        choice = input().lower()
-        if default is not None and choice == "":
-            return valid[default]
-        elif choice in valid:
-            return valid[choice]
-        else:
-            sys.stdout.write("Please respond with 'yes' or 'no' " "(or 'y' or 'n').\n")
-
-
-def get_body_map(run_dir, world, inv=False):
-    body_to_name = json.load(open(join(run_dir, 'planning_config.json'), 'r'))['body_to_name']
-    body_to_new = {eval(k): world.name_to_body[v] for k, v in body_to_name.items()}
-    if inv:
-        return {v: k for k, v in body_to_new.items()}
-    return body_to_new
 
 
 def modify_plan_with_body_map(plan, body_map):

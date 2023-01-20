@@ -5,6 +5,7 @@ import os
 import json
 import pickle
 import shutil
+import copy
 from os import listdir
 from os.path import join, abspath, dirname, isdir, isfile
 from tabnanny import verbose
@@ -31,9 +32,9 @@ from world_builder.actions import apply_actions
 
 from mamao_tools.feasibility_checkers import Shuffler
 from mamao_tools.data_utils import get_instance_info, exist_instance, get_indices, \
-    get_plan_skeleton, get_successful_plan, get_feasibility_checker, get_plan
+    get_plan_skeleton, get_successful_plan, get_feasibility_checker, get_plan, get_body_map
 
-from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser, get_body_map, \
+from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser, \
     modify_plan_with_body_map
 
 ## special modes
@@ -73,13 +74,16 @@ check_time = 1666297068  ## 1665768219 for goals, 1664750094 for in, 1666297068 
 
 ##########################################
 
-TASK_NAME = 'mm_storage'
+# TASK_NAME = 'mm_storage'
 # TASK_NAME = 'mm_sink'
 # TASK_NAME = 'mm_braiser'
 # TASK_NAME = '_test'
+TASK_NAME = 'tt_storage'
 
 CASES = None  ##
-CASES = ['150', '395', '399', '404', '406', '418', '424', '428', '430', '435', '438', '439', '444', '453', '455', '466', '475', '479', '484', '489', '494', '539', '540', '547', '548', '553', '802', '804', '810', '815', '818', '823', '831', '833', '838', '839', '848', '858', '860', '862']
+CASES = ['34']
+# CASES = ['45', '340', '387', '467'] ## mm_storage
+# CASES = ['150', '395', '399', '404', '406', '418', '424', '428', '430', '435', '438', '439', '444', '453', '455', '466', '475', '479', '484', '489', '494', '539', '540', '547', '548', '553', '802', '804', '810', '815', '818', '823', '831', '833', '838', '839', '848', '858', '860', '862']
 # CASES = ['1514', '1566', '1612', '1649', '1812', '2053', '2110', '2125', '2456', '2534', '2535', '2576', '2613']
 # CASES = ['688', '810', '813', '814', '816', '824', '825', '830', '831', '915', '917', '927', '931', '939', '948', '949', '950', '1099', '1100', '1101', '1102', '1107', '1108', '1109', '1110', '1115', '1116', '1118', '1120', '1125', '1127', '1132', '1143', '1144', '1151', '1152']
 
@@ -87,9 +91,9 @@ if CASES is not None:
     SKIP_IF_SOLVED = False
     SKIP_IF_SOLVED_RECENTLY = False
 
-PARALLEL = GENERATE_SKELETONS # and False
-FEASIBILITY_CHECKER = 'None'
-## None | oracle | pvt | pvt* | pvt-task | pvt-all | binary | shuffle
+PARALLEL = GENERATE_SKELETONS and False
+FEASIBILITY_CHECKER = 'heuristic'
+## None | oracle | pvt | pvt* | pvt-task | pvt-all | binary | shuffle | heuristic
 if GENERATE_SKELETONS:
     FEASIBILITY_CHECKER = 'oracle'
 
@@ -209,7 +213,10 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     print_goal(goal)
     print(SEPARATOR)
 
-    fc = get_feasibility_checker(run_dir, mode=FEASIBILITY_CHECKER, diverse=DIVERSE)
+    if FEASIBILITY_CHECKER == 'heuristic':
+        fc = get_feasibility_checker([copy.deepcopy(problem), goal, init], mode='heuristic')
+    else:
+        fc = get_feasibility_checker(run_dir, mode=FEASIBILITY_CHECKER, diverse=DIVERSE)
     # fc = Shuffler()
 
     start = time.time()
@@ -218,9 +225,10 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     if DIVERSE:
         kwargs.update(dict(
             diverse=DIVERSE,
-            downward_time=10,  ## max time to get 100, 10 sec, 30 sec for 300
+            downward_time=3,  ## max time to get 100, 10 sec, 30 sec for 300
             evaluation_time=60,  ## on each skeleton
             max_plans=100,  ## number of skeletons
+            visualize=True,
         ))
         if GENERATE_SKELETONS:
             kwargs['evaluation_time'] = -0.5
@@ -232,7 +240,7 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
             kwargs['collect_dataset'] = True
 
     cwd = os.getcwd()
-    max_time = 8 * 60
+    max_time = 6 * 60
     solution = 'failed'
     with timeout(duration=max_time):
         if parallel:
@@ -243,6 +251,7 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     if solution == 'failed':
         reset_simulation()
         shutil.rmtree(exp_dir)
+        return
 
     if GENERATE_MULTIPLE_SOLUTIONS:
         from mamao_tools.data_utils import save_multiple_solutions
@@ -280,6 +289,7 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
         json.dump(data, f, indent=3)
 
     fc.dump_log(join(ori_dir, f'{PREFIX}fc_log={FEASIBILITY_CHECKER}.json'))
+    commands_file = join(ori_dir, f'{PREFIX}commands_rerun_fc={FEASIBILITY_CHECKER}.pkl')
 
     if plan is not None:
         print(SEPARATOR)
@@ -288,7 +298,7 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
             print('Commands:', commands)
             problem.remove_gripper()
             saver.restore()
-        with open(join(ori_dir, f'{PREFIX}commands_rerun_fc={FEASIBILITY_CHECKER}.pkl'), 'wb') as f:
+        with open(commands_file, 'wb') as f:
             pickle.dump(commands, f)
         if has_gui():
             saver.restore()
@@ -297,15 +307,19 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
             input('End?')
 
         ## maybe generate a multiple_solutions.json file
-        if 'fastamp-data' and '/mm_' in run_dir:
-            old_plan = get_plan(run_dir)[0]
+        if 'fastamp-data' in run_dir and '/mm_' in run_dir:
+            old_plan = get_plan(run_dir)[0][0]
             indices = get_indices(run_dir)
             # indices.update({eval(k): v for k, v in indices.items()})
             skeleton_kargs = dict(indices=indices, include_movable=True, include_joint=True)
             rerun_dir = join(run_dir, f"rerun_{get_datetime(TO_LISDF=True)}")
             shutil.move(join(run_dir, ori_dir), rerun_dir)
             if len(old_plan) > len(plan):
-                new_plan = modify_plan_with_body_map(plan, get_body_map(run_dir, world, inv=True))
+                body_map = get_body_map(run_dir, world, inv=True)
+                new_plan = modify_plan_with_body_map(plan, body_map)
+                with open(join(rerun_dir, 'commands.pkl'), 'wb') as f:
+                    pickle.dump(post_process(problem, new_plan), f)
+
                 new_plan = [[a.name] + [str(s) for s in a.args] for a in new_plan]
                 multiple_solutions = [{
                     'plan': new_plan,
@@ -320,6 +334,10 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
                 solutions_file = join(run_dir, 'multiple_solutions.json')
                 json.dump(multiple_solutions, open(solutions_file, 'w'), indent=3)
                 print('Saved multiple solutions to', solutions_file)
+
+                shutil.move(join('visualizations', 'log.json'), join(rerun_dir, 'log.json'))
+                with open(join(rerun_dir, 'planning_config.json'), 'w') as f:
+                    json.dump({'body_map': {str(k): v for k, v in body_map.items()}}, f, indent=3)
 
     # disconnect()
     reset_simulation()
