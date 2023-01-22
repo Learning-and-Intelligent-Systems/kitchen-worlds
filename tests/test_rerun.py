@@ -17,7 +17,7 @@ import argparse
 
 from pybullet_tools.pr2_utils import get_group_conf
 from pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, wait_if_gui, \
-    SEPARATOR, get_aabb, wait_for_duration, safe_remove, ensure_dir, reset_simulation, timeout
+    SEPARATOR, get_aabb, wait_for_duration, safe_remove, ensure_dir, reset_simulation, timeout, wait_unlocked
 from pybullet_tools.bullet_utils import summarize_facts, print_goal, nice, get_datetime, \
     initialize_logs
 from pybullet_tools.pr2_agent import get_stream_info, post_process, move_cost_fn, \
@@ -204,12 +204,13 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
         from utils import load_lisdf_nvisii
         scene = load_lisdf_nvisii(exp_dir)
 
+    ## because there can be a gap in body indexing due to reachability checking created gripper
     pddlstream_problem = pddlstream_from_dir(problem, exp_dir=exp_dir, replace_pddl=True,
                                              collisions=not args.cfree, teleport=False)
 
     stream_info = world.robot.get_stream_info(partial=False, defer=False)
     _, _, _, stream_map, init, goal = pddlstream_problem
-    summarize_facts(init, world=world)
+    world.summarize_facts(init)
     print_goal(goal)
     print(SEPARATOR)
 
@@ -307,7 +308,7 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
             input('End?')
 
         ## maybe generate a multiple_solutions.json file
-        if 'fastamp-data' in run_dir and '/mm_' in run_dir:
+        if 'fastamp-data-rss' in run_dir:
             old_plan = get_plan(run_dir)[0][0]
             indices = get_indices(run_dir)
             # indices.update({eval(k): v for k, v in indices.items()})

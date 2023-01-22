@@ -34,12 +34,13 @@ USE_GYM = False
 SAVE_COMPOSED_JPG = False
 SAVE_GIF = True
 SAVE_JPG = True or SAVE_COMPOSED_JPG or SAVE_GIF
+PREVIEW_SCENE = True
 
 SAVE_MP4 = False
 STEP_BY_STEP = False
 AUTO_PLAY = True
 EVALUATE_QUALITY = False
-PARALLEL = SAVE_JPG and False
+PARALLEL = SAVE_JPG and not PREVIEW_SCENE
 
 SKIP_IF_PROCESSED_RECENTLY = True
 CHECK_TIME = 1673817489 - 5 * 60
@@ -51,6 +52,7 @@ GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/10/'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/1998/' + 'rerun/diverse_commands_rerun_fc=None.pkl'
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/230115_115113_original_0'
+GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/mm_braiser/521'
 
 GIVEN_DIR = None
 # GIVEN_DIR = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen_100'
@@ -80,13 +82,15 @@ TASK_NAME = 'mm_two_fridge_in'
 
 #####################################################################
 
-TASK_NAME = 'mm_storage'
+# TASK_NAME = 'mm_storage'
 # TASK_NAME = 'mm_sink'
 # TASK_NAME = 'mm_braiser'
-# TASK_NAME = 'tt'
+# TASK_NAME = 'mm_storage_long'
+# TASK_NAME = 'tt_storage_long'
+TASK_NAME = 'tt'
 
 CASES = None
-CASES = ['45','340', '387', '467']  ##
+# CASES = ['45','340', '387', '467']  ##
 # CASES = get_sample_envs_for_rss(task_name=TASK_NAME, count=None)
 
 parser = get_base_parser(task_name=TASK_NAME, parallel=PARALLEL, use_viewer=True)
@@ -146,7 +150,7 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, hei
         world.summarize_all_objects()
     body_map = get_body_map(run_dir, world) if 'rerun' not in run_dir_ori else None
     commands, plan = check_if_exist_rerun(run_dir, world, commands, plan)
-    # wait_unlocked()
+    wait_unlocked()
 
     ## save the initial scene image in pybullet
     if SAVE_JPG:

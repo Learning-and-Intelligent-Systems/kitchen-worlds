@@ -46,20 +46,22 @@ ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb', 'meraki']
 # DEFAULT_TASK = '_examples'
 # DEFAULT_TASK = 'ff_two_fridge_goals'
 
+# DEFAULT_TASK = 'mm'
 # DEFAULT_TASK = 'mm_storage'
 # DEFAULT_TASK = 'mm_sink'
 # DEFAULT_TASK = 'mm_braiser'
 # DEFAULT_TASK = 'mm_storage_long'
+DEFAULT_TASK = 'tt_storage_long'
 
-DEFAULT_TASK = 'tt'
+# DEFAULT_TASK = 'tt'
 
 #################################################################
 
+GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/230115_115113_original_0'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/0'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/0'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/0'
-GIVEN_PATH = None
 
 MODIFIED_TIME = 1663895681
 PARALLEL = True
@@ -163,7 +165,7 @@ def adjust_indices_for_full_kitchen(indices):
 
 
 def render_segmentation_mask(test_dir, viz_dir, camera_poses, camera_kwargs, crop=False,
-                             transparent=False, pairs=None, width=1280, height=960, fx=800):
+                             transparent=False, pairs=None, width=1280, height=960, fx=800, done=None):
     ## width = 1960, height = 1470, fx = 800
     world = load_lisdf_pybullet(test_dir, width=width, height=height, verbose=False,
                                 transparent=transparent)
@@ -176,12 +178,18 @@ def render_segmentation_mask(test_dir, viz_dir, camera_poses, camera_kwargs, cro
     indices = get_indices(viz_dir, body_map=get_body_map(viz_dir, world))
     indices = adjust_indices_for_full_kitchen(indices)
 
-    for i in range(len(camera_poses)):
-        common = dict(img_dir=viz_dir, width=width, height=height, fx=fx)
-        world.add_camera(camera_poses[i], **common, **camera_kwargs[i])
+    ## pointing at goal region
+    camera_poses.append(unit_pose())
+    camera_kwargs.append(world.camera_kwargs)
+    common = dict(img_dir=viz_dir, width=width, height=height, fx=fx)
 
-        ## a fix for previous wrong lisdf names in planning_config[name_to_body]
-        # fix_planning_config(viz_dir)
+    ## a fix for previous wrong lisdf names in planning_config[name_to_body]
+    # fix_planning_config(viz_dir)
+
+    for i in range(len(camera_poses)):
+        if done is not None and done[i]:
+            continue
+        world.add_camera(camera_poses[i], **common, **camera_kwargs[i])
 
         new_key = 'seg_image' if not crop else 'crop_image'
         new_key = 'transp_image' if transparent else new_key
@@ -190,6 +198,7 @@ def render_segmentation_mask(test_dir, viz_dir, camera_poses, camera_kwargs, cro
             new_key = f"{new_key}_{i}"
         rgb_dir = join(viz_dir, new_key)
         os.makedirs(rgb_dir, exist_ok=True)
+        # print(f'    ..... generating in {new_key}')
 
         ## get the scene image
         imgs = world.camera.get_image(segment=True, segment_links=True)
@@ -242,7 +251,7 @@ def render_segmentation_mask(test_dir, viz_dir, camera_poses, camera_kwargs, cro
                 # else:
                 #     print('key not found', k)
             foreground = rgb * expand_mask(mask)
-            background[np.where(mask!= 0)] = 0
+            background[np.where(mask != 0)] = 0
             new_image = foreground + background
 
             im = PIL.Image.fromarray(new_image)
@@ -312,6 +321,7 @@ def get_num_images(viz_dir, pairwise=False):
 
 
 def process(viz_dir, redo=REDO):
+    num_dirs = 6
     test_dir = copy_dir_for_process(viz_dir)
 
     # load_lisdf_synthesizer(test_dir)
@@ -328,9 +338,9 @@ def process(viz_dir, redo=REDO):
     if isdir(join(viz_dir, 'masked_rgbs')):
         shutil.rmtree(join(viz_dir, 'masked_rgbs'))
     rgb_dir = join(viz_dir, 'rgb_images')
-    seg_dirs = [join(viz_dir, f'seg_images_{i}') for i in range(4)]
-    crop_dirs = [join(viz_dir, f'crop_images_{i}') for i in range(4)]
-    transp_dirs = [join(viz_dir, f'transp_images_{i}') for i in range(4)]
+    seg_dirs = [join(viz_dir, f'seg_images_{i}') for i in range(num_dirs)]
+    crop_dirs = [join(viz_dir, f'crop_images_{i}') for i in range(num_dirs)]
+    transp_dirs = [join(viz_dir, f'transp_images_{i}') for i in range(num_dirs)]
     tmp_file = join(viz_dir, 'planning_config_tmp.json')
 
     if isdir(rgb_dir):
@@ -349,6 +359,7 @@ def process(viz_dir, redo=REDO):
             camera_kwargs.append(
                 {'camera_point': (cx+1, y, 2.2), 'target_point': (0, y, 0.5)}
             )
+
         camera_poses = [unit_pose()] * len(camera_kwargs)
         add_to_planning_config(viz_dir, 'camera_kwargs', camera_kwargs)
 
@@ -402,16 +413,17 @@ def process(viz_dir, redo=REDO):
     # name, dirs, kwargs = 'transparent doors', transp_dirs, dict(crop=True, transparent=True)
 
     ## skip if all done
-    done = True
+    done = []
     for img_dir in dirs:
-        done = done and isdir(img_dir) and len(listdir(img_dir)) >= num_imgs
-    if not done or redo:
+        done.append(isdir(img_dir) and len(listdir(img_dir)) >= num_imgs)
+
+    if (False in done) or redo:
         print(viz_dir, f'{name} ...')
-        render_segmentation_mask(test_dir, viz_dir, camera_poses, camera_kwargs, **kwargs)
+        render_segmentation_mask(test_dir, viz_dir, camera_poses, camera_kwargs,
+                                 done=done, **kwargs)
         reset_simulation()
     else:
         print('skipping', viz_dir, f'{name}')
-
 
     ## ----------------------------------------------------------------
     add_key(viz_dir)
