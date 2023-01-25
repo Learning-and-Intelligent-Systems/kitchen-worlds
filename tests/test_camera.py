@@ -3,10 +3,13 @@ import os
 from tqdm import tqdm
 import PIL.Image
 import numpy as np
-import argparse
-import sys
+import json
+import shutil
+from os import listdir
+from os.path import join, isdir, isfile, dirname, getmtime, basename
 import time
 from config import EXP_PATH
+
 from pybullet_tools.utils import quat_from_euler, reset_simulation, remove_body, AABB, \
     get_aabb_extent, get_aabb_center, get_joint_name, get_link_name, euler_from_quat, \
     set_color, apply_alpha, YELLOW, WHITE, get_aabb, get_point, wait_unlocked, \
@@ -16,20 +19,15 @@ from pybullet_tools.bullet_utils import get_segmask, get_door_links, adjust_segm
 
 from lisdf_tools.lisdf_loader import load_lisdf_pybullet, get_depth_images, create_gripper_robot, \
     make_furniture_transparent
-from lisdf_tools.image_utils import draw_bb, crop_image, get_mask_bb, expand_mask, \
-    make_image_background
-import json
-import shutil
-from os import listdir
-from os.path import join, isdir, isfile, dirname, getmtime, basename
+from lisdf_tools.image_utils import draw_bb, crop_image, get_mask_bb, save_seg_image_given_obj_keys
 
 # from utils import load_lisdf_synthesizer
 from mamao_tools.data_utils import get_indices, exist_instance, get_init_tuples, \
-    get_body_map, get_world_center, add_to_planning_config
+    get_body_map, get_world_center, add_to_planning_config, get_worlds_aabb
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 
 N_PX = 224
-NEW_KEY = 'meraki'
+NEW_KEY = 'rss'
 ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb', 'meraki']
 
 #################################################################
@@ -46,12 +44,13 @@ ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb', 'meraki']
 # DEFAULT_TASK = '_examples'
 # DEFAULT_TASK = 'ff_two_fridge_goals'
 
-# DEFAULT_TASK = 'mm'
+DEFAULT_TASK = 'mm'
 # DEFAULT_TASK = 'mm_storage'
 # DEFAULT_TASK = 'mm_sink'
 # DEFAULT_TASK = 'mm_braiser'
+# DEFAULT_TASK = 'mm_braiser_to_storage'
 # DEFAULT_TASK = 'mm_storage_long'
-DEFAULT_TASK = 'tt_storage_long'
+# DEFAULT_TASK = 'tt_storage_long'
 
 # DEFAULT_TASK = 'tt'
 
@@ -59,12 +58,13 @@ DEFAULT_TASK = 'tt_storage_long'
 
 GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/230115_115113_original_0'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/0'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/0'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/0'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/165'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/129'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/56'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage_long/177'
 
 MODIFIED_TIME = 1663895681
-PARALLEL = True
+PARALLEL = False and (GIVEN_PATH is None)
 USE_VIEWER = True
 REDO = False
 
@@ -160,8 +160,7 @@ def fix_planning_config(viz_dir):
 
 
 def adjust_indices_for_full_kitchen(indices):
-    return {k: v for k, v in indices.items() if not \
-            'pr2' in v or 'braiser_bottom' in v or 'sink_bottom' in v}
+    return {k: v for k, v in indices.items() if not 'pr2' in v}
 
 
 def render_segmentation_mask(test_dir, viz_dir, camera_poses, camera_kwargs, crop=False,
@@ -181,7 +180,8 @@ def render_segmentation_mask(test_dir, viz_dir, camera_poses, camera_kwargs, cro
     ## pointing at goal region
     camera_poses.append(unit_pose())
     camera_kwargs.append(world.camera_kwargs)
-    common = dict(img_dir=viz_dir, width=width, height=height, fx=fx)
+    common = dict(img_dir=viz_dir, width=width//2, height=height//2, fx=fx//2)
+    crop_kwargs = dict(crop=crop, center=crop, width=width//2, height=height//2, N_PX=N_PX)
 
     ## a fix for previous wrong lisdf names in planning_config[name_to_body]
     # fix_planning_config(viz_dir)
@@ -190,6 +190,15 @@ def render_segmentation_mask(test_dir, viz_dir, camera_poses, camera_kwargs, cro
         if done is not None and done[i]:
             continue
         world.add_camera(camera_poses[i], **common, **camera_kwargs[i])
+
+        if not crop:
+            if 0 < i < len(camera_poses)-1:
+                crop_kwargs = dict(crop=True, center=False, width=width//2, height=height//2,
+                                   N_PX=height//2, align_vertical='top', keep_ratio=True) ##
+            elif i == len(camera_poses)-1:
+                n_px = int(height//2 * 0.6) if '_sink' not in viz_dir else int(height//2)
+                crop_kwargs = dict(crop=True, center=False, width=width//2, height=height//2,
+                                   N_PX=n_px)
 
         new_key = 'seg_image' if not crop else 'crop_image'
         new_key = 'transp_image' if transparent else new_key
@@ -204,6 +213,8 @@ def render_segmentation_mask(test_dir, viz_dir, camera_poses, camera_kwargs, cro
         imgs = world.camera.get_image(segment=True, segment_links=True)
         rgb = imgs.rgbPixels[:, :, :3]
         im = PIL.Image.fromarray(rgb)
+        if not crop and crop_kwargs['crop']:
+            im = crop_image(im, **{k: v for k, v in crop_kwargs.items() if k not in ['crop', 'center']})
         im.save(join(rgb_dir, f'{new_key}_scene.png'))
         im_name = new_key+"_[{index}]_{name}.png"
 
@@ -228,9 +239,13 @@ def render_segmentation_mask(test_dir, viz_dir, camera_poses, camera_kwargs, cro
             indices.update({'+'.join([str(inv_indices[n]) for n in p]): p for p in pairs})
 
         """ render cropped images """
+        files = []
         for k, v in indices.items():
-            if '+' not in k:  ## single object/part
+            ## single object/part
+            if '+' not in k:
                 keys = obj_keys[v]
+
+            ## pairs of objects/parts
             else:
                 keys = []
                 for vv in v:
@@ -240,34 +255,18 @@ def render_segmentation_mask(test_dir, viz_dir, camera_poses, camera_kwargs, cro
             ## skip generation if already exists
             file_name = join(rgb_dir, im_name.format(index=str(k), name=v))
             if isfile(file_name): continue
+            files.append(file_name)
 
-            ## generate image
-            mask = np.zeros_like(rgb[:, :, 0])
-            background = make_image_background(rgb)
-            for k in keys:
-                if k in unique:
-                    c, r = zip(*unique[k])
-                    mask[(np.asarray(c), np.asarray(r))] = 1
-                # else:
-                #     print('key not found', k)
-            foreground = rgb * expand_mask(mask)
-            background[np.where(mask != 0)] = 0
-            new_image = foreground + background
+            ## save the cropped image
+            save_seg_image_given_obj_keys(rgb, keys, unique, file_name, **crop_kwargs)
 
-            im = PIL.Image.fromarray(new_image)
+        if len([f for f in files if 'braiserbody' in f]) == 2:
+            bottom_file = [f for f in files if 'braiser_bottom' in f][0]
+            braiser_file = [f for f in files if f not in bottom_file][0]
+            shutil.copy(braiser_file, bottom_file)
 
-            ## crop image with object bounding box centered
-            if crop:
-                bb = get_mask_bb(mask)
-                # if bb is not None:
-                #     draw_bb(new_image, bb)
-                im = crop_image(im, bb, width, height, N_PX=N_PX)
-
-            # im.show()
-            im.save(file_name)
-        #     print(v)
-
-        if not transparent and len(camera_poses) > 1 and i == 0:
+        # ---------- make furniture transparent
+        if not transparent and len(camera_poses) > 1 and i == len(camera_poses)-2:
             make_furniture_transparent(world, viz_dir, lower_tpy=1, upper_tpy=0)
 
 
@@ -320,7 +319,7 @@ def get_num_images(viz_dir, pairwise=False):
     return num_images, pairs
 
 
-def process(viz_dir, redo=REDO):
+def generate_images(viz_dir, redo=REDO):
     num_dirs = 6
     test_dir = copy_dir_for_process(viz_dir)
 
@@ -357,11 +356,12 @@ def process(viz_dir, redo=REDO):
         ]
         for y in [cy-3*ly/8, cy-ly/8, cy+ly/8, cy+3*ly/8]: ## [cy-ly/3, cy, cy+ly/3]:
             camera_kwargs.append(
-                {'camera_point': (cx+1, y, 2.2), 'target_point': (0, y, 0.5)}
+                # {'camera_point': (cx+1, y, 2.2), 'target_point': (0, y, 0.5)}
+                {'camera_point': (cx+1.8, y, 2.8), 'target_point': (0, y, 0.5)}
             )
 
         camera_poses = [unit_pose()] * len(camera_kwargs)
-        add_to_planning_config(viz_dir, 'camera_kwargs', camera_kwargs)
+        add_to_planning_config(viz_dir, {'camera_kwargs': camera_kwargs})
 
     else:  ## CoRL
         (x, y, z), quat = camera_pose
@@ -372,7 +372,7 @@ def process(viz_dir, redo=REDO):
         camera_pose = [(x, y, z + 1), quat_from_euler((r - 0.3, p, w))]
         camera_poses = [camera_pose]
         camera_kwargs = [dict()]
-        add_to_planning_config(viz_dir, 'img_camera_pose', camera_pose)
+        add_to_planning_config(viz_dir, {'img_camera_pose': camera_pose})
 
     # check_file = join(seg_dirs[0], 'crop_image_scene.png')
     # if isfile(check_file) and os.path.getmtime(check_file) > MODIFIED_TIME:
@@ -392,6 +392,24 @@ def process(viz_dir, redo=REDO):
         for transp_dir in transp_dirs:
             if isdir(transp_dir):
                 shutil.rmtree(transp_dir)
+
+    ## ----------------------------------------------------
+    # for seg_dir in seg_dirs:
+    #     files = [join(seg_dir, f) for f in listdir(seg_dir) if 'braiserbody' in f]
+    #     if len(files) == 2:
+    #         bottom_file = [f for f in files if 'braiser_bottom' in f][0]
+    #         braiser_file = [f for f in files if f not in bottom_file][0]
+    #         shutil.copy(braiser_file, bottom_file)
+
+    ## ----------------------------------------------------
+    # if exist_instance(viz_dir, '100015') and isdir(seg_dirs[0]):
+    #     braiser_files = [join(seg_dirs[0], f) for f in listdir(seg_dirs[0]) \
+    #                      if f.endswith('.png') and 'braiser' in f]
+    #     if len(braiser_files) > 0:
+    #         if 1674437043 > os.path.getmtime(braiser_files[0]) > 1674351569:
+    #             print('braiser problem', viz_dir)
+    #             for f in braiser_files:
+    #                 os.remove(f)
 
     ## ------------- visualization function to test -------------------
     # render_rgb_image(test_dir, viz_dir, camera_pose)
@@ -430,5 +448,14 @@ def process(viz_dir, redo=REDO):
     shutil.rmtree(test_dir)
 
 
+def process_worlds_aabb():
+    """ ((-0.879, -2.56, -0.002), (1.15, 9.477, 2.841)) """
+    run_dirs = process_all_tasks(None, args.t, parallel=False, return_dirs=True)
+    aabb = get_worlds_aabb(run_dirs)
+
+
 if __name__ == "__main__":
+    process = generate_images
     process_all_tasks(process, args.t, parallel=args.p, path=GIVEN_PATH)
+
+    # process_worlds_aabb()

@@ -87,7 +87,8 @@ def get_task_names(task_name):
     # elif task_name == 'zz':
     #     task_names = ['zz_three_fridge', 'ss_two_fridge_pick', 'ss_two_fridge_in']
 
-    mm_task_names = ['mm_storage', 'mm_sink', 'mm_braiser', 'mm_storage_long']
+    mm_task_names = ['mm_storage', 'mm_sink', 'mm_braiser',
+                     'mm_sink_to_storage', 'mm_braiser_to_storage']
     if task_name == 'mm':
         task_names = mm_task_names
     elif task_name == 'tt':
@@ -103,6 +104,9 @@ def get_run_dirs(task_name):
     for task_name in task_names:
         dataset_dir = join('/home/yang/Documents/fastamp-data-rss/', task_name)
         # organize_dataset(task_name)
+        if not isdir(dataset_dir):
+            print('get_run_dirs | no directory', dataset_dir)
+            continue
         subdirs = listdir(dataset_dir)
         subdirs.sort()
         subdirs = [join(dataset_dir, s) for s in subdirs if isdir(join(dataset_dir, s))]
@@ -132,7 +136,7 @@ def parallel_processing(process, inputs, parallel):
 
 
 def process_all_tasks(process, task_name, parallel=False, cases=None, path=None,
-                      dir=None, case_filter=None):
+                      dir=None, case_filter=None, return_dirs=False):
     clear_pddlstream_cache()
 
     if dir is not None:
@@ -151,6 +155,9 @@ def process_all_tasks(process, task_name, parallel=False, cases=None, path=None,
 
     if case_filter is not None:
         cases = [c for c in cases if case_filter(c)]
+
+    if return_dirs:
+        return cases
 
     parallel_processing(process, cases, parallel)
 

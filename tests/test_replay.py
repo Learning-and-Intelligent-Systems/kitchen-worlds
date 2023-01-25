@@ -18,14 +18,15 @@ import sys
 from PIL import Image
 
 from pybullet_tools.bullet_utils import query_yes_no, get_datetime
-from pybullet_tools.utils import reset_simulation, VideoSaver, wait_unlocked
+from pybullet_tools.utils import reset_simulation, VideoSaver, wait_unlocked, draw_aabb, get_aabb
 from lisdf_tools.lisdf_loader import load_lisdf_pybullet, pddlstream_from_dir
 from lisdf_tools.lisdf_planning import pddl_to_init_goal, Problem
 from lisdf_tools.image_utils import make_composed_image_multiple_episodes, images_to_gif
 from isaac_tools.gym_utils import save_gym_run
 from world_builder.actions import apply_actions
 
-from mamao_tools.data_utils import get_plan, get_body_map, get_multiple_solutions
+from mamao_tools.data_utils import get_plan, get_body_map, get_multiple_solutions, \
+    add_to_planning_config, load_planning_config, exist_instance
 
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser, \
     get_sample_envs_for_rss
@@ -34,25 +35,30 @@ USE_GYM = False
 SAVE_COMPOSED_JPG = False
 SAVE_GIF = True
 SAVE_JPG = True or SAVE_COMPOSED_JPG or SAVE_GIF
-PREVIEW_SCENE = True
+PREVIEW_SCENE = False
+
+CHECK_COLLISIONS = True
+CFREE_RANGE = 0.1
+VISUALIZE_COLLISIONS = False
 
 SAVE_MP4 = False
 STEP_BY_STEP = False
 AUTO_PLAY = True
 EVALUATE_QUALITY = False
-PARALLEL = SAVE_JPG and not PREVIEW_SCENE
+PARALLEL = SAVE_JPG and not PREVIEW_SCENE and False  ## and not CHECK_COLLISIONS
 
-SKIP_IF_PROCESSED_RECENTLY = True
-CHECK_TIME = 1673817489 - 5 * 60
+SKIP_IF_PROCESSED_RECENTLY = False
+CHECK_TIME = 1674417578
 
 GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/one_fridge_pick_pr2/one_fridge_pick_pr2_1004_01:29_1'
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/0104_094417_original_1'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/45'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/10/'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/43'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/10'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/563'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/1998/' + 'rerun/diverse_commands_rerun_fc=None.pkl'
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/230115_115113_original_0'
-GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/mm_braiser/521'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/mm_sink_to_storage/41'
 
 GIVEN_DIR = None
 # GIVEN_DIR = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen_100'
@@ -66,7 +72,7 @@ TASK_NAME = 'one_fridge_pick_pr2'
 # TASK_NAME = 'mm_one_fridge_table_on'
 # TASK_NAME = 'mm_one_fridge_table_pick'
 # TASK_NAME = 'mm_two_fridge_pick'
-TASK_NAME = 'mm_two_fridge_in'
+# TASK_NAME = 'mm_two_fridge_in'
 
 # TASK_NAME = 'tt_one_fridge_pick'
 # TASK_NAME = 'tt_one_fridge_table_in'
@@ -85,13 +91,17 @@ TASK_NAME = 'mm_two_fridge_in'
 # TASK_NAME = 'mm_storage'
 # TASK_NAME = 'mm_sink'
 # TASK_NAME = 'mm_braiser'
-# TASK_NAME = 'mm_storage_long'
-# TASK_NAME = 'tt_storage_long'
-TASK_NAME = 'tt'
+# TASK_NAME = 'mm'
+
+TASK_NAME = 'mm_sink_to_storage'
 
 CASES = None
 # CASES = ['45','340', '387', '467']  ##
 # CASES = get_sample_envs_for_rss(task_name=TASK_NAME, count=None)
+
+if GIVEN_PATH:
+    VISUALIZE_COLLISIONS = True
+    PARALLEL = False
 
 parser = get_base_parser(task_name=TASK_NAME, parallel=PARALLEL, use_viewer=True)
 args = parser.parse_args()
@@ -124,7 +134,10 @@ def check_if_exist_rerun(run_dir, world, commands, plan):
     multiple_solutions = get_multiple_solutions(run_dir, indices=indices, commands_too=True)
     if len(multiple_solutions) > 1:
         plan, path = multiple_solutions[0]
-        commands = pickle.load(open(join(path, 'commands.pkl'), "rb"))
+        commands_file = join(path, 'commands.pkl')
+        if not isfile(commands_file):
+            return None
+        commands = pickle.load(open(commands_file, "rb"))
     return commands, plan
 
 
@@ -149,11 +162,24 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, hei
     if verbose:
         world.summarize_all_objects()
     body_map = get_body_map(run_dir, world) if 'rerun' not in run_dir_ori else None
-    commands, plan = check_if_exist_rerun(run_dir, world, commands, plan)
-    wait_unlocked()
+    result = check_if_exist_rerun(run_dir, world, commands, plan)
+    if result is None:
+        print(run_dir_ori, 'does not have rerun commands.pkl')
+        reset_simulation()
+        shutil.rmtree(exp_dir)
+        return
+    commands, plan = result
+
+    ## -----------------------------------------------------------
+    # artichoke = world.safely_get_body_from_name('veggiepotato')
+    # draw_aabb(get_aabb(artichoke))
+    # microwave = world.safely_get_body_from_name('microwave')
+    # draw_aabb(get_aabb(microwave))
+    # wait_unlocked()
+    ## -----------------------------------------------------------
 
     ## save the initial scene image in pybullet
-    if SAVE_JPG:
+    if not CHECK_COLLISIONS and SAVE_JPG:
         viz_dir = join(run_dir_ori, 'zoomin')
         world.add_camera(viz_dir, width=width//4, height=height//4, fx=fx//2, img_dir=viz_dir,
                          **world.camera_kwargs)
@@ -199,26 +225,38 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, hei
         if answer:
             time_step = 2e-5 if SAVE_JPG else 0.02
             time_step = None if STEP_BY_STEP else time_step
-            episodes = apply_actions(problem, commands, time_step=time_step, verbose=verbose, plan=plan,
-                                     body_map=body_map, SAVE_COMPOSED_JPG=SAVE_COMPOSED_JPG, SAVE_GIF=SAVE_GIF)
+            results = apply_actions(problem, commands, time_step=time_step, verbose=verbose, plan=plan,
+                                    body_map=body_map, SAVE_COMPOSED_JPG=SAVE_COMPOSED_JPG, SAVE_GIF=SAVE_GIF,
+                                    CHECK_COLLISIONS=CHECK_COLLISIONS, cfree_range=CFREE_RANGE,
+                                    VISUALIZE_COLLISIONS=VISUALIZE_COLLISIONS)
 
-        if SAVE_COMPOSED_JPG:
-            h, w, _ = episodes[0][0][0][0].shape
-            crop = (0, h//3-h//30, w, 2*h//3-h//30)
-            make_composed_image_multiple_episodes(episodes, join(world.img_dir, 'composed.jpg'),
-                                                  verbose=verbose, crop=crop)
+        if CHECK_COLLISIONS:
+            new_data = {'cfree': results} if results else {'cfree': CFREE_RANGE}
+            add_to_planning_config(run_dir, new_data)
+            if results:
+                print('COLLIDED', run_dir)
 
-        if SAVE_GIF:
-            h, w, _ = episodes[0].shape
-            crop = (0, h//3-h//30, w, 2*h//3-h//30)
-            gif_name = 'replay.gif'
-            images_to_gif(world.img_dir, gif_name, episodes, crop=crop)
+        else:
 
-        if SAVE_COMPOSED_JPG or SAVE_GIF:
-            world.camera = world.cameras[0]
+            if SAVE_COMPOSED_JPG:
+                episodes = results
+                h, w, _ = episodes[0][0][0][0].shape
+                crop = (0, h//3-h//30, w, 2*h//3-h//30)
+                make_composed_image_multiple_episodes(episodes, join(world.img_dir, 'composed.jpg'),
+                                                      verbose=verbose, crop=crop)
 
-        if SAVE_JPG:
-            world.visualize_image(index='final', rgb=True, **world.camera_kwargs)
+            if SAVE_GIF:
+                episodes = results
+                h, w, _ = episodes[0].shape
+                crop = (0, h//3-h//30, w, 2*h//3-h//30)
+                gif_name = 'replay.gif'
+                images_to_gif(world.img_dir, gif_name, episodes, crop=crop)
+
+            if SAVE_COMPOSED_JPG or SAVE_GIF:
+                world.camera = world.cameras[0]
+
+            if SAVE_JPG:
+                world.visualize_image(index='final', rgb=True, **world.camera_kwargs)
 
         if EVALUATE_QUALITY:
             answer = query_yes_no(f"delete this run {run_name}?", default='no')
@@ -317,32 +355,53 @@ def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, world_siz
     save_gym_run(img_dir, gif_name, filenames, save_gif=save_gif, save_mp4=save_mp4)
 
 
+def generated_recentely(file):
+    result = False
+    if isfile(file):
+        if SKIP_IF_PROCESSED_RECENTLY:
+            last_modified = os.path.getmtime(file)
+            if last_modified > CHECK_TIME:
+                result = True
+        else:
+            result = True
+    return result
+
+
 def case_filter(run_dir_ori):
     """ whether to process this run """
     if CASES is not None or GIVEN_PATH is not None:
         return True
+
     result = True
+    if CHECK_COLLISIONS:
+        # return True
+        config = load_planning_config(run_dir_ori)
+        if 'cfree' in config: ##  and config['cfree']:
+            # if isinstance(config['cfree'], str) and exist_instance(run_dir_ori, '100015') \
+            #         and 'braiser' in config['cfree']:
+            #     return True
+            result = False
+        return result
+
     if SAVE_JPG:
         viz_dir = join(run_dir_ori, 'zoomin')
-        if isdir(viz_dir) and len([a for a in listdir(viz_dir) if '.png' in a]) > 1:
-            if SKIP_IF_PROCESSED_RECENTLY:
-                file = join(viz_dir, 'rgb_image_final.png')
-                last_modified = os.path.getmtime(file)
-                if last_modified > CHECK_TIME:
-                    print('skipping SAVE_JPG for recently processed dir', run_dir_ori)
-                    result = False
-            else:
-                result = False
+        if isdir(viz_dir):
+            enough = len([a for a in listdir(viz_dir) if '.png' in a]) > 1
+            file = join(viz_dir, 'rgb_image_final.png')
+            result = not generated_recentely(file) or not enough
+    if result:
+        return result
+
     if SAVE_GIF:
         file = join(run_dir_ori, 'replay.gif')
-        if isfile(file):
-            if SKIP_IF_PROCESSED_RECENTLY:
-                last_modified = os.path.getmtime(file)
-                if last_modified > CHECK_TIME:
-                    print('skipping SAVE_GIF for recently processed dir', run_dir_ori)
-                    result = False
-            else:
-                result = False
+        result = not generated_recentely(file)
+    multiple_solutions_file = join(run_dir_ori, 'multiple_solutions.json')
+
+    # if not result and isfile(multiple_solutions_file):
+    #     plans = json.load(open(multiple_solutions_file, 'r'))
+    #     if len(plans) == 2 and 'rerun_dir' in plans[0]:
+    #         print('dont skip multiple solutions', run_dir_ori)
+    #         result = True
     return result
 
 
