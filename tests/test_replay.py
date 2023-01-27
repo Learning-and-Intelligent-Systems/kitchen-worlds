@@ -64,7 +64,7 @@ GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/mm_braiser_to_storage/1'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/_gmm/902'
 GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/45' + '/rerun_230120_000551/commands.pkl'
-GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_braiser/0' + '/rerun/diverse_commands_rerun_fc=None.pkl'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_braiser/0' + '/rerun/diverse_commands_rerun_fc=None.pkl'
 
 GIVEN_DIR = None
 # GIVEN_DIR = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen_100'

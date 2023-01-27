@@ -338,8 +338,8 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
                 pickle.dump(post_process(problem, new_plan), f)
 
             shutil.move(join('visualizations', 'log.json'), join(rerun_dir, log_name))
-            with open(join(rerun_dir, 'planning_config.json'), 'w') as f:
-                json.dump({'body_map': {str(k): v for k, v in body_map.items()}}, f, indent=3)
+            # with open(join(rerun_dir, 'planning_config.json'), 'w') as f:
+            #     json.dump({'body_map': {str(k): v for k, v in body_map.items()}}, f, indent=3)
 
             if 'fastamp-data-rss/mm_' in run_dir and len(old_plan) > len(plan):
                 new_plan = [[a.name] + [str(s) for s in a.args] for a in new_plan]
