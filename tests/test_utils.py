@@ -38,11 +38,23 @@ def clear_pddlstream_cache():
         shutil.rmtree('temp')
 
 
+def clear_constraint_networks(viz_dir):
+    constraint_dir = join(viz_dir, 'constraint_networks')
+    stream_dir = join(viz_dir, 'stream_plans')
+    if isdir(constraint_dir) and len(listdir(constraint_dir)) == 0:
+        shutil.rmtree(constraint_dir)
+    if isdir(stream_dir) and len(listdir(stream_dir)) == 0:
+        shutil.rmtree(stream_dir)
+
+
 def copy_dir_for_process(viz_dir, tag=None, verbose=True, print_fn=None):
     if not verbose:
         print_fn = print
     elif print_fn is None:
         from pybullet_tools.logging import myprint as print_fn
+
+    clear_constraint_networks(viz_dir)
+
     subdir = basename(viz_dir)
     task_name = basename(viz_dir.replace(f"/{subdir}", ''))
 

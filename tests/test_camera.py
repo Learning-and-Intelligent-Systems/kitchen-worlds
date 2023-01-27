@@ -18,7 +18,7 @@ from pybullet_tools.bullet_utils import get_segmask, get_door_links, adjust_segm
     get_obj_keys_for_segmentation
 
 from lisdf_tools.lisdf_loader import load_lisdf_pybullet, get_depth_images, create_gripper_robot, \
-    make_furniture_transparent
+    make_furniture_transparent, get_camera_kwargs_from_camera_zoomin as get_camera_kwargs
 from lisdf_tools.image_utils import draw_bb, crop_image, get_mask_bb, save_seg_image_given_obj_keys
 
 # from utils import load_lisdf_synthesizer
@@ -27,7 +27,7 @@ from mamao_tools.data_utils import get_indices, exist_instance, get_init_tuples,
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 
 N_PX = 224
-NEW_KEY = 'rss'
+NEW_KEY = 'channel7'
 ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb', 'meraki']
 
 #################################################################
@@ -44,15 +44,20 @@ ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb', 'meraki']
 # DEFAULT_TASK = '_examples'
 # DEFAULT_TASK = 'ff_two_fridge_goals'
 
-DEFAULT_TASK = 'mm'
+#################################################################
+
+# DEFAULT_TASK = 'mm'
 # DEFAULT_TASK = 'mm_storage'
 # DEFAULT_TASK = 'mm_sink'
 # DEFAULT_TASK = 'mm_braiser'
 # DEFAULT_TASK = 'mm_braiser_to_storage'
+# DEFAULT_TASK = 'mm_sink_to_storage'
 # DEFAULT_TASK = 'mm_storage_long'
-# DEFAULT_TASK = 'tt_storage_long'
 
-# DEFAULT_TASK = 'tt'
+# DEFAULT_TASK = 'tt_storage_long'
+# DEFAULT_TASK = 'tt_braiser_to_storage'
+
+DEFAULT_TASK = 'tt'
 
 #################################################################
 
@@ -60,8 +65,8 @@ GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/230115_115113_original_0'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/165'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/129'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/56'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage_long/177'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/122'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser_to_storage/4'
 
 MODIFIED_TIME = 1663895681
 PARALLEL = False and (GIVEN_PATH is None)
@@ -163,7 +168,7 @@ def adjust_indices_for_full_kitchen(indices):
     return {k: v for k, v in indices.items() if not 'pr2' in v}
 
 
-def render_segmentation_mask(test_dir, viz_dir, camera_poses, camera_kwargs, crop=False,
+def render_segmentation_mask(test_dir, viz_dir, camera_poses, camera_kwargs, camera_zoomins=[], crop=False,
                              transparent=False, pairs=None, width=1280, height=960, fx=800, done=None):
     ## width = 1960, height = 1470, fx = 800
     world = load_lisdf_pybullet(test_dir, width=width, height=height, verbose=False,
@@ -177,9 +182,10 @@ def render_segmentation_mask(test_dir, viz_dir, camera_poses, camera_kwargs, cro
     indices = get_indices(viz_dir, body_map=get_body_map(viz_dir, world))
     indices = adjust_indices_for_full_kitchen(indices)
 
-    ## pointing at goal region
-    camera_poses.append(unit_pose())
-    camera_kwargs.append(world.camera_kwargs)
+    ## pointing at goal regions: initial and final
+    camera_poses.extend([unit_pose()] * len(camera_zoomins))
+    camera_kwargs.extend([get_camera_kwargs(world, d) for d in camera_zoomins])
+
     common = dict(img_dir=viz_dir, width=width//2, height=height//2, fx=fx//2)
     crop_kwargs = dict(crop=crop, center=crop, width=width//2, height=height//2, N_PX=N_PX)
 
@@ -189,6 +195,12 @@ def render_segmentation_mask(test_dir, viz_dir, camera_poses, camera_kwargs, cro
     for i in range(len(camera_poses)):
         if done is not None and done[i]:
             continue
+
+        # ---------- make furniture disappear
+        if not transparent and len(camera_poses) > 1 and i == len(camera_poses) - 1:
+            make_furniture_transparent(world, viz_dir, lower_tpy=1, upper_tpy=0,
+                                       remove_upper_furnitures=True)
+
         world.add_camera(camera_poses[i], **common, **camera_kwargs[i])
 
         if not crop:
@@ -265,10 +277,6 @@ def render_segmentation_mask(test_dir, viz_dir, camera_poses, camera_kwargs, cro
             braiser_file = [f for f in files if f not in bottom_file][0]
             shutil.copy(braiser_file, bottom_file)
 
-        # ---------- make furniture transparent
-        if not transparent and len(camera_poses) > 1 and i == len(camera_poses)-2:
-            make_furniture_transparent(world, viz_dir, lower_tpy=1, upper_tpy=0)
-
 
 def add_key(viz_dir):
     config_file = join(viz_dir, 'planning_config.json')
@@ -320,35 +328,10 @@ def get_num_images(viz_dir, pairwise=False):
 
 
 def generate_images(viz_dir, redo=REDO):
-    num_dirs = 6
-    test_dir = copy_dir_for_process(viz_dir)
 
-    # load_lisdf_synthesizer(test_dir)
-
-    constraint_dir = join(viz_dir, 'constraint_networks')
-    stream_dir = join(viz_dir, 'stream_plans')
-    if isdir(constraint_dir) and len(listdir(constraint_dir)) == 0:
-        shutil.rmtree(constraint_dir)
-    if isdir(stream_dir) and len(listdir(stream_dir)) == 0:
-        shutil.rmtree(stream_dir)
-
-    if isdir(join(viz_dir, 'rgbs')):
-        shutil.rmtree(join(viz_dir, 'rgbs'))
-    if isdir(join(viz_dir, 'masked_rgbs')):
-        shutil.rmtree(join(viz_dir, 'masked_rgbs'))
-    rgb_dir = join(viz_dir, 'rgb_images')
-    seg_dirs = [join(viz_dir, f'seg_images_{i}') for i in range(num_dirs)]
-    crop_dirs = [join(viz_dir, f'crop_images_{i}') for i in range(num_dirs)]
-    transp_dirs = [join(viz_dir, f'transp_images_{i}') for i in range(num_dirs)]
-    tmp_file = join(viz_dir, 'planning_config_tmp.json')
-
-    if isdir(rgb_dir):
-        shutil.rmtree(rgb_dir)
-    if isfile(tmp_file):
-        os.remove(tmp_file)
-
-    """ just one rgb image """
+    """ get the camera poses """
     camera_pose = get_camera_pose(viz_dir)
+    camera_zoomins = []
     if camera_pose is None:  ## RSS
         cx, cy, lx, ly = get_world_center(viz_dir)
         camera_kwargs = [
@@ -361,7 +344,8 @@ def generate_images(viz_dir, redo=REDO):
             )
 
         camera_poses = [unit_pose()] * len(camera_kwargs)
-        add_to_planning_config(viz_dir, {'camera_kwargs': camera_kwargs})
+        config = add_to_planning_config(viz_dir, {'camera_kwargs': camera_kwargs})
+        camera_zoomins += config['camera_zoomins']
 
     else:  ## CoRL
         (x, y, z), quat = camera_pose
@@ -374,12 +358,20 @@ def generate_images(viz_dir, redo=REDO):
         camera_kwargs = [dict()]
         add_to_planning_config(viz_dir, {'img_camera_pose': camera_pose})
 
+    num_dirs = len(camera_kwargs) + len(camera_zoomins)
+    test_dir = copy_dir_for_process(viz_dir)
+
+    rgb_dir = join(viz_dir, 'rgb_images')
+    seg_dirs = [join(viz_dir, f'seg_images_{i}') for i in range(num_dirs)]
+    crop_dirs = [join(viz_dir, f'crop_images_{i}') for i in range(num_dirs)]
+    transp_dirs = [join(viz_dir, f'transp_images_{i}') for i in range(num_dirs)]
+
     # check_file = join(seg_dirs[0], 'crop_image_scene.png')
     # if isfile(check_file) and os.path.getmtime(check_file) > MODIFIED_TIME:
     #     redo = False
 
     """ other types of image """
-    redo = False
+    redo = True or GIVEN_PATH is not None
     if not check_key_same(viz_dir) or redo:
         # if isdir(rgb_dir):
         #     shutil.rmtree(rgb_dir)
@@ -387,11 +379,11 @@ def generate_images(viz_dir, redo=REDO):
         #     if isdir(crop_dir):
         #         shutil.rmtree(crop_dir)
         for seg_dir in seg_dirs:
-            if isdir(seg_dir):
+            if isdir(seg_dir) and ('images_5' in seg_dir):
                 shutil.rmtree(seg_dir)
-        for transp_dir in transp_dirs:
-            if isdir(transp_dir):
-                shutil.rmtree(transp_dir)
+        # for transp_dir in transp_dirs:
+        #     if isdir(transp_dir):
+        #         shutil.rmtree(transp_dir)
 
     ## ----------------------------------------------------
     # for seg_dir in seg_dirs:
@@ -437,7 +429,7 @@ def generate_images(viz_dir, redo=REDO):
 
     if (False in done) or redo:
         print(viz_dir, f'{name} ...')
-        render_segmentation_mask(test_dir, viz_dir, camera_poses, camera_kwargs,
+        render_segmentation_mask(test_dir, viz_dir, camera_poses, camera_kwargs, camera_zoomins,
                                  done=done, **kwargs)
         reset_simulation()
     else:

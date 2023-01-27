@@ -81,7 +81,7 @@ check_time = 1666297068  ## 1665768219 for goals, 1664750094 for in, 1666297068 
 TASK_NAME = 'tt_storage'
 
 CASES = None  ##
-CASES = ['34']
+CASES = ['1']
 # CASES = ['45', '340', '387', '467'] ## mm_storage
 # CASES = ['150', '395', '399', '404', '406', '418', '424', '428', '430', '435', '438', '439', '444', '453', '455', '466', '475', '479', '484', '489', '494', '539', '540', '547', '548', '553', '802', '804', '810', '815', '818', '823', '831', '833', '838', '839', '848', '858', '860', '862']
 # CASES = ['1514', '1566', '1612', '1649', '1812', '2053', '2110', '2125', '2456', '2534', '2535', '2576', '2613']
@@ -92,7 +92,7 @@ if CASES is not None:
     SKIP_IF_SOLVED_RECENTLY = False
 
 PARALLEL = GENERATE_SKELETONS and False
-FEASIBILITY_CHECKER = 'heuristic'
+FEASIBILITY_CHECKER = 'None'
 ## None | oracle | pvt | pvt* | pvt-task | pvt-all | binary | shuffle | heuristic
 if GENERATE_SKELETONS:
     FEASIBILITY_CHECKER = 'oracle'
@@ -308,19 +308,31 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
             input('End?')
 
         ## maybe generate a multiple_solutions.json file
-        if 'fastamp-data-rss' in run_dir:
+        if 'fastamp-data-rss/' in run_dir:
             old_plan = get_plan(run_dir)[0][0]
             indices = get_indices(run_dir)
             # indices.update({eval(k): v for k, v in indices.items()})
             skeleton_kargs = dict(indices=indices, include_movable=True, include_joint=True)
-            rerun_dir = join(run_dir, f"rerun_{get_datetime(TO_LISDF=True)}")
-            shutil.move(join(run_dir, ori_dir), rerun_dir)
-            if len(old_plan) > len(plan):
-                body_map = get_body_map(run_dir, world, inv=True)
-                new_plan = modify_plan_with_body_map(plan, body_map)
-                with open(join(rerun_dir, 'commands.pkl'), 'wb') as f:
-                    pickle.dump(post_process(problem, new_plan), f)
+            if 'fastamp-data-rss/mm_' in run_dir:
+                rerun_dir = join(run_dir, f"rerun_{get_datetime(TO_LISDF=True)}")
+                shutil.move(join(run_dir, ori_dir), rerun_dir)
+                commands_name = 'commands.pkl'
+                log_name = 'log.json'
+            else:
+                rerun_dir = ori_dir
+                commands_name = f'{PREFIX}commands_rerun_fc={FEASIBILITY_CHECKER}.pkl'
+                log_name = f'{PREFIX}runlog_fc={FEASIBILITY_CHECKER}.pkl'
 
+            body_map = get_body_map(run_dir, world, inv=True)
+            new_plan = modify_plan_with_body_map(plan, body_map)
+            with open(join(rerun_dir, commands_name), 'wb') as f:
+                pickle.dump(post_process(problem, new_plan), f)
+
+            shutil.move(join('visualizations', 'log.json'), join(rerun_dir, log_name))
+            with open(join(rerun_dir, 'planning_config.json'), 'w') as f:
+                json.dump({'body_map': {str(k): v for k, v in body_map.items()}}, f, indent=3)
+
+            if 'fastamp-data-rss/mm_' in run_dir and len(old_plan) > len(plan):
                 new_plan = [[a.name] + [str(s) for s in a.args] for a in new_plan]
                 multiple_solutions = [{
                     'plan': new_plan,
@@ -335,10 +347,6 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
                 solutions_file = join(run_dir, 'multiple_solutions.json')
                 json.dump(multiple_solutions, open(solutions_file, 'w'), indent=3)
                 print('Saved multiple solutions to', solutions_file)
-
-                shutil.move(join('visualizations', 'log.json'), join(rerun_dir, 'log.json'))
-                with open(join(rerun_dir, 'planning_config.json'), 'w') as f:
-                    json.dump({'body_map': {str(k): v for k, v in body_map.items()}}, f, indent=3)
 
     # disconnect()
     reset_simulation()

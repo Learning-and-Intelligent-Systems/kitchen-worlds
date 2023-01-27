@@ -26,7 +26,8 @@ from isaac_tools.gym_utils import save_gym_run
 from world_builder.actions import apply_actions
 
 from mamao_tools.data_utils import get_plan, get_body_map, get_multiple_solutions, \
-    add_to_planning_config, load_planning_config, exist_instance
+    add_to_planning_config, load_planning_config, exist_instance, \
+    check_unrealistic_placement_z
 
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser, \
     get_sample_envs_for_rss
@@ -53,12 +54,15 @@ CHECK_TIME = 1674417578
 GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/one_fridge_pick_pr2/one_fridge_pick_pr2_1004_01:29_1'
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/0104_094417_original_1'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/43'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/528'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/10'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/563'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/1998/' + 'rerun/diverse_commands_rerun_fc=None.pkl'
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/230115_115113_original_0'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/mm_sink_to_storage/41'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/tt_sink/1'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/mm_braiser_to_storage/1'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/_gmm/902'
 
 GIVEN_DIR = None
 # GIVEN_DIR = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen_100'
@@ -66,7 +70,7 @@ GIVEN_DIR = None
 
 #####################################################################
 
-TASK_NAME = 'one_fridge_pick_pr2'
+# TASK_NAME = 'one_fridge_pick_pr2'
 
 # TASK_NAME = 'mm_one_fridge_table_in'
 # TASK_NAME = 'mm_one_fridge_table_on'
@@ -88,12 +92,14 @@ TASK_NAME = 'one_fridge_pick_pr2'
 
 #####################################################################
 
+# TASK_NAME = 'mm'
 # TASK_NAME = 'mm_storage'
 # TASK_NAME = 'mm_sink'
-# TASK_NAME = 'mm_braiser'
-# TASK_NAME = 'mm'
+TASK_NAME = 'mm_braiser'
+# TASK_NAME = 'mm_sink_to_storage'
+# TASK_NAME = 'mm_braiser_to_storage'
 
-TASK_NAME = 'mm_sink_to_storage'
+# TASK_NAME = 'tt'
 
 CASES = None
 # CASES = ['45','340', '387', '467']  ##
@@ -157,7 +163,9 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, hei
 
     exp_dir, run_dir, commands, plan = get_pkl_run(run_dir_ori, verbose=verbose)
 
-    world = load_lisdf_pybullet(exp_dir, use_gui=not USE_GYM, width=width, height=height, verbose=False)
+    # load_lisdf_synthesizer(exp_dir)
+    world = load_lisdf_pybullet(exp_dir, use_gui=not USE_GYM, width=width, height=height,
+                                verbose=False) ## , clear_for_topdown_camera=True
     problem = Problem(world)
     if verbose:
         world.summarize_all_objects()
@@ -232,6 +240,11 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, hei
 
         if CHECK_COLLISIONS:
             new_data = {'cfree': results} if results else {'cfree': CFREE_RANGE}
+            ## another way to be bad data is if the place pose is not realistic
+            if new_data['cfree'] == CFREE_RANGE:
+                result = check_unrealistic_placement_z(world, run_dir)
+                if result:
+                    new_data['cfree'] = result
             add_to_planning_config(run_dir, new_data)
             if results:
                 print('COLLIDED', run_dir)
@@ -374,9 +387,13 @@ def case_filter(run_dir_ori):
 
     result = True
     if CHECK_COLLISIONS:
-        # return True
-        config = load_planning_config(run_dir_ori)
+        return True
+        # config, mod_time = load_planning_config(run_dir_ori, return_mod_time=True)
         if 'cfree' in config: ##  and config['cfree']:
+            if mod_time > 1674746024:
+                return False
+            if isinstance(config['cfree'], float):  ## check if unrealistic
+                return True
             # if isinstance(config['cfree'], str) and exist_instance(run_dir_ori, '100015') \
             #         and 'braiser' in config['cfree']:
             #     return True
