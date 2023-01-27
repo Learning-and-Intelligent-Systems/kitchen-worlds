@@ -32,10 +32,10 @@ from world_builder.actions import apply_actions
 
 from mamao_tools.feasibility_checkers import Shuffler
 from mamao_tools.data_utils import get_instance_info, exist_instance, get_indices, \
-    get_plan_skeleton, get_successful_plan, get_feasibility_checker, get_plan, get_body_map
-
-from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser, \
+    get_plan_skeleton, get_successful_plan, get_feasibility_checker, get_plan, get_body_map, \
     modify_plan_with_body_map
+
+from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 
 ## special modes
 GENERATE_MULTIPLE_SOLUTIONS = False
@@ -78,10 +78,16 @@ check_time = 1666297068  ## 1665768219 for goals, 1664750094 for in, 1666297068 
 # TASK_NAME = 'mm_sink'
 # TASK_NAME = 'mm_braiser'
 # TASK_NAME = '_test'
+
 TASK_NAME = 'tt_storage'
+# TASK_NAME = 'tt_sink'
+# TASK_NAME = 'tt_braiser'
+# TASK_NAME = 'tt_storage_to_storage'
+# TASK_NAME = 'tt_sink_to_storage'
+# TASK_NAME = 'tt_braiser_to_storage'
 
 CASES = None  ##
-CASES = ['1']
+# CASES = ['1']
 # CASES = ['45', '340', '387', '467'] ## mm_storage
 # CASES = ['150', '395', '399', '404', '406', '418', '424', '428', '430', '435', '438', '439', '444', '453', '455', '466', '475', '479', '484', '489', '494', '539', '540', '547', '548', '553', '802', '804', '810', '815', '818', '823', '831', '833', '838', '839', '848', '858', '860', '862']
 # CASES = ['1514', '1566', '1612', '1649', '1812', '2053', '2110', '2125', '2456', '2534', '2535', '2576', '2613']
@@ -92,7 +98,7 @@ if CASES is not None:
     SKIP_IF_SOLVED_RECENTLY = False
 
 PARALLEL = GENERATE_SKELETONS and False
-FEASIBILITY_CHECKER = 'None'
+FEASIBILITY_CHECKER = 'oracle'
 ## None | oracle | pvt | pvt* | pvt-task | pvt-all | binary | shuffle | heuristic
 if GENERATE_SKELETONS:
     FEASIBILITY_CHECKER = 'oracle'
@@ -190,7 +196,7 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
         return
 
     initialize_logs()
-    exp_dir = copy_dir_for_process(run_dir, tag='replaying')
+    exp_dir = copy_dir_for_process(run_dir, tag='rerunning')
 
     if False:
         from utils import load_lisdf_synthesizer
@@ -217,7 +223,7 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     if FEASIBILITY_CHECKER == 'heuristic':
         fc = get_feasibility_checker([copy.deepcopy(problem), goal, init], mode='heuristic')
     else:
-        fc = get_feasibility_checker(run_dir, mode=FEASIBILITY_CHECKER, diverse=DIVERSE)
+        fc = get_feasibility_checker(run_dir, mode=FEASIBILITY_CHECKER, diverse=DIVERSE, world=world)
     # fc = Shuffler()
 
     start = time.time()
@@ -321,10 +327,13 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
             else:
                 rerun_dir = ori_dir
                 commands_name = f'{PREFIX}commands_rerun_fc={FEASIBILITY_CHECKER}.pkl'
-                log_name = f'{PREFIX}runlog_fc={FEASIBILITY_CHECKER}.pkl'
+                log_name = f'{PREFIX}runlog_fc={FEASIBILITY_CHECKER}.log'
+                if isfile(join(rerun_dir, 'diverse_runlog_fc=None.pkl')):
+                    shutil.move(join(rerun_dir, 'diverse_runlog_fc=None.pkl'),
+                                join(rerun_dir, 'diverse_runlog_fc=None.json'))
 
-            body_map = get_body_map(run_dir, world, inv=True)
-            new_plan = modify_plan_with_body_map(plan, body_map)
+            inv_body_map = get_body_map(run_dir, world, inv=True)
+            new_plan = modify_plan_with_body_map(plan, inv_body_map)
             with open(join(rerun_dir, commands_name), 'wb') as f:
                 pickle.dump(post_process(problem, new_plan), f)
 

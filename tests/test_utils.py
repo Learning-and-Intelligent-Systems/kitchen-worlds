@@ -239,21 +239,6 @@ def mp4_to_gif(mp4_file, frame_folder='output'):
     print('converted mp4 to', output_file)
 
 
-def modify_plan_with_body_map(plan, body_map):
-    from pddlstream.language.constants import Action
-    new_plan = []
-    for action in plan:
-        new_args = []
-        for a in action.args:
-            if a in body_map:
-                new_args.append(body_map[a])
-            else:
-                if hasattr(a, 'body') and a in body_map:
-                    a.body = body_map[a]
-                new_args.append(a)
-        new_plan.append(Action(action.name, new_args))
-    return new_plan
-
 
 ##########################################################################
 

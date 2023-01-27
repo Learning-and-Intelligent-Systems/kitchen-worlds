@@ -38,7 +38,7 @@ SAVE_GIF = True
 SAVE_JPG = True or SAVE_COMPOSED_JPG or SAVE_GIF
 PREVIEW_SCENE = False
 
-CHECK_COLLISIONS = True
+CHECK_COLLISIONS = False
 CFREE_RANGE = 0.1
 VISUALIZE_COLLISIONS = False
 
@@ -63,6 +63,8 @@ GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/tt_sink/1'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/mm_braiser_to_storage/1'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/_gmm/902'
+GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/45' + '/rerun_230120_000551/commands.pkl'
+GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_braiser/0' + '/rerun/diverse_commands_rerun_fc=None.pkl'
 
 GIVEN_DIR = None
 # GIVEN_DIR = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen_100'
@@ -108,6 +110,10 @@ CASES = None
 if GIVEN_PATH:
     VISUALIZE_COLLISIONS = True
     PARALLEL = False
+if GIVEN_PATH is not None and 'rerun' in GIVEN_PATH:
+    SAVE_JPG = False
+    SAVE_COMPOSED_JPG = False
+    SAVE_GIF = False
 
 parser = get_base_parser(task_name=TASK_NAME, parallel=PARALLEL, use_viewer=True)
 args = parser.parse_args()
@@ -125,7 +131,7 @@ def get_pkl_run(run_dir, verbose=True):
         pkl_file = join(rerun_dir, pkl_file)
 
     exp_dir = copy_dir_for_process(run_dir, tag='replaying', verbose=verbose)
-    if 'rerun' in pkl_file:
+    if basename(pkl_file) != 'commands.pkl':
         plan_json = join(run_dir, pkl_file).replace('commands', 'plan').replace('.pkl', '.json')
         plan = get_plan(run_dir, plan_json=plan_json)
     else:
@@ -166,10 +172,11 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, hei
     # load_lisdf_synthesizer(exp_dir)
     world = load_lisdf_pybullet(exp_dir, use_gui=not USE_GYM, width=width, height=height,
                                 verbose=False) ## , clear_for_topdown_camera=True
+    wait_unlocked()
     problem = Problem(world)
     if verbose:
         world.summarize_all_objects()
-    body_map = get_body_map(run_dir, world) if 'rerun' not in run_dir_ori else None
+    body_map = get_body_map(run_dir, world)
     result = check_if_exist_rerun(run_dir, world, commands, plan)
     if result is None:
         print(run_dir_ori, 'does not have rerun commands.pkl')
