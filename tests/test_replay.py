@@ -38,12 +38,12 @@ SAVE_GIF = True
 SAVE_JPG = True or SAVE_COMPOSED_JPG or SAVE_GIF
 PREVIEW_SCENE = False
 
-CHECK_COLLISIONS = False
+CHECK_COLLISIONS = True
 CFREE_RANGE = 0.1
 VISUALIZE_COLLISIONS = False
 
 SAVE_MP4 = False
-STEP_BY_STEP = False
+STEP_BY_STEP = True
 AUTO_PLAY = True
 EVALUATE_QUALITY = False
 PARALLEL = SAVE_JPG and not PREVIEW_SCENE and False  ## and not CHECK_COLLISIONS
@@ -59,11 +59,11 @@ GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/563'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/1998/' + 'rerun/diverse_commands_rerun_fc=None.pkl'
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/230115_115113_original_0'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/mm_sink_to_storage/41'
+GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/mm_sink_to_storage/43'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/tt_sink/1'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/mm_braiser_to_storage/1'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/_gmm/902'
-GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/45' + '/rerun_230120_000551/commands.pkl'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/45' + '/rerun_230120_000551/commands.pkl'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_braiser/0' + '/rerun/diverse_commands_rerun_fc=None.pkl'
 
 GIVEN_DIR = None
@@ -162,10 +162,6 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, hei
             camera_point=(8.5, 2.5, 3), target_point=(0, 2.5, 0)):
 
     verbose = not SAVE_JPG
-
-    if 'full_kitchen' in run_dir_ori:
-        camera_point = (4, 4, 8)
-        target_point = (0, 4, 0)
 
     exp_dir, run_dir, commands, plan = get_pkl_run(run_dir_ori, verbose=verbose)
 

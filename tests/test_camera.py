@@ -67,6 +67,7 @@ GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/129'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/122'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser_to_storage/4'
+GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink_to_storage/84'
 
 MODIFIED_TIME = 1663895681
 PARALLEL = False and (GIVEN_PATH is None)
@@ -197,20 +198,21 @@ def render_segmentation_mask(test_dir, viz_dir, camera_poses, camera_kwargs, cam
             continue
 
         # ---------- make furniture disappear
-        if not transparent and len(camera_poses) > 1 and i == len(camera_poses) - 1:
+        if not transparent and len(camera_poses) > 1 and i == len(camera_poses) - len(camera_zoomins):
             make_furniture_transparent(world, viz_dir, lower_tpy=1, upper_tpy=0,
                                        remove_upper_furnitures=True)
 
         world.add_camera(camera_poses[i], **common, **camera_kwargs[i])
 
         if not crop:
-            if 0 < i < len(camera_poses)-1:
+            if 0 < i < len(camera_poses)-len(camera_zoomins):
                 crop_kwargs = dict(crop=True, center=False, width=width//2, height=height//2,
-                                   N_PX=height//2, align_vertical='top', keep_ratio=True) ##
-            elif i == len(camera_poses)-1:
-                n_px = int(height//2 * 0.6) if '_sink' not in viz_dir else int(height//2)
+                                   N_PX=height//2, align_vertical='top', keep_ratio=True)
+            elif i >= len(camera_poses)-len(camera_zoomins):
+                ## more zoomed-in on braiser
+                n_px = int(height//2 * 0.6) if (i == len(camera_poses)-1) else int(height//2)
                 crop_kwargs = dict(crop=True, center=False, width=width//2, height=height//2,
-                                   N_PX=n_px)
+                                   N_PX=n_px, align_vertical='center', keep_ratio=True)
 
         new_key = 'seg_image' if not crop else 'crop_image'
         new_key = 'transp_image' if transparent else new_key
@@ -379,7 +381,7 @@ def generate_images(viz_dir, redo=REDO):
         #     if isdir(crop_dir):
         #         shutil.rmtree(crop_dir)
         for seg_dir in seg_dirs:
-            if isdir(seg_dir) and ('images_5' in seg_dir):
+            if isdir(seg_dir) and ('images_5' in seg_dir or 'images_6' in seg_dir):
                 shutil.rmtree(seg_dir)
         # for transp_dir in transp_dirs:
         #     if isdir(transp_dir):

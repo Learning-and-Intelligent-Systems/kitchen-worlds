@@ -1,16 +1,14 @@
-from os.path import join, isdir, getsize
+from os.path import join, isdir, getsize, abspath
+import sys
 from os import listdir
 import numpy as np
 import shutil
 import random
-from config import *
+from config import MAMAO_DATA_PATH, ASSET_PATH
 from test_utils import copy_dir_for_process, get_task_names
 from pybullet_tools.utils import connect
 from isaac_tools.gym_utils import images_to_gif
 from test_utils import get_sample_envs_200
-
-
-MAMAO_DATA_PATH = '/home/yang/Documents/fastamp-data'
 
 
 ###########################################################################
@@ -18,20 +16,20 @@ MAMAO_DATA_PATH = '/home/yang/Documents/fastamp-data'
 
 def test_load_lisdf():
     from isaac_tools.gym_utils import load_lisdf
-    ori_dir = join(MAMAO_DATA_PATH, 'tt_two_fridge_in/4')
+    ori_dir = join(MAMAO_DATA_PATH, 'mm_sink_to_storage/22')
     lisdf_dir = copy_dir_for_process(ori_dir)
     for name, path, scale, is_fixed, pose, positions in load_lisdf(lisdf_dir, robots=True):
         print(name, positions)
 
 
-def test_load_one(loading_effect=False):
+def test_load_one(loading_effect=False, **kwargs):
     from isaac_tools.gym_utils import load_lisdf_isaacgym
     ori_dir = '/home/caelan/Programs/interns/yang/kitchen-worlds/test_cases/tt_one_fridge_pick_2'
-    ori_dir = join(MAMAO_DATA_PATH, 'tt_two_fridge_in/4')
     ori_dir = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/1231-093847_original_2'
     ori_dir = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/1230-134950_original_1'
+    ori_dir = join(MAMAO_DATA_PATH, 'mm_sink_to_storage/84')
     lisdf_dir = copy_dir_for_process(ori_dir)
-    world = load_lisdf_isaacgym(abspath(lisdf_dir), pause=True, loading_effect=loading_effect)
+    world = load_lisdf_isaacgym(abspath(lisdf_dir), pause=True, loading_effect=loading_effect, **kwargs)
     if loading_effect:
         shutil.move(join(lisdf_dir, world), join(ori_dir, world))
     shutil.rmtree(lisdf_dir)
@@ -142,8 +140,8 @@ def test_load_objects():
 
 if __name__ == "__main__":
     # test_load_lisdf()
-    # test_load_one(loading_effect=True)
+    test_load_one(loading_effect=False, load_cameras=True, save_obj_shots=True)
     # test_load_multiple(test_camera_pose=True)
-    test_load_objects()
+    # test_load_objects()
 
 
