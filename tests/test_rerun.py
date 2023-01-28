@@ -277,6 +277,8 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
             max_plans=100,  ## number of skeletons
             visualize=True,
         ))
+        if GENERATE_NEW_LABELS:
+            kwargs['downward_time'] = 6
         if GENERATE_SKELETONS or GENERATE_NEW_LABELS:
             kwargs['evaluation_time'] = -0.5
             # if MORE_PLANS:
