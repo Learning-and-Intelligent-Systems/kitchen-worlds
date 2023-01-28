@@ -64,7 +64,7 @@ GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/mm_braiser_to_storage/1'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/_gmm/902'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/45' + '/rerun_230120_000551/commands.pkl'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_braiser/0' + '/rerun/diverse_commands_rerun_fc=None.pkl'
+GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_storage/0' + '/rerun_2/diverse_commands_rerun_fc=None.pkl'
 
 GIVEN_DIR = None
 # GIVEN_DIR = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen_100'
@@ -167,8 +167,9 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, hei
     exp_dir, run_dir, commands, plan = get_pkl_run(run_dir_ori, verbose=verbose)
 
     # load_lisdf_synthesizer(exp_dir)
+    larger_world = 'rerun' in run_dir_ori and '/tt_' in run_dir_ori
     world = load_lisdf_pybullet(exp_dir, use_gui=not USE_GYM, width=width, height=height,
-                                verbose=False) ## , clear_for_topdown_camera=True
+                                verbose=False, larger_world=larger_world)
     # wait_unlocked()
     problem = Problem(world)
     if verbose:

@@ -90,7 +90,7 @@ TASK_NAME = 'tt_storage'
 # TASK_NAME = 'tt_braiser_to_storage'
 
 CASES = None  ##
-CASES = ['0']
+# CASES = ['0']
 # CASES = ['45', '340', '387', '467'] ## mm_storage
 # CASES = ['150', '395', '399', '404', '406', '418', '424', '428', '430', '435', '438', '439', '444', '453', '455', '466', '475', '479', '484', '489', '494', '539', '540', '547', '548', '553', '802', '804', '810', '815', '818', '823', '831', '833', '838', '839', '848', '858', '860', '862']
 # CASES = ['1514', '1566', '1612', '1649', '1812', '2053', '2110', '2125', '2456', '2534', '2535', '2576', '2613']
@@ -159,6 +159,7 @@ def clear_all_rerun_results(run_dir, **kwargs):
 
 def check_if_skip(run_dir, **kwargs):
     skip = False
+    # return skip
     if GENERATE_NEW_PROBLEM:
         file = join(run_dir, f'problem_larger.pddl')
         return isfile(file)
@@ -203,6 +204,9 @@ def check_if_skip(run_dir, **kwargs):
 def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     from pybullet_tools.logging import myprint as print
     ori_dir = join(run_dir, RERUN_SUBDIR)
+    # if isdir(ori_dir):
+    #     shutil.rmtree(ori_dir)
+    # return
     if not isdir(ori_dir):
         os.mkdir(ori_dir)
     if check_if_skip(run_dir):
@@ -219,6 +223,25 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
 
     world = load_lisdf_pybullet(exp_dir, verbose=False, use_gui=args.viewer,
                                 larger_world=larger_world) ## , width=720, height=560
+
+    if not GENERATE_NEW_PROBLEM:
+        inv_body_map = get_body_map(run_dir, world, inv=True)
+        pc_file = join(ori_dir, 'planning_config.json')
+        if not isfile(pc_file):
+            with open(join(ori_dir, 'planning_config.json'), 'w') as f:
+                json.dump({'inv_body_map': {str(k): v for k, v in inv_body_map.items()}}, f, indent=3)
+
+    if isfile(join(ori_dir, 'diverse_runlog_fc=None.log')):
+        shutil.move(join(ori_dir, 'diverse_runlog_fc=None.log'),
+                    join(ori_dir, 'diverse_runlog_fc=None.json'))
+    if isfile(join(ori_dir, 'diverse_runlog_fc=None.pkl')):
+        shutil.move(join(ori_dir, 'diverse_runlog_fc=None.pkl'),
+                    join(ori_dir, 'diverse_runlog_fc=None.json'))
+
+    # reset_simulation()
+    # shutil.rmtree(exp_dir)
+    # return
+
     saver = WorldSaver()
     problem = Problem(world)
 
@@ -257,14 +280,6 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     stream_info = world.robot.get_stream_info(partial=False, defer=False)
     print_goal(goal)
     print(SEPARATOR)
-
-    ######################################################
-
-    # ## temporary
-    # inv_body_map = get_body_map(run_dir, world, inv=True)
-    # with open(join(run_dir, 'rerun_230120_000551', 'planning_config.json'), 'w') as f:
-    #     json.dump({'body_map': {str(k): v for k, v in inv_body_map.items()}}, f, indent=3)
-    # sys.exit()
 
     ######################################################
 
@@ -378,10 +393,7 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
             else:
                 rerun_dir = ori_dir
                 commands_name = f'{PREFIX}commands_rerun_fc={FEASIBILITY_CHECKER}.pkl'
-                log_name = f'{PREFIX}runlog_fc={FEASIBILITY_CHECKER}.log'
-                if isfile(join(rerun_dir, 'diverse_runlog_fc=None.pkl')):
-                    shutil.move(join(rerun_dir, 'diverse_runlog_fc=None.pkl'),
-                                join(rerun_dir, 'diverse_runlog_fc=None.json'))
+                log_name = f'{PREFIX}runlog_fc={FEASIBILITY_CHECKER}.json'
 
             inv_body_map = get_body_map(run_dir, world, inv=True)
             new_plan = modify_plan_with_body_map(plan, inv_body_map)
