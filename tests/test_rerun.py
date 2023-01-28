@@ -41,13 +41,14 @@ from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 GENERATE_MULTIPLE_SOLUTIONS = False
 GENERATE_SKELETONS = False
 GENERATE_NEW_PROBLEM = False
-GENERATE_NEW_LABELS = True
+GENERATE_NEW_LABELS = False
+USE_LARGE_WORLD = True
 
 USE_VIEWER = False
 LOCK_VIEWER = True
 DIVERSE = True
 PREFIX = 'diverse_' if DIVERSE else ''
-RERUN_SUBDIR = 'rerun'
+RERUN_SUBDIR = 'rerun_2'
 
 SKIP_IF_SOLVED = True and not GENERATE_SKELETONS
 SKIP_IF_SOLVED_RECENTLY = True and not GENERATE_SKELETONS
@@ -81,7 +82,7 @@ TASK_NAME = 'mm_storage'
 # TASK_NAME = 'mm_braiser'
 # TASK_NAME = '_test'
 
-# TASK_NAME = 'tt_storage'
+TASK_NAME = 'tt_storage'
 # TASK_NAME = 'tt_sink'
 # TASK_NAME = 'tt_braiser'
 # TASK_NAME = 'tt_storage_to_storage'
@@ -89,7 +90,7 @@ TASK_NAME = 'mm_storage'
 # TASK_NAME = 'tt_braiser_to_storage'
 
 CASES = None  ##
-CASES = ['45']
+CASES = ['0']
 # CASES = ['45', '340', '387', '467'] ## mm_storage
 # CASES = ['150', '395', '399', '404', '406', '418', '424', '428', '430', '435', '438', '439', '444', '453', '455', '466', '475', '479', '484', '489', '494', '539', '540', '547', '548', '553', '802', '804', '810', '815', '818', '823', '831', '833', '838', '839', '848', '858', '860', '862']
 # CASES = ['1514', '1566', '1612', '1649', '1812', '2053', '2110', '2125', '2456', '2534', '2535', '2576', '2613']
@@ -104,6 +105,9 @@ FEASIBILITY_CHECKER = 'None'
 ## None | oracle | pvt | pvt* | pvt-task | pvt-all | binary | shuffle | heuristic
 if GENERATE_SKELETONS:
     FEASIBILITY_CHECKER = 'oracle'
+if GENERATE_NEW_PROBLEM:
+    GENERATE_NEW_LABELS = False
+    USE_LARGE_WORLD = False
 if GENERATE_NEW_LABELS:
     FEASIBILITY_CHECKER = 'larger_world'
     GENERATE_NEW_PROBLEM = False
@@ -155,7 +159,11 @@ def clear_all_rerun_results(run_dir, **kwargs):
 
 def check_if_skip(run_dir, **kwargs):
     skip = False
-    if GENERATE_SKELETONS:
+    if GENERATE_NEW_PROBLEM:
+        file = join(run_dir, f'problem_larger.pddl')
+        return isfile(file)
+
+    elif GENERATE_SKELETONS:
         file = join(run_dir, f'diverse_plans.json')
         MORE_PLANS = False
         if isfile(file):
@@ -200,7 +208,7 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     if check_if_skip(run_dir):
         return
 
-    larger_world = GENERATE_NEW_LABELS
+    larger_world = USE_LARGE_WORLD or GENERATE_NEW_LABELS
 
     initialize_logs()
     exp_dir = copy_dir_for_process(run_dir, tag='rerunning')

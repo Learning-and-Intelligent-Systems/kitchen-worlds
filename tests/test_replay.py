@@ -38,12 +38,12 @@ SAVE_GIF = True
 SAVE_JPG = True or SAVE_COMPOSED_JPG or SAVE_GIF
 PREVIEW_SCENE = False
 
-CHECK_COLLISIONS = True
+CHECK_COLLISIONS = False
 CFREE_RANGE = 0.1
 VISUALIZE_COLLISIONS = False
 
 SAVE_MP4 = False
-STEP_BY_STEP = True
+STEP_BY_STEP = False
 AUTO_PLAY = True
 EVALUATE_QUALITY = False
 PARALLEL = SAVE_JPG and not PREVIEW_SCENE and False  ## and not CHECK_COLLISIONS
@@ -59,7 +59,7 @@ GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/563'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/1998/' + 'rerun/diverse_commands_rerun_fc=None.pkl'
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/230115_115113_original_0'
-GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/mm_sink_to_storage/43'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/mm_sink_to_storage/43'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/tt_sink/1'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/mm_braiser_to_storage/1'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/_gmm/902'
@@ -97,11 +97,12 @@ GIVEN_DIR = None
 # TASK_NAME = 'mm'
 # TASK_NAME = 'mm_storage'
 # TASK_NAME = 'mm_sink'
-TASK_NAME = 'mm_braiser'
+# TASK_NAME = 'mm_braiser'
 # TASK_NAME = 'mm_sink_to_storage'
 # TASK_NAME = 'mm_braiser_to_storage'
 
 # TASK_NAME = 'tt'
+TASK_NAME = 'tt_storage'
 
 CASES = None
 # CASES = ['45','340', '387', '467']  ##
@@ -168,7 +169,7 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, hei
     # load_lisdf_synthesizer(exp_dir)
     world = load_lisdf_pybullet(exp_dir, use_gui=not USE_GYM, width=width, height=height,
                                 verbose=False) ## , clear_for_topdown_camera=True
-    wait_unlocked()
+    # wait_unlocked()
     problem = Problem(world)
     if verbose:
         world.summarize_all_objects()
