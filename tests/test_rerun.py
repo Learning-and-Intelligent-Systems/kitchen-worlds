@@ -101,7 +101,7 @@ if CASES is not None:
     SKIP_IF_SOLVED_RECENTLY = False
 
 PARALLEL = GENERATE_SKELETONS and False
-FEASIBILITY_CHECKER = 'pvt-task'
+FEASIBILITY_CHECKER = 'oracle'
 ## None | oracle | pvt | pvt* | pvt-task | pvt-all | binary | shuffle | heuristic
 if GENERATE_SKELETONS:
     FEASIBILITY_CHECKER = 'oracle'
@@ -210,9 +210,17 @@ def check_if_skip(run_dir, **kwargs):
 def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     from pybullet_tools.logging import myprint as print
     ori_dir = join(run_dir, RERUN_SUBDIR)
+    #######################################################
     # if isdir(ori_dir):
     #     shutil.rmtree(ori_dir)
     # return
+    #######################################################
+    # if isdir(ori_dir):
+    #     rem_files = [f for f in listdir(ori_dir) if f'={FEASIBILITY_CHECKER}' in f]
+    #     for f in rem_files:
+    #         os.remove(join(ori_dir, f))
+    # return
+    #######################################################
     if not isdir(ori_dir):
         os.mkdir(ori_dir)
     if check_if_skip(run_dir):

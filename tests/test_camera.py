@@ -376,7 +376,7 @@ def generate_images(viz_dir, redo=REDO):
     #     redo = False
 
     """ other types of image """
-    redo = False or GIVEN_PATH is not None
+    redo = False ## or GIVEN_PATH is not None
     if not check_key_same(viz_dir) or redo:
         # if isdir(rgb_dir):
         #     shutil.rmtree(rgb_dir)
@@ -431,6 +431,13 @@ def generate_images(viz_dir, redo=REDO):
     done = []
     for img_dir in dirs:
         done.append(isdir(img_dir) and len(listdir(img_dir)) >= num_imgs)
+
+        if isdir(img_dir):
+            files = [join(img_dir, f) for f in listdir(img_dir) if 'braiserbody' in f]
+            if len(files) == 2:
+                bottom_file = [f for f in files if 'braiser_bottom' in f][0]
+                braiser_file = [f for f in files if f not in bottom_file][0]
+                shutil.copy(braiser_file, bottom_file)
 
     if (False in done) or redo:
         print(viz_dir, f'{name} ...')
