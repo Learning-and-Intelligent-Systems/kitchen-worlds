@@ -32,7 +32,7 @@ from mamao_tools.data_utils import get_plan, get_body_map, get_multiple_solution
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser, \
     get_sample_envs_for_rss
 
-USE_GYM = True
+USE_GYM = False
 SAVE_COMPOSED_JPG = False
 SAVE_GIF = True
 SAVE_JPG = True or SAVE_COMPOSED_JPG or SAVE_GIF
@@ -75,6 +75,7 @@ GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/106'
 GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/4'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/19'
 GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/5'
+GIVEN_PATH = None
 
 GIVEN_DIR = None
 # GIVEN_DIR = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen_100'
@@ -113,11 +114,11 @@ TASK_NAME = 'mm_storage'
 
 # TASK_NAME = 'tt'
 # TASK_NAME = 'tt_storage'
-# TASK_NAME = 'tt_sink'
+TASK_NAME = 'tt_sink'
 # TASK_NAME = 'tt_braiser'
 
 CASES = None
-CASES = ['169']  ##
+# CASES = ['169']  ##
 # CASES = get_sample_envs_for_rss(task_name=TASK_NAME, count=None)
 
 if GIVEN_PATH:
