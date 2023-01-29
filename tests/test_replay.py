@@ -46,7 +46,7 @@ SAVE_MP4 = False
 STEP_BY_STEP = False
 AUTO_PLAY = True
 EVALUATE_QUALITY = False
-PARALLEL = SAVE_JPG and not PREVIEW_SCENE and False  ## and not CHECK_COLLISIONS
+PARALLEL = SAVE_JPG and not PREVIEW_SCENE and True  ## and not CHECK_COLLISIONS
 
 SKIP_IF_PROCESSED_RECENTLY = False
 CHECK_TIME = 1674417578
@@ -64,7 +64,7 @@ GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/mm_braiser_to_storage/1'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/_gmm/902'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/45' + '/rerun_230120_000551/commands.pkl'
-GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_storage/0' + '/rerun_2/diverse_commands_rerun_fc=None.pkl'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_storage/0' + '/rerun_2/diverse_commands_rerun_fc=None.pkl'
 
 GIVEN_DIR = None
 # GIVEN_DIR = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen_100'
@@ -97,12 +97,12 @@ GIVEN_DIR = None
 # TASK_NAME = 'mm'
 # TASK_NAME = 'mm_storage'
 # TASK_NAME = 'mm_sink'
-# TASK_NAME = 'mm_braiser'
+TASK_NAME = 'mm_braiser'
 # TASK_NAME = 'mm_sink_to_storage'
 # TASK_NAME = 'mm_braiser_to_storage'
 
 # TASK_NAME = 'tt'
-TASK_NAME = 'tt_storage'
+# TASK_NAME = 'tt_storage'
 
 CASES = None
 # CASES = ['45','340', '387', '467']  ##
@@ -406,6 +406,9 @@ def case_filter(run_dir_ori):
         return result
 
     if SAVE_JPG:
+        run_num = eval(run_dir_ori[run_dir_ori.rfind('/')+1:])
+        if 364 <= run_num < 386:
+            return True
         viz_dir = join(run_dir_ori, 'zoomin')
         if isdir(viz_dir):
             enough = len([a for a in listdir(viz_dir) if '.png' in a]) > 1

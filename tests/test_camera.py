@@ -49,7 +49,7 @@ ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb', 'meraki']
 # DEFAULT_TASK = 'mm'
 # DEFAULT_TASK = 'mm_storage'
 # DEFAULT_TASK = 'mm_sink'
-# DEFAULT_TASK = 'mm_braiser'
+DEFAULT_TASK = 'mm_braiser'
 # DEFAULT_TASK = 'mm_braiser_to_storage'
 # DEFAULT_TASK = 'mm_sink_to_storage'
 # DEFAULT_TASK = 'mm_storage_long'
@@ -57,7 +57,7 @@ ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb', 'meraki']
 # DEFAULT_TASK = 'tt_storage_long'
 # DEFAULT_TASK = 'tt_braiser_to_storage'
 
-DEFAULT_TASK = 'tt'
+# DEFAULT_TASK = 'tt'
 
 #################################################################
 
@@ -67,10 +67,10 @@ GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/129'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/122'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser_to_storage/4'
-GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink_to_storage/84'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink_to_storage/84'
 
 MODIFIED_TIME = 1663895681
-PARALLEL = False and (GIVEN_PATH is None)
+PARALLEL = True and (GIVEN_PATH is None)
 USE_VIEWER = True
 REDO = False
 
