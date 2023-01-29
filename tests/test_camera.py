@@ -47,9 +47,9 @@ ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb', 'meraki']
 #################################################################
 
 # DEFAULT_TASK = 'mm'
-# DEFAULT_TASK = 'mm_storage'
+DEFAULT_TASK = 'mm_storage'
 # DEFAULT_TASK = 'mm_sink'
-DEFAULT_TASK = 'mm_braiser'
+# DEFAULT_TASK = 'mm_braiser'
 # DEFAULT_TASK = 'mm_braiser_to_storage'
 # DEFAULT_TASK = 'mm_sink_to_storage'
 # DEFAULT_TASK = 'mm_storage_long'
@@ -59,12 +59,14 @@ DEFAULT_TASK = 'mm_braiser'
 
 # DEFAULT_TASK = 'tt'
 
+LARGER_WORLD = DEFAULT_TASK in ['mm_storage']
+
 #################################################################
 
 GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/230115_115113_original_0'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/165'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/129'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/0'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/122'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser_to_storage/4'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink_to_storage/84'
@@ -173,7 +175,7 @@ def render_segmentation_mask(test_dir, viz_dir, camera_poses, camera_kwargs, cam
                              transparent=False, pairs=None, width=1280, height=960, fx=800, done=None):
     ## width = 1960, height = 1470, fx = 800
     world = load_lisdf_pybullet(test_dir, width=width, height=height, verbose=False,
-                                transparent=transparent)
+                                transparent=transparent, larger_world=LARGER_WORLD)
     remove_body(world.robot.body)
     if transparent:
         world.make_doors_transparent()
