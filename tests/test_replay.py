@@ -32,7 +32,7 @@ from mamao_tools.data_utils import get_plan, get_body_map, get_multiple_solution
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser, \
     get_sample_envs_for_rss
 
-USE_GYM = False
+USE_GYM = True
 SAVE_COMPOSED_JPG = False
 SAVE_GIF = True
 SAVE_JPG = True or SAVE_COMPOSED_JPG or SAVE_GIF
@@ -54,7 +54,7 @@ CHECK_TIME = 1674417578
 GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/one_fridge_pick_pr2/one_fridge_pick_pr2_1004_01:29_1'
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/0104_094417_original_1'
-GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/232'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/232'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/10'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/563'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/1998/' + 'rerun/diverse_commands_rerun_fc=None.pkl'
@@ -65,6 +65,16 @@ GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/232'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/_gmm/902'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/45' + '/rerun_230120_000551/commands.pkl'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_storage/0' + '/rerun_2/diverse_commands_rerun_fc=None.pkl'
+
+## in the paper
+GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/169'
+GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/467'
+GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/469'
+GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/1'
+GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/106'
+GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/4'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/19'
+GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/5'
 
 GIVEN_DIR = None
 # GIVEN_DIR = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen_100'
@@ -95,19 +105,19 @@ GIVEN_DIR = None
 #####################################################################
 
 # TASK_NAME = 'mm'
-# TASK_NAME = 'mm_storage'
+TASK_NAME = 'mm_storage'
 # TASK_NAME = 'mm_sink'
-TASK_NAME = 'mm_braiser'
+# TASK_NAME = 'mm_braiser'
 # TASK_NAME = 'mm_sink_to_storage'
 # TASK_NAME = 'mm_braiser_to_storage'
 
 # TASK_NAME = 'tt'
 # TASK_NAME = 'tt_storage'
 # TASK_NAME = 'tt_sink'
-TASK_NAME = 'tt_braiser'
+# TASK_NAME = 'tt_braiser'
 
 CASES = None
-# CASES = ['45','340', '387', '467']  ##
+CASES = ['169']  ##
 # CASES = get_sample_envs_for_rss(task_name=TASK_NAME, count=None)
 
 if GIVEN_PATH:
@@ -172,12 +182,12 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, hei
     larger_world = 'rerun' in run_dir_ori and '/tt_' in run_dir_ori
     world = load_lisdf_pybullet(exp_dir, use_gui=not USE_GYM, width=width, height=height,
                                 verbose=False, larger_world=larger_world)
-    if GIVEN_PATH is not None:
+    if not USE_GYM and GIVEN_PATH is not None:
         wait_unlocked()
     problem = Problem(world)
     if verbose:
         world.summarize_all_objects()
-    body_map = get_body_map(run_dir, world)
+    body_map = get_body_map(run_dir, world, larger=False)
     result = check_if_exist_rerun(run_dir, world, commands, plan)
     if result is None:
         print(run_dir_ori, 'does not have rerun commands.pkl')
