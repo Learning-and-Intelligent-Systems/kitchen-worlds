@@ -41,7 +41,7 @@ from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 GENERATE_MULTIPLE_SOLUTIONS = False
 GENERATE_SKELETONS = False
 GENERATE_NEW_PROBLEM = False
-GENERATE_NEW_LABELS = True
+GENERATE_NEW_LABELS = False
 USE_LARGE_WORLD = True
 
 USE_VIEWER = False
@@ -82,7 +82,7 @@ check_time = 1666297068  ## 1665768219 for goals, 1664750094 for in, 1666297068 
 TASK_NAME = 'mm_braiser'
 # TASK_NAME = '_test'
 
-# TASK_NAME = 'tt_storage'
+TASK_NAME = 'tt_storage'
 # TASK_NAME = 'tt_sink'
 # TASK_NAME = 'tt_braiser'
 # TASK_NAME = 'tt_storage_to_storage'
@@ -101,7 +101,7 @@ if CASES is not None:
     SKIP_IF_SOLVED_RECENTLY = False
 
 PARALLEL = GENERATE_SKELETONS and False
-FEASIBILITY_CHECKER = 'None'
+FEASIBILITY_CHECKER = 'pvt-task'
 ## None | oracle | pvt | pvt* | pvt-task | pvt-all | binary | shuffle | heuristic
 if GENERATE_SKELETONS:
     FEASIBILITY_CHECKER = 'oracle'
