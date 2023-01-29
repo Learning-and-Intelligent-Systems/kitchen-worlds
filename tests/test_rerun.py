@@ -41,7 +41,7 @@ from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 GENERATE_MULTIPLE_SOLUTIONS = False
 GENERATE_SKELETONS = False
 GENERATE_NEW_PROBLEM = False
-GENERATE_NEW_LABELS = True
+GENERATE_NEW_LABELS = False
 USE_LARGE_WORLD = True
 
 USE_VIEWER = False
@@ -77,20 +77,20 @@ check_time = 1666297068  ## 1665768219 for goals, 1664750094 for in, 1666297068 
 
 ##########################################
 
-TASK_NAME = 'mm_storage'
+# TASK_NAME = 'mm_storage'
 # TASK_NAME = 'mm_sink'
 # TASK_NAME = 'mm_braiser'
 # TASK_NAME = '_test'
 
 # TASK_NAME = 'tt_storage'
 # TASK_NAME = 'tt_sink'
-# TASK_NAME = 'tt_braiser'
+TASK_NAME = 'tt_braiser'
 # TASK_NAME = 'tt_storage_to_storage'
 # TASK_NAME = 'tt_sink_to_storage'
 # TASK_NAME = 'tt_braiser_to_storage'
 
 CASES = None  ##
-# CASES = ['0']
+# CASES = ['1']
 # CASES = ['45', '340', '387', '467'] ## mm_storage
 # CASES = ['150', '395', '399', '404', '406', '418', '424', '428', '430', '435', '438', '439', '444', '453', '455', '466', '475', '479', '484', '489', '494', '539', '540', '547', '548', '553', '802', '804', '810', '815', '818', '823', '831', '833', '838', '839', '848', '858', '860', '862']
 # CASES = ['1514', '1566', '1612', '1649', '1812', '2053', '2110', '2125', '2456', '2534', '2535', '2576', '2613']
@@ -161,6 +161,7 @@ def check_if_skip(run_dir, **kwargs):
     skip = False
     # return skip
     if GENERATE_NEW_PROBLEM:
+        return False
         file = join(run_dir, f'problem_larger.pddl')
         return isfile(file)
 
