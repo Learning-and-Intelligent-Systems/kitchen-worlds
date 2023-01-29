@@ -64,18 +64,18 @@ GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/mm_braiser_to_storage/1'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/_gmm/902'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/45' + '/rerun_230120_000551/commands.pkl'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_storage/0' + '/rerun_2/diverse_commands_rerun_fc=None.pkl'
+GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_sink/0' + '/rerun_2/diverse_commands_rerun_fc=None.pkl'
 
 ## in the paper
-GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/169'
-GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/467'
-GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/469'
-GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/1'
-GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/106'
-GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/4'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/169'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/467'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/469'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/1'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/106'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/4'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/19'
-GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/5'
-GIVEN_PATH = None
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/5'
+# GIVEN_PATH = None
 
 GIVEN_DIR = None
 # GIVEN_DIR = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen_100'
