@@ -54,13 +54,13 @@ CHECK_TIME = 1674417578
 GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/one_fridge_pick_pr2/one_fridge_pick_pr2_1004_01:29_1'
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/0104_094417_original_1'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/528'
+GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/232'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/10'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/563'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/1998/' + 'rerun/diverse_commands_rerun_fc=None.pkl'
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/230115_115113_original_0'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/mm_sink_to_storage/43'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/tt_sink/1'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/tt_sink/26'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/mm_braiser_to_storage/1'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/_gmm/902'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/45' + '/rerun_230120_000551/commands.pkl'
@@ -103,6 +103,8 @@ TASK_NAME = 'mm_braiser'
 
 # TASK_NAME = 'tt'
 # TASK_NAME = 'tt_storage'
+# TASK_NAME = 'tt_sink'
+TASK_NAME = 'tt_braiser'
 
 CASES = None
 # CASES = ['45','340', '387', '467']  ##
@@ -170,7 +172,8 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, hei
     larger_world = 'rerun' in run_dir_ori and '/tt_' in run_dir_ori
     world = load_lisdf_pybullet(exp_dir, use_gui=not USE_GYM, width=width, height=height,
                                 verbose=False, larger_world=larger_world)
-    # wait_unlocked()
+    if GIVEN_PATH is not None:
+        wait_unlocked()
     problem = Problem(world)
     if verbose:
         world.summarize_all_objects()
@@ -392,8 +395,7 @@ def case_filter(run_dir_ori):
 
     result = True
     if CHECK_COLLISIONS:
-        return True
-        # config, mod_time = load_planning_config(run_dir_ori, return_mod_time=True)
+        config, mod_time = load_planning_config(run_dir_ori, return_mod_time=True)
         if 'cfree' in config: ##  and config['cfree']:
             if mod_time > 1674746024:
                 return False
@@ -406,9 +408,9 @@ def case_filter(run_dir_ori):
         return result
 
     if SAVE_JPG:
-        run_num = eval(run_dir_ori[run_dir_ori.rfind('/')+1:])
-        if 364 <= run_num < 386:
-            return True
+        # run_num = eval(run_dir_ori[run_dir_ori.rfind('/')+1:])
+        # if 364 <= run_num < 386:
+        #     return True
         viz_dir = join(run_dir_ori, 'zoomin')
         if isdir(viz_dir):
             enough = len([a for a in listdir(viz_dir) if '.png' in a]) > 1

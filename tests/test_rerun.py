@@ -41,7 +41,7 @@ from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 GENERATE_MULTIPLE_SOLUTIONS = False
 GENERATE_SKELETONS = False
 GENERATE_NEW_PROBLEM = False
-GENERATE_NEW_LABELS = False
+GENERATE_NEW_LABELS = True
 USE_LARGE_WORLD = True
 
 USE_VIEWER = False
@@ -82,7 +82,7 @@ TASK_NAME = 'mm_storage'
 # TASK_NAME = 'mm_braiser'
 # TASK_NAME = '_test'
 
-TASK_NAME = 'tt_storage'
+# TASK_NAME = 'tt_storage'
 # TASK_NAME = 'tt_sink'
 # TASK_NAME = 'tt_braiser'
 # TASK_NAME = 'tt_storage_to_storage'
@@ -162,6 +162,11 @@ def check_if_skip(run_dir, **kwargs):
     # return skip
     if GENERATE_NEW_PROBLEM:
         file = join(run_dir, f'problem_larger.pddl')
+        return isfile(file)
+
+    elif GENERATE_NEW_LABELS:
+        return False
+        file = join(run_dir, f'diverse_plans_larger.json')
         return isfile(file)
 
     elif GENERATE_SKELETONS:
@@ -300,8 +305,6 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
             max_plans=100,  ## number of skeletons
             visualize=True,
         ))
-        if GENERATE_NEW_LABELS:
-            kwargs['downward_time'] = 6
         if GENERATE_SKELETONS or GENERATE_NEW_LABELS:
             kwargs['evaluation_time'] = -0.5
             # if MORE_PLANS:
