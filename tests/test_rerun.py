@@ -33,7 +33,7 @@ from world_builder.actions import apply_actions
 
 from mamao_tools.data_utils import get_instance_info, exist_instance, get_indices, \
     get_plan_skeleton, get_successful_plan, get_feasibility_checker, get_plan, get_body_map, \
-    modify_plan_with_body_map, add_to_planning_config
+    modify_plan_with_body_map, add_to_planning_config, load_planning_config
 
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 
@@ -41,7 +41,7 @@ from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 GENERATE_MULTIPLE_SOLUTIONS = False
 GENERATE_SKELETONS = False
 GENERATE_NEW_PROBLEM = True
-GENERATE_NEW_LABELS = True
+GENERATE_NEW_LABELS = False
 USE_LARGE_WORLD = True
 
 USE_VIEWER = False
@@ -79,18 +79,18 @@ check_time = 1666297068  ## 1665768219 for goals, 1664750094 for in, 1666297068 
 
 # TASK_NAME = 'mm_storage'
 # TASK_NAME = 'mm_sink'
-TASK_NAME = 'mm_braiser'
+# TASK_NAME = 'mm_braiser'
 # TASK_NAME = '_test'
 
 # TASK_NAME = 'tt_storage'
 # TASK_NAME = 'tt_sink'
-# TASK_NAME = 'tt_braiser'
+TASK_NAME = 'tt_braiser'
 # TASK_NAME = 'tt_storage_to_storage'
 # TASK_NAME = 'tt_sink_to_storage'
 # TASK_NAME = 'tt_braiser_to_storage'
 
 CASES = None  ##
-# CASES = ['1']
+# CASES = ['0']
 # CASES = ['45', '340', '387', '467'] ## mm_storage
 # CASES = ['150', '395', '399', '404', '406', '418', '424', '428', '430', '435', '438', '439', '444', '453', '455', '466', '475', '479', '484', '489', '494', '539', '540', '547', '548', '553', '802', '804', '810', '815', '818', '823', '831', '833', '838', '839', '848', '858', '860', '862']
 # CASES = ['1514', '1566', '1612', '1649', '1812', '2053', '2110', '2125', '2456', '2534', '2535', '2576', '2613']
@@ -261,6 +261,7 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
                                              larger_world=larger_world)
     _, _, _, stream_map, init, goal = pddlstream_problem
     world.summarize_facts(init)
+    print_goal(goal)
 
     ######################################################
     if GENERATE_NEW_PROBLEM:
@@ -270,11 +271,15 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
         out_path = join(run_dir, 'problem_larger.pddl')
 
         ## add new objects and facts according to key
-        added_obj, added_init, added_body_to_name = add_objects_and_facts(world, init, goal)
+        added_obj, added_init = add_objects_and_facts(world, init, goal)
 
         ## generate a new problem
         generate_problem_pddl(world, init, goal, out_path=out_path,
                               added_obj=added_obj, added_init=added_init)
+        body_to_name = load_planning_config(run_dir)['body_to_name']
+        added_body_to_name = {
+            str(world.name_to_body[k]): k for k in list(body_to_name.values())+added_obj
+        }
         add_to_planning_config(run_dir, {'body_to_name_new': added_body_to_name})
 
         reset_simulation()
@@ -284,7 +289,6 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     ######################################################
 
     stream_info = world.robot.get_stream_info(partial=False, defer=False)
-    print_goal(goal)
     print(SEPARATOR)
 
     ######################################################
@@ -306,6 +310,10 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
             max_plans=100,  ## number of skeletons
             visualize=True,
         ))
+        # if FEASIBILITY_CHECKER == 'larger' and '_braiser' in run_dir:
+        #     kwargs['downward_time'] = 6
+        #     kwargs['max_plans'] = 200
+
         if GENERATE_SKELETONS or GENERATE_NEW_LABELS:
             kwargs['evaluation_time'] = -0.5
             # if MORE_PLANS:
