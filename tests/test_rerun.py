@@ -79,7 +79,7 @@ check_time = 1666297068  ## 1665768219 for goals, 1664750094 for in, 1666297068 
 
 # TASK_NAME = 'mm_storage'
 # TASK_NAME = 'mm_sink'
-TASK_NAME = 'mm_braiser'
+# TASK_NAME = 'mm_braiser'
 # TASK_NAME = '_test'
 
 TASK_NAME = 'tt_storage'
@@ -87,7 +87,7 @@ TASK_NAME = 'tt_sink'
 # TASK_NAME = 'tt_braiser'
 # TASK_NAME = 'tt_storage_to_storage'
 # TASK_NAME = 'tt_sink_to_storage'
-# TASK_NAME = 'tt_braiser_to_storage'
+TASK_NAME = 'tt_braiser_to_storage'
 
 CASES = None  ##
 # CASES = ['0']
@@ -314,7 +314,7 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
         kwargs.update(dict(
             diverse=DIVERSE,
             downward_time=3,  ## max time to get 100, 10 sec, 30 sec for 300
-            evaluation_time=20,  ## on each skeleton
+            evaluation_time=60,  ## on each skeleton
             max_plans=100,  ## number of skeletons
             visualize=True,
         ))
