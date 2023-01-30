@@ -79,7 +79,7 @@ check_time = 1666297068  ## 1665768219 for goals, 1664750094 for in, 1666297068 
 
 # TASK_NAME = 'mm_storage'
 # TASK_NAME = 'mm_sink'
-TASK_NAME = 'mm_braiser'
+# TASK_NAME = 'mm_braiser'
 # TASK_NAME = '_test'
 
 # TASK_NAME = 'tt_storage'
@@ -242,7 +242,7 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     exp_dir = copy_dir_for_process(run_dir, tag='rerunning')
 
     if False:
-        from utils import load_lisdf_synthesizer
+        from isaac_tools.urdf_utils import load_lisdf_synthesizer
         scene = load_lisdf_synthesizer(exp_dir)
 
     world = load_lisdf_pybullet(exp_dir, verbose=False, use_gui=args.viewer,
@@ -270,7 +270,7 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     problem = Problem(world)
 
     if False:
-        from utils import load_lisdf_nvisii
+        from isaac_tools.urdf_utils import load_lisdf_nvisii
         scene = load_lisdf_nvisii(exp_dir)
 
     ## because there can be a gap in body indexing due to reachability checking created gripper
