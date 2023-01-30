@@ -41,8 +41,8 @@ from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 ## special modes
 GENERATE_MULTIPLE_SOLUTIONS = False
 GENERATE_SKELETONS = False
-GENERATE_NEW_PROBLEM = True
-GENERATE_NEW_LABELS = True
+GENERATE_NEW_PROBLEM = False
+GENERATE_NEW_LABELS = False
 USE_LARGE_WORLD = True
 
 USE_VIEWER = False
@@ -81,7 +81,7 @@ check_time = 1666297068  ## 1665768219 for goals, 1664750094 for in, 1666297068 
 # TASK_NAME = 'mm_storage'
 # TASK_NAME = 'mm_sink'
 # TASK_NAME = 'mm_braiser'
-TASK_NAME = 'mm_braiser_to_storage'
+# TASK_NAME = 'mm_braiser_to_storage'
 # TASK_NAME = '_test'
 
 # TASK_NAME = 'tt_storage'
@@ -89,7 +89,7 @@ TASK_NAME = 'mm_braiser_to_storage'
 # TASK_NAME = 'tt_braiser'
 # TASK_NAME = 'tt_storage_to_storage'
 # TASK_NAME = 'tt_sink_to_storage'
-# TASK_NAME = 'tt_braiser_to_storage'
+TASK_NAME = 'tt_braiser_to_storage'
 
 evaluation_time = {
     'tt_storage': 60,
@@ -171,6 +171,7 @@ def clear_all_rerun_results(run_dir, **kwargs):
 
 def check_if_skip(run_dir, **kwargs):
     skip = False
+    run_num = eval(run_dir.split('/')[-1])
     # return skip
     if GENERATE_NEW_PROBLEM:
         return False
@@ -222,6 +223,11 @@ def check_if_skip(run_dir, **kwargs):
 def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     from pybullet_tools.logging import myprint as print
     ori_dir = join(run_dir, RERUN_SUBDIR)
+    #######################################################
+    # if 'tt_' in run_dir:
+    #     diverse_larger = join(run_dir, 'diverse_plans_larger.json')
+    #     if isfile(diverse_larger):
+    #         os.remove(diverse_larger)
     #######################################################
     # if isdir(ori_dir):
     #     shutil.rmtree(ori_dir)
