@@ -33,7 +33,8 @@ from world_builder.actions import apply_actions
 
 from mamao_tools.data_utils import get_instance_info, exist_instance, get_indices, \
     get_plan_skeleton, get_successful_plan, get_feasibility_checker, get_plan, get_body_map, \
-    modify_plan_with_body_map, add_to_planning_config, load_planning_config
+    modify_plan_with_body_map, add_to_planning_config, load_planning_config, \
+    add_objects_and_facts
 
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 
@@ -41,7 +42,7 @@ from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 GENERATE_MULTIPLE_SOLUTIONS = False
 GENERATE_SKELETONS = False
 GENERATE_NEW_PROBLEM = True
-GENERATE_NEW_LABELS = False
+GENERATE_NEW_LABELS = True
 USE_LARGE_WORLD = True
 
 USE_VIEWER = False
@@ -80,6 +81,7 @@ check_time = 1666297068  ## 1665768219 for goals, 1664750094 for in, 1666297068 
 # TASK_NAME = 'mm_storage'
 # TASK_NAME = 'mm_sink'
 # TASK_NAME = 'mm_braiser'
+TASK_NAME = 'mm_braiser_to_storage'
 # TASK_NAME = '_test'
 
 # TASK_NAME = 'tt_storage'
@@ -87,7 +89,7 @@ check_time = 1666297068  ## 1665768219 for goals, 1664750094 for in, 1666297068 
 # TASK_NAME = 'tt_braiser'
 # TASK_NAME = 'tt_storage_to_storage'
 # TASK_NAME = 'tt_sink_to_storage'
-TASK_NAME = 'tt_braiser_to_storage'
+# TASK_NAME = 'tt_braiser_to_storage'
 
 evaluation_time = {
     'tt_storage': 60,
@@ -171,12 +173,12 @@ def check_if_skip(run_dir, **kwargs):
     skip = False
     # return skip
     if GENERATE_NEW_PROBLEM:
-        # return False
+        return False
         file = join(run_dir, f'problem_larger.pddl')
         return isfile(file)
 
     elif GENERATE_NEW_LABELS:
-        # return False
+        return False
         file = join(run_dir, f'diverse_plans_larger.json')
         return isfile(file)
 
@@ -283,13 +285,12 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
 
     ######################################################
     if GENERATE_NEW_PROBLEM:
-        from world_builder.world_generator import generate_problem_pddl, \
-            add_objects_and_facts
+        from world_builder.world_generator import generate_problem_pddl
 
         out_path = join(run_dir, 'problem_larger.pddl')
 
         ## add new objects and facts according to key
-        added_obj, added_init = add_objects_and_facts(world, init, goal)
+        added_obj, added_init = add_objects_and_facts(world, init, run_dir)
 
         ## generate a new problem
         generate_problem_pddl(world, init, goal, out_path=out_path,
