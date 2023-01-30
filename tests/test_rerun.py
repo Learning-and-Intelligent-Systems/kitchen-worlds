@@ -82,15 +82,25 @@ check_time = 1666297068  ## 1665768219 for goals, 1664750094 for in, 1666297068 
 TASK_NAME = 'mm_braiser'
 # TASK_NAME = '_test'
 
-TASK_NAME = 'tt_storage'
-TASK_NAME = 'tt_sink'
+# TASK_NAME = 'tt_storage'
+# TASK_NAME = 'tt_sink'
 # TASK_NAME = 'tt_braiser'
 # TASK_NAME = 'tt_storage_to_storage'
 # TASK_NAME = 'tt_sink_to_storage'
-# TASK_NAME = 'tt_braiser_to_storage'
+TASK_NAME = 'tt_braiser_to_storage'
+
+evaluation_time = {
+    'tt_storage': 60,
+    'tt_sink': 20,
+    'tt_braiser': 60,
+    'tt_sink_to_storage': 30,
+    'tt_braiser_to_storage': 30,
+}
+evaluation_time.update({n.replace('tt', 'mm'): v for n, v in evaluation_time.items()})
+evaluation_time = evaluation_time[TASK_NAME]
 
 CASES = None  ##
-# CASES = ['0']
+CASES = ['0']
 # CASES = ['45', '340', '387', '467'] ## mm_storage
 # CASES = ['150', '395', '399', '404', '406', '418', '424', '428', '430', '435', '438', '439', '444', '453', '455', '466', '475', '479', '484', '489', '494', '539', '540', '547', '548', '553', '802', '804', '810', '815', '818', '823', '831', '833', '838', '839', '848', '858', '860', '862']
 # CASES = ['1514', '1566', '1612', '1649', '1812', '2053', '2110', '2125', '2456', '2534', '2535', '2576', '2613']
@@ -314,7 +324,7 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
         kwargs.update(dict(
             diverse=DIVERSE,
             downward_time=3,  ## max time to get 100, 10 sec, 30 sec for 300
-            evaluation_time=20,  ## on each skeleton
+            evaluation_time=evaluation_time,  ## on each skeleton
             max_plans=100,  ## number of skeletons
             visualize=True,
         ))
