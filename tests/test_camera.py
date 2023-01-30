@@ -69,7 +69,7 @@ GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/165'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/0'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/0'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser_to_storage/4'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser_to_storage/1'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink_to_storage/84'
 
 MODIFIED_TIME = 1663895681
@@ -277,7 +277,8 @@ def render_segmentation_mask(test_dir, viz_dir, camera_poses, camera_kwargs, cam
             ## save the cropped image
             save_seg_image_given_obj_keys(rgb, keys, unique, file_name, **crop_kwargs)
 
-        if len([f for f in files if 'braiserbody' in f]) == 2:
+        files = [f for f in files if 'braiserbody' in f]
+        if len(files) == 2:
             bottom_file = [f for f in files if 'braiser_bottom' in f][0]
             braiser_file = [f for f in files if f not in bottom_file][0]
             shutil.copy(braiser_file, bottom_file)
@@ -334,6 +335,25 @@ def get_num_images(viz_dir, pairwise=False):
 
 def generate_images(viz_dir, redo=REDO):
 
+    # s5 = join(viz_dir, 'seg_images_5')
+    # s6 = join(viz_dir, 'seg_images_6')
+    # s7 = join(viz_dir, 'seg_images_7')
+    # shutil.move(s5, s7)
+    # shutil.move(s6, s5)
+    # files = [join(s5, f) for f in listdir(s5) if 'png' in f]
+    # for f in files:
+    #     shutil.move(f, f.replace('/seg_images_6', '/seg_images_5'))
+    # return
+
+    file = join(viz_dir, 'seg_images_0', 'seg_images_0_[25]_braiserbody#1.png')
+    if not isfile(file):
+        print(file)
+    return
+
+    # run_num = eval(viz_dir.split('/')[-1])
+    # if run_num < 80:
+    #     return
+
     """ get the camera poses """
     camera_pose = get_camera_pose(viz_dir)
     camera_zoomins = []
@@ -376,7 +396,7 @@ def generate_images(viz_dir, redo=REDO):
     #     redo = False
 
     """ other types of image """
-    redo = False ## or GIVEN_PATH is not None
+    redo = False or GIVEN_PATH is not None
     if not check_key_same(viz_dir) or redo:
         # if isdir(rgb_dir):
         #     shutil.rmtree(rgb_dir)
@@ -384,7 +404,7 @@ def generate_images(viz_dir, redo=REDO):
         #     if isdir(crop_dir):
         #         shutil.rmtree(crop_dir)
         for seg_dir in seg_dirs:
-            if isdir(seg_dir): ## and ('images_5' in seg_dir or 'images_6' in seg_dir):
+            if isdir(seg_dir) and ('images_5' in seg_dir): ##  or 'images_6' in seg_dir
                 shutil.rmtree(seg_dir)
         # for transp_dir in transp_dirs:
         #     if isdir(transp_dir):
