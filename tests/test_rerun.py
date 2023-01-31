@@ -101,8 +101,10 @@ evaluation_time = {
 evaluation_time.update({n.replace('tt', 'mm'): v for n, v in evaluation_time.items()})
 evaluation_time = evaluation_time[TASK_NAME]
 
+downward_time = 5 if not GENERATE_NEW_LABELS or 'braiser_to_storage' in TASK_NAME else 3
+
 CASES = None  ##
-# CASES = ['1']
+# CASES = ['34']
 # CASES = ['45', '340', '387', '467'] ## mm_storage
 # CASES = ['150', '395', '399', '404', '406', '418', '424', '428', '430', '435', '438', '439', '444', '453', '455', '466', '475', '479', '484', '489', '494', '539', '540', '547', '548', '553', '802', '804', '810', '815', '818', '823', '831', '833', '838', '839', '848', '858', '860', '862']
 # CASES = ['1514', '1566', '1612', '1649', '1812', '2053', '2110', '2125', '2456', '2534', '2535', '2576', '2613']
@@ -339,7 +341,7 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     if DIVERSE:
         kwargs.update(dict(
             diverse=DIVERSE,
-            downward_time=3,  ## max time to get 100, 10 sec, 30 sec for 300
+            downward_time=downward_time,  ## max time to get 100, 10 sec, 30 sec for 300
             evaluation_time=evaluation_time,  ## on each skeleton
             max_plans=100,  ## number of skeletons
             visualize=True,

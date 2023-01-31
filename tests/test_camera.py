@@ -47,7 +47,7 @@ ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb', 'meraki']
 #################################################################
 
 # DEFAULT_TASK = 'mm'
-# DEFAULT_TASK = 'mm_storage'  ## done
+DEFAULT_TASK = 'mm_storage'  ## done
 # DEFAULT_TASK = 'mm_braiser'
 # DEFAULT_TASK = 'mm_sink'
 # DEFAULT_TASK = 'mm_braiser_to_storage'
@@ -55,6 +55,8 @@ ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb', 'meraki']
 # DEFAULT_TASK = 'mm_storage_long'
 
 DEFAULT_TASK = 'tt_storage'  ## done
+# DEFAULT_TASK = 'tt_storage'  ## done
+# DEFAULT_TASK = 'tt_braiser'
 # DEFAULT_TASK = 'tt_storage_long'
 # DEFAULT_TASK = 'tt_braiser_to_storage'
 
@@ -68,13 +70,14 @@ GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/230115_115113_original_0'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/165'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/0'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/0'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_storage/0'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_braiser/0'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser_to_storage/1'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink_to_storage/84'
 GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_storage/2'
 
 MODIFIED_TIME = 1663895681
-PARALLEL = False and (GIVEN_PATH is None)
+PARALLEL = True and (GIVEN_PATH is None)
 USE_VIEWER = True
 REDO = False
 
@@ -184,7 +187,7 @@ def render_segmentation_mask(test_dir, viz_dir, camera_poses, camera_kwargs, cam
         doorless_lisdf = create_doorless_lisdf(test_dir)
 
     """ find the door links """
-    indices = get_indices(viz_dir) ## , body_map=get_body_map(viz_dir, world)
+    indices = get_indices(viz_dir, body_map=get_body_map(viz_dir, world)) ##
     indices = adjust_indices_for_full_kitchen(indices)
 
     ## pointing at goal regions: initial and final
@@ -348,7 +351,6 @@ def generate_images(viz_dir, redo=REDO):
     # return
 
     ##################################################
-
     # file = join(viz_dir, 'seg_images_0', 'seg_images_0_[25]_braiserbody#1.png')
     # if not isfile(file):
     #     print(file)
@@ -400,7 +402,7 @@ def generate_images(viz_dir, redo=REDO):
     #     redo = False
 
     """ other types of image """
-    redo = False or GIVEN_PATH is not None
+    redo = True ## or GIVEN_PATH is not None
     if not check_key_same(viz_dir) or redo:
         # if isdir(rgb_dir):
         #     shutil.rmtree(rgb_dir)
@@ -408,7 +410,7 @@ def generate_images(viz_dir, redo=REDO):
         #     if isdir(crop_dir):
         #         shutil.rmtree(crop_dir)
         for seg_dir in seg_dirs:
-            if isdir(seg_dir): ## and ('seg_images_5/' in seg_dir): ## or 'seg_images_6/' in seg_dir:
+            if isdir(seg_dir) and '/seg_images_5' in seg_dir: ##  or 'images_6' in seg_dir
                 shutil.rmtree(seg_dir)
         # for transp_dir in transp_dirs:
         #     if isdir(transp_dir):
