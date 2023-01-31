@@ -46,7 +46,7 @@ SAVE_MP4 = False
 STEP_BY_STEP = False
 AUTO_PLAY = True
 EVALUATE_QUALITY = False
-PARALLEL = SAVE_JPG and not PREVIEW_SCENE and True  ## and not CHECK_COLLISIONS
+PARALLEL = SAVE_JPG and not PREVIEW_SCENE and False  ## and not CHECK_COLLISIONS
 
 SKIP_IF_PROCESSED_RECENTLY = False
 CHECK_TIME = 1674417578
@@ -64,7 +64,7 @@ GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/mm_braiser_to_storage/1'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/_gmm/902'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/45' + '/rerun_230120_000551/commands.pkl'
-GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_sink/0' + '/rerun_2/diverse_commands_rerun_fc=None.pkl'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_sink/0' + '/rerun_2/diverse_commands_rerun_fc=None.pkl'
 
 ## in the paper
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/169'
@@ -114,8 +114,10 @@ TASK_NAME = 'mm_storage'
 
 # TASK_NAME = 'tt'
 # TASK_NAME = 'tt_storage'
-TASK_NAME = 'tt_sink'
+# TASK_NAME = 'tt_sink'
 # TASK_NAME = 'tt_braiser'
+
+TASK_NAME = 'ww_sink'
 
 CASES = None
 # CASES = ['169']  ##

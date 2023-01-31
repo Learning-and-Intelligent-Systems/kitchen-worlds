@@ -84,12 +84,12 @@ check_time = 1666297068  ## 1665768219 for goals, 1664750094 for in, 1666297068 
 # TASK_NAME = 'mm_braiser_to_storage'
 # TASK_NAME = '_test'
 
-# TASK_NAME = 'tt_storage'
+TASK_NAME = 'tt_storage'
 # TASK_NAME = 'tt_sink'
 # TASK_NAME = 'tt_braiser'
 # TASK_NAME = 'tt_storage_to_storage'
 # TASK_NAME = 'tt_sink_to_storage'
-TASK_NAME = 'tt_braiser_to_storage'
+# TASK_NAME = 'tt_braiser_to_storage'
 
 evaluation_time = {
     'tt_storage': 60,
@@ -113,7 +113,7 @@ if CASES is not None:
     SKIP_IF_SOLVED_RECENTLY = False
 
 PARALLEL = GENERATE_SKELETONS and False
-FEASIBILITY_CHECKER = 'None'
+FEASIBILITY_CHECKER = 'pvt-task'
 ## None | oracle | pvt | pvt* | pvt-task | pvt-all | binary | shuffle | heuristic
 if GENERATE_SKELETONS:
     FEASIBILITY_CHECKER = 'oracle'
@@ -237,6 +237,15 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     #     rem_files = [f for f in listdir(ori_dir) if f'={FEASIBILITY_CHECKER}' in f]
     #     for f in rem_files:
     #         os.remove(join(ori_dir, f))
+    # return
+    #######################################################
+    # if isdir(ori_dir):
+    #     des_dir = join(run_dir, RERUN_SUBDIR+'_old')
+    #     if not isdir(des_dir):
+    #         os.mkdir(des_dir)
+    #     rem_files = [f for f in listdir(ori_dir) if f'={FEASIBILITY_CHECKER}' in f]
+    #     for f in rem_files:
+    #         shutil.move(join(ori_dir, f), join(des_dir, f))
     # return
     #######################################################
     if not isdir(ori_dir):
