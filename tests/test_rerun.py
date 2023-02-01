@@ -86,10 +86,10 @@ check_time = 1675220260  ## for 12 sec of FD
 
 # TASK_NAME = 'tt_storage'
 # TASK_NAME = 'tt_sink'
-TASK_NAME = 'tt_braiser'
+# TASK_NAME = 'tt_braiser'
 # TASK_NAME = 'tt_storage_to_storage'
 # TASK_NAME = 'tt_sink_to_storage'
-# TASK_NAME = 'tt_braiser_to_storage'
+TASK_NAME = 'tt_braiser_to_storage'
 
 # TASK_NAME = 'hh_braiser'
 
@@ -123,7 +123,7 @@ if CASES is not None:
     SKIP_IF_SOLVED_RECENTLY = False
 
 PARALLEL = GENERATE_SKELETONS and False
-FEASIBILITY_CHECKER = 'None'
+FEASIBILITY_CHECKER = 'pvt-56'
 ## None | oracle | pvt | pvt* | pvt-task | pvt-all | binary | shuffle | heuristic
 if GENERATE_SKELETONS:
     FEASIBILITY_CHECKER = 'oracle'
@@ -449,10 +449,12 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
                 shutil.move(join(run_dir, ori_dir), rerun_dir)
                 commands_name = 'commands.pkl'
                 log_name = 'log.json'
+                txt_name = 'printouts.txt'
             else:
                 rerun_dir = ori_dir
                 commands_name = f'{PREFIX}commands_rerun_fc={FEASIBILITY_CHECKER}.pkl'
                 log_name = f'{PREFIX}runlog_fc={FEASIBILITY_CHECKER}.json'
+                txt_name = f'{PREFIX}printouts_fc={FEASIBILITY_CHECKER}.json'
 
             inv_body_map = get_body_map(run_dir, world, inv=True)
             new_plan = modify_plan_with_body_map(plan, inv_body_map)
@@ -460,6 +462,7 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
                 pickle.dump(post_process(problem, new_plan), f)
 
             shutil.move(join('visualizations', 'log.json'), join(rerun_dir, log_name))
+            shutil.move(join('txt_file.txt'), join(rerun_dir, txt_name))
 
             if 'fastamp-data-rss/mm_' in run_dir and len(old_plan) > len(plan):
                 with open(join(rerun_dir, 'planning_config.json'), 'w') as f:
