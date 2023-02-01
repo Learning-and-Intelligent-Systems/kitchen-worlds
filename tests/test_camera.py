@@ -61,6 +61,7 @@ DEFAULT_TASK = 'tt_storage'  ## done
 # DEFAULT_TASK = 'tt_braiser_to_storage'
 
 # DEFAULT_TASK = 'tt'
+DEFAULT_TASK = 'hh_braiser'
 
 LARGER_WORLD = 'mm_' in DEFAULT_TASK or 'tt_' in DEFAULT_TASK
 
@@ -74,10 +75,10 @@ GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_braiser/0'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser_to_storage/1'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink_to_storage/84'
-GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_storage/2'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_storage/2'
 
 MODIFIED_TIME = 1663895681
-PARALLEL = True and (GIVEN_PATH is None)
+PARALLEL = False and (GIVEN_PATH is None)
 USE_VIEWER = True
 REDO = False
 
