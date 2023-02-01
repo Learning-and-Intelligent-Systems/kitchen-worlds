@@ -54,7 +54,7 @@ RERUN_SUBDIR = 'rerun_2'
 SKIP_IF_SOLVED = True and not GENERATE_SKELETONS
 SKIP_IF_SOLVED_RECENTLY = True and not GENERATE_SKELETONS
 RETRY_IF_FAILED = True
-check_time = 1666297068  ## 1665768219 for goals, 1664750094 for in, 1666297068 for goals
+check_time = 1675220260  ## for 12 sec of FD
 
 #########################################
 
@@ -101,16 +101,18 @@ evaluation_time = {
     'tt_sink': 20,
     'tt_braiser': 60,
     'tt_sink_to_storage': 30,
-    'tt_braiser_to_storage': 30,
+    'tt_braiser_to_storage': 60,
 }
 evaluation_time.update({n.replace('tt', 'mm'): v for n, v in evaluation_time.items()})
 evaluation_time.update({n.replace('tt', 'hh'): v for n, v in evaluation_time.items()})
 evaluation_time = evaluation_time[TASK_NAME]
 
-downward_time = 10 if not GENERATE_NEW_LABELS or 'braiser_to_storage' in TASK_NAME else 3
+downward_time = 3
+if 'braiser_to_storage' in TASK_NAME:
+    downward_time = 120
 
 CASES = None  ##
-# CASES = ['40']
+# CASES = ['0']
 # CASES = ['45', '340', '387', '467'] ## mm_storage
 # CASES = ['150', '395', '399', '404', '406', '418', '424', '428', '430', '435', '438', '439', '444', '453', '455', '466', '475', '479', '484', '489', '494', '539', '540', '547', '548', '553', '802', '804', '810', '815', '818', '823', '831', '833', '838', '839', '848', '858', '860', '862']
 # CASES = ['1514', '1566', '1612', '1649', '1812', '2053', '2110', '2125', '2456', '2534', '2535', '2576', '2613']
@@ -131,6 +133,7 @@ if GENERATE_NEW_PROBLEM:
 if GENERATE_NEW_LABELS:
     FEASIBILITY_CHECKER = 'larger_world'
     GENERATE_NEW_PROBLEM = False
+    downward_time = 5
 
 ## =========================================
 
@@ -368,7 +371,7 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
             kwargs['collect_dataset'] = True
 
     cwd = os.getcwd()
-    max_time = 6 * 60
+    max_time = 6 * 60 + downward_time
     solution = 'failed'
     with timeout(duration=max_time):
         if parallel:
