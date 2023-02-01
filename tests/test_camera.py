@@ -50,20 +50,19 @@ ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb', 'meraki']
 DEFAULT_TASK = 'mm_storage'  ## done
 # DEFAULT_TASK = 'mm_braiser'
 # DEFAULT_TASK = 'mm_sink'
-# DEFAULT_TASK = 'mm_braiser_to_storage'
+DEFAULT_TASK = 'mm_braiser_to_storage'
 # DEFAULT_TASK = 'mm_sink_to_storage'
 # DEFAULT_TASK = 'mm_storage_long'
 
-DEFAULT_TASK = 'tt_storage'  ## done
+# DEFAULT_TASK = 'tt_storage'  ## done
 # DEFAULT_TASK = 'tt_storage'  ## done
 # DEFAULT_TASK = 'tt_braiser'
 # DEFAULT_TASK = 'tt_storage_long'
 # DEFAULT_TASK = 'tt_braiser_to_storage'
 # DEFAULT_TASK = 'tt'
-DEFAULT_TASK = 'hh_braiser'
 
-DEFAULT_TASK = 'hh_storage'  ## done
-DEFAULT_TASK = 'hh_braiser'  ## done
+# DEFAULT_TASK = 'hh_storage'  ## done
+# DEFAULT_TASK = 'hh_braiser'  ## done
 
 LARGER_WORLD = 'mm_' in DEFAULT_TASK or 'tt_' in DEFAULT_TASK
 
@@ -73,14 +72,14 @@ GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/230115_115113_original_0'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/165'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/0'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_storage/0'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_braiser/0'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser_to_storage/1'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink_to_storage/84'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_storage/0'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_braiser/0'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_storage/2'
 
 MODIFIED_TIME = 1663895681
-PARALLEL = False and (GIVEN_PATH is None)
+PARALLEL = True and (GIVEN_PATH is None)
 USE_VIEWER = True
 REDO = False
 
@@ -406,7 +405,7 @@ def generate_images(viz_dir, redo=REDO):
     #     redo = False
 
     """ other types of image """
-    redo = True ## or GIVEN_PATH is not None
+    redo = False ## or GIVEN_PATH is not None
     if not check_key_same(viz_dir) or redo:
         # if isdir(rgb_dir):
         #     shutil.rmtree(rgb_dir)

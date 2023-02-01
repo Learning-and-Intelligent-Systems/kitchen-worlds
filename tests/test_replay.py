@@ -34,7 +34,7 @@ from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser,
 
 USE_GYM = False
 SAVE_COMPOSED_JPG = False
-SAVE_GIF = True
+SAVE_GIF = False
 SAVE_JPG = True or SAVE_COMPOSED_JPG or SAVE_GIF
 PREVIEW_SCENE = False
 
@@ -106,7 +106,7 @@ GIVEN_DIR = None
 #####################################################################
 
 # TASK_NAME = 'mm'
-TASK_NAME = 'mm_storage'
+# TASK_NAME = 'mm_storage'
 # TASK_NAME = 'mm_sink'
 # TASK_NAME = 'mm_braiser'
 # TASK_NAME = 'mm_sink_to_storage'
@@ -117,10 +117,11 @@ TASK_NAME = 'mm_storage'
 # TASK_NAME = 'tt_sink'
 # TASK_NAME = 'tt_braiser'
 
-TASK_NAME = 'ww_sink'
+TASK_NAME = 'ww_sink_to_storage'
+# TASK_NAME = 'ww_sink'
 
 CASES = None
-# CASES = ['169']  ##
+# CASES = ['0']  ##
 # CASES = get_sample_envs_for_rss(task_name=TASK_NAME, count=None)
 
 if GIVEN_PATH:
@@ -208,11 +209,14 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, hei
     ## -----------------------------------------------------------
 
     ## save the initial scene image in pybullet
+    zoomin_kwargs = dict(width=width//4, height=height//4, fx=fx//2)
     if not CHECK_COLLISIONS and SAVE_JPG:
-        viz_dir = join(run_dir_ori, 'zoomin')
-        world.add_camera(viz_dir, width=width//4, height=height//4, fx=fx//2, img_dir=viz_dir,
-                         **world.camera_kwargs)
-        world.visualize_image(index='initial', rgb=True)
+        for sud in range(len(world.camera_kwargs)):
+            viz_dir = join(run_dir_ori, f'zoomin_{sud}'.replace('_0', ''))
+            world.add_camera(viz_dir, img_dir=viz_dir, **zoomin_kwargs, **world.camera_kwargs[sud])
+            world.visualize_image(index='initial', rgb=True)
+
+        ## for a view of the whole scene
         if SAVE_COMPOSED_JPG or SAVE_GIF:
             world.add_camera(viz_dir, width=width//2, height=height//2, fx=fx//2, img_dir=viz_dir,
                              camera_point=(6, 4, 2), target_point=(0, 4, 1))
@@ -286,11 +290,15 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, hei
                 gif_name = 'replay.gif'
                 images_to_gif(world.img_dir, gif_name, episodes, crop=crop)
 
-            if SAVE_COMPOSED_JPG or SAVE_GIF:
-                world.camera = world.cameras[0]
+            # if SAVE_COMPOSED_JPG or SAVE_GIF:
+            #     world.camera = world.cameras[0]
 
             if SAVE_JPG:
-                world.visualize_image(index='final', rgb=True, **world.camera_kwargs)
+                for sud in range(len(world.camera_kwargs)):
+                    viz_dir = join(run_dir_ori, f'zoomin_{sud}'.replace('_0', ''))
+                    world.add_camera(viz_dir, img_dir=viz_dir, **zoomin_kwargs, **world.camera_kwargs[sud])
+                    world.visualize_image(index='final', rgb=True)
+                # world.visualize_image(index='final', rgb=True, **world.camera_kwargs)
 
         if EVALUATE_QUALITY:
             answer = query_yes_no(f"delete this run {run_name}?", default='no')
@@ -403,6 +411,7 @@ def generated_recentely(file):
 
 def case_filter(run_dir_ori):
     """ whether to process this run """
+    return True
     if CASES is not None or GIVEN_PATH is not None:
         return True
 
