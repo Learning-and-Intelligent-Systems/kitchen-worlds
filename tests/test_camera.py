@@ -59,8 +59,10 @@ DEFAULT_TASK = 'tt_storage'  ## done
 # DEFAULT_TASK = 'tt_braiser'
 # DEFAULT_TASK = 'tt_storage_long'
 # DEFAULT_TASK = 'tt_braiser_to_storage'
-
 # DEFAULT_TASK = 'tt'
+
+DEFAULT_TASK = 'hh_storage'  ## done
+DEFAULT_TASK = 'hh_braiser'  ## done
 
 LARGER_WORLD = 'mm_' in DEFAULT_TASK or 'tt_' in DEFAULT_TASK
 
@@ -74,7 +76,7 @@ GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_braiser/0'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser_to_storage/1'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink_to_storage/84'
-GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_storage/2'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_storage/4'
 
 MODIFIED_TIME = 1663895681
 PARALLEL = True and (GIVEN_PATH is None)
@@ -187,7 +189,8 @@ def render_segmentation_mask(test_dir, viz_dir, camera_poses, camera_kwargs, cam
         doorless_lisdf = create_doorless_lisdf(test_dir)
 
     """ find the door links """
-    indices = get_indices(viz_dir, body_map=get_body_map(viz_dir, world)) ##
+    body_map = get_body_map(viz_dir, world) if 'mm_' in viz_dir else None
+    indices = get_indices(viz_dir, larger=True, body_map=body_map)
     indices = adjust_indices_for_full_kitchen(indices)
 
     ## pointing at goal regions: initial and final
@@ -410,7 +413,7 @@ def generate_images(viz_dir, redo=REDO):
         #     if isdir(crop_dir):
         #         shutil.rmtree(crop_dir)
         for seg_dir in seg_dirs:
-            if isdir(seg_dir) and '/seg_images_5' in seg_dir: ##  or 'images_6' in seg_dir
+            if isdir(seg_dir): ## and '/seg_images_5' in seg_dir: ##  or 'images_6' in seg_dir
                 shutil.rmtree(seg_dir)
         # for transp_dir in transp_dirs:
         #     if isdir(transp_dir):
