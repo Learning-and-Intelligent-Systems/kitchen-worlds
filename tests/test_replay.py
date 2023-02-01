@@ -116,8 +116,10 @@ GIVEN_DIR = None
 # TASK_NAME = 'tt_storage'
 # TASK_NAME = 'tt_sink'
 # TASK_NAME = 'tt_braiser'
+TASK_NAME = 'tt_braiser_to_storage'
 
-TASK_NAME = 'ww_sink_to_storage'
+TASK_NAME = 'ww_braiser_to_storage'
+# TASK_NAME = 'ww_sink_to_storage'
 # TASK_NAME = 'ww_sink'
 
 CASES = None

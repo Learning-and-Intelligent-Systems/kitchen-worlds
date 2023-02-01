@@ -123,7 +123,7 @@ if CASES is not None:
     SKIP_IF_SOLVED_RECENTLY = False
 
 PARALLEL = GENERATE_SKELETONS and False
-FEASIBILITY_CHECKER = 'oracle' ## 'pvt-56', 'pvt-task'
+FEASIBILITY_CHECKER = 'None'
 ## None | oracle | pvt | pvt* | pvt-task | pvt-all | binary | shuffle | heuristic
 if GENERATE_SKELETONS:
     FEASIBILITY_CHECKER = 'oracle'
