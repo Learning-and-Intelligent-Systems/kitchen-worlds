@@ -82,14 +82,15 @@ check_time = 1675220260  ## for 12 sec of FD
 # TASK_NAME = 'mm_sink'
 # TASK_NAME = 'mm_braiser'
 # TASK_NAME = 'mm_braiser_to_storage'
+# TASK_NAME = 'mm_sink_to_storage'
 # TASK_NAME = '_test'
 
-# TASK_NAME = 'tt_storage'
+TASK_NAME = 'tt_storage'
 # TASK_NAME = 'tt_sink'
 # TASK_NAME = 'tt_braiser'
 # TASK_NAME = 'tt_storage_to_storage'
 # TASK_NAME = 'tt_sink_to_storage'
-TASK_NAME = 'tt_braiser_to_storage'
+# TASK_NAME = 'tt_braiser_to_storage'
 
 # TASK_NAME = 'hh_braiser'
 
@@ -97,7 +98,7 @@ TASK_NAME = 'tt_braiser_to_storage'
 # TASK_NAME = 'hh_braiser'
 
 evaluation_time = {
-    'tt_storage': 60,
+    'tt_storage': 80,
     'tt_sink': 20,
     'tt_braiser': 60,
     'tt_sink_to_storage': 30,
@@ -112,7 +113,7 @@ if 'braiser_to_storage' in TASK_NAME:
     downward_time = 60
 
 CASES = None  ##
-# CASES = ['11']
+# CASES = ['0']
 # CASES = ['45', '340', '387', '467'] ## mm_storage
 # CASES = ['150', '395', '399', '404', '406', '418', '424', '428', '430', '435', '438', '439', '444', '453', '455', '466', '475', '479', '484', '489', '494', '539', '540', '547', '548', '553', '802', '804', '810', '815', '818', '823', '831', '833', '838', '839', '848', '858', '860', '862']
 # CASES = ['1514', '1566', '1612', '1649', '1812', '2053', '2110', '2125', '2456', '2534', '2535', '2576', '2613']
@@ -123,7 +124,7 @@ if CASES is not None:
     SKIP_IF_SOLVED_RECENTLY = False
 
 PARALLEL = GENERATE_SKELETONS and False
-FEASIBILITY_CHECKER = 'pvt-56'
+FEASIBILITY_CHECKER = 'oracle'
 ## None | oracle | pvt | pvt* | pvt-task | pvt-all | binary | shuffle | heuristic
 if GENERATE_SKELETONS:
     FEASIBILITY_CHECKER = 'oracle'
@@ -185,6 +186,8 @@ def check_if_skip(run_dir, **kwargs):
     run_num = eval(run_dir.split('/')[-1])
     # return skip
     if GENERATE_NEW_PROBLEM:
+        # if run_num < 24:
+        #     return True
         return False
         file = join(run_dir, f'problem_larger.pddl')
         return isfile(file)

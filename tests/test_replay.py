@@ -43,7 +43,7 @@ CFREE_RANGE = 0.1
 VISUALIZE_COLLISIONS = False
 
 SAVE_MP4 = False
-STEP_BY_STEP = False
+STEP_BY_STEP = True
 AUTO_PLAY = True
 EVALUATE_QUALITY = False
 PARALLEL = SAVE_JPG and not PREVIEW_SCENE and False  ## and not CHECK_COLLISIONS
@@ -109,21 +109,22 @@ GIVEN_DIR = None
 # TASK_NAME = 'mm_storage'
 # TASK_NAME = 'mm_sink'
 # TASK_NAME = 'mm_braiser'
-# TASK_NAME = 'mm_sink_to_storage'
+TASK_NAME = 'mm_sink_to_storage'
 # TASK_NAME = 'mm_braiser_to_storage'
 
 # TASK_NAME = 'tt'
 # TASK_NAME = 'tt_storage'
 # TASK_NAME = 'tt_sink'
 # TASK_NAME = 'tt_braiser'
-TASK_NAME = 'tt_braiser_to_storage'
+# TASK_NAME = 'tt_braiser_to_storage'
+TASK_NAME = 'tt_sink_to_storage'
 
-TASK_NAME = 'ww_braiser_to_storage'
+# TASK_NAME = 'ww_braiser_to_storage'
 # TASK_NAME = 'ww_sink_to_storage'
 # TASK_NAME = 'ww_sink'
 
 CASES = None
-# CASES = ['0']  ##
+CASES = ['16']  ##
 # CASES = get_sample_envs_for_rss(task_name=TASK_NAME, count=None)
 
 if GIVEN_PATH:

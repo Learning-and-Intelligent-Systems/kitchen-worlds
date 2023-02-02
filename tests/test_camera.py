@@ -18,7 +18,7 @@ from pybullet_tools.bullet_utils import get_segmask, get_door_links, adjust_segm
     get_obj_keys_for_segmentation
 
 from lisdf_tools.lisdf_loader import load_lisdf_pybullet, get_depth_images, create_gripper_robot, \
-    make_furniture_transparent, get_camera_kwargs_from_camera_zoomin as get_camera_kwargs
+    make_furniture_transparent, get_camera_kwargs as get_camera_kwargs
 from lisdf_tools.image_utils import draw_bb, crop_image, get_mask_bb, save_seg_image_given_obj_keys
 
 # from utils import load_lisdf_synthesizer
@@ -50,8 +50,8 @@ ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb', 'meraki']
 DEFAULT_TASK = 'mm_storage'  ## done
 # DEFAULT_TASK = 'mm_braiser'
 # DEFAULT_TASK = 'mm_sink'
-DEFAULT_TASK = 'mm_braiser_to_storage'
-# DEFAULT_TASK = 'mm_sink_to_storage'
+# DEFAULT_TASK = 'mm_braiser_to_storage'
+DEFAULT_TASK = 'mm_sink_to_storage'
 # DEFAULT_TASK = 'mm_storage_long'
 
 # DEFAULT_TASK = 'tt_storage'  ## done
@@ -59,6 +59,7 @@ DEFAULT_TASK = 'mm_braiser_to_storage'
 # DEFAULT_TASK = 'tt_braiser'
 # DEFAULT_TASK = 'tt_storage_long'
 # DEFAULT_TASK = 'tt_braiser_to_storage'
+# DEFAULT_TASK = 'tt_sink_to_storage'
 # DEFAULT_TASK = 'tt'
 
 # DEFAULT_TASK = 'hh_storage'  ## done
@@ -72,14 +73,15 @@ GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/230115_115113_original_0'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/165'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/0'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser_to_storage/1'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser_to_storage/0'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink_to_storage/84'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_storage/0'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_braiser/0'
+GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'ww_braiser/2'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_storage/2'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_braiser_to_storage/0'
 
 MODIFIED_TIME = 1663895681
-PARALLEL = True and (GIVEN_PATH is None)
+PARALLEL = False and (GIVEN_PATH is None)
 USE_VIEWER = True
 REDO = False
 
@@ -208,7 +210,7 @@ def render_segmentation_mask(test_dir, viz_dir, camera_poses, camera_kwargs, cam
             continue
 
         # ---------- make furniture disappear
-        if not transparent and len(camera_poses) > 1 and i == len(camera_poses) - len(camera_zoomins):
+        if not transparent and len(camera_poses) > 1 and i == len(camera_poses) - 1:
             make_furniture_transparent(world, viz_dir, lower_tpy=1, upper_tpy=0,
                                        remove_upper_furnitures=True)
 
@@ -405,7 +407,7 @@ def generate_images(viz_dir, redo=REDO):
     #     redo = False
 
     """ other types of image """
-    redo = False ## or GIVEN_PATH is not None
+    redo = True ## or GIVEN_PATH is not None
     if not check_key_same(viz_dir) or redo:
         # if isdir(rgb_dir):
         #     shutil.rmtree(rgb_dir)
@@ -413,7 +415,7 @@ def generate_images(viz_dir, redo=REDO):
         #     if isdir(crop_dir):
         #         shutil.rmtree(crop_dir)
         for seg_dir in seg_dirs:
-            if isdir(seg_dir): ## and '/seg_images_5' in seg_dir: ##  or 'images_6' in seg_dir
+            if isdir(seg_dir): ## and ('/seg_images_5' in seg_dir or 'images_6' in seg_dir):
                 shutil.rmtree(seg_dir)
         # for transp_dir in transp_dirs:
         #     if isdir(transp_dir):
