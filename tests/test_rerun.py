@@ -34,7 +34,7 @@ from world_builder.actions import apply_actions
 from mamao_tools.data_utils import get_instance_info, exist_instance, get_indices, \
     get_plan_skeleton, get_successful_plan, get_feasibility_checker, get_plan, get_body_map, \
     modify_plan_with_body_map, add_to_planning_config, load_planning_config, \
-    add_objects_and_facts
+    add_objects_and_facts, delete_wrongly_supported
 
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 
@@ -42,8 +42,9 @@ from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 GENERATE_MULTIPLE_SOLUTIONS = False
 GENERATE_SKELETONS = False
 GENERATE_NEW_PROBLEM = False
-GENERATE_NEW_LABELS = False
+GENERATE_NEW_LABELS = True
 USE_LARGE_WORLD = True
+CLEAN_LARGE_WORLD = False
 
 USE_VIEWER = False
 LOCK_VIEWER = True
@@ -81,15 +82,16 @@ check_time = 1675220260  ## for 12 sec of FD
 # TASK_NAME = 'mm_storage'
 # TASK_NAME = 'mm_sink'
 # TASK_NAME = 'mm_braiser'
-# TASK_NAME = 'mm_braiser_to_storage'
-# TASK_NAME = '_test'
+TASK_NAME = 'mm_braiser_to_storage'
+# TASK_NAME = 'mm_sink_to_storage'
+TASK_NAME = 'ooo_braiser_to_storage'
 
 # TASK_NAME = 'tt_storage'
 # TASK_NAME = 'tt_sink'
 # TASK_NAME = 'tt_braiser'
 # TASK_NAME = 'tt_storage_to_storage'
 # TASK_NAME = 'tt_sink_to_storage'
-TASK_NAME = 'tt_braiser_to_storage'
+# TASK_NAME = 'tt_braiser_to_storage'
 
 # TASK_NAME = 'hh_braiser'
 
@@ -105,6 +107,7 @@ evaluation_time = {
 }
 evaluation_time.update({n.replace('tt', 'mm'): v for n, v in evaluation_time.items()})
 evaluation_time.update({n.replace('tt', 'hh'): v for n, v in evaluation_time.items()})
+evaluation_time.update({n.replace('tt', 'ooo'): v for n, v in evaluation_time.items()})
 evaluation_time = evaluation_time[TASK_NAME]
 
 downward_time = 3
@@ -123,7 +126,7 @@ if CASES is not None:
     SKIP_IF_SOLVED_RECENTLY = False
 
 PARALLEL = GENERATE_SKELETONS and False
-FEASIBILITY_CHECKER = 'pvt-56'
+FEASIBILITY_CHECKER = 'pvt-task'  ## 'pvt-56', 'pvt-task'
 ## None | oracle | pvt | pvt* | pvt-task | pvt-all | binary | shuffle | heuristic
 if GENERATE_SKELETONS:
     FEASIBILITY_CHECKER = 'oracle'
@@ -134,6 +137,8 @@ if GENERATE_NEW_LABELS:
     FEASIBILITY_CHECKER = 'larger_world'
     GENERATE_NEW_PROBLEM = False
     downward_time = 5
+if CLEAN_LARGE_WORLD:
+    USE_LARGE_WORLD = True
 
 ## =========================================
 
@@ -182,9 +187,13 @@ def clear_all_rerun_results(run_dir, **kwargs):
 
 def check_if_skip(run_dir, **kwargs):
     skip = False
+    # return skip
     run_num = eval(run_dir.split('/')[-1])
     # return skip
-    if GENERATE_NEW_PROBLEM:
+    if CLEAN_LARGE_WORLD:
+        return False
+
+    elif GENERATE_NEW_PROBLEM:
         return False
         file = join(run_dir, f'problem_larger.pddl')
         return isfile(file)
@@ -266,6 +275,10 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     if check_if_skip(run_dir):
         return
 
+    if CLEAN_LARGE_WORLD:
+        delete_wrongly_supported(run_dir)
+        return
+
     larger_world = USE_LARGE_WORLD or GENERATE_NEW_LABELS
 
     initialize_logs()
@@ -278,7 +291,7 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     world = load_lisdf_pybullet(exp_dir, verbose=False, use_gui=args.viewer,
                                 larger_world=larger_world) ## , width=720, height=560
 
-    if not GENERATE_NEW_PROBLEM:
+    if not GENERATE_NEW_PROBLEM and not CLEAN_LARGE_WORLD:
         inv_body_map = get_body_map(run_dir, world, inv=True)
         pc_file = join(ori_dir, 'planning_config.json')
         if not isfile(pc_file):
@@ -454,7 +467,7 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
                 rerun_dir = ori_dir
                 commands_name = f'{PREFIX}commands_rerun_fc={FEASIBILITY_CHECKER}.pkl'
                 log_name = f'{PREFIX}runlog_fc={FEASIBILITY_CHECKER}.json'
-                txt_name = f'{PREFIX}printouts_fc={FEASIBILITY_CHECKER}.json'
+                txt_name = f'{PREFIX}printouts_fc={FEASIBILITY_CHECKER}.txt'
 
             inv_body_map = get_body_map(run_dir, world, inv=True)
             new_plan = modify_plan_with_body_map(plan, inv_body_map)
