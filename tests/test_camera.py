@@ -55,7 +55,7 @@ DEFAULT_TASK = 'mm_sink'
 # DEFAULT_TASK = 'mm_storage_long'
 
 # DEFAULT_TASK = 'tt_storage'  ## done
-DEFAULT_TASK = 'tt_sink'  ## done
+# DEFAULT_TASK = 'tt_sink'  ## done
 # DEFAULT_TASK = 'tt_braiser'
 # DEFAULT_TASK = 'tt_storage_long'
 # DEFAULT_TASK = 'tt_braiser_to_storage'
@@ -345,15 +345,18 @@ def get_num_images(viz_dir, pairwise=False):
 
 def generate_images(viz_dir, redo=REDO):
 
-    if not exist_instance(viz_dir, '100501'):
-        return
+    # if not exist_instance(viz_dir, '100501'):
+    #     return
 
     # A = join(viz_dir, 'seg_images_5')
     # B = join(viz_dir, 'seg_images_6')
+    # if isdir(B):
+    #     shutil.rmtree(B)
     # shutil.copytree(A, B)
     # files = [join(B, f) for f in listdir(B) if 'png' in f]
     # for f in files:
-    #     shutil.move(f, f.replace('/seg_images_5', '/seg_images_6'))
+    #     target_dir = f.replace('/seg_images_5', '/seg_images_6')
+    #     shutil.move(f, target_dir)
     #
     # return
     ##################################################
