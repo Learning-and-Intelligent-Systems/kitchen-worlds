@@ -51,11 +51,11 @@ ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb', 'meraki']
 # DEFAULT_TASK = 'mm_braiser'
 # DEFAULT_TASK = 'mm_sink'
 # DEFAULT_TASK = 'mm_braiser_to_storage'
-DEFAULT_TASK = 'mm_sink_to_storage'
+# DEFAULT_TASK = 'mm_sink_to_storage'
 # DEFAULT_TASK = 'mm_storage_long'
 
 # DEFAULT_TASK = 'tt_storage'  ## done
-# DEFAULT_TASK = 'tt_storage'  ## done
+DEFAULT_TASK = 'tt_sink'  ## done
 # DEFAULT_TASK = 'tt_braiser'
 # DEFAULT_TASK = 'tt_storage_long'
 # DEFAULT_TASK = 'tt_braiser_to_storage'
@@ -71,17 +71,17 @@ LARGER_WORLD = 'mm_' in DEFAULT_TASK or 'tt_' in DEFAULT_TASK
 
 GIVEN_PATH = None
 # GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/230115_115113_original_0'
-GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/0'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/0'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/0'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser_to_storage/0'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink_to_storage/84'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_storage/0'
-GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'ww_braiser/2'
+# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'ww_braiser/2'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_storage/2'
 # GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_braiser_to_storage/0'
 
 MODIFIED_TIME = 1663895681
-PARALLEL = False and (GIVEN_PATH is None)
+PARALLEL = True and (GIVEN_PATH is None)
 USE_VIEWER = True
 REDO = False
 
@@ -343,6 +343,16 @@ def get_num_images(viz_dir, pairwise=False):
 
 
 def generate_images(viz_dir, redo=REDO):
+
+    # A = join(viz_dir, 'seg_images_5')
+    # B = join(viz_dir, 'seg_images_6')
+    # shutil.copytree(A, B)
+    # files = [join(B, f) for f in listdir(B) if 'png' in f]
+    # for f in files:
+    #     shutil.move(f, f.replace('/seg_images_5', '/seg_images_6'))
+    #
+    # return
+    ##################################################
 
     # A = join(viz_dir, 'seg_images_5')
     # B = join(viz_dir, 'seg_images_6')
