@@ -80,9 +80,9 @@ check_time = 1675220260  ## for 12 sec of FD
 ##########################################
 
 # TASK_NAME = 'mm_storage'
-TASK_NAME = 'mm_sink'
+# TASK_NAME = 'mm_sink'
 # TASK_NAME = 'mm_braiser'
-# TASK_NAME = 'mm_braiser_to_storage'
+TASK_NAME = 'mm_braiser_to_storage'
 # TASK_NAME = 'mm_sink_to_storage'
 # TASK_NAME = 'mm_braiser_to_storage'
 # TASK_NAME = 'mm_sink_to_storage'
@@ -91,7 +91,7 @@ TASK_NAME = 'mm_sink'
 # TASK_NAME = 'tt_sink'
 # TASK_NAME = 'tt_braiser'
 # TASK_NAME = 'tt_storage_to_storage'
-TASK_NAME = 'tt_sink_to_storage'
+# TASK_NAME = 'tt_sink_to_storage'
 # TASK_NAME = 'tt_braiser_to_storage'
 
 # TASK_NAME = 'hh_braiser'
@@ -100,7 +100,7 @@ TASK_NAME = 'tt_sink_to_storage'
 # TASK_NAME = 'hh_braiser'
 
 evaluation_time = {
-    'tt_storage': 80,
+    'tt_storage': 60,
     'tt_sink': 20,
     'tt_braiser': 60,
     'tt_sink_to_storage': 30,
@@ -126,7 +126,7 @@ if CASES is not None:
     SKIP_IF_SOLVED_RECENTLY = False
 
 PARALLEL = GENERATE_SKELETONS and False
-FEASIBILITY_CHECKER = 'pvt-task'  ## 'pvt-56', 'pvt-task'
+FEASIBILITY_CHECKER = 'None'  ## 'pvt-56', 'pvt-task'
 ## None | oracle | pvt | pvt* | pvt-task | pvt-all | binary | shuffle | heuristic
 if GENERATE_SKELETONS:
     FEASIBILITY_CHECKER = 'oracle'
@@ -136,7 +136,7 @@ if GENERATE_NEW_PROBLEM:
 if GENERATE_NEW_LABELS:
     FEASIBILITY_CHECKER = 'larger_world'
     GENERATE_NEW_PROBLEM = False
-    downward_time = 5
+    downward_time = 20
 if CLEAN_LARGE_WORLD:
     USE_LARGE_WORLD = True
 
