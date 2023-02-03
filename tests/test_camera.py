@@ -51,7 +51,7 @@ ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb', 'meraki']
 # DEFAULT_TASK = 'mm_braiser'
 DEFAULT_TASK = 'mm_sink'
 # DEFAULT_TASK = 'mm_braiser_to_storage'
-DEFAULT_TASK = 'mm_sink_to_storage'
+# DEFAULT_TASK = 'mm_sink_to_storage'
 # DEFAULT_TASK = 'mm_storage_long'
 
 # DEFAULT_TASK = 'tt_storage'  ## done
@@ -347,6 +347,16 @@ def generate_images(viz_dir, redo=REDO):
 
     if not exist_instance(viz_dir, '100501'):
         return
+
+    # A = join(viz_dir, 'seg_images_5')
+    # B = join(viz_dir, 'seg_images_6')
+    # shutil.copytree(A, B)
+    # files = [join(B, f) for f in listdir(B) if 'png' in f]
+    # for f in files:
+    #     shutil.move(f, f.replace('/seg_images_5', '/seg_images_6'))
+    #
+    # return
+    ##################################################
 
     # A = join(viz_dir, 'seg_images_5')
     # B = join(viz_dir, 'seg_images_6')

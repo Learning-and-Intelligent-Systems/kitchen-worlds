@@ -80,14 +80,14 @@ check_time = 1675220260  ## for 12 sec of FD
 ##########################################
 
 # TASK_NAME = 'mm_storage'
-# TASK_NAME = 'mm_sink'
+TASK_NAME = 'mm_sink'
 # TASK_NAME = 'mm_braiser'
-TASK_NAME = 'mm_braiser_to_storage'
+# TASK_NAME = 'mm_braiser_to_storage'
 # TASK_NAME = 'mm_sink_to_storage'
 # TASK_NAME = 'mm_braiser_to_storage'
 # TASK_NAME = 'mm_sink_to_storage'
 
-TASK_NAME = 'tt_storage'
+# TASK_NAME = 'tt_storage'
 # TASK_NAME = 'tt_sink'
 # TASK_NAME = 'tt_braiser'
 # TASK_NAME = 'tt_storage_to_storage'
@@ -108,7 +108,6 @@ evaluation_time = {
 }
 evaluation_time.update({n.replace('tt', 'mm'): v for n, v in evaluation_time.items()})
 evaluation_time.update({n.replace('tt', 'hh'): v for n, v in evaluation_time.items()})
-evaluation_time.update({n.replace('tt', 'ooo'): v for n, v in evaluation_time.items()})
 evaluation_time = evaluation_time[TASK_NAME]
 
 downward_time = 3
