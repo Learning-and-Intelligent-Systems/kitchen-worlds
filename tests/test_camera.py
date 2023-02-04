@@ -49,7 +49,7 @@ ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb', 'meraki']
 # DEFAULT_TASK = 'mm'
 # DEFAULT_TASK = 'mm_storage'  ## done
 # DEFAULT_TASK = 'mm_braiser'
-DEFAULT_TASK = 'mm_sink'
+# DEFAULT_TASK = 'mm_sink'
 # DEFAULT_TASK = 'mm_braiser_to_storage'
 # DEFAULT_TASK = 'mm_sink_to_storage'
 # DEFAULT_TASK = 'mm_storage_long'
@@ -59,7 +59,7 @@ DEFAULT_TASK = 'mm_sink'
 # DEFAULT_TASK = 'tt_braiser'
 # DEFAULT_TASK = 'tt_storage_long'
 # DEFAULT_TASK = 'tt_braiser_to_storage'
-# DEFAULT_TASK = 'tt_sink_to_storage'  ## done
+DEFAULT_TASK = 'tt_sink_to_storage'  ## done
 # DEFAULT_TASK = 'tt'
 
 # DEFAULT_TASK = 'hh_storage'  ## done
