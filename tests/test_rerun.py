@@ -187,6 +187,7 @@ def check_if_skip(run_dir, **kwargs):
     # return skip
     run_num = eval(run_dir.split('/')[-1])
     # if run_num in [10, 15, 19, 24, 31]:
+    # if run_num <= 22:
     #     return True
     # return skip
     if CLEAN_LARGE_WORLD:
@@ -197,7 +198,10 @@ def check_if_skip(run_dir, **kwargs):
         #     return True
         return False
         file = join(run_dir, f'problem_larger.pddl')
-        return isfile(file)
+        if not isfile(file):
+            return False
+        checks = json.load(open(join(run_dir, 'diverse_plans_larger.json'), 'r'))['checks']
+        return len(checks) > 0
 
     elif GENERATE_NEW_LABELS:
         if run_num < 123:
