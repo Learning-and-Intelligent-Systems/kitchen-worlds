@@ -42,7 +42,7 @@ from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 GENERATE_MULTIPLE_SOLUTIONS = False
 GENERATE_SKELETONS = False
 GENERATE_NEW_PROBLEM = False
-GENERATE_NEW_LABELS = True
+GENERATE_NEW_LABELS = False
 USE_LARGE_WORLD = True
 CLEAN_LARGE_WORLD = False
 
@@ -82,16 +82,16 @@ check_time = 1675220260  ## for 12 sec of FD
 # TASK_NAME = 'mm_storage'
 # TASK_NAME = 'mm_sink'
 # TASK_NAME = 'mm_braiser'
-TASK_NAME = 'mm_braiser_to_storage'
+# TASK_NAME = 'mm_braiser_to_storage'
 # TASK_NAME = 'mm_sink_to_storage'
 # TASK_NAME = 'mm_braiser_to_storage'
 # TASK_NAME = 'mm_sink_to_storage'
 
 # TASK_NAME = 'tt_storage'
-# TASK_NAME = 'tt_sink'
+TASK_NAME = 'tt_sink'
 # TASK_NAME = 'tt_braiser'
 # TASK_NAME = 'tt_storage_to_storage'
-# TASK_NAME = 'tt_sink_to_storage'
+TASK_NAME = 'tt_sink_to_storage'
 # TASK_NAME = 'tt_braiser_to_storage'
 
 # TASK_NAME = 'hh_braiser'
@@ -101,32 +101,29 @@ TASK_NAME = 'mm_braiser_to_storage'
 
 evaluation_time = {
     'tt_storage': 60,
-    'tt_sink': 20,
+    'tt_sink': 60,
     'tt_braiser': 60,
-    'tt_sink_to_storage': 30,
-    'tt_braiser_to_storage': 60,
+    'tt_sink_to_storage': 60,
+    'tt_braiser_to_storage': 30,
 }
 evaluation_time.update({n.replace('tt', 'mm'): v for n, v in evaluation_time.items()})
 evaluation_time.update({n.replace('tt', 'hh'): v for n, v in evaluation_time.items()})
+evaluation_time.update({n.replace('tt', 'val'): v for n, v in evaluation_time.items()})
 evaluation_time = evaluation_time[TASK_NAME]
 
 downward_time = 3
-if 'braiser_to_storage' in TASK_NAME:
+if '_to_storage' in TASK_NAME:
     downward_time = 60
 
 CASES = None  ##
-# CASES = ['0']
-# CASES = ['45', '340', '387', '467'] ## mm_storage
-# CASES = ['150', '395', '399', '404', '406', '418', '424', '428', '430', '435', '438', '439', '444', '453', '455', '466', '475', '479', '484', '489', '494', '539', '540', '547', '548', '553', '802', '804', '810', '815', '818', '823', '831', '833', '838', '839', '848', '858', '860', '862']
-# CASES = ['1514', '1566', '1612', '1649', '1812', '2053', '2110', '2125', '2456', '2534', '2535', '2576', '2613']
-# CASES = ['688', '810', '813', '814', '816', '824', '825', '830', '831', '915', '917', '927', '931', '939', '948', '949', '950', '1099', '1100', '1101', '1102', '1107', '1108', '1109', '1110', '1115', '1116', '1118', '1120', '1125', '1127', '1132', '1143', '1144', '1151', '1152']
+CASES = ['2']
 
 if CASES is not None:
     SKIP_IF_SOLVED = False
     SKIP_IF_SOLVED_RECENTLY = False
 
 PARALLEL = GENERATE_SKELETONS and False
-FEASIBILITY_CHECKER = 'None'  ## 'pvt-56', 'pvt-task'
+FEASIBILITY_CHECKER = 'pvt-task'  ## 'pvt-56', 'pvt-task'
 ## None | oracle | pvt | pvt* | pvt-task | pvt-all | binary | shuffle | heuristic
 if GENERATE_SKELETONS:
     FEASIBILITY_CHECKER = 'oracle'
@@ -189,6 +186,8 @@ def check_if_skip(run_dir, **kwargs):
     skip = False
     # return skip
     run_num = eval(run_dir.split('/')[-1])
+    # if run_num in [10, 15, 19, 24, 31]:
+    #     return True
     # return skip
     if CLEAN_LARGE_WORLD:
         return False
@@ -201,6 +200,8 @@ def check_if_skip(run_dir, **kwargs):
         return isfile(file)
 
     elif GENERATE_NEW_LABELS:
+        if run_num < 123:
+            return True
         return False
         file = join(run_dir, f'diverse_plans_larger.json')
         return isfile(file)
@@ -267,6 +268,13 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     #     des_dir = join(run_dir, RERUN_SUBDIR+'_old')
     #     if not isdir(des_dir):
     #         os.mkdir(des_dir)
+    #     rem_files = [f for f in listdir(ori_dir) if f'={FEASIBILITY_CHECKER}' in f]
+    #     for f in rem_files:
+    #         shutil.move(join(ori_dir, f), join(des_dir, f))
+    # return
+    #######################################################
+    # if isdir(ori_dir):
+    #     des_dir = join(run_dir, 'rerun_2')
     #     rem_files = [f for f in listdir(ori_dir) if f'={FEASIBILITY_CHECKER}' in f]
     #     for f in rem_files:
     #         shutil.move(join(ori_dir, f), join(des_dir, f))
