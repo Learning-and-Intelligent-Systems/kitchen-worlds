@@ -30,9 +30,9 @@
     (graspable m7)
     (graspable m8)
     (graspable m9)
-    ;(graspable m10)
-    ;(graspable m11)
-    ;(graspable m12)
+    (graspable m10)
+    (graspable m11)
+    (graspable m12)
 
     ;(grasp m9 right 1)
 
