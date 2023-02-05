@@ -11,7 +11,7 @@
     (arm right)
 
     (controllable right)
-    (handempty right)
+   ; (handempty right)
 
     ; (floor floor)
     (surface table)
