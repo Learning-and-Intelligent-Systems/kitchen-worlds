@@ -34,7 +34,7 @@
     ;(graspable m11)
     ;(graspable m12)
 
-    (grasp m9 right 1)
+    ;(grasp m9 right 1)
 
     (bconf q=(-0.6, 0.0, 0.0))
     (atbconf q=(-0.6, 0.0, 0.0))
