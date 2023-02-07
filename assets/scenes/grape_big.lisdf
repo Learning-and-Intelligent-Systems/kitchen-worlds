@@ -128,9 +128,9 @@
       </link>
     </model>
 
-		<Model name="large_cap_1">
+		<model name="large_cap_1">
 			<static>false</static>
-			<pose>0.42 0.2 0.055 0 3.14159 0</pose>
+			<pose>0.42 0.35 0.055 0 3.14159 0</pose>
 			<link name="large_cap_link">
 				<collision name="large_cap_collision">
 					<geometry>

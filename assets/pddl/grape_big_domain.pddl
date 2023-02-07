@@ -23,6 +23,9 @@
     (surface ?x)
     (stackable ?x ?y)
 
+    ; goals
+    (on ?x ?y)
+
   )
 )
 
