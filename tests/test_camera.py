@@ -30,59 +30,11 @@ N_PX = 224
 NEW_KEY = 'channel7'
 ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb', 'meraki']
 
-#################################################################
-
-# DEFAULT_TASK = 'tt_two_fridge_pick'
-# DEFAULT_TASK = 'tt_two_fridge_in'
-# DEFAULT_TASK = 'tt'
-# DEFAULT_TASK = 'mm'
-# DEFAULT_TASK = 'mm_two_fridge_pick'
-# DEFAULT_TASK = 'ff'
-# DEFAULT_TASK = 'ww_two_fridge_in'
-# DEFAULT_TASK = 'ww'
-# DEFAULT_TASK = 'zz'
-# DEFAULT_TASK = '_examples'
-# DEFAULT_TASK = 'ff_two_fridge_goals'
-
-#################################################################
-
-# DEFAULT_TASK = 'mm'
-# DEFAULT_TASK = 'mm_storage'  ## done
-# DEFAULT_TASK = 'mm_braiser'
-# DEFAULT_TASK = 'mm_sink'
-# DEFAULT_TASK = 'mm_braiser_to_storage'
-# DEFAULT_TASK = 'mm_sink_to_storage'
-# DEFAULT_TASK = 'mm_storage_long'
-
-# DEFAULT_TASK = 'tt_storage'  ## done
-# DEFAULT_TASK = 'tt_sink'  ## done
-# DEFAULT_TASK = 'tt_braiser'
-# DEFAULT_TASK = 'tt_storage_long'
-# DEFAULT_TASK = 'tt_braiser_to_storage'
-DEFAULT_TASK = 'tt_sink_to_storage'  ## done
-# DEFAULT_TASK = 'tt'
-
-# DEFAULT_TASK = 'hh_storage'  ## done
-# DEFAULT_TASK = 'hh_braiser'  ## done
-
+DEFAULT_TASK = 'mm_sink'
 LARGER_WORLD = 'mm_' in DEFAULT_TASK or 'tt_' in DEFAULT_TASK
-
-#################################################################
-
 GIVEN_PATH = None
-# GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/230115_115113_original_0'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/0'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/0'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser_to_storage/0'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink_to_storage/84'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_storage/0'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'ww_braiser/2'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_sink_to_storage/11'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_storage/2'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_braiser_to_storage/0'
-
-MODIFIED_TIME = 1663895681
-PARALLEL = True and (GIVEN_PATH is None)
+MODIFIED_TIME = 1675535195
+PARALLEL = False and (GIVEN_PATH is None)
 USE_VIEWER = True
 REDO = False
 
@@ -417,16 +369,15 @@ def generate_images(viz_dir, redo=REDO):
         add_to_planning_config(viz_dir, {'img_camera_pose': camera_pose})
 
     num_dirs = len(camera_kwargs) + len(camera_zoomins)
-    test_dir = copy_dir_for_process(viz_dir)
 
     rgb_dir = join(viz_dir, 'rgb_images')
     seg_dirs = [join(viz_dir, f'seg_images_{i}') for i in range(num_dirs)]
     crop_dirs = [join(viz_dir, f'crop_images_{i}') for i in range(num_dirs)]
     transp_dirs = [join(viz_dir, f'transp_images_{i}') for i in range(num_dirs)]
 
-    # check_file = join(seg_dirs[0], 'crop_image_scene.png')
+    # check_file = join(viz_dir, 'seg_images_6', 'seg_images_6_scene.png')
     # if isfile(check_file) and os.path.getmtime(check_file) > MODIFIED_TIME:
-    #     redo = False
+    #     return
 
     """ other types of image """
     redo = True ## or GIVEN_PATH is not None
@@ -437,7 +388,7 @@ def generate_images(viz_dir, redo=REDO):
         #     if isdir(crop_dir):
         #         shutil.rmtree(crop_dir)
         for seg_dir in seg_dirs:
-            if isdir(seg_dir): ## and ('/seg_images_5' in seg_dir or 'images_6' in seg_dir): ##
+            if isdir(seg_dir) and '/seg_images_6' in seg_dir: ## and ('/seg_images_5' in seg_dir or 'images_6' in seg_dir): ##
                 shutil.rmtree(seg_dir)
         # for transp_dir in transp_dirs:
         #     if isdir(transp_dir):
@@ -492,17 +443,17 @@ def generate_images(viz_dir, redo=REDO):
         #         braiser_file = [f for f in files if f not in bottom_file][0]
         #         shutil.copy(braiser_file, bottom_file)
 
+    test_dir = None
     if (False in done) or redo:
         print(viz_dir, f'{name} ...')
+        test_dir = copy_dir_for_process(viz_dir)
         render_segmentation_mask(test_dir, viz_dir, camera_poses, camera_kwargs, camera_zoomins,
                                  done=done, **kwargs)
         reset_simulation()
+        shutil.rmtree(test_dir)
+        add_key(viz_dir)
     else:
         print('skipping', viz_dir, f'{name}')
-
-    ## ----------------------------------------------------------------
-    add_key(viz_dir)
-    shutil.rmtree(test_dir)
 
 
 def process_worlds_aabb():

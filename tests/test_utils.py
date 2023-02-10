@@ -2,6 +2,7 @@ from os import listdir
 from os.path import join, abspath, dirname, basename, isdir, isfile
 from tabnanny import verbose
 import os
+import math
 import json
 from config import EXP_PATH, MAMAO_DATA_PATH
 import numpy as np
@@ -387,8 +388,24 @@ def get_sample_envs_for_rss(task_name=None, count=None):
 
 
 def get_sample_envs_full_kitchen(count=4, data_dir='test_full_kitchen_100'):
-    data_dir = join('/home/yang/Documents/kitchen-worlds/outputs', data_dir)
-    dirs = [join(data_dir, f) for f in listdir(data_dir) if isdir(join(data_dir, f))]
+    from mamao_tools.data_utils import load_planning_config
+    # data_dir = join('/home/yang/Documents/kitchen-worlds/outputs', data_dir)
+    # dirs = [join(data_dir, f) for f in listdir(data_dir) if isdir(join(data_dir, f))]
+    task_names = ['mm_storage', 'mm_sink', 'mm_braiser',
+                  'mm_sink_to_storage', 'mm_braiser_to_storage']
+    num_per_problem = math.ceil(count / len(task_names))
+    dirs = []
+    for t in task_names:
+        task_dir = join(MAMAO_DATA_PATH, t)
+        run_dirs = [join(task_dir, f) for f in listdir(task_dir) if isdir(join(task_dir, f))]
+        cleaned_dirs = []
+        for rr in run_dirs:
+            conf = load_planning_config(rr)
+            if 'cfree' in conf and isinstance(conf['cfree'], float):
+                cleaned_dirs.append(rr)
+        dirs.extend(cleaned_dirs)
+        # dirs.extend(random.sample(run_dirs, num_per_problem))
+    random.shuffle(dirs)
     return make_count(dirs, count)
 
 

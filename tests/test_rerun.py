@@ -50,54 +50,14 @@ USE_VIEWER = False
 LOCK_VIEWER = True
 DIVERSE = True
 PREFIX = 'diverse_' if DIVERSE else ''
-RERUN_SUBDIR = 'rerun_2'
+RERUN_SUBDIR = 'rerun_3'
 
 SKIP_IF_SOLVED = True and not GENERATE_SKELETONS
 SKIP_IF_SOLVED_RECENTLY = True and not GENERATE_SKELETONS
 RETRY_IF_FAILED = True
 check_time = 1675220260  ## for 12 sec of FD
 
-#########################################
-
-# TASK_NAME = 'tt_one_fridge_pick'
-# TASK_NAME = 'tt_one_fridge_table_pick'
-# TASK_NAME = 'tt_one_fridge_table_in'
-# TASK_NAME = 'tt_two_fridge_pick'
-# TASK_NAME = 'tt_two_fridge_in'
-# TASK_NAME = 'tt_two_fridge_goals'
-# TASK_NAME = 'tt'
-
-# TASK_NAME = '_examples'
-# TASK_NAME = 'zz'
-# TASK_NAME = 'ss_two_fridge_pick'
-# TASK_NAME = 'ss_two_fridge_in'
-# TASK_NAME = 'mm_two_fridge_goals'
-# TASK_NAME = 'mm_test'
-
-# TASK_NAME = 'mm_two_fridge_in'
-# TASK_NAME = 'mm'
-
-##########################################
-
-# TASK_NAME = 'mm_storage'
-# TASK_NAME = 'mm_sink'
-# TASK_NAME = 'mm_braiser'
-# TASK_NAME = 'mm_braiser_to_storage'
-# TASK_NAME = 'mm_sink_to_storage'
-# TASK_NAME = 'mm_braiser_to_storage'
-# TASK_NAME = 'mm_sink_to_storage'
-
-# TASK_NAME = 'tt_storage'
 TASK_NAME = 'tt_sink'
-# TASK_NAME = 'tt_braiser'
-# TASK_NAME = 'tt_storage_to_storage'
-TASK_NAME = 'tt_sink_to_storage'
-# TASK_NAME = 'tt_braiser_to_storage'
-
-# TASK_NAME = 'hh_braiser'
-
-# TASK_NAME = 'hh_storage'
-# TASK_NAME = 'hh_braiser'
 
 evaluation_time = {
     'tt_storage': 60,
@@ -116,14 +76,14 @@ if '_to_storage' in TASK_NAME:
     downward_time = 60
 
 CASES = None  ##
-CASES = ['2']
+CASES = ['5']
 
 if CASES is not None:
     SKIP_IF_SOLVED = False
     SKIP_IF_SOLVED_RECENTLY = False
 
 PARALLEL = GENERATE_SKELETONS and False
-FEASIBILITY_CHECKER = 'pvt-task'  ## 'pvt-56', 'pvt-task'
+FEASIBILITY_CHECKER = 'None'  ## 'pvt-56', 'pvt-task'
 ## None | oracle | pvt | pvt* | pvt-task | pvt-all | binary | shuffle | heuristic
 if GENERATE_SKELETONS:
     FEASIBILITY_CHECKER = 'oracle'

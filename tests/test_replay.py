@@ -17,12 +17,12 @@ import time
 import sys
 from PIL import Image
 
-from pybullet_tools.bullet_utils import query_yes_no, get_datetime
+from pybullet_tools.bullet_utils import query_yes_no, get_datetime, nice
 from pybullet_tools.utils import reset_simulation, VideoSaver, wait_unlocked, draw_aabb, get_aabb
 from lisdf_tools.lisdf_loader import load_lisdf_pybullet, pddlstream_from_dir
 from lisdf_tools.lisdf_planning import pddl_to_init_goal, Problem
 from lisdf_tools.image_utils import make_composed_image_multiple_episodes, images_to_gif
-from isaac_tools.gym_utils import save_gym_run
+from isaac_tools.gym_utils import save_gym_run, interpolate_camera_pose
 from world_builder.actions import apply_actions
 
 from mamao_tools.data_utils import get_plan, get_body_map, get_multiple_solutions, \
@@ -32,7 +32,7 @@ from mamao_tools.data_utils import get_plan, get_body_map, get_multiple_solution
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser, \
     get_sample_envs_for_rss
 
-USE_GYM = False
+USE_GYM = True
 SAVE_COMPOSED_JPG = False
 SAVE_GIF = False
 SAVE_JPG = True or SAVE_COMPOSED_JPG or SAVE_GIF
@@ -43,7 +43,7 @@ CFREE_RANGE = 0.1
 VISUALIZE_COLLISIONS = False
 
 SAVE_MP4 = False
-STEP_BY_STEP = True
+STEP_BY_STEP = False
 AUTO_PLAY = True
 EVALUATE_QUALITY = False
 PARALLEL = SAVE_JPG and not PREVIEW_SCENE and False  ## and not CHECK_COLLISIONS
@@ -51,80 +51,14 @@ PARALLEL = SAVE_JPG and not PREVIEW_SCENE and False  ## and not CHECK_COLLISIONS
 SKIP_IF_PROCESSED_RECENTLY = False
 CHECK_TIME = 1674417578
 
+CAMERA_KWARGS = None
+LIGHT_CONFIG = None
+CAMERA_MOVEMENT = None
 GIVEN_PATH = None
-# GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/one_fridge_pick_pr2/one_fridge_pick_pr2_1004_01:29_1'
-# GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/0104_094417_original_1'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/232'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/10'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/563'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/1998/' + 'rerun/diverse_commands_rerun_fc=None.pkl'
-# GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/230115_115113_original_0'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/mm_sink_to_storage/43'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/tt_sink/26'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/mm_braiser_to_storage/1'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/_gmm/902'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/45' + '/rerun_230120_000551/commands.pkl'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'tt_sink/0' + '/rerun_2/diverse_commands_rerun_fc=None.pkl'
-
-## in the paper
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/169'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/467'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_storage/469'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/1'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser/106'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/4'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/19'
-# GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_sink/5'
-# GIVEN_PATH = None
-
 GIVEN_DIR = None
-# GIVEN_DIR = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen_100'
-# GIVEN_DIR ='/home/yang/Documents/fastamp-data-rss/' + 'mm_storage_long'
-
-#####################################################################
-
-# TASK_NAME = 'one_fridge_pick_pr2'
-
-# TASK_NAME = 'mm_one_fridge_table_in'
-# TASK_NAME = 'mm_one_fridge_table_on'
-# TASK_NAME = 'mm_one_fridge_table_pick'
-# TASK_NAME = 'mm_two_fridge_pick'
-# TASK_NAME = 'mm_two_fridge_in'
-
-# TASK_NAME = 'tt_one_fridge_pick'
-# TASK_NAME = 'tt_one_fridge_table_in'
-# TASK_NAME = 'tt_two_fridge_pick'
-# TASK_NAME = 'tt_two_fridge_in'
-
-# TASK_NAME = 'ff_one_fridge_table_pick'
-# TASK_NAME = 'ff_two_fridge_pick'
-
-# TASK_NAME = '_examples'
-# TASK_NAME = 'elsewhere'
-# TASK_NAME = 'discarded'
-
-#####################################################################
-
-# TASK_NAME = 'mm'
-# TASK_NAME = 'mm_storage'
-# TASK_NAME = 'mm_sink'
-# TASK_NAME = 'mm_braiser'
-TASK_NAME = 'mm_sink_to_storage'
-# TASK_NAME = 'mm_braiser_to_storage'
-
-# TASK_NAME = 'tt'
-# TASK_NAME = 'tt_storage'
-# TASK_NAME = 'tt_sink'
-# TASK_NAME = 'tt_braiser'
-# TASK_NAME = 'tt_braiser_to_storage'
-TASK_NAME = 'tt_sink_to_storage'
-
-# TASK_NAME = 'ww_braiser_to_storage'
-# TASK_NAME = 'ww_sink_to_storage'
-# TASK_NAME = 'ww_sink'
-
+TASK_NAME = 'mm_storage'
 CASES = None
-CASES = ['16']  ##
+# CASES = ['16']  ##
 # CASES = get_sample_envs_for_rss(task_name=TASK_NAME, count=None)
 
 if GIVEN_PATH:
@@ -142,16 +76,22 @@ args = parser.parse_args()
 
 
 def get_pkl_run(run_dir, verbose=True):
-    pkl_file = 'commands.pkl'
-    if run_dir.endswith('.pkl'):
-        pkl_file = basename(run_dir)
-        run_dir = run_dir[:-len(pkl_file) - 1]
-        rerun_dir = basename(run_dir)
-        run_dir = run_dir[:-len(rerun_dir) - 1]
-        pkl_file = join(rerun_dir, pkl_file)
+    if basename(run_dir) == 'collisions.pkl':
+        pkl_file = run_dir
+        run_dir = dirname(run_dir)
+    else:
+        pkl_file = 'commands.pkl'
+        if run_dir.endswith('.pkl'):
+            pkl_file = basename(run_dir)
+            run_dir = run_dir[:-len(pkl_file) - 1]
+            rerun_dir = basename(run_dir)
+            run_dir = run_dir[:-len(rerun_dir) - 1]
+            pkl_file = join(rerun_dir, pkl_file)
 
     exp_dir = copy_dir_for_process(run_dir, tag='replaying', verbose=verbose)
-    if basename(pkl_file) != 'commands.pkl':
+    if basename(pkl_file) == 'collisions.pkl':
+        plan = None
+    elif basename(pkl_file) != 'commands.pkl':
         plan_json = join(run_dir, pkl_file).replace('commands', 'plan').replace('.pkl', '.json')
         plan = get_plan(run_dir, plan_json=plan_json)
     else:
@@ -178,7 +118,7 @@ def swap_microwave(run_dir, verbose=False):
     world = load_lisdf_pybullet(exp_dir, use_gui=not USE_GYM, verbose=False)
 
 
-def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, height=1120, fx=600,
+def run_one(run_dir_ori, task_name=TASK_NAME, save_gif=True, save_mp4=SAVE_MP4, width=1440, height=1120, fx=600,
             camera_point=(8.5, 2.5, 3), target_point=(0, 2.5, 0)):
 
     verbose = not SAVE_JPG
@@ -189,8 +129,11 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, hei
     larger_world = 'rerun' in run_dir_ori and '/tt_' in run_dir_ori
     world = load_lisdf_pybullet(exp_dir, use_gui=not USE_GYM, width=width, height=height,
                                 verbose=False, larger_world=larger_world)
-    if not USE_GYM and GIVEN_PATH is not None:
-        wait_unlocked()
+    aabb = get_aabb(world.name_to_body['counter#1'])
+    print(nice(aabb))
+    print(aabb.upper[0])
+    # if not USE_GYM and GIVEN_PATH is not None:
+    #     wait_unlocked()
     problem = Problem(world)
     if verbose:
         world.summarize_all_objects()
@@ -227,20 +170,61 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_mp4=SAVE_MP4, width=1440, hei
 
     if USE_GYM:
         from isaac_tools.gym_utils import load_lisdf_isaacgym, record_actions_in_gym, set_camera_target_body
-        gym_world = load_lisdf_isaacgym(abspath(exp_dir), camera_width=1280, camera_height=800,
+        frame_width = 1280
+        frame_height = 800
+        if LIGHT_CONF is not None:
+            frame_width = 3840
+            frame_height = 2160
+            save_mp4 = True
+            save_gif = False
+        gym_world = load_lisdf_isaacgym(abspath(exp_dir), camera_width=frame_width, camera_height=frame_height,
                                         camera_point=camera_point, target_point=target_point)
         set_camera_target_body(gym_world, run_dir)
+
+        save_name = basename(exp_dir).replace('temp_', '')
+
+        #####################################################
+
+        ## set better camera view for making gif screenshots
+        if CAMERA_KWARGS is not None:
+            camera_point = CAMERA_KWARGS['camera_point']
+            camera_target = CAMERA_KWARGS['camera_target']
+            gym_world.set_viewer_target(camera_point, camera_target)
+            gym_world.set_camera_target(gym_world.cameras[0], camera_point, camera_target)
+            if 'sink' in run_dir:
+                gym_world.simulator.set_light(
+                    direction=np.asarray([0, -1, 0.2]), ## [0, -1, 0.2]
+                    intensity=np.asarray([1, 1, 1]))
+            if True:
+                img_file = gym_world.get_rgba_image(gym_world.cameras[0])
+                from PIL import Image
+                im = Image.fromarray(img_file)
+                im.save(join('gym_images', save_name+'.png'))
+                sys.exit()
+
+        if LIGHT_CONF is not None:
+            gym_world.simulator.set_light(**LIGHT_CONF)
+
+        #####################################################
+
         img_dir = join(exp_dir, 'gym_images')
         gif_name = 'gym_replay.gif'
         os.mkdir(img_dir)
         gif_name = record_actions_in_gym(problem, commands, gym_world, img_dir=img_dir, body_map=body_map,
-                                         gif_name=gif_name, time_step=0, verbose=False, plan=plan)
+                                         gif_name=gif_name, time_step=0, verbose=False, plan=plan,
+                                         save_gif=save_gif, save_mp4=save_mp4, camera_movement=CAMERA_MOVEMENT)
         # gym_world.wait_if_gui()
-        shutil.copy(join(exp_dir, gif_name), join(run_dir, gif_name))
-        print('moved gif to {}'.format(join(run_dir, gif_name)))
 
-        new_file = join('gym_images', basename(exp_dir).replace('temp_', '')+'.gif')
-        shutil.move(join(exp_dir, gif_name), new_file)
+        new_file = join('gym_images', save_name+'.gif')
+        if save_gif:
+            # shutil.copy(join(exp_dir, gif_name), join(run_dir, gif_name))
+            print('moved gif to {}'.format(join(run_dir, new_file)))
+            shutil.move(join(exp_dir, gif_name), new_file)
+        if save_mp4:
+            mp4_name = gif_name.replace('.gif', '.mp4')
+            new_mp4_name = new_file.replace('.gif', '.mp4')
+            shutil.move(join(mp4_name), new_mp4_name)
+            print('moved mp4 to {}'.format(join(run_dir, new_mp4_name)))
         del(gym_world.simulator)
 
     elif save_mp4:
@@ -362,7 +346,7 @@ def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, world_siz
             exp_dir, run_dir, commands, plan = get_pkl_run(lisdf_dirs[i], verbose=verbose)
             world = load_lisdf_pybullet(exp_dir, use_gui=not USE_GYM or debug,
                                         width=width, height=height, verbose=False)
-            body_map = get_body_map(run_dir, world)
+            body_map = get_body_map(run_dir, world, larger=False)
             problem = Problem(world)
             wconfs = record_actions_in_gym(problem, commands, plan=plan, return_wconf=True,
                                            world_index=i, body_map=body_map)
@@ -375,24 +359,31 @@ def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, world_siz
         gym_world, offsets = load_envs_isaacgym(lisdf_dirs, num_rows=num_rows, num_cols=num_cols, world_size=world_size,
                                                 camera_point=camera_point_begin, target_point=target_point, verbose=verbose)
 
+    # img_file = gym_world.get_rgba_image(gym_world.cameras[0])
+    # from PIL import Image
+    # im = Image.fromarray(img_file)
+    # im.save(join('gym_images', 'replay_all_in_gym' + '.png'))
+    # sys.exit()
+
     all_wconfs = merge_all_wconfs(all_wconfs)
     print(f'\n\nrendering all {len(all_wconfs)} frames')
 
     ## update all scenes for each frame
     filenames = []
     for i in tqdm(range(len(all_wconfs))):
-        if camera_point_final != camera_point_begin:
-            if isinstance(camera_point_final, tuple) and isinstance(camera_point_final, tuple):
-                camera_point = tuple([camera_point_begin[j] + (camera_point_final[j] - camera_point_begin[j]) * i / len(all_wconfs)
-                                      for j in range(3)])
-            else:
-                ## rotate camera around point begin by radius of camera_point_final
-                dx = camera_point_final * math.sin(2 * math.pi * i / len(all_wconfs))
-                dy = camera_point_final * math.cos(2 * math.pi * i / len(all_wconfs))
-                offset = [dx, dy, 0]
-                camera_point = tuple([camera_point_begin[j] + offset[j] for j in range(3)])
-            gym_world.set_camera_target(gym_world.cameras[0], camera_point, target_point)
+        kwargs = dict(camera_point_begin=camera_point_begin,
+                      camera_point_final=camera_point_final,
+                      target_point=target_point)
+        interpolate_camera_pose(gym_world, i, len(all_wconfs), kwargs)
         update_gym_world_by_wconf(gym_world, all_wconfs[i], offsets=offsets)
+
+        # ## just save the initial state
+        # img_file = gym_world.get_rgba_image(gym_world.cameras[0])
+        # from PIL import Image
+        # im = Image.fromarray(img_file)
+        # im.save(join('gym_images', 'replay_all_in_gym' + '.png'))
+        # sys.exit()
+
         if i % frame_gap == 0:
             img_file = gym_world.get_rgba_image(gym_world.cameras[0])
             filenames.append(img_file)
@@ -414,7 +405,6 @@ def generated_recentely(file):
 
 def case_filter(run_dir_ori):
     """ whether to process this run """
-    return True
     if CASES is not None or GIVEN_PATH is not None:
         return True
 
@@ -465,9 +455,15 @@ if __name__ == '__main__':
 
     # replay_all_in_gym(num_rows=14, num_cols=14, world_size=(6, 6), save_gif=True)
 
-    ## record 1 : 250+ worlds
+    # record 1 : 250+ worlds
+    # replay_all_in_gym(num_rows=2, num_cols=1, world_size=(4, 8), loading_effect=False,
+    #                   frame_gap=1, save_mp4=True, save_gif=False, verbose=False, camera_motion='zoom')
     # replay_all_in_gym(num_rows=32, num_cols=8, world_size=(4, 8), loading_effect=True,
     #                   frame_gap=1, save_mp4=True, save_gif=False, verbose=False, camera_motion='zoom')
+
+    # record 1 : 96+ worlds
+    # replay_all_in_gym(num_rows=32, num_cols=8, world_size=(4, 8), loading_effect=False,
+    #                   frame_gap=3, save_mp4=True, save_gif=False, verbose=False, camera_motion='zoom')
 
     ## record 2 : robot execution
     # replay_all_in_gym(num_rows=8, num_cols=3, world_size=(4, 8), loading_effect=False,

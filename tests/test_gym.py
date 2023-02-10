@@ -28,6 +28,7 @@ def test_load_one(loading_effect=False, **kwargs):
     ori_dir = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/1231-093847_original_2'
     ori_dir = '/home/yang/Documents/kitchen-worlds/outputs/test_full_kitchen/1230-134950_original_1'
     ori_dir = join(MAMAO_DATA_PATH, 'mm_sink_to_storage/84')
+    ori_dir = join(MAMAO_DATA_PATH, 'mm_sink_to_storage/23')
     lisdf_dir = copy_dir_for_process(ori_dir)
     world = load_lisdf_isaacgym(abspath(lisdf_dir), pause=True, loading_effect=loading_effect, **kwargs)
     if loading_effect:
@@ -140,8 +141,8 @@ def test_load_objects():
 
 if __name__ == "__main__":
     # test_load_lisdf()
-    test_load_one(loading_effect=False, load_cameras=True, save_obj_shots=True)
-    # test_load_multiple(test_camera_pose=True)
+    # test_load_one(loading_effect=False, load_cameras=True, save_obj_shots=False)
+    test_load_multiple(test_camera_pose=True)
     # test_load_objects()
 
 
