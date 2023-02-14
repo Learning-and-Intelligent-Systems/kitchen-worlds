@@ -4,7 +4,7 @@ from tabnanny import verbose
 import os
 import math
 import json
-from config import EXP_PATH, MAMAO_DATA_PATH
+from config import EXP_PATH, MAMAO_DATA_PATH, SCENE_CONFIG_PATH
 import numpy as np
 import random
 import time
@@ -13,15 +13,18 @@ import pickle
 import shutil
 import argparse
 
-# TASK_NAME = 'tt_one_fridge_pick'
-TASK_NAME = 'tt_one_fridge_table_pick'
-# TASK_NAME = 'tt_one_fridge_table_in'
-# TASK_NAME = 'tt_two_fridge_pick'
-# TASK_NAME = 'tt_two_fridge_in'
-# TASK_NAME = 'mm_two_fridge_in'
+from world_builder.utils import parse_yaml
 
 
-def get_base_parser(task_name=TASK_NAME, parallel=False, use_viewer=False):
+def get_config(config_name):
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-c', '--config', type=str, default=config_name)
+    args = parser.parse_args()
+    config = parse_yaml(join(SCENE_CONFIG_PATH, args.config))
+    return config
+
+
+def get_base_parser(task_name=None, parallel=False, use_viewer=False):
     parser = argparse.ArgumentParser()
     parser.add_argument('-t', type=str, default=task_name)
     parser.add_argument('-p', action='store_true', default=parallel)
