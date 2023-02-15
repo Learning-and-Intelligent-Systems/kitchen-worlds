@@ -57,7 +57,7 @@ sudo apt-get install graphviz graphviz-dev  ## on Ubuntu
 (cd pddlstream; ./downward/build.py)
 ```
 
-4. Build IK solvers
+4. Build IK solvers (If using PR2)
 
 IKFast solver for PR2 arm planning:
 
@@ -78,7 +78,25 @@ pip install tracikpy/
 
 [graphviz](https://pygraphviz.github.io/documentation/latest/install.html)
 
-## Examples
+## Exmamples
+
+collects data (including scene layout `scene.lisdf`, `problem.pddl`, plan, and trajectory) according to the configuration file in [pybullet_planning/pipelines](https://github.com/zt-yang/pybullet_planning/blob/master/pipelines/kitchen_mini_feg.yaml) directory, and outputs to a subdirectory in `kitchen-worlds/outputs/test_feg_kitchen_mini/` named by datetime. 
+
+```commandline
+python test_data_generation.py -c kitchen_full_feg.yaml
+```
+
+replays the generated trajectory and generates a `replay.gif` in a given path to the data directory (containing `scene.lisdf`, `problem.pddl`, `commands.pkl`), for example:
+
+```commandline
+python test_replay.py --path /home/yang/Documents/kitchen-worlds/outputs/test_feg_kitchen_mini/230214_205947
+```
+
+----------
+
+The following are no longer working as of Feb 2023. Will be updated soon.
+
+## Examples 
 
 ### Test planner for MALAO project
 

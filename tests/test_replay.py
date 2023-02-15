@@ -32,9 +32,9 @@ from mamao_tools.data_utils import get_plan, get_body_map, get_multiple_solution
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser, \
     get_sample_envs_for_rss
 
-USE_GYM = True
+USE_GYM = False
 SAVE_COMPOSED_JPG = False
-SAVE_GIF = False
+SAVE_GIF = True
 SAVE_JPG = True or SAVE_COMPOSED_JPG or SAVE_GIF
 PREVIEW_SCENE = False
 
@@ -52,7 +52,7 @@ SKIP_IF_PROCESSED_RECENTLY = False
 CHECK_TIME = 1674417578
 
 CAMERA_KWARGS = None
-LIGHT_CONFIG = None
+LIGHT_CONF = None
 CAMERA_MOVEMENT = None
 GIVEN_PATH = None
 GIVEN_DIR = None
@@ -70,8 +70,12 @@ if GIVEN_PATH is not None and 'rerun' in GIVEN_PATH:
     SAVE_GIF = False
 
 parser = get_base_parser(task_name=TASK_NAME, parallel=PARALLEL, use_viewer=True)
+parser.add_argument('--path', type=str, default=GIVEN_PATH)
+parser.add_argument('--step', action='store_true', default=STEP_BY_STEP)
 args = parser.parse_args()
 
+GIVEN_PATH = args.path
+STEP_BY_STEP = args.step
 #####################################
 
 
@@ -157,13 +161,14 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_gif=True, save_mp4=SAVE_MP4, 
     ## save the initial scene image in pybullet
     zoomin_kwargs = dict(width=width//4, height=height//4, fx=fx//2)
     if not CHECK_COLLISIONS and SAVE_JPG:
+        viz_dir = join(run_dir_ori, f'images')
         for sud in range(len(world.camera_kwargs)):
             viz_dir = join(run_dir_ori, f'zoomin_{sud}'.replace('_0', ''))
             world.add_camera(viz_dir, img_dir=viz_dir, **zoomin_kwargs, **world.camera_kwargs[sud])
             world.visualize_image(index='initial', rgb=True)
 
         ## for a view of the whole scene
-        if SAVE_COMPOSED_JPG or SAVE_GIF:
+        if (SAVE_COMPOSED_JPG or SAVE_GIF):
             world.add_camera(viz_dir, width=width//2, height=height//2, fx=fx//2, img_dir=viz_dir,
                              camera_point=(6, 4, 2), target_point=(0, 4, 1))
             world.make_transparent(world.robot.body, transparency=0)
