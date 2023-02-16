@@ -18,7 +18,7 @@
 
     (pushable steak)
     (pushtool steak right)
-    ;(graspable steak)
+    (graspable steak)
     (graspable cabbage)
     (graspable salt)
     (graspable pepper)

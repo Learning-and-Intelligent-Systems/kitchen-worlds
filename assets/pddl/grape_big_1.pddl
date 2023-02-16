@@ -40,6 +40,6 @@
     (graspable large_cap_1)
     (graspable large_cap_2)    
  )
-  (:goal (and (on grape_1 grape_2)))
+  (:goal (and (on grape_1 small_cap_1)))
 )
 
