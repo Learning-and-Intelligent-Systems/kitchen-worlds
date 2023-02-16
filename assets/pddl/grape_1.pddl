@@ -10,10 +10,6 @@
     ;; discrete facts (e.g. types, affordances)
     (arm right)
 
-    (controllable right)
-   ; (handempty right)
-
-    ; (floor floor)
     (surface table)
 
     (graspable small_cap)
