@@ -34,7 +34,7 @@ from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser,
 
 USE_GYM = True
 SAVE_COMPOSED_JPG = False
-SAVE_GIF = True
+SAVE_GIF = False
 SAVE_JPG = True or SAVE_COMPOSED_JPG or SAVE_GIF
 PREVIEW_SCENE = False
 ROBOT_VIEW = True
@@ -320,6 +320,10 @@ def merge_all_wconfs(all_wconfs):
         for num in range(len(all_wconfs)):
             if t < len(all_wconfs[num]):
                 whole_wconf.update(all_wconfs[num][t])
+            elif t < 2 * len(all_wconfs[num]):
+                whole_wconf.update(all_wconfs[num][2 * len(all_wconfs[num]) - t - 1])
+            elif t < 3 * len(all_wconfs[num]):
+                whole_wconf.update(all_wconfs[num][t - 2 * len(all_wconfs[num])])
         whole_wconfs.append(whole_wconf)
     return whole_wconfs
 
@@ -339,7 +343,7 @@ def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, world_siz
     # os.mkdir(img_dir)
 
     data_dir = 'test_full_kitchen_100' if loading_effect else 'test_full_kitchen_sink'
-    ori_dirs, camera_point_begin, camera_point_final, target_point = get_dirs_camera(
+    ori_dirs, camera_point_begin, target_point, camera_kwargs = get_dirs_camera(
         num_rows, num_cols, world_size, data_dir=data_dir, camera_motion=camera_motion)
     lisdf_dirs = [copy_dir_for_process(ori_dir, verbose=verbose) for ori_dir in ori_dirs]
     num_worlds = min([len(lisdf_dirs), num_rows * num_cols])
@@ -379,13 +383,12 @@ def replay_all_in_gym(width=1440, height=1120, num_rows=5, num_cols=5, world_siz
     all_wconfs = merge_all_wconfs(all_wconfs)
     print(f'\n\nrendering all {len(all_wconfs)} frames')
 
+    all_wconfs = all_wconfs[:600]
+
     ## update all scenes for each frame
     filenames = []
     for i in tqdm(range(len(all_wconfs))):
-        kwargs = dict(camera_point_begin=camera_point_begin,
-                      camera_point_final=camera_point_final,
-                      target_point=target_point)
-        interpolate_camera_pose(gym_world, i, len(all_wconfs), kwargs)
+        interpolate_camera_pose(gym_world, i, len(all_wconfs), camera_kwargs)
         update_gym_world_by_wconf(gym_world, all_wconfs[i], offsets=offsets)
 
         # ## just save the initial state
@@ -474,7 +477,7 @@ if __name__ == '__main__':
 
     # record 1 : 96+ worlds
     # replay_all_in_gym(num_rows=32, num_cols=8, world_size=(4, 8), loading_effect=False,
-    #                   frame_gap=3, save_mp4=True, save_gif=False, verbose=False, camera_motion='zoom')
+    #                   frame_gap=1, save_mp4=True, save_gif=False, verbose=False, camera_motion='pan')
 
     ## record 2 : robot execution
     # replay_all_in_gym(num_rows=8, num_cols=3, world_size=(4, 8), loading_effect=False,

@@ -253,6 +253,9 @@ def get_dirs_camera(num_rows=5, num_cols=5, world_size=(6, 6), data_dir=None, ca
     if world_size == (4, 8):
         ori_dirs = get_sample_envs_full_kitchen(num_rows * num_cols, data_dir=data_dir)
 
+    camera_target = None
+    target_point_begin = None
+    target_point_final = None
     if num_rows == 1 and num_cols == 1:
 
         if world_size == (4, 8):
@@ -327,11 +330,26 @@ def get_dirs_camera(num_rows=5, num_cols=5, world_size=(6, 6), data_dir=None, ca
     elif num_rows == 32 and num_cols == 8:
 
         if world_size == (4, 8):
-            camera_target = (5*(11+16), 8*4-4, 0)
-            camera_point_begin = (5*(12+16), 8*4-6, 2)
-            camera_point_final = (5*(16+16), 8*2, 12)
+            if camera_motion == 'zoom':
+                camera_target = (5*(11+16), 8*4-4, 0)
+                camera_point_begin = (5*(12+16), 8*4-6, 2)
+                camera_point_final = (5*(16+16), 8*2, 12)
+            elif camera_motion == 'pan':
+                target_point_begin = (5*(32-4), 8*3-4, 0)
+                target_point_final = (5*(16-4), 8*3-4, 0)
+                camera_point_begin = (5*32, 8*1, 12)
+                camera_point_final = (5*16, 8*1, 12)
 
-    return ori_dirs, camera_point_begin, camera_point_final, camera_target
+    if target_point_begin is None and target_point_final is None:
+        target_point_begin = target_point_final = camera_target
+    if camera_target is None:
+        camera_target = target_point_begin
+
+    kwargs = dict(camera_point_begin=camera_point_begin,
+                  camera_point_final=camera_point_final,
+                  target_point_begin=target_point_begin,
+                  target_point_final=target_point_final)
+    return ori_dirs, camera_point_begin, camera_target, kwargs
 
 
 ##################################################################################

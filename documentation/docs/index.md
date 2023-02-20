@@ -78,9 +78,9 @@ pip install tracikpy/
 
 [graphviz](https://pygraphviz.github.io/documentation/latest/install.html)
 
-## Exmamples
+## Examples
 
-collects data (including scene layout `scene.lisdf`, `problem.pddl`, plan, and trajectory) according to the configuration file in [pybullet_planning/pipelines](https://github.com/zt-yang/pybullet_planning/blob/master/pipelines/kitchen_mini_feg.yaml) directory, and outputs to a subdirectory in `kitchen-worlds/outputs/test_feg_kitchen_mini/` named by datetime. 
+collects data (including scene layout `scene.lisdf`, `problem.pddl`, plan, and trajectory) according to the configuration file in [pybullet_planning/pipelines](https://github.com/zt-yang/pybullet_planning/blob/master/pipelines/kitchen_full_feg.yaml) directory, and outputs to a subdirectory in `kitchen-worlds/outputs/test_feg_kitchen_mini/` named by datetime. 
 
 ```commandline
 python test_data_generation.py -c kitchen_full_feg.yaml
@@ -94,9 +94,11 @@ python test_replay.py --path /home/yang/Documents/kitchen-worlds/outputs/test_fe
 
 ----------
 
-The following are no longer working as of Feb 2023. Will be updated soon.
+The test scripts below this line haven't been tested as of Feb 2023. Will be updated soon.
 
-## Examples 
+----------
+
+## Examples (obsolete)
 
 ### Test planner for MALAO project
 

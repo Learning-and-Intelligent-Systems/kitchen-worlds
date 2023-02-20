@@ -26,3 +26,4 @@ outputs/
 !outputs/style.css
 
 collisions.json
+*.mp4
