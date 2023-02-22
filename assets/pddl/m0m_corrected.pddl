@@ -11,13 +11,13 @@
     ;; discrete facts (e.g. types, affordances)
     ;; (canmove)
 
-    (arm left)
+    ;(arm left)
     (arm right)
 
-    (controllable left)
+    ;(controllable left)
     (controllable right)
     
-    (handempty left)
+    ;(handempty left)
     (handempty right)
 
     (floor floor#1_1)
