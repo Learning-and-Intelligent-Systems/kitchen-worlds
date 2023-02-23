@@ -155,12 +155,12 @@ def process_all_tasks(process, task_name, parallel=False, cases=None, path=None,
                       dir=None, case_filter=None, return_dirs=False):
     clear_pddlstream_cache()
 
-    if dir is not None:
+    if path is not None:
+        cases = [path]
+    elif dir is not None:
         cases = [join(dir, c) for c in listdir(dir)]
         cases = [c for c in cases if isdir(c) and not isfile(join(c, 'gym_replay.gif'))]
         # cases = cases[:1]
-    elif path is not None:
-        cases = [path]
     elif cases is not None and len(cases) > 0:
         cases = [join(MAMAO_DATA_PATH, task_name, case) for case in cases]
     else:

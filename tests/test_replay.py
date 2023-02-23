@@ -18,7 +18,8 @@ import sys
 from PIL import Image
 
 from pybullet_tools.bullet_utils import query_yes_no, get_datetime, nice
-from pybullet_tools.utils import reset_simulation, VideoSaver, wait_unlocked, draw_aabb, get_aabb
+from pybullet_tools.utils import reset_simulation, VideoSaver, wait_unlocked, draw_aabb, get_aabb, \
+    get_aabb_center
 from lisdf_tools.lisdf_loader import load_lisdf_pybullet, pddlstream_from_dir
 from lisdf_tools.lisdf_planning import pddl_to_init_goal, Problem
 from lisdf_tools.image_utils import make_composed_image_multiple_episodes, images_to_gif
@@ -26,8 +27,8 @@ from isaac_tools.gym_utils import save_gym_run, interpolate_camera_pose
 from world_builder.actions import apply_actions
 
 from mamao_tools.data_utils import get_plan, get_body_map, get_multiple_solutions, \
-    add_to_planning_config, load_planning_config, exist_instance, \
-    check_unrealistic_placement_z
+    add_to_planning_config, load_planning_config, exist_instance, get_world_aabb, \
+    check_unrealistic_placement_z, get_goals
 
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser, \
     get_sample_envs_for_rss
@@ -37,7 +38,9 @@ SAVE_COMPOSED_JPG = False
 SAVE_GIF = False
 SAVE_JPG = True or SAVE_COMPOSED_JPG or SAVE_GIF
 PREVIEW_SCENE = False
-ROBOT_VIEW = True
+
+MP4_SIDE_VIEW = False
+MP4_TOP_VIEW = True
 
 CHECK_COLLISIONS = False
 CFREE_RANGE = 0.1
@@ -57,14 +60,17 @@ LIGHT_CONF = None
 CAMERA_MOVEMENT = None
 GIVEN_PATH = None
 GIVEN_DIR = None
+FRAME_WIDTH = 1280
+FRAME_HEIGHT = 800
+
 TASK_NAME = 'mm_storage'
 CASES = None
 # CASES = ['16']  ##
 # CASES = get_sample_envs_for_rss(task_name=TASK_NAME, count=None)
 
 GIVEN_DIR = '/home/yang/Documents/fastamp-data-rss/'
-GIVEN_PATH = GIVEN_DIR + 'tt_storage/44' + '/rerun_2/diverse_commands_rerun_fc=pvt-task.pkl'
-# GIVEN_PATH = GIVEN_DIR + 'tt_braiser/4' + '/rerun_2/diverse_commands_rerun_fc=pvt-task.pkl'
+replay_pkl = '/rerun_2/diverse_commands_rerun_fc=pvt-task.pkl'
+GIVEN_PATH = GIVEN_DIR + 'tt_sink_to_storage/14' + replay_pkl
 CAMERA_MOVEMENT = None
 
 if GIVEN_PATH:
@@ -74,6 +80,16 @@ if GIVEN_PATH is not None and 'rerun' in GIVEN_PATH:
     SAVE_JPG = False
     SAVE_COMPOSED_JPG = False
     SAVE_GIF = False
+if MP4_SIDE_VIEW or MP4_TOP_VIEW or LIGHT_CONF is not None:
+    SAVE_MP4 = True
+    SAVE_GIF = False
+    if LIGHT_CONF is not None:
+        FRAME_WIDTH = 3840
+        FRAME_HEIGHT = 2160
+    if MP4_SIDE_VIEW or MP4_TOP_VIEW:
+        FRAME_WIDTH = 1920
+        FRAME_HEIGHT = 1080
+        LIGHT_CONF = dict(direction=np.asarray([0, -1, 0]), intensity=np.asarray([1, 1, 1]))
 
 parser = get_base_parser(task_name=TASK_NAME, parallel=PARALLEL, use_viewer=True)
 parser.add_argument('--path', type=str, default=GIVEN_PATH)
@@ -128,7 +144,7 @@ def swap_microwave(run_dir, verbose=False):
     world = load_lisdf_pybullet(exp_dir, use_gui=not USE_GYM, verbose=False)
 
 
-def run_one(run_dir_ori, task_name=TASK_NAME, save_gif=True, save_mp4=SAVE_MP4, width=1440, height=1120, fx=600,
+def run_one(run_dir_ori, task_name=TASK_NAME, save_gif=SAVE_GIF, save_mp4=SAVE_MP4, width=1440, height=1120, fx=600,
             camera_point=(8.5, 2.5, 3), target_point=(0, 2.5, 0)):
 
     verbose = not SAVE_JPG
@@ -174,21 +190,15 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_gif=True, save_mp4=SAVE_MP4, 
             world.visualize_image(index='initial', rgb=True)
 
         ## for a view of the whole scene
-        if (SAVE_COMPOSED_JPG or SAVE_GIF):
+        if SAVE_COMPOSED_JPG or SAVE_GIF:
             world.add_camera(viz_dir, width=width//2, height=height//2, fx=fx//2, img_dir=viz_dir,
                              camera_point=(6, 4, 2), target_point=(0, 4, 1))
             world.make_transparent(world.robot.body, transparency=0)
 
     if USE_GYM:
         from isaac_tools.gym_utils import load_lisdf_isaacgym, record_actions_in_gym, set_camera_target_body
-        frame_width = 1280
-        frame_height = 800
-        if LIGHT_CONF is not None:
-            frame_width = 3840
-            frame_height = 2160
-            save_mp4 = True
-            save_gif = False
-        gym_world = load_lisdf_isaacgym(abspath(exp_dir), camera_width=frame_width, camera_height=frame_height,
+
+        gym_world = load_lisdf_isaacgym(abspath(exp_dir), camera_width=FRAME_WIDTH, camera_height=FRAME_HEIGHT,
                                         camera_point=camera_point, target_point=target_point)
         set_camera_target_body(gym_world, run_dir)
 
@@ -197,6 +207,56 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_gif=True, save_mp4=SAVE_MP4, 
         #####################################################
 
         ## set better camera view for making gif screenshots
+        removed = []
+        if MP4_SIDE_VIEW or MP4_TOP_VIEW:
+            world_aabb = get_world_aabb(run_dir)
+            x, y, _ = get_aabb_center(world_aabb)
+            if MP4_SIDE_VIEW:
+                x2 = 8
+                z2 = 3
+            if MP4_TOP_VIEW:
+                x2 = x+0.1
+                z2 = 9
+                trashcan = (np.array([-4, -4, 8]), np.array([0, 0, 0, 1]))
+                goals = get_goals(run_dir)
+                removed = []
+
+                ## remove all cabinetupper
+                removed.extend(world.remove_from_gym_world('cabinetupper', gym_world, trashcan))
+
+                ## remove cabinettop if not in goal
+                if 'cabinettop' not in goals[-1][-1]:
+                    removed.extend(world.remove_from_gym_world('cabinettop', gym_world, trashcan))
+                else:
+                    name_one = goals[-1][-1].split('::')[0]
+                    exceptions = [name_one, f"{name_one}_filler"]
+                    removed.extend(world.remove_from_gym_world('cabinettop', gym_world, trashcan,
+                                                               exceptions=exceptions))
+                if 'storedinspace' == goals[-1][0] or True:
+                    x2 = x + 3
+
+                ## remove the shelf if bottles are not to be moved
+                if not (goals[-1][0] == 'storedinspace' and goals[-1][1] == '@bottle'):
+                    removed.extend(world.remove_from_gym_world('shelf', gym_world, trashcan))
+                    count_in = []
+                    count_out = []
+                    for name in world.name_to_body:
+                        if name in ['floor1'] or '::' in name:
+                            continue
+                        print('checking', name)
+                        pose = gym_world.get_pose(gym_world.get_actor(name))
+                        if pose[0][2] > 1.5 and ('bottle' in name or 'medicine' in name):
+                            count_in.append(name)
+                        else:
+                            count_out.append(name)
+                    print('count_in', count_in)
+                    print('count_out', count_out)
+                    if len(count_in) > 0:
+                        removed.extend(world.remove_from_gym_world(count_in[0], gym_world, trashcan,
+                                                                   exceptions=count_out))
+
+            CAMERA_KWARGS = dict(camera_point=[x2, y, z2], camera_target=[x, y, 1])
+
         if CAMERA_KWARGS is not None:
             camera_point = CAMERA_KWARGS['camera_point']
             camera_target = CAMERA_KWARGS['camera_target']
@@ -206,7 +266,7 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_gif=True, save_mp4=SAVE_MP4, 
                 gym_world.simulator.set_light(
                     direction=np.asarray([0, -1, 0.2]), ## [0, -1, 0.2]
                     intensity=np.asarray([1, 1, 1]))
-            if True:
+            if False:
                 img_file = gym_world.get_rgba_image(gym_world.cameras[0])
                 from PIL import Image
                 im = Image.fromarray(img_file)
@@ -223,9 +283,14 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_gif=True, save_mp4=SAVE_MP4, 
         os.mkdir(img_dir)
         gif_name = record_actions_in_gym(problem, commands, gym_world, img_dir=img_dir, body_map=body_map,
                                          gif_name=gif_name, time_step=0, verbose=False, plan=plan,
-                                         save_gif=save_gif, save_mp4=save_mp4, camera_movement=CAMERA_MOVEMENT)
+                                         save_gif=save_gif, save_mp4=save_mp4, camera_movement=CAMERA_MOVEMENT,
+                                         ignore_actors=removed)
         # gym_world.wait_if_gui()
 
+        if MP4_SIDE_VIEW:
+            save_name = save_name + '_side'
+        if MP4_TOP_VIEW:
+            save_name = save_name + '_top'
         new_file = join('gym_images', save_name+'.gif')
         if save_gif:
             # shutil.copy(join(exp_dir, gif_name), join(run_dir, gif_name))
@@ -235,7 +300,7 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_gif=True, save_mp4=SAVE_MP4, 
             mp4_name = gif_name.replace('.gif', '.mp4')
             new_mp4_name = new_file.replace('.gif', '.mp4')
             shutil.move(join(mp4_name), new_mp4_name)
-            print('moved mp4 to {}'.format(join(run_dir, new_mp4_name)))
+            print('moved mp4 to {}'.format(join(new_mp4_name)))
         del(gym_world.simulator)
 
     elif save_mp4:

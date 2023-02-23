@@ -5,10 +5,10 @@ import numpy as np
 import shutil
 import random
 from config import MAMAO_DATA_PATH, ASSET_PATH
-from test_utils import copy_dir_for_process, get_task_names
 from pybullet_tools.utils import connect
-from isaac_tools.gym_utils import images_to_gif
-from test_utils import get_sample_envs_200
+from isaac_tools.gym_utils import images_to_gif, load_obj_shots_bg, take_obj_shot
+
+from test_utils import copy_dir_for_process, get_sample_envs_200
 
 
 ###########################################################################
@@ -77,7 +77,7 @@ def test_load_multiple(test_camera_pose=False):
         shutil.rmtree(lisdf_dir)
 
 
-def test_load_objects():
+def test_load_objects(save_obj_shots=False, width=1980, height=1238):
     sys.path.append('/home/yang/Documents/playground/srl_stream/src')
     from srl_stream.gym_world import create_single_world, default_arguments
     from pybullet_tools.utils import pose_from_tform
@@ -85,9 +85,10 @@ def test_load_objects():
     from world_builder.partnet_scales import MODEL_SCALES, MODEL_HEIGHTS
     from world_builder.utils import get_instances, get_scale_by_category
 
-    connect(use_gui=False, shadows=False, width=1980, height=1238)
+    connect(use_gui=False, shadows=False, width=width, height=height)
     gym_world = create_single_world(args=default_arguments(use_gpu=True), spacing=5.)
     gym_world.set_viewer_target((3, 3, 3), target=(0, 0, 0))
+    gym_world.create_camera(width=width, height=height, fov=60)
 
     ## test all categories
     wanted = ['Food']  ## None
@@ -99,6 +100,19 @@ def test_load_objects():
     if skip_till is not None:
         categories = categories[categories.index(skip_till):]
 
+    if save_obj_shots:
+        # background = (1, 1, 1, 1)
+        background = (0, 0, 0, 1)
+        load_obj_shots_bg(gym_world, background=background)
+        load_obj_shots_bg(gym_world, background=background, vertical=False)
+        categories = [
+            # 'Food', 'Bottle', 'Medicine',
+            # 'BraiserBody', 'BraiserLid',
+            'CabinetTop', # 'MiniFridge',
+            # 'Sink'
+        ]
+        wanted = None
+
     ## test specific categories
     ids = None
     # categories = ['Food']
@@ -106,7 +120,7 @@ def test_load_objects():
 
     assets = {}
     count = 0
-    for k in range(2):
+    for k in range(1):
         for i in range(len(categories)):
             cat = categories[i]
             if cat in unwanted or (wanted is not None and cat not in wanted):
@@ -132,6 +146,16 @@ def test_load_objects():
                 pose = transformations.translation_matrix([i, j+12*k, 0.1]) @ \
                        transformations.euler_matrix(*[0, 0, np.pi,])
                 pose = pose_from_tform(pose)
+
+                if save_obj_shots:
+                    img_file = join('gym_images', '_obj', f'{cat}_{idx}.png')
+                    direction = 'horizontal'
+                    if cat in ['Food']:
+                        direction = 'vertical'
+                    elif cat in ['Sink', 'CabinetTop', 'MiniFridge', 'BraiserBody', 'BraiserLid']:
+                        direction = 'diagonal'
+                    take_obj_shot(gym_world, actor, img_file, pose, direction=direction)
+
                 gym_world.set_pose(actor, pose)
             gym_world.simulator.update_viewer()
             gym_world.set_viewer_target((3+i, 3+j+12*k, 3), target=(i, j+12*k, 0))
@@ -142,7 +166,7 @@ def test_load_objects():
 if __name__ == "__main__":
     # test_load_lisdf()
     # test_load_one(loading_effect=False, load_cameras=True, save_obj_shots=False)
-    test_load_multiple(test_camera_pose=True)
-    # test_load_objects()
+    # test_load_multiple(test_camera_pose=True)
+    test_load_objects(save_obj_shots=True)
 
 
