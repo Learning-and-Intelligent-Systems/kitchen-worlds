@@ -33,21 +33,22 @@ from mamao_tools.data_utils import get_plan, get_body_map, get_multiple_solution
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser, \
     get_sample_envs_for_rss
 
-USE_GYM = True
+USE_GYM = False
 SAVE_COMPOSED_JPG = False
 SAVE_GIF = False
 SAVE_JPG = True or SAVE_COMPOSED_JPG or SAVE_GIF
 PREVIEW_SCENE = False
+SAVE_ANIMATION_JSON = False
 
 MP4_SIDE_VIEW = False
-MP4_TOP_VIEW = True
+MP4_TOP_VIEW = False
 
 CHECK_COLLISIONS = False
 CFREE_RANGE = 0.1
 VISUALIZE_COLLISIONS = False
 
 SAVE_MP4 = False
-STEP_BY_STEP = False
+STEP_BY_STEP = True
 AUTO_PLAY = True
 EVALUATE_QUALITY = False
 PARALLEL = SAVE_JPG and not PREVIEW_SCENE and False  ## and not CHECK_COLLISIONS
@@ -63,15 +64,10 @@ GIVEN_DIR = None
 FRAME_WIDTH = 1280
 FRAME_HEIGHT = 800
 
-TASK_NAME = 'mm_storage'
+TASK_NAME = 'mm_braiser'
 CASES = None
-# CASES = ['16']  ##
+CASES = ['1']  ##
 # CASES = get_sample_envs_for_rss(task_name=TASK_NAME, count=None)
-
-GIVEN_DIR = '/home/yang/Documents/fastamp-data-rss/'
-replay_pkl = '/rerun_2/diverse_commands_rerun_fc=pvt-task.pkl'
-GIVEN_PATH = GIVEN_DIR + 'tt_sink_to_storage/14' + replay_pkl
-CAMERA_MOVEMENT = None
 
 if GIVEN_PATH:
     VISUALIZE_COLLISIONS = True
@@ -179,6 +175,13 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_gif=SAVE_GIF, save_mp4=SAVE_M
     # draw_aabb(get_aabb(microwave))
     # wait_unlocked()
     ## -----------------------------------------------------------
+
+    if SAVE_ANIMATION_JSON:
+        from isaac_tools.gym_utils import record_actions_in_gym
+        wconfs = record_actions_in_gym(problem, commands, body_map=body_map, return_wconf=True)
+        with open(join(run_dir_ori, 'animation.json'), 'w') as f:
+            json.dump(wconfs, f, indent=2)
+        sys.exit()
 
     ## save the initial scene image in pybullet
     zoomin_kwargs = dict(width=width//4, height=height//4, fx=fx//2)
