@@ -36,13 +36,15 @@
 
     ;(grasp m9 right 1)
 
-    (bconf q=(-0.6, 0.0, 0.0))
-    (atbconf q=(-0.6, 0.0, 0.0))
+    (bconf q=(-1.0, 0.0, 0.0))
+    (atbconf q=(-1.0, 0.0, 0.0))
 
     (surface table)
     (surface sink)
     (surface stove)
     (surface shelf)
+
+    (atpose floor p0=(0.0, 0.0, -0.1, 0))
 
     (workspace lo=(-1.25, -1.25, 0.0) hi=(1.25, 1.25, 2.0))
 
