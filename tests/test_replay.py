@@ -69,6 +69,9 @@ CASES = None
 CASES = ['1']  ##
 # CASES = get_sample_envs_for_rss(task_name=TASK_NAME, count=None)
 
+# GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/' \
+#              'test_full_kitchen/230304_190213_original_4'
+
 if GIVEN_PATH:
     VISUALIZE_COLLISIONS = True
     PARALLEL = False
