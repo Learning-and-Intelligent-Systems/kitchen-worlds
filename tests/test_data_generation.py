@@ -33,7 +33,7 @@ from test_utils import parallel_processing, get_config
 from test_world_builder import create_pybullet_world
 
 
-DEFAULT_YAML = 'kitchen_full_feg.yaml'
+DEFAULT_YAML = 'clean_dish_feg.yaml'
 config = get_config(DEFAULT_YAML)
 
 
