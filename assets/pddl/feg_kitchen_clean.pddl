@@ -1,0 +1,265 @@
+(define (domain fe-gripper-tamp)
+  (:requirements :strips :equality)
+
+  (:constants
+    @movable @bottle @edible @medicine
+  )
+
+  (:predicates
+
+    (Drawer ?o)
+    (Door ?o)
+    (Knob ?o)
+    (Joint ?o)
+
+    (Edible ?o)
+    (CleaningSurface ?s)
+    (HeatingSurface ?s)
+    (ControlledBy ?s ?n)
+
+    (Controllable ?a)
+    (HandEmpty ?a)
+    (SEConf ?q)
+    (Pose ?o ?p)
+    (Position ?o ?p)
+    (IsOpenedPosition ?o ?p)
+    (IsClosedPosition ?o ?p)
+    (Grasp ?o ?g)
+    (HandleGrasp ?o ?g)
+
+    (Graspable ?o)
+    (Stackable ?o ?r)
+    (Containable ?o ?r)
+
+    (OriginalSEConf ?q)
+
+    (Kin ?a ?o ?p ?g ?q ?t)
+    (KinHandle ?a ?o ?p ?g ?q1)
+    (KinGraspHandle ?a ?o ?p ?g ?q1 ?t)
+    (KinPullDoorHandle ?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?t)
+
+    (FreeMotion ?p1 ?t ?p2)
+    (Supported ?o ?p ?r)
+    (Contained ?o ?p ?s)
+    (Traj ?t)
+
+    (TrajPoseCollision ?t ?o ?p)
+    (CFreePosePose ?o ?p ?o2 ?p2)
+    (CFreeApproachPose ?o ?p ?g ?o2 ?p2)
+    (CFreeTrajPose ?t ?o2 ?p2)
+
+    (AtSEConf ?q)
+    (AtPose ?o ?p)
+    (AtPosition ?o ?p)
+    (OpenPosition ?o ?p)
+    (ClosedPosition ?o ?p)
+
+    (AtGrasp ?a ?o ?g)
+    (AtHandleGrasp ?a ?o ?g)
+    (HandleGrasped ?a ?o)
+
+    (CanMove)
+    (CanPull)
+    (CanUngrasp)
+    (Cleaned ?o)
+    (Cooked ?o)
+    (OpenedJoint ?o)
+    (ClosedJoint ?o)
+    (GraspedHandle ?o)
+
+    (On ?o ?r)
+    (In ?o ?r) ;;
+    (Holding ?a ?o)
+
+    (UnsafePose ?o ?p)
+    (UnsafeApproach ?o ?p ?g)
+    (UnsafeTraj ?t)
+
+    (PoseObstacle ?o ?p ?o2)
+    (ApproachObstacle ?o ?p ?g ?o2)
+
+    (Debug1)
+    (Debug2)
+    (Debug3)
+    (Debug4)
+
+    (OfType ?o ?t)
+    (StoredInSpace ?t ?r)
+    (Space ?r)
+    (ContainObj ?o)
+    (AtAttachment ?o ?j)
+    (NewPoseFromAttachment ?o ?p)
+
+    (Cleaned ?o)
+    (Cooked ?o)
+
+    (PlateInCabinet ?o ?p)
+    (FoundInCabinet ?o)
+    (NoDirtyPlateInCabinet ?o)
+  )
+
+  (:functions
+    ; (MoveCost ?t)
+    (PickCost)
+    (PlaceCost)
+  )
+
+  (:action move_cartesian
+    :parameters (?q1 ?q2 ?t)
+    :precondition (and (CanMove) (AtSEConf ?q1)
+                       (FreeMotion ?q1 ?t ?q2)
+                       ; (not (UnsafeTraj ?t))
+                   )
+    :effect (and (AtSEConf ?q2) (not (AtSEConf ?q1))
+                 (not (CanMove))
+                 ; (CanPull)
+                 ; (increase (total-cost) (MoveCost ?t))
+                 (increase (total-cost) 1)
+                 )
+  )
+
+  (:action pick_hand
+    :parameters (?a ?o ?p ?g ?q ?t)
+    :precondition (and (Kin ?a ?o ?p ?g ?q ?t) (HandEmpty ?a)
+                       (AtPose ?o ?p)
+                       (AtSEConf ?q)
+                       ; (not (CanMove))
+                       ; (not (UnsafeTraj ?t))
+                       (not (UnsafeApproach ?o ?p ?g))
+                       )
+    :effect (and (AtGrasp ?a ?o ?g) (CanMove)
+                 (not (AtPose ?o ?p)) (not (HandEmpty ?a))
+                 ; (increase (total-cost) (PickCost))
+                 (increase (total-cost) 1)
+                 )
+  )
+
+  (:action place_hand
+    :parameters (?a ?o ?p ?g ?q ?t)
+    :precondition (and (Kin ?a ?o ?p ?g ?q ?t)
+                       (AtGrasp ?a ?o ?g)
+                       (AtSEConf ?q)
+                       ; (not (CanMove))
+                       ; (not (UnsafeTraj ?t))
+                       (not (UnsafePose ?o ?p))
+                       (not (UnsafeApproach ?o ?p ?g))
+                       )
+    :effect (and (AtPose ?o ?p) (CanMove) (HandEmpty ?a)
+                 (not (AtGrasp ?a ?o ?g))
+                 ; (increase (total-cost) (PlaceCost))
+                 (increase (total-cost) 1)
+                 )
+  )
+
+    ;; including grasping and pulling, q1 is approach grasp for p1, q2 is approach grasp for p2
+    (:action grasp_pull_handle
+      :parameters (?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?t1 ?t2 ?t3)
+      :precondition (and (Joint ?o) (HandEmpty ?a) ; (CanPull)
+                         (AtSEConf ?q1)
+                         (AtPosition ?o ?p1) (Position ?o ?p2) (not (= ?p1 ?p2))
+                         (KinGraspHandle ?a ?o ?p1 ?g ?q1 ?t1)
+                         (KinPullDoorHandle ?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?t2)
+                         (KinGraspHandle ?a ?o ?p2 ?g ?q2 ?t3)
+                         ; (not (UnsafeTraj ?t))
+                         ; (not (UnsafePose ?o ?p))
+                         ; (not (UnsafeApproach ?o ?p ?g))
+                    )
+      :effect (and (GraspedHandle ?o)
+                  (CanMove) ; (not (CanPull))
+                  (AtSEConf ?q2) (not (AtSEConf ?q1))
+                  (AtPosition ?o ?p2) (not (AtPosition ?o ?p1))
+                  (increase (total-cost) 1)
+              )
+    )
+
+    ;; with attachment
+    (:action pull_articulated_handle_attachment
+      :parameters (?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?t ?o3 ?p3 ?p4)
+      :precondition (and (Joint ?o) (not (= ?p1 ?p2)) (CanPull)
+                         (AtPosition ?o ?p1) (Position ?o ?p2) (AtHandleGrasp ?a ?o ?g)
+                         (KinPullDoorHandle ?a ?o ?p1 ?p2 ?g ?q1 ?q2 ?t)
+
+                         (ContainObj ?o3) (AtPose ?o3 ?p3) (Pose ?o3 ?p4)
+                         (AtAttachment ?o3 ?o) (NewPoseFromAttachment ?o3 ?p4)
+                    )
+      :effect (and (not (CanPull)) (CanUngrasp)
+                  (AtPosition ?o ?p2) (not (AtPosition ?o ?p1))
+                  (not (AtPose ?o3 ?p3)) (AtPose ?o3 ?p4)
+              )
+    )
+
+    (:action declare_store_in_space
+      :parameters (?t ?r)
+      :precondition (and (Space ?r)
+                         (forall (?o) (imply (OfType ?o ?t) (In ?o ?r)))
+                    )
+      :effect (and (StoredInSpace ?t ?r))
+    )
+
+  (:action just-clean
+    :parameters (?o ?s)
+    :precondition (and (CleaningSurface ?s) (On ?o ?s) )
+    :effect (and (Cleaned ?o) (CanMove))
+  )
+
+  (:action wait-clean
+    :parameters (?o ?s ?n)
+    :precondition (and (Edible ?o) (CleaningSurface ?s) (ControlledBy ?s ?n)
+                       (On ?o ?s) (GraspedHandle ?n)
+                       )
+    :effect (and (Cleaned ?o))
+  )
+  (:action wait-cook
+    :parameters (?o ?s ?n)
+    :precondition (and (Edible ?o) (HeatingSurface ?s) (ControlledBy ?s ?n)
+                       (On ?o ?s) (GraspedHandle ?n)
+                       (Cleaned ?o)
+                       )
+    :effect (and (Cooked ?o)
+                 (not (Cleaned ?o)))
+  )
+
+  (:derived (On ?o ?r)
+    (exists (?p) (and (Supported ?o ?p ?r) (AtPose ?o ?p)))
+  )
+  (:derived (In ?o ?r)
+    (exists (?p) (and (Contained ?o ?p ?r) (AtPose ?o ?p)))
+  )
+  (:derived (Holding ?a ?o)
+    (exists (?g) (and (Grasp ?o ?g) (AtGrasp ?a ?o ?g)))
+  )
+
+  (:derived (OpenedJoint ?o)
+    (exists (?pstn) (and (Joint ?o) (Position ?o ?pstn) (AtPosition ?o ?pstn)
+                      (IsOpenedPosition ?o ?pstn)))
+  )
+  (:derived (ClosedJoint ?o)
+    (exists (?pstn) (and (Joint ?o) (Position ?o ?pstn) (AtPosition ?o ?pstn)
+                      (IsClosedPosition ?o ?pstn)))
+  )
+
+  (:derived (FoundInCabinet ?o)
+    (exists (?p) (and (Pose ?o ?p) (PlateInCabinet ?o ?p)))
+  )
+  (:derived (NoDirtyPlateInCabinet ?c)
+    (not (exists (?o ?p) (and (AtPose ?o ?p) (OfType ?o @bottle) (PlateInCabinet ?o ?p)
+                              (In ?o ?c) (not (Cleaned ?o)))))
+  )
+
+  (:derived (UnsafePose ?o ?p)
+    (exists (?o2 ?p2) (and (Pose ?o ?p) (Pose ?o2 ?p2) (not (= ?o ?o2))
+                           (not (CFreePosePose ?o ?p ?o2 ?p2))
+                           (AtPose ?o2 ?p2)))
+  )
+  (:derived (UnsafeApproach ?o ?p ?g)
+    (exists (?o2 ?p2) (and (Pose ?o ?p) (Grasp ?o ?g) (Pose ?o2 ?p2) (not (= ?o ?o2))
+                           (not (CFreeApproachPose ?o ?p ?g ?o2 ?p2))
+                           (AtPose ?o2 ?p2)))
+  )
+
+  ;; in order to use fluent streams
+  ;(:derived (UnsafeTraj ?t)
+  ;  (exists (?o2 ?p2) (and (Traj ?t) (Pose ?o2 ?p2) (AtPose ?o2 ?p2)
+  ;                         (not (CFreeTrajPose ?t ?o2 ?p2))))
+  ;)
+)
