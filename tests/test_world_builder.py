@@ -17,7 +17,7 @@ from world_builder.utils import parse_yaml
 from test_utils import get_config
 
 
-DEFAULT_YAML = 'kitchen_full_feg.yaml'
+DEFAULT_YAML = 'clean_dish_feg.yaml'
 
 
 def main():

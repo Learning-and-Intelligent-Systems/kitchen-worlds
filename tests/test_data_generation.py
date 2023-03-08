@@ -33,7 +33,7 @@ from test_utils import parallel_processing, get_config
 from test_world_builder import create_pybullet_world
 
 
-DEFAULT_YAML = 'kitchen_full_feg.yaml'
+DEFAULT_YAML = 'clean_dish_feg.yaml'
 config = get_config(DEFAULT_YAML)
 
 
@@ -88,10 +88,10 @@ def process(index):
     stream_info = world.robot.get_stream_info()
 
     kwargs = {'visualize': True}
-    if config.diverse:
+    if config.planner.diverse:
         kwargs.update(dict(
             diverse=True,
-            downward_time=20,  ## max time to get 100, 10 sec, 30 sec for 300
+            downward_time=config.planner.downward_time,  ## max time to get 100, 10 sec, 30 sec for 300
             evaluation_time=60,  ## on each skeleton
             max_plans=200,  ## number of skeletons
         ))
