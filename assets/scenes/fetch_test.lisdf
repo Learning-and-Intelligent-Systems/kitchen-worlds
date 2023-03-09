@@ -23,7 +23,7 @@
 
     <model name="box">
       <static>true</static>
-      <pose>0.3 0.3 0.55 0 0 0</pose>
+      <pose>0.3 0.1 0.55 0 0 0</pose>
       <link name="box_link">
 	<collision name="box_collision">
 	  <geometry>

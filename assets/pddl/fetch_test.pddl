@@ -8,7 +8,7 @@
 
   (:init
     ;; discrete facts (e.g. types, affordances)
-    (canmove)
+    ;; (canmove)
 
     (arm right)
     (controllable right)
@@ -23,7 +23,6 @@
     (atbconf q=(-0.6, 0.0, 0.0))
 
     (surface floor)
-
     (workspace lo=(-2.0, -2., 0.0) hi=(2.0, 2., 2.0))
 
  )
