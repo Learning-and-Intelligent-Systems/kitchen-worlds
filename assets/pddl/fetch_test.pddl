@@ -8,7 +8,7 @@
 
   (:init
     ;; discrete facts (e.g. types, affordances)
-    ;; (canmove)
+    (canmove)
 
     (arm right)
     (controllable right)
@@ -19,8 +19,8 @@
     (graspable box)
     (graspable other_box)    
 
-    (bconf q=(-0.6, 0.0, 0.0))
-    (atbconf q=(-0.6, 0.0, 0.0))
+    (bconf q=(-1.0, 0.0, 0.0))
+    (atbconf q=(-1.0, 0.0, 0.0))
 
     (surface floor)
     (workspace lo=(-2.0, -2., 0.0) hi=(2.0, 2., 2.0))

@@ -44,7 +44,7 @@
     (surface stove)
     (surface shelf)
 
-    (atpose floor p0=(0.0, 0.0, -0.1, 0))
+    ;(atpose floor p0=(0.0, 0.0, -0.1, 0))
 
     (workspace lo=(-1.25, -1.25, 0.0) hi=(1.25, 1.25, 2.0))
 

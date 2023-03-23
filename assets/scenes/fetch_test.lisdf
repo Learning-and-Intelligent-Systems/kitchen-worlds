@@ -22,8 +22,8 @@
     </model>
 
     <model name="box">
-      <static>true</static>
-      <pose>0.3 0.1 0.55 0 0 0</pose>
+      <static>false</static>
+      <pose>0.3 0.2 0.55 0 0 0</pose>
       <link name="box_link">
 	<collision name="box_collision">
 	  <geometry>
@@ -42,7 +42,7 @@
     </model>
     
     <model name="other_box">
-      <static>true</static>
+      <static>false</static>
       <pose>0.3 0.0 0.55 0 0 0</pose>
       <link name="other_box_link">
 	<collision name="other_box_collision">
@@ -60,6 +60,27 @@
 	</visual>
       </link>
     </model>
+
+    <model name="support">
+      <static>true</static>
+      <pose>0.35 0.1 0.245 0 0 0</pose>
+      <link name="box_link">
+	<collision name="box_collision">
+	  <geometry>
+	    <box><size>0.2 0.3 0.5</size></box>
+	  </geometry>
+	</collision>
+	<visual name="box_visual">
+	  <geometry>
+	    <box> <size>0.2 0.3 0.5</size> </box>
+	  </geometry>
+	  <material>
+	    <ambient>1 1 0 1</ambient>
+	  </material>
+	</visual>
+      </link>
+    </model>
+    
     
   </world>
 </sdf>
