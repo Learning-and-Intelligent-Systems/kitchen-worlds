@@ -15,6 +15,7 @@ test_cases/
 
 */statistics/
 */temp/
+tests/.ipynb_checkpoints/
 tests/txt_file.txt
 tests/visualizations/
 tests/statistics/
