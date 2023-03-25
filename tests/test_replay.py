@@ -47,8 +47,8 @@ CHECK_COLLISIONS = False
 CFREE_RANGE = 0.1
 VISUALIZE_COLLISIONS = False
 
-SAVE_MP4 = False
-STEP_BY_STEP = True
+SAVE_MP4 = True
+STEP_BY_STEP = False
 AUTO_PLAY = True
 EVALUATE_QUALITY = False
 PARALLEL = SAVE_JPG and not PREVIEW_SCENE and False  ## and not CHECK_COLLISIONS
@@ -59,7 +59,7 @@ CHECK_TIME = 1674417578
 CAMERA_KWARGS = None
 LIGHT_CONF = None
 CAMERA_MOVEMENT = None
-GIVEN_PATH = None
+GIVEN_PATH = "/home/weiyu/Research/nsplan/original/kitchen-worlds/outputs/test_clean_dish_feg_0325/bowl_in_cabinet_2"
 GIVEN_DIR = None
 FRAME_WIDTH = 1280
 FRAME_HEIGHT = 800
@@ -143,7 +143,7 @@ def swap_microwave(run_dir, verbose=False):
     world = load_lisdf_pybullet(exp_dir, use_gui=not USE_GYM, verbose=False)
 
 
-def run_one(run_dir_ori, task_name=TASK_NAME, save_gif=SAVE_GIF, save_mp4=SAVE_MP4, width=1440, height=1120, fx=600,
+def run_one(run_dir_ori, task_name=TASK_NAME, save_gif=SAVE_GIF, save_mp4=SAVE_MP4, width=1440, height=1440, fx=800,
             camera_point=(8.5, 2.5, 3), target_point=(0, 2.5, 0)):
 
     verbose = not SAVE_JPG
@@ -154,9 +154,9 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_gif=SAVE_GIF, save_mp4=SAVE_M
     larger_world = 'rerun' in run_dir_ori and '/tt_' in run_dir_ori
     world = load_lisdf_pybullet(exp_dir, use_gui=not USE_GYM, width=width, height=height,
                                 verbose=False, larger_world=larger_world)
-    aabb = get_aabb(world.name_to_body['counter#1'])
-    print(nice(aabb))
-    print(aabb.upper[0])
+    # aabb = get_aabb(world.name_to_body['counter#1'])
+    # print(nice(aabb))
+    # print(aabb.upper[0])
     # if not USE_GYM and GIVEN_PATH is not None:
     #     wait_unlocked()
     problem = Problem(world)
@@ -199,7 +199,7 @@ def run_one(run_dir_ori, task_name=TASK_NAME, save_gif=SAVE_GIF, save_mp4=SAVE_M
         if SAVE_COMPOSED_JPG or SAVE_GIF:
             world.add_camera(viz_dir, width=width//2, height=height//2, fx=fx//2, img_dir=viz_dir,
                              camera_point=(6, 4, 2), target_point=(0, 4, 1))
-            world.make_transparent(world.robot.body, transparency=0)
+            # world.make_transparent(world.robot.body, transparency=0.5)
 
     if USE_GYM:
         from isaac_tools.gym_utils import load_lisdf_isaacgym, record_actions_in_gym, set_camera_target_body

@@ -2,7 +2,7 @@
   (:requirements :strips :equality)
 
   (:constants
-    @movable @bottle @edible @medicine
+    @movable @bottle @edible @medicine @bowl
   )
 
   (:predicates
@@ -242,7 +242,7 @@
     (exists (?p) (and (Pose ?o ?p) (PlateInCabinet ?o ?p)))
   )
   (:derived (NoDirtyPlateInCabinet ?c)
-    (not (exists (?o ?p) (and (AtPose ?o ?p) (OfType ?o @bottle) (PlateInCabinet ?o ?p)
+    (not (exists (?o ?p) (and (AtPose ?o ?p) (OfType ?o @bowl) (PlateInCabinet ?o ?p)
                               (In ?o ?c) (not (Cleaned ?o)))))
   )
 
