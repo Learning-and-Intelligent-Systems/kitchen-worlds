@@ -17,11 +17,11 @@ test_cases/
 */temp/
 tests/.ipynb_checkpoints/
 tests/txt_file.txt
+tests/collisions.pkl
 tests/visualizations/
 tests/statistics/
 tests/vhacd/
 tests/gym_images/
-tests/.ipynb_checkpoints/
 
 outputs/
 !outputs/data_demo.html
