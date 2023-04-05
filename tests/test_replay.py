@@ -48,7 +48,7 @@ CFREE_RANGE = 0.1
 VISUALIZE_COLLISIONS = False
 
 SAVE_MP4 = True
-STEP_BY_STEP = False
+STEP_BY_STEP = True
 AUTO_PLAY = True
 EVALUATE_QUALITY = False
 PARALLEL = SAVE_JPG and not PREVIEW_SCENE and False  ## and not CHECK_COLLISIONS
@@ -60,6 +60,7 @@ CAMERA_KWARGS = None
 LIGHT_CONF = None
 CAMERA_MOVEMENT = None
 GIVEN_PATH = "/home/weiyu/Research/nsplan/original/kitchen-worlds/outputs/test_clean_dish_feg_0325/bowl_in_cabinet_2"
+GIVEN_PATH = "/home/yang/Documents/kitchen-worlds/outputs/test_clean_dish_feg_0325/230324_211253"
 GIVEN_DIR = None
 FRAME_WIDTH = 1280
 FRAME_HEIGHT = 800

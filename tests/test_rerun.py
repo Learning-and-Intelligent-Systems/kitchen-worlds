@@ -50,14 +50,14 @@ USE_VIEWER = False
 LOCK_VIEWER = True
 DIVERSE = True
 PREFIX = 'diverse_' if DIVERSE else ''
-RERUN_SUBDIR = 'rerun_3'
+RERUN_SUBDIR = 'rerun_4'
 
 SKIP_IF_SOLVED = True and not GENERATE_SKELETONS
 SKIP_IF_SOLVED_RECENTLY = True and not GENERATE_SKELETONS
 RETRY_IF_FAILED = True
 check_time = 1675220260  ## for 12 sec of FD
 
-TASK_NAME = 'tt_sink'
+TASK_NAME = 'tt_braiser'
 
 evaluation_time = {
     'tt_storage': 60,
@@ -76,7 +76,7 @@ if '_to_storage' in TASK_NAME:
     downward_time = 60
 
 CASES = None  ##
-CASES = ['5']
+CASES = ['0']
 
 if CASES is not None:
     SKIP_IF_SOLVED = False

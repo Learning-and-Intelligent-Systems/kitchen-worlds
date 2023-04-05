@@ -198,7 +198,7 @@
 
   (:action just-clean
     :parameters (?o ?s)
-    :precondition (and (CleaningSurface ?s) (On ?o ?s) )
+    :precondition (and (CleaningSurface ?s) (On ?o ?s))
     :effect (and (Cleaned ?o) (CanMove))
   )
 
