@@ -20,6 +20,7 @@ tests/visualizations/
 tests/statistics/
 tests/vhacd/
 tests/gym_images/
+tests/.ipynb_checkpoints/
 
 outputs/
 !outputs/data_demo.html

@@ -69,8 +69,8 @@ CASES = None
 CASES = ['1']  ##
 # CASES = get_sample_envs_for_rss(task_name=TASK_NAME, count=None)
 
-GIVEN_PATH = '/home/yang/Documents/kitchen-worlds/outputs/' \
-             'test_full_kitchen/230308_083748_original_4'
+GIVEN_PATH = '/home/yang/Documents/cognitive-architectures/bullet/experiments/' \
+             'kitchen_food_cleaned/230401_142631_original'
 
 if GIVEN_PATH:
     VISUALIZE_COLLISIONS = True
