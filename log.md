@@ -29,7 +29,11 @@ loaders.py  load_counter_moveables  force bottles to be in sink
 counters["bottle"] = [world.name_to_object(n) for n in ["sink#1::sink_bottom"]]
 
 ---
+We can add new acronym objects and grasps using [create_acronym_objects_and_grasps.py](create_acronym_objects_and_grasps.py)
+
+---
 TODO
-- also clean in dishwasher
-- more objects
-- specify initial state
+-[ ] also clean in dishwasher
+-[x] more objects
+-[ ] specify initial state
+-[ ] debug acronym grasps, using [test_skills.py](test_skills.py)

@@ -2,7 +2,7 @@
   (:requirements :strips :equality)
 
   (:constants
-    @movable @bottle @edible @medicine @bowl @mug
+    @movable @bottle @edible @medicine @bowl
   )
 
   (:predicates
@@ -95,9 +95,7 @@
 
     (PlateInCabinet ?o ?p)
     (FoundInCabinet ?o)
-    (NoDirtyBowlInCabinet ?o)
-    (NoDirtyPanInCabinet ?o)
-    (NoDirtyMugInCabinet ?o)
+    (NoDirtyPlateInCabinet ?o)
   )
 
   (:functions
@@ -235,16 +233,8 @@
   (:derived (FoundInCabinet ?o)
     (exists (?p) (and (Pose ?o ?p) (PlateInCabinet ?o ?p)))
   )
-  (:derived (NoDirtyBowlInCabinet ?c)
+  (:derived (NoDirtyPlateInCabinet ?c)
     (not (exists (?o ?p) (and (AtPose ?o ?p) (OfType ?o @bowl) (PlateInCabinet ?o ?p)
-                              (In ?o ?c) (not (Cleaned ?o)))))
-  )
-  (:derived (NoDirtyPanInCabinet ?c)
-    (not (exists (?o ?p) (and (AtPose ?o ?p) (OfType ?o @pan) (PlateInCabinet ?o ?p)
-                              (In ?o ?c) (not (Cleaned ?o)))))
-  )
-  (:derived (NoDirtyMugInCabinet ?c)
-    (not (exists (?o ?p) (and (AtPose ?o ?p) (OfType ?o @mug) (PlateInCabinet ?o ?p)
                               (In ?o ?c) (not (Cleaned ?o)))))
   )
 
