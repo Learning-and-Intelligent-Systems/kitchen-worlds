@@ -57,10 +57,10 @@ SKIP_IF_SOLVED_RECENTLY = True and not GENERATE_SKELETONS
 RETRY_IF_FAILED = True
 check_time = 1675220260  ## for 12 sec of FD
 
-TASK_NAME = 'tt_braiser'
+TASK_NAME = 'tt_storage'
 
 evaluation_time = {
-    'tt_storage': 60,
+    'tt_storage': 90,
     'tt_sink': 60,
     'tt_braiser': 60,
     'tt_sink_to_storage': 60,
@@ -76,7 +76,7 @@ if '_to_storage' in TASK_NAME:
     downward_time = 60
 
 CASES = None  ##
-# CASES = ['0']
+CASES = ['13']
 
 if CASES is not None:
     SKIP_IF_SOLVED = False
@@ -146,10 +146,8 @@ def check_if_skip(run_dir, **kwargs):
     skip = False
     # return skip
     run_num = eval(run_dir.split('/')[-1])
-    # if run_num in [10, 15, 19, 24, 31]:
-    # if run_num <= 22:
+    # if run_num in [1]:
     #     return True
-    # return skip
     if CLEAN_LARGE_WORLD:
         return False
 
@@ -221,7 +219,7 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     # if isdir(ori_dir):
     #     shutil.rmtree(ori_dir)
     # return
-    #######################################################
+    ###################### remove all previous results on the fc #############################
     # if isdir(ori_dir):
     #     rem_files = [f for f in listdir(ori_dir) if f'={FEASIBILITY_CHECKER}' in f]
     #     for f in rem_files:
@@ -236,7 +234,7 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     #     for f in rem_files:
     #         shutil.move(join(ori_dir, f), join(des_dir, f))
     # return
-    #######################################################
+    #####################################################################
     # if isdir(ori_dir):
     #     des_dir = join(run_dir, 'rerun_2')
     #     rem_files = [f for f in listdir(ori_dir) if f'={FEASIBILITY_CHECKER}' in f]
