@@ -20,12 +20,14 @@
     (Controllable ?a)
     (HandEmpty ?a)
     (SEConf ?q)
+    (ActionableConf ?q)
     (Pose ?o ?p)
     (Position ?o ?p)
     (IsOpenedPosition ?o ?p)
     (IsClosedPosition ?o ?p)
     (Grasp ?o ?g)
     (HandleGrasp ?o ?g)
+    (SEConfCloseToSurface ?q ?s)
 
     (Graspable ?o)
     (Stackable ?o ?r)
@@ -82,6 +84,7 @@
     (Debug2)
     (Debug3)
     (Debug4)
+    (Enabled)
 
     (OfType ?o ?t)
     (StoredInSpace ?t ?r)
@@ -148,6 +151,7 @@
                        )
     :effect (and (AtPose ?o ?p) (CanMove) (HandEmpty ?a)
                  (not (AtGrasp ?a ?o ?g))
+                 (ActionableConf ?q)
                  ; (increase (total-cost) (PlaceCost))
                  (increase (total-cost) 1)
                  )
@@ -190,11 +194,23 @@
               )
     )
 
-  (:action just-clean
+  (:action just-clean  ;; currently disabled
     :parameters (?o ?s)
-    :precondition (and (CleaningSurface ?s) (On ?o ?s))
+    :precondition (and (CleaningSurface ?s) (On ?o ?s) (Enabled))
     :effect (and (Cleaned ?o) (CanMove))
   )
+
+  (:action just-clean-all
+    :parameters (?s ?q)
+    :precondition (and
+                    (CleaningSurface ?s) (ActionableConf ?q)
+                    (SEConfCloseToSurface ?q ?s)
+                  )
+    :effect (and
+                (forall (?o) (when (On ?o ?s) (Cleaned ?o)))
+            )
+  )
+
 
   (:action wait-clean
     :parameters (?o ?s ?n)

@@ -19,7 +19,7 @@ from pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, 
     set_numpy_seed, set_renderer
 from pybullet_tools.bullet_utils import summarize_facts, print_goal, nice, get_datetime
 from pybullet_tools.pr2_agent import solve_multiple, post_process, pddlstream_from_state_goal, \
-    create_cwd_saver
+    create_cwd_saver, solve_one
 from pybullet_tools.pr2_primitives import control_commands, apply_commands
 from pybullet_tools.logging import parallel_print, myprint
 
@@ -76,7 +76,6 @@ def process(index):
     domain_path = abspath(config.planner.domain_pddl)
     stream_path = abspath(config.planner.stream_pddl)
 
-    cwd_saver = create_cwd_saver()
     print_fn = parallel_print ## if args.parallel else myprint
     print_fn(config)
 
@@ -96,8 +95,11 @@ def process(index):
             max_plans=200,  ## number of skeletons
         ))
     start = time.time()
-    solution, tmp_dir = solve_multiple(pddlstream_problem, stream_info, lock=config.lock,
-                                       cwd_saver=cwd_saver, **kwargs)
+    solution, tmp_dir = solve_one(pddlstream_problem, stream_info, lock=config.lock, **kwargs)
+
+    # cwd_saver = create_cwd_saver()
+    # solution, tmp_dir = solve_multiple(pddlstream_problem, stream_info, lock=config.lock,
+    #                                    cwd_saver=cwd_saver, **kwargs)
 
     print_solution(solution)
     plan, cost, evaluations = solution
@@ -122,9 +124,9 @@ def process(index):
     txt_file = join(tmp_dir, 'txt_file.txt')
     if isfile(txt_file):
         shutil.move(txt_file, join(exp_dir, f"log.txt"))
-    txt_file = join(tmp_dir, 'visualizations', 'log.json')
-    if isfile(txt_file):
-        shutil.move(txt_file, join(exp_dir, f"log.json"))
+    viz_dir = join(tmp_dir, 'visualizations')
+    if isdir(viz_dir):
+        shutil.move(viz_dir, join(exp_dir, 'visualizations'))
     cwd_saver.restore()
 
     """ =============== save commands for replay =============== """

@@ -41,6 +41,11 @@
     :domain (and (Pose ?o1 ?p1) (Grasp ?o1 ?g1) (Pose ?o2 ?p2))
     :certified (CFreeApproachPose ?o1 ?p1 ?g1 ?o2 ?p2)
   )
+  (:stream test-seconf-close-to-surface
+    :inputs (?q ?s)
+    :domain (and (SEConf ?q) (Surface ?s))
+    :certified (SEConfCloseToSurface ?q ?s)
+  )
 
   ;(:stream test-cfree-traj-pose
   ;  :inputs (?t ?o2 ?p2)
