@@ -86,7 +86,7 @@ def process(index):
         teleport=config.teleport, print_fn=print_fn)
     stream_info = world.robot.get_stream_info()
 
-    kwargs = {'visualize': True}
+    kwargs = {'visualize': False}
     if config.planner.diverse:
         kwargs.update(dict(
             diverse=True,
@@ -95,11 +95,12 @@ def process(index):
             max_plans=200,  ## number of skeletons
         ))
     start = time.time()
-    solution, tmp_dir = solve_one(pddlstream_problem, stream_info, lock=config.lock, **kwargs)
 
-    # cwd_saver = create_cwd_saver()
-    # solution, tmp_dir = solve_multiple(pddlstream_problem, stream_info, lock=config.lock,
-    #                                    cwd_saver=cwd_saver, **kwargs)
+    # solution, tmp_dir = solve_one(pddlstream_problem, stream_info, lock=config.lock, **kwargs)
+
+    cwd_saver = create_cwd_saver()
+    solution, tmp_dir = solve_multiple(pddlstream_problem, stream_info, lock=config.lock,
+                                       cwd_saver=cwd_saver, **kwargs)
 
     print_solution(solution)
     plan, cost, evaluations = solution
