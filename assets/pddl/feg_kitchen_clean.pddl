@@ -2,7 +2,7 @@
   (:requirements :strips :equality)
 
   (:constants
-    @movable @bottle @edible @medicine @bowl @mug
+    @movable @bottle @edible @medicine @bowl @mug @pan
   )
 
   (:predicates

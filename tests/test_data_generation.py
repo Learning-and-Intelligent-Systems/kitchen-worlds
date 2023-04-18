@@ -65,7 +65,7 @@ def process(index):
     set_numpy_seed(seed)
     print('Seed:', seed)
 
-    exp_dir = abspath(join(config.data.out_dir, get_datetime(TO_LISDF=True)))
+    exp_dir = abspath(join(config.data.out_dir, "seed_{}_".format(seed) + get_datetime(TO_LISDF=True)))
     os.makedirs(exp_dir, exist_ok=True)
     new_config.data.out_dir = exp_dir
 
