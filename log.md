@@ -48,6 +48,15 @@ problems elsewhere
             adjust_for_reachability(obj, counter, d_x_min, world=world)
         return obj
 ```
+
+---
+changed /Sink/00005/mobility.urdf scale in `world_builder/partnet_scales.py`
+
+---
+do you need to use all three in sampled goals? NoDirtyBowlInCabinet, NoDirtyPanInCabinet, NoDirtyMugInCabinet?
+any axiom with (not (exists)) will make FastDownward slows down drastically, it's ok to have one for different types, but you may not need to have all three of them in the domain for each problem if the problem doesn't require it
+the more specific the definition, the less it burdens the planner because it has t enumerate all facts that satisfy it in future possible states
+Then I will use separate domain files
 ---
 TODO
 -[ ] also clean in dishwasher

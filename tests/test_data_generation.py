@@ -67,7 +67,7 @@ def process(input_dict):
     set_random_seed(seed)
     set_numpy_seed(seed)
 
-    exp_dir = abspath(join(config.data.out_dir, "semantic_spec_{}_seed_{}_time_".format(semantic_spec_seed, seed) + get_datetime(TO_LISDF=True)))
+    exp_dir = abspath(join(config.data.out_dir, "semantic_spec_{}_seed_{}_time_".format(semantic_spec_seed, seed))) #+ get_datetime(TO_LISDF=True)))
     print(exp_dir)
     os.makedirs(exp_dir, exist_ok=True)
     new_config.data.out_dir = exp_dir
@@ -167,13 +167,14 @@ def collect_for_fastamp():
 
     if config.env_seed is not None and config.semantic_spec is not None:
         inputs = [{"semantic_spec": config.semantic_spec, "env_seed": config.env_seed}]
-        parallel_processing(process, inputs, parallel=config.parallel)
     else:
         semantic_specs = get_semantic_specs(config.semantic_specs_dir)
         inputs = []
-        for spec in semantic_specs:
-            inputs.append({"semantic_spec": spec, "env_seed": 2})
-        parallel_processing(process, inputs, parallel=config.parallel)
+        for spec in semantic_specs[23:]:
+            for env_seed in range(10):
+                inputs.append({"semantic_spec": spec, "env_seed": env_seed})
+
+    parallel_processing(process, inputs, parallel=config.parallel)
 
 
 if __name__ == '__main__':
