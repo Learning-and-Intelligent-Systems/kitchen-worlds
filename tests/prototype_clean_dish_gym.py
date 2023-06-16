@@ -502,7 +502,7 @@ def process(input_dict):
 
     input("env initialized, next?")
 
-    play(env)
+    # play(env)
 
 
 def play(env):
@@ -968,10 +968,133 @@ class CleanDishEnvV1(gym.Env):
         # set tiny to True when we are not using GUI
         tiny = not self.config.viewer
         camera_image = camera.get_image(camera_point=camera_point, target_point=target_point, tiny=tiny)
+        # CameraImage = namedtuple('CameraImage', ['rgbPixels', 'depthPixels', 'segmentationMaskBuffer', 'camera_pose', 'camera_matrix'])
 
         if self.render_mode == "human":
             plt.imshow(camera_image.rgbPixels)
             plt.show()
+
+        if self.render_mode == "human":
+            plt.imshow(camera_image.depthPixels)
+            plt.show()
+
+        if self.render_mode == "human":
+            plt.imshow(camera_image.segmentationMaskBuffer)
+            plt.show()
+
+        # https://github.com/valtsblukis/hlsm
+        # https://colab.research.google.com/drive/1HAqemP4cE81SQ6QO1-N85j5bF4C0qLs0?usp=sharing#scrollTo=MIlYMxU-Jgn5
+        # https://towardsdatascience.com/how-to-voxelize-meshes-and-point-clouds-in-python-ca94d403f81d
+
+        # convert rgbd to point cloud
+        import torch
+        from nsplan_tools.rgbs_to_pc import lift
+        import trimesh
+        from pybullet_tools.utils import tform_from_pose, apply_alpha
+
+        print(camera_image.camera_pose)
+
+        H, W, C = camera_image.rgbPixels.shape
+
+        y, x = torch.meshgrid(torch.arange(H), torch.arange(W))
+        intrinsics = torch.from_numpy(camera_image.camera_matrix)
+        depth = torch.from_numpy(camera_image.depthPixels.flatten().astype(np.float32))
+        obj_xyz = lift(x.flatten(), y.flatten(), depth, intrinsics[None, :, :])
+        obj_rgb = camera_image.rgbPixels.reshape(-1, 4).astype(np.float32)
+        obj_xyz = trimesh.transform_points(obj_xyz, tform_from_pose(camera_image.camera_pose))
+
+        # crop
+        min_point = [0.0, 1.0, 0.0]
+        max_point = [1.0, 5.0, 4.0]
+
+        min_crop_mask = (obj_xyz[:, 0] > min_point[0]) & (obj_xyz[:, 1] > min_point[1]) & (
+                obj_xyz[:, 2] > min_point[2])
+        max_crop_mask = (obj_xyz[:, 0] < max_point[0]) & (obj_xyz[:, 1] < max_point[1]) & (
+                obj_xyz[:, 2] < max_point[2])
+        crop_mask = min_crop_mask & max_crop_mask
+
+        obj_xyz = obj_xyz[crop_mask]
+        obj_rgb = obj_rgb[crop_mask]
+
+        print(f"number of points: {len(obj_xyz)}")
+
+        subsample_idx = np.random.permutation(len(obj_xyz))[:50000]
+        trimesh.PointCloud(obj_xyz, obj_rgb, axis=-1).show()
+
+        trimesh.PointCloud(obj_xyz[subsample_idx], obj_rgb[subsample_idx], axis=-1).show()
+
+
+        # voxelization
+        # from nsplan_tools.voxelization_utils import visualise_voxel
+        # from nsplan_tools.voxelization import VoxelGrid
+        #
+        # SCENE_BOUNDS = [0.0, 1.0, 0.0, 1.0, 5.0, 4.0]  # [x_min, y_min, z_min, x_max, y_max, z_max] - the metric volume to be voxelized
+        # VOXEL_SIZES = [25]  # 100x100x100 voxels
+        # device = "cpu"
+        # BATCH_SIZE = 1
+        # NUM_CAMERAS = 1
+        #
+        #
+        # # initialize voxelizer
+        # vox_grid = VoxelGrid(
+        #     coord_bounds=SCENE_BOUNDS,
+        #     voxel_size=VOXEL_SIZES[0],
+        #     device=device,
+        #     batch_size=BATCH_SIZE,
+        #     feature_size=4,
+        #     max_num_coords=np.prod([width, height]) * NUM_CAMERAS,
+        # )
+        #
+        # # tensorize scene bounds
+        # bounds = torch.tensor(SCENE_BOUNDS, device=device).unsqueeze(0)
+        #
+        # # voxelize!
+        # # pcd_flat: B, P, 3
+        # # flat_imag_features: B, P, C
+        #
+        # def _norm_rgb(x):
+        #     return (x.float() / 255.0) * 2.0 - 1.0
+        #
+        # voxel_grid = vox_grid.coords_to_bounding_voxel_grid(torch.from_numpy(obj_xyz.astype(np.float32))[None, :, :],
+        #                                                     coord_features=_norm_rgb(torch.from_numpy(obj_rgb)[None, :, :]),
+        #                                                     coord_bounds=bounds)
+        #
+        # # swap to channels fist
+        # vis_voxel_grid = voxel_grid.permute(0, 4, 1, 2, 3).detach().cpu().numpy()
+        #
+        # visualise_voxel(vis_voxel_grid[0], voxel_size=0.045, show=True)
+
+
+        # o3d
+        import open3d as o3d
+
+        # Initialize a point cloud object
+        pcd = o3d.geometry.PointCloud()
+        # Add the points, colors and normals as Vectors
+        pcd.points = o3d.utility.Vector3dVector(obj_xyz)
+
+        pcd.colors = o3d.utility.Vector3dVector(obj_rgb[:, :3]/255.0)
+
+        # # Create a voxel grid from the point cloud with a voxel_size of 0.01
+        voxel_grid = o3d.geometry.VoxelGrid.create_from_point_cloud(pcd, voxel_size=0.02)
+
+        print(f"number of voxels: {len(voxel_grid.get_voxels())}")
+
+        # Initialize a visualizer object
+        vis = o3d.visualization.Visualizer()
+        # Create a window, name it and scale it
+        vis.create_window()
+
+        # Add the voxel grid to the visualizer
+        vis.add_geometry(voxel_grid)
+
+        # We run the visualizater
+        vis.run()
+        # Once the visualizer is closed destroy the window and clean up
+        vis.destroy_window()
+
+
+
         return camera_image
 
     def _get_info(self):
