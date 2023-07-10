@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
-
-import itertools
 import shutil
 import pickle
 import os
@@ -12,8 +10,6 @@ import copy
 import json
 from os.path import join, abspath, dirname, isdir, isfile, basename
 from config import EXP_PATH, OUTPUT_PATH
-from itertools import product
-
 
 from pddlstream.language.constants import Equal, AND, print_solution, PDDLProblem
 from pddlstream.algorithms.meta import solve, create_parser
@@ -36,7 +32,7 @@ from world_builder.world_generator import save_to_outputs_folder
 from test_utils import parallel_processing, get_config
 from test_world_builder import create_pybullet_world
 
-from nsplan_tools.generate_semantic_specification import get_semantic_specs
+from nsplan_tools.generate_semantic_specification import get_semantic_specs, load_dict_from_json
 
 # additional dependencies for using streams
 from pybullet_tools.bullet_utils import set_camera_target_body, visualize_camera_image, get_readable_list
@@ -44,14 +40,17 @@ from pybullet_planning.pybullet_tools.utils import get_image_at_pose, get_image,
 import matplotlib.pyplot as plt
 from world_builder.entities import StaticCamera
 from pybullet_tools.pr2_primitives import Pose, Conf
-from pybullet_tools.utils import get_pose, multiply, quat_from_euler, dump_world, get_bodies, remove_body
+from pybullet_tools.utils import get_pose, multiply, quat_from_euler
 from pybullet_tools.flying_gripper_utils import get_se3_joints, se3_from_pose
 from world_builder.actions import get_primitive_actions
 
 # gym-related
-import gymnasium as gym
-from gymnasium import error, spaces, utils
-from gymnasium.utils import seeding
+# import gymnasium as gym
+# from gymnasium import error, spaces, utils
+# from gymnasium.utils import seeding
+import  gym
+from gym import error, spaces, utils
+from gym.utils import seeding
 import numpy as np
 
 
@@ -465,6 +464,52 @@ def process_v0(input_dict):
     reset_simulation()
     disconnect()
 
+def get_env():
+    """ 
+    Geng Chen: get environment
+    """
+    if config.env_seed is not None and config.semantic_spec is not None:
+        inputs = [{"semantic_spec": config.semantic_spec, "env_seed": config.env_seed}]
+    else:
+        semantic_specs = get_semantic_specs(config.semantic_specs_dir)
+        inputs = []
+        for spec in semantic_specs[23:]:
+            for env_seed in range(10):
+                inputs.append({"semantic_spec": spec, "env_seed": env_seed})
+    print(config)
+    input_dict = inputs[0]
+    seed = input_dict["env_seed"]
+    semantic_spec = input_dict["semantic_spec"]
+    semantic_spec_seed = os.path.splitext(semantic_spec)[0]
+
+    
+
+    new_config = copy.deepcopy(config)
+    new_config.seed = seed
+    set_random_seed(seed)
+    set_numpy_seed(seed)
+
+    semantic_spec_file = os.path.join(config.semantic_specs_dir, semantic_spec)
+    semantic_spec_dict = load_dict_from_json(semantic_spec_file)
+    obj_dict = semantic_spec_dict["objects"]
+    goal_dict =semantic_spec_dict["goals"]
+    # print('--------------')
+    # print(obj_dict)
+    # print(goal_dict)
+    new_config.obj_dict = obj_dict
+    new_config.goal_dict = goal_dict
+
+    exp_dir = abspath(join(config.data.out_dir, "semantic_spec_{}_seed_{}_time_".format(semantic_spec_seed, seed))) #+ get_datetime(TO_LISDF=True)))
+    os.makedirs(exp_dir, exist_ok=True)
+    new_config.data.out_dir = exp_dir
+
+    new_config.world.builder_kwargs["semantic_spec_file"] = os.path.join(config.semantic_specs_dir, semantic_spec)
+
+    world, goal = create_pybullet_world(new_config, SAVE_LISDF=False, SAVE_TESTCASE=True)
+
+    env = CleanDishEnvV1(world, goal, new_config, render_mode="human")
+    env.reset()
+    return env
 
 def process(input_dict):
     """ exist a version in cognitive-architectures for generating mini-datasets (single process),
@@ -499,22 +544,26 @@ def process(input_dict):
     new_config.world.builder_kwargs["semantic_spec_file"] = os.path.join(config.semantic_specs_dir, semantic_spec)
 
     """ STEP 1 -- GENERATE SCENES """
+
     world, goal = create_pybullet_world(new_config, SAVE_LISDF=False, SAVE_TESTCASE=True)
 
     env = CleanDishEnvV1(world, goal, config, render_mode="human")
+    #env = CleanDishEnvV1(world, goal, new_config, render_mode="human")
     env.reset()
 
     input("env initialized, next?")
 
-    # play(env)
-    random_simulate(env)
+    play(env)
 
-
-
+from PIL import Image
 def play(env):
     try:
         done = False
         obs = env.reset()
+        #print(obs[0])
+        # print(obs[0][0])
+        image = Image.fromarray(obs[0][0])
+        image.save('kitchen.png')
         num_moves = 0
         while not done:
             print("-"*10)
@@ -525,6 +574,8 @@ def play(env):
             loc_name = input("location name > ")
             action = env.convert_text_to_action(manip_name, obj_name, loc_name)
             obs, score, done, _, info = env.step(action)
+            image = Image.fromarray(obs[0])
+            image.save('kitchen.png')
             print(f"\nscore {score}, done {done}")
             num_moves += 1
     except KeyboardInterrupt:
@@ -533,45 +584,6 @@ def play(env):
     print("\n" + "*" * 100)
     print("Played {} steps, scoring {} points.".format(num_moves, score))
     print("*" * 100 + "\n")
-
-
-def random_simulate(env):
-
-    text_actions = sorted(env.get_admissible_text_actions())
-    print(f"{len(text_actions)} available actions: {text_actions}")
-
-    done = False
-    obs, info = env.reset()
-    print(obs)
-    num_moves = 0
-
-    # single_step feasibility
-
-    data = []  # (o, a, feasible)
-    symbolic_feasible_text_actions = []
-    for text_action in text_actions:
-        symbolic_feasible = env.check_symbolic_action_feasibility(text_action[0], text_action[1], text_action[2])
-        if not symbolic_feasible:
-            data.append((obs, text_action, False))
-        else:
-            symbolic_feasible_text_actions.append(text_action)
-    print(f"{len(symbolic_feasible_text_actions)} symbolic feasible actions: {symbolic_feasible_text_actions}")
-
-    motion_feasible_text_actions = []
-    for text_action in symbolic_feasible_text_actions:
-        input("before reset")
-        env.reset()
-        input("after reset")
-        action = env.convert_text_to_action(text_action[0], text_action[1], text_action[2])
-        _, score, done, _, info = env.step(action)
-        print(score, done)
-        if score == -1:
-            data.append((obs, action, False))
-        else:
-            data.append((obs, action, True))
-            motion_feasible_text_actions.append(text_action)
-    print(f"{len(motion_feasible_text_actions)} motion feasible actions: {motion_feasible_text_actions}")
-
 
 
 def debug_play(env):
@@ -601,7 +613,6 @@ def debug_play(env):
     print("\n" + "*"*100)
     print("Played {} steps, scoring {} points.".format(num_moves, score))
     print("*" * 100 + "\n")
-
 
 class CleanDishEnvV0(gym.Env):
 
@@ -897,21 +908,26 @@ class CleanDishEnvV1(gym.Env):
         self.symbolic_goal = {}
         self.parse_symbolic_goal()
 
+        #CG:object descriptions and mission in language
+        self.object_name_to_des={}
+        print(self.object_name_to_id)
+        goal_obj = list(self.symbolic_goal.keys())[0]
+        goal_loc = list(self.symbolic_goal.values())[0]
+        for key, value in self.config.obj_dict.items():
+            print(value.get('class'))
+            print(value.get('location'))
+            if value.get('class') == goal_obj.split('#')[0]:
+                goal_obj_color = value.get('color')
+        self.mission = 'place ' + goal_obj_color + ' '+ goal_obj.split('#')[0] + ' ' + goal_loc
+
     def print_admissible_actions(self):
         print("Manipulation actions:", sorted(list(self.manipulation_name_to_id.keys())))
         print("Objects:", sorted(list(self.object_name_to_id.keys())))
         print("Locations:", sorted(list(self.location_name_to_id.keys())))
 
-    def get_admissible_text_actions(self):
-        manipulation_names = sorted(list(self.manipulation_name_to_id.keys()))
-        object_names = sorted(list(self.object_name_to_id.keys()))
-        location_names = sorted(list(self.location_name_to_id.keys()))
-
-        actions = list(itertools.product(manipulation_names, object_names, location_names))
-        return actions
-
     def set_up_text_actions(self, object_names, locations):
-        self.manipulation_name_to_id = {"pick": 0, "place": 1}
+        #self.manipulation_name_to_id = {"pick": 0, "place": 1}
+        self.manipulation_name_to_id = {"pick": 0, "place": 1, "clean": 2}
 
         self.object_name_to_id = {}
         for object_name in sorted(object_names):
@@ -945,32 +961,22 @@ class CleanDishEnvV1(gym.Env):
         symbolically_feasible = self.check_symbolic_action_feasibility(manip_name, obj_name, loc_name)
 
         if symbolically_feasible:
-
-            bodies_before = get_bodies()
             # saver = WorldSaver()
-            # with LockRenderer(lock=True):
-            if manip_name == "pick":
-                # execute pick
-                commands = self._get_pick_action(obj_name)
-            elif manip_name == "place":
-                # execute place
-                commands = self._get_place_action(obj_name, loc_name)
+            with LockRenderer(lock=True):
+                if manip_name == "pick":
+                    # execute pick
+                    commands = self._get_pick_action(obj_name)
+                elif manip_name == "place":
+                    # execute place
+                    commands = self._get_place_action(obj_name, loc_name)
             # TODO: we want to be able to restore to the state before planning, but right not grasp attachements are not
             #       correctly restored.
             # saver.restore()
             # self.state.assign()
 
-            # important: cleanup
-            bodies_after = get_bodies()
-            aux_bodies = set(bodies_after) - set(bodies_before)
-            print("new bodies created in finding motion", aux_bodies)
-            for body in aux_bodies:
-                remove_body(body)
-            if "hand" in self.robot.grippers:
-                self.robot.remove_gripper("hand")
-
         ## step env and compute reward
-        if symbolically_feasible is False or commands is None:
+        # if symbolically_feasible is False or commands is None:
+        if symbolically_feasible is False:
             terminated = False
             reward = -1
         else:
@@ -979,14 +985,16 @@ class CleanDishEnvV1(gym.Env):
 
             # debug: right now we are restoring the world to the initial state and execute all actions planned so far.
             #        once we have way to restore to any particular time of the execution, we don't need to do this anymore.
-            self.commands_so_far += commands
+            if manip_name != 'clean':
+                self.commands_so_far += commands
             self.state.remove_gripper()
             self.saver.restore()
             set_renderer(True)
             apply_actions(self.state, self.commands_so_far, time_step=0, verbose=False)
 
             # update symbolic state
-            self.update_symbolic_state(target_obj_name=obj_name)
+            #self.update_symbolic_state(target_obj_name=obj_name)
+            self.update_symbolic_state(target_obj_name=obj_name, target_manip_name = manip_name)
 
             terminated = self.check_reach_symbolic_goal()
             reward = 100 if terminated else 0  # Binary sparse rewards
@@ -998,18 +1006,7 @@ class CleanDishEnvV1(gym.Env):
         return observation, reward, terminated, False, info
 
     def reset(self):
-
-        print(self.robot.grippers)
-
-        self.state.remove_gripper()
         self.saver.restore()
-
-        self.current_g = None
-        self.commands_so_far = []
-        # map from each object to its information
-        self.symbolic_state = {}
-        self.initialize_symbolic_state()
-        self.update_symbolic_state()
 
         observation = self._get_obs()
         info = self._get_info()
@@ -1037,139 +1034,50 @@ class CleanDishEnvV1(gym.Env):
         camera_matrix = get_camera_matrix(width=width, height=height, fx=fx)
         camera = StaticCamera(unit_pose(), camera_matrix=camera_matrix)
         sink = self.world.name_to_body('sink#1')
-        camera_point, target_point = set_camera_target_body(sink, dx=3, dy=0, dz=1)
+        camera_point, target_point = set_camera_target_body(sink, dx=2, dy=0, dz=1)
         # we can set tiny to true when not using gui
         # https://github.com/bulletphysics/bullet3/issues/1157
 
         # set tiny to True when we are not using GUI
         tiny = not self.config.viewer
         camera_image = camera.get_image(camera_point=camera_point, target_point=target_point, tiny=tiny)
-        # CameraImage = namedtuple('CameraImage', ['rgbPixels', 'depthPixels', 'segmentationMaskBuffer', 'camera_pose', 'camera_matrix'])
 
         if self.render_mode == "human":
             plt.imshow(camera_image.rgbPixels)
             plt.show()
-
-        if self.render_mode == "human":
-            plt.imshow(camera_image.depthPixels)
-            plt.show()
-
-        if self.render_mode == "human":
-            plt.imshow(camera_image.segmentationMaskBuffer)
-            plt.show()
-
-        # https://github.com/valtsblukis/hlsm
-        # https://colab.research.google.com/drive/1HAqemP4cE81SQ6QO1-N85j5bF4C0qLs0?usp=sharing#scrollTo=MIlYMxU-Jgn5
-        # https://towardsdatascience.com/how-to-voxelize-meshes-and-point-clouds-in-python-ca94d403f81d
-
-        # # convert rgbd to point cloud
-        # import torch
-        # from nsplan_tools.rgbs_to_pc import lift
-        # import trimesh
-        # from pybullet_tools.utils import tform_from_pose, apply_alpha
-        #
-        # print(camera_image.camera_pose)
-        #
-        # H, W, C = camera_image.rgbPixels.shape
-        #
-        # y, x = torch.meshgrid(torch.arange(H), torch.arange(W))
-        # intrinsics = torch.from_numpy(camera_image.camera_matrix)
-        # depth = torch.from_numpy(camera_image.depthPixels.flatten().astype(np.float32))
-        # obj_xyz = lift(x.flatten(), y.flatten(), depth, intrinsics[None, :, :])
-        # obj_rgb = camera_image.rgbPixels.reshape(-1, 4).astype(np.float32)
-        # obj_xyz = trimesh.transform_points(obj_xyz, tform_from_pose(camera_image.camera_pose))
-        #
-        # # crop
-        # min_point = [0.0, 1.0, 0.0]
-        # max_point = [1.0, 5.0, 4.0]
-        #
-        # min_crop_mask = (obj_xyz[:, 0] > min_point[0]) & (obj_xyz[:, 1] > min_point[1]) & (
-        #         obj_xyz[:, 2] > min_point[2])
-        # max_crop_mask = (obj_xyz[:, 0] < max_point[0]) & (obj_xyz[:, 1] < max_point[1]) & (
-        #         obj_xyz[:, 2] < max_point[2])
-        # crop_mask = min_crop_mask & max_crop_mask
-        #
-        # obj_xyz = obj_xyz[crop_mask]
-        # obj_rgb = obj_rgb[crop_mask]
-        #
-        # print(f"number of points: {len(obj_xyz)}")
-        #
-        # subsample_idx = np.random.permutation(len(obj_xyz))[:50000]
-        # trimesh.PointCloud(obj_xyz, obj_rgb, axis=-1).show()
-        #
-        # trimesh.PointCloud(obj_xyz[subsample_idx], obj_rgb[subsample_idx], axis=-1).show()
-        #
-        #
-        # # voxelization
-        # # from nsplan_tools.voxelization_utils import visualise_voxel
-        # # from nsplan_tools.voxelization import VoxelGrid
-        # #
-        # # SCENE_BOUNDS = [0.0, 1.0, 0.0, 1.0, 5.0, 4.0]  # [x_min, y_min, z_min, x_max, y_max, z_max] - the metric volume to be voxelized
-        # # VOXEL_SIZES = [25]  # 100x100x100 voxels
-        # # device = "cpu"
-        # # BATCH_SIZE = 1
-        # # NUM_CAMERAS = 1
-        # #
-        # #
-        # # # initialize voxelizer
-        # # vox_grid = VoxelGrid(
-        # #     coord_bounds=SCENE_BOUNDS,
-        # #     voxel_size=VOXEL_SIZES[0],
-        # #     device=device,
-        # #     batch_size=BATCH_SIZE,
-        # #     feature_size=4,
-        # #     max_num_coords=np.prod([width, height]) * NUM_CAMERAS,
-        # # )
-        # #
-        # # # tensorize scene bounds
-        # # bounds = torch.tensor(SCENE_BOUNDS, device=device).unsqueeze(0)
-        # #
-        # # # voxelize!
-        # # # pcd_flat: B, P, 3
-        # # # flat_imag_features: B, P, C
-        # #
-        # # def _norm_rgb(x):
-        # #     return (x.float() / 255.0) * 2.0 - 1.0
-        # #
-        # # voxel_grid = vox_grid.coords_to_bounding_voxel_grid(torch.from_numpy(obj_xyz.astype(np.float32))[None, :, :],
-        # #                                                     coord_features=_norm_rgb(torch.from_numpy(obj_rgb)[None, :, :]),
-        # #                                                     coord_bounds=bounds)
-        # #
-        # # # swap to channels fist
-        # # vis_voxel_grid = voxel_grid.permute(0, 4, 1, 2, 3).detach().cpu().numpy()
-        # #
-        # # visualise_voxel(vis_voxel_grid[0], voxel_size=0.045, show=True)
-        #
-        #
-        # # o3d
-        # import open3d as o3d
-        #
-        # # Initialize a point cloud object
-        # pcd = o3d.geometry.PointCloud()
-        # # Add the points, colors and normals as Vectors
-        # pcd.points = o3d.utility.Vector3dVector(obj_xyz)
-        #
-        # pcd.colors = o3d.utility.Vector3dVector(obj_rgb[:, :3]/255.0)
-        #
-        # # # Create a voxel grid from the point cloud with a voxel_size of 0.01
-        # voxel_grid = o3d.geometry.VoxelGrid.create_from_point_cloud(pcd, voxel_size=0.02)
-        #
-        # print(f"number of voxels: {len(voxel_grid.get_voxels())}")
-        #
-        # # Initialize a visualizer object
-        # vis = o3d.visualization.Visualizer()
-        # # Create a window, name it and scale it
-        # vis.create_window()
-        #
-        # # Add the voxel grid to the visualizer
-        # vis.add_geometry(voxel_grid)
-        #
-        # # We run the visualizater
-        # vis.run()
-        # # Once the visualizer is closed destroy the window and clean up
-        # vis.destroy_window()
-
         return camera_image
+
+    def _get_obs_multiview(self):
+        # return {"agent": self._agent_location, "target": self._target_location}
+
+        width = 1280
+        height = 960
+        fx = 800
+        camera_matrix = get_camera_matrix(width=width, height=height, fx=fx)
+        camera = StaticCamera(unit_pose(), camera_matrix=camera_matrix)
+        sink = self.world.name_to_body('sink#1')
+        camera_point1, target_point1 = set_camera_target_body(sink, dx=2, dy=0, dz=1)
+        sink = self.world.name_to_body('sink#1')
+        camera_point2, target_point2 = set_camera_target_body(sink, dx=0.01, dy=0, dz=1)
+        cabinettop = self.world.name_to_body('cabinettop')
+        camera_point3, target_point3 = set_camera_target_body(cabinettop, dx=0.01, dy=0, dz=1)
+        shelf_lower = self.world.name_to_body('shelf_lower')
+        camera_point4, target_point4 = set_camera_target_body(shelf_lower, dx=0.01, dy=0, dz=1)
+        # we can set tiny to true when not using gui
+        # https://github.com/bulletphysics/bullet3/issues/1157
+
+        # set tiny to True when we are not using GUI
+        tiny = not self.config.viewer
+        camera_image1 = camera.get_image(camera_point=camera_point1, target_point=target_point1, tiny=tiny)
+        camera_image2 = camera.get_image(camera_point=camera_point2, target_point=target_point2, tiny=tiny)
+        camera_image3 = camera.get_image(camera_point=camera_point3, target_point=target_point3, tiny=tiny)
+        camera_image4 = camera.get_image(camera_point=camera_point4, target_point=target_point4, tiny=tiny)
+
+        camera_images = [camera_image1, camera_image2, camera_image3, camera_image4]
+        # if self.render_mode == "human":
+        #     plt.imshow(camera_image.rgbPixels)
+        #     plt.show()
+        return camera_images
 
     def _get_info(self):
         # return {
@@ -1286,12 +1194,13 @@ class CleanDishEnvV1(gym.Env):
             self.symbolic_state[obj.name] = {"location": None, "cleanliness": None}
         self.symbolic_state["grasped"] = None
 
-    def update_symbolic_state(self, target_obj_name=None):
+    # def update_symbolic_state(self, target_obj_name=None):
+    def update_symbolic_state(self, target_obj_name=None, target_manip_name = None):
 
         ## first get some facts from world state
         facts = self.state.get_facts(init_facts=[], objects=None)
         relevant_predicates = ["supported", "contained", "cleaned"]
-        predicates = {}
+        predicates = {}                                                        
         for fact in facts:
             pred = fact[0].lower()
             if pred not in relevant_predicates:
@@ -1325,6 +1234,10 @@ class CleanDishEnvV1(gym.Env):
             for fact in pred_to_list["cleaned"]:
                 obj_name = fact[1].split("|")[1]
                 self.symbolic_state[obj_name]["cleanliness"] = True
+
+        #cg: if manip mane is clean, directly update state
+        if target_manip_name == 'clean':
+            self.symbolic_state[target_obj_name]["cleanliness"] = True
 
         ## update gripper state
         if self.current_g is not None:
@@ -1380,6 +1293,47 @@ class CleanDishEnvV1(gym.Env):
 
         return at_goal
 
+#CG: make reset environment have random semantics
+class RandomSemanticSpecWrapper(gym.Wrapper):
+    def __init__(self, env):
+        super().__init__(env)
+
+    def reset(self):
+        filenames = [filename for filename in os.listdir(config.semantic_specs_dir) if filename.endswith('.json')]
+        semantic_spec = random.choice(filenames)
+        semantic_spec_seed = os.path.splitext(semantic_spec)[0]
+        seed = random.randint(0, 10)
+
+        new_config = copy.deepcopy(config)
+        new_config.seed = seed
+        set_random_seed(seed)
+        set_numpy_seed(seed)
+
+        semantic_spec_file = os.path.join(config.semantic_specs_dir, semantic_spec)
+        semantic_spec_dict = load_dict_from_json(semantic_spec_file)
+        obj_dict = semantic_spec_dict["objects"]
+        goal_dict =semantic_spec_dict["goals"]
+        print(obj_dict)
+        print(goal_dict)
+        new_config.obj_dict = obj_dict
+        new_config.goal_dict = goal_dict
+
+        exp_dir = abspath(join(config.data.out_dir, "semantic_spec_{}_seed_{}_time_".format(semantic_spec_seed, seed))) #+ get_datetime(TO_LISDF=True)))
+        print(exp_dir)
+        os.makedirs(exp_dir, exist_ok=True)
+        new_config.data.out_dir = exp_dir
+
+        new_config.world.builder_kwargs["semantic_spec_file"] = os.path.join(config.semantic_specs_dir, semantic_spec)
+
+        """ STEP 1 -- GENERATE SCENES """
+        file = create_pybullet_world(new_config, SAVE_LISDF=False, SAVE_TESTCASE=True, RESET=True)
+        world, goal = create_pybullet_world(new_config, SAVE_LISDF=False, SAVE_TESTCASE=True)
+
+        self.env = CleanDishEnvV1(world, goal, new_config, render_mode="human")
+        self.env.reset()
+        observation = self.env.reset()
+
+        return observation
 
 def get_facts(world, state):
     facts = state.get_facts(init_facts=[], objects=None)
