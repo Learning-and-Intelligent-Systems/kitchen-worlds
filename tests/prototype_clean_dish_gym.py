@@ -501,13 +501,12 @@ def process(input_dict):
     """ STEP 1 -- GENERATE SCENES """
     world, goal = create_pybullet_world(new_config, SAVE_LISDF=False, SAVE_TESTCASE=True)
 
-    env = CleanDishEnvV1(world, goal, config, render_mode="human")
-    env.reset()
-
-    input("env initialized, next?")
-
+    # env = CleanDishEnvV1(world, goal, config, render_mode="human")
+    # input("env initialized, next?")
     # play(env)
-    random_simulate(env)
+
+    env = CleanDishEnvV1(world, goal, config, render_mode="human")
+    random_simulate_bfs(env, max_depth=2)
 
 
 
@@ -535,7 +534,7 @@ def play(env):
     print("*" * 100 + "\n")
 
 
-def random_simulate(env):
+def random_simulate_single_step(env):
 
     text_actions = sorted(env.get_admissible_text_actions())
     print(f"{len(text_actions)} available actions: {text_actions}")
@@ -559,11 +558,9 @@ def random_simulate(env):
 
     motion_feasible_text_actions = []
     for text_action in symbolic_feasible_text_actions:
-        input("before reset")
-        env.reset()
-        input("after reset")
+        obs, info = env.reset()
         action = env.convert_text_to_action(text_action[0], text_action[1], text_action[2])
-        _, score, done, _, info = env.step(action)
+        obs, score, done, _, info = env.step(action)
         print(score, done)
         if score == -1:
             data.append((obs, action, False))
@@ -572,6 +569,88 @@ def random_simulate(env):
             motion_feasible_text_actions.append(text_action)
     print(f"{len(motion_feasible_text_actions)} motion feasible actions: {motion_feasible_text_actions}")
 
+
+def random_simulate_bfs(env, max_depth=1):
+
+    text_actions = sorted(env.get_admissible_text_actions())
+    print(f"{len(text_actions)} available actions: {text_actions}")
+
+    obs, info = env.reset()
+    print(obs)
+
+    # the format of each node in the search tree
+    # TODO: also add action_so_far so we can trace
+    commands_so_far = []
+    current_g = None
+    symbolic_state = None
+    action_to_feasibility = {}
+    depth = 0
+    root_node = (obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth)
+
+    # bfs tree
+    queue = [root_node]  # initialize a queue
+    visited = []
+
+    # search begins
+    # TODO: add heuristic to avoid cycles
+    while queue:
+        (cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth) = queue.pop(0)
+        print("\n\n" + "=" * 100)
+        print((cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth))
+        # input("a node is popped from the queue")
+
+        if depth >= max_depth:
+            continue
+
+        # expansion
+        reset_obs, _ = env.reset_to_state(commands_so_far, current_g, symbolic_state)
+        # debug: make sure cur_obs is the same as reset_obs
+
+        symbolic_feasible_text_actions = []
+        for text_action in text_actions:
+            symbolic_feasible = env.check_symbolic_action_feasibility(text_action[0], text_action[1], text_action[2])
+            if not symbolic_feasible:
+                action_to_feasibility[text_action] = False
+            else:
+                symbolic_feasible_text_actions.append(text_action)
+        print(f"{len(symbolic_feasible_text_actions)} symbolic feasible actions: {symbolic_feasible_text_actions}")
+
+        motion_feasible_text_actions = []  # bookkeeping
+        for text_action in symbolic_feasible_text_actions:
+            reset_obs, _ = env.reset_to_state(commands_so_far, current_g, symbolic_state)
+            # debug: make sure cur_obs is the same as reset_obs
+            action = env.convert_text_to_action(text_action[0], text_action[1], text_action[2])
+            new_obs, new_score, new_done, _, _ = env.step(action)
+            if new_score == -1:
+                # not feasible
+                action_to_feasibility[text_action] = False
+            else:
+                action_to_feasibility[text_action] = True
+                motion_feasible_text_actions.append(text_action)
+                # add new node to frontier
+                new_commands_so_far = env.commands_so_far
+                new_current_g = env.current_g
+                new_symbolic_state = env.symbolic_state
+                new_action_to_feasibility = {}
+                new_depth = depth + 1
+                new_node = (new_obs, new_commands_so_far, new_current_g, new_symbolic_state, new_action_to_feasibility, new_depth)
+                queue.append(new_node)
+        print(f"{len(motion_feasible_text_actions)} motion feasible actions: {motion_feasible_text_actions}")
+
+        visited.append((cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth))
+
+    print("\n\n" + "=" * 100)
+    print("all states")
+    for state in visited:
+        print("\n" + "-"*50)
+        cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth = state
+        print(cur_obs.rgbPixels)
+        print(f"depth: {depth}")
+        for action in action_to_feasibility:
+            print(f"{action}: {action_to_feasibility[action]}")
+        input("next?")
+
+    return visited
 
 
 def debug_play(env):
@@ -603,226 +682,226 @@ def debug_play(env):
     print("*" * 100 + "\n")
 
 
-class CleanDishEnvV0(gym.Env):
-
-    """
-    This environment is for mainly for debug purpose. It only supports one object and one location
-    """
-
-    # TODO: do we need to differentiate observation and render?
-    #       observation may be low-level object and robot state
-
-    metadata = {'render_modes': ['human', 'rgb_array']}
-
-    def __init__(self, world, goal, config, render_mode):
-        self.world = world
-        self.goal = goal
-        self.config = config
-
-        self.saver = WorldSaver()
-
-        state = State(world)
-        self.state = state
-        self.robot = state.robot
-        self.problem = state
-
-        domain_path = abspath(self.config.planner.domain_pddl)
-        self.stream_map = self.robot.get_stream_map(self.problem, collisions=not self.config.cfree,
-                                                    custom_limits=self.world.robot.custom_limits,
-                                                    teleport=self.config.teleport, domain_pddl=domain_path,
-                                                    num_grasp_samples=30)
-
-        # debug env, only manipulate one object
-        self.debug_object_name = 'bowl#1'
-        self.debug_surface_name = 'shelf_lower'
-
-        # Here's an observation space for 200 wide x 100 high RGB image inputs:
-        self.observation_space = spaces.Box(low=0, high=255, shape=(1280, 960, 3), dtype=np.uint8)
-        # use a list of cameras: https://stackoverflow.com/questions/68113725/openai-gym-observation-space-representation
-
-        # use text action: https://github.com/microsoft/TextWorld/blob/main/notebooks/Playing%20TextWorld%20generated%20games%20with%20OpenAI%20Gym.ipynb
-        # pick obj, place obj
-        self.action_space = spaces.Discrete(2)
-
-        assert render_mode is None or render_mode in self.metadata["render_modes"]
-        self.render_mode = render_mode
-
-        # record some state information
-        # TODO: maybe this information is redundant and we can get it from elsewhere, like world, saver, ..
-        self.current_g = None
-
-    def step(self, action):
-        # return observation, reward, terminated, False, info
-
-        ## compute action
-        commands = None
-
-        # TODO: it seems like these stream functions will also change the world state, we need to be able to save state
-        #       before planning and revert after planning
-        if action == 0:
-            # execute pick
-            commands = self._get_pick_action(self.debug_object_name)
-        elif action == 1:
-            # execute place
-            commands = self._get_place_action(self.debug_object_name, self.debug_surface_name)
-
-        ## step env and compute reward
-        if commands is None:
-            terminated = False
-            reward = -100
-        else:
-            set_renderer(True)
-            apply_actions(self.state, commands, time_step=config.time_step, verbose=False)
-
-            terminated = False
-            reward = 1 if terminated else 0  # Binary sparse rewards
-
-        ## update observation
-        observation = self._get_obs()
-        info = self._get_info()
-
-        return observation, reward, terminated, False, info
-
-    def reset(self):
-        self.saver.restore()
-
-        observation = self._get_obs()
-        info = self._get_info()
-        return observation
-
-
-    def render(self, mode='human'):
-        camera_image = self._get_obs()
-
-        if mode == 'human':
-            plt.imshow(camera_image.rgbPixels)
-            plt.show()
-
-        return camera_image
-
-    def close(self):
-        reset_simulation()
-        disconnect()
-
-    def _get_obs(self):
-        # return {"agent": self._agent_location, "target": self._target_location}
-
-        width = 1280
-        height = 960
-        fx = 800
-        camera_matrix = get_camera_matrix(width=width, height=height, fx=fx)
-        camera = StaticCamera(unit_pose(), camera_matrix=camera_matrix)
-        sink = self.world.name_to_body('sink#1')
-        camera_point, target_point = set_camera_target_body(sink, dx=3, dy=0, dz=1)
-        # we can set tiny to true when not using gui
-        # https://github.com/bulletphysics/bullet3/issues/1157
-        camera_image = camera.get_image(camera_point=camera_point, target_point=target_point, tiny=False)
-        # plt.imshow(camera_image.rgbPixels)
-        # plt.show()
-        return camera_image
-
-    def _get_info(self):
-        # return {
-        #     "distance": np.linalg.norm(
-        #         self._agent_location - self._target_location, ord=1
-        #     )
-        # }
-
-        return {}
-
-    def _get_pick_action(self, object_name):
-
-        ## before we do anything
-        if self.current_g is not None:
-            # there is already object in hand
-            return None
-
-        # get current robot configuration
-        current_q = Conf(self.robot, get_se3_joints(self.robot))
-
-        obj_body = self.world.name_to_body(object_name)
-        world_obj = self.world.name_to_object(object_name)
-
-        # get current pose and instantiate Pose()
-        obj_pose = world_obj.get_link_pose(link=-1)
-        obj_Pose = Pose(obj_body, get_pose(obj_body))
-
-        # return a list of tuple [(grasp, )]
-        grasp_list = next(self.stream_map["sample-grasp"](body=obj_body))
-        print("sample {} grasps for {}: {}".format(len(grasp_list), world_obj, grasp_list))
-
-        for grasp in grasp_list:
-            print("find ik for grasp", grasp)
-
-            ## find ik
-            for ik in self.stream_map["inverse-kinematics-hand"](a=None, o=obj_body, p=obj_Pose, g=grasp[0]):
-                if len(ik) == 0:
-                    continue
-
-                ## now we want to sample a trajectory from current position to next
-                q2 = ik[0][0]
-                for move_cmd in self.stream_map["plan-free-motion-hand"](q1=current_q, q2=q2):
-                    print(move_cmd)
-                    if len(move_cmd) == 0:
-                        continue
-
-                    ## computes actions to step the world
-                    pick_action = ('pick_hand', ('hand', obj_body, obj_Pose, grasp[0], None, ik[0][1]))
-                    move_action = ('move_cartesian', (current_q, ik[0][0], move_cmd[0][0]))
-                    commands = []
-                    for action in [move_action, pick_action]:
-                        commands += get_primitive_actions(action, self.world)
-
-                    ## update world state
-                    self.current_g = grasp[0]
-
-                    return commands
-
-        return None
-
-    def _get_place_action(self, object_name, surface_name):
-
-        ## before we do anything
-        if self.current_g is None:
-            # there is nothing in hand to be placed
-            return None
-
-        # get current robot configuration
-        current_q = Conf(self.robot, get_se3_joints(self.robot))
-
-        surface = self.world.name_to_body(surface_name)
-
-        obj_body = self.world.name_to_body(object_name)
-
-        for placement_pose in self.stream_map["sample-pose-on"](body=obj_body, surface=surface):
-
-            print("find ik for placement pose", placement_pose)
-
-            for ik in self.stream_map["inverse-kinematics-hand"](a=None, o=obj_body, p=placement_pose[0][0], g=self.current_g):
-                print(ik)
-                if len(ik) == 0:
-                    continue
-
-                ## motion plan to place
-                q = ik[0][0]
-                for move_cmd in self.stream_map["plan-free-motion-hand"](q1=current_q, q2=q):
-                    print(move_cmd)
-                    if len(move_cmd) == 0:
-                        continue
-
-                    ## computes actions to step the world
-                    move_action = ('move_cartesian', (current_q, q, move_cmd[0][0]))
-                    place_action = ('place_hand', ('hand', obj_body, placement_pose, self.current_g, None, ik[0][1]))
-                    commands = []
-                    for action in [move_action, place_action]:
-                        commands += get_primitive_actions(action, self.world)
-
-                    ## update world state
-                    self.current_g = None
-
-                    return commands
-
-        return None
+# class CleanDishEnvV0(gym.Env):
+#
+#     """
+#     This environment is for mainly for debug purpose. It only supports one object and one location
+#     """
+#
+#     # TODO: do we need to differentiate observation and render?
+#     #       observation may be low-level object and robot state
+#
+#     metadata = {'render_modes': ['human', 'rgb_array']}
+#
+#     def __init__(self, world, goal, config, render_mode):
+#         self.world = world
+#         self.goal = goal
+#         self.config = config
+#
+#         self.saver = WorldSaver()
+#
+#         state = State(world)
+#         self.state = state
+#         self.robot = state.robot
+#         self.problem = state
+#
+#         domain_path = abspath(self.config.planner.domain_pddl)
+#         self.stream_map = self.robot.get_stream_map(self.problem, collisions=not self.config.cfree,
+#                                                     custom_limits=self.world.robot.custom_limits,
+#                                                     teleport=self.config.teleport, domain_pddl=domain_path,
+#                                                     num_grasp_samples=30)
+#
+#         # debug env, only manipulate one object
+#         self.debug_object_name = 'bowl#1'
+#         self.debug_surface_name = 'shelf_lower'
+#
+#         # Here's an observation space for 200 wide x 100 high RGB image inputs:
+#         self.observation_space = spaces.Box(low=0, high=255, shape=(1280, 960, 3), dtype=np.uint8)
+#         # use a list of cameras: https://stackoverflow.com/questions/68113725/openai-gym-observation-space-representation
+#
+#         # use text action: https://github.com/microsoft/TextWorld/blob/main/notebooks/Playing%20TextWorld%20generated%20games%20with%20OpenAI%20Gym.ipynb
+#         # pick obj, place obj
+#         self.action_space = spaces.Discrete(2)
+#
+#         assert render_mode is None or render_mode in self.metadata["render_modes"]
+#         self.render_mode = render_mode
+#
+#         # record some state information
+#         # TODO: maybe this information is redundant and we can get it from elsewhere, like world, saver, ..
+#         self.current_g = None
+#
+#     def step(self, action):
+#         # return observation, reward, terminated, False, info
+#
+#         ## compute action
+#         commands = None
+#
+#         # TODO: it seems like these stream functions will also change the world state, we need to be able to save state
+#         #       before planning and revert after planning
+#         if action == 0:
+#             # execute pick
+#             commands = self._get_pick_action(self.debug_object_name)
+#         elif action == 1:
+#             # execute place
+#             commands = self._get_place_action(self.debug_object_name, self.debug_surface_name)
+#
+#         ## step env and compute reward
+#         if commands is None:
+#             terminated = False
+#             reward = -100
+#         else:
+#             set_renderer(True)
+#             apply_actions(self.state, commands, time_step=config.time_step, verbose=False)
+#
+#             terminated = False
+#             reward = 1 if terminated else 0  # Binary sparse rewards
+#
+#         ## update observation
+#         observation = self._get_obs()
+#         info = self._get_info()
+#
+#         return observation, reward, terminated, False, info
+#
+#     def reset(self):
+#         self.saver.restore()
+#
+#         observation = self._get_obs()
+#         info = self._get_info()
+#         return observation
+#
+#
+#     def render(self, mode='human'):
+#         camera_image = self._get_obs()
+#
+#         if mode == 'human':
+#             plt.imshow(camera_image.rgbPixels)
+#             plt.show()
+#
+#         return camera_image
+#
+#     def close(self):
+#         reset_simulation()
+#         disconnect()
+#
+#     def _get_obs(self):
+#         # return {"agent": self._agent_location, "target": self._target_location}
+#
+#         width = 1280
+#         height = 960
+#         fx = 800
+#         camera_matrix = get_camera_matrix(width=width, height=height, fx=fx)
+#         camera = StaticCamera(unit_pose(), camera_matrix=camera_matrix)
+#         sink = self.world.name_to_body('sink#1')
+#         camera_point, target_point = set_camera_target_body(sink, dx=3, dy=0, dz=1)
+#         # we can set tiny to true when not using gui
+#         # https://github.com/bulletphysics/bullet3/issues/1157
+#         camera_image = camera.get_image(camera_point=camera_point, target_point=target_point, tiny=False)
+#         # plt.imshow(camera_image.rgbPixels)
+#         # plt.show()
+#         return camera_image
+#
+#     def _get_info(self):
+#         # return {
+#         #     "distance": np.linalg.norm(
+#         #         self._agent_location - self._target_location, ord=1
+#         #     )
+#         # }
+#
+#         return {}
+#
+#     def _get_pick_action(self, object_name):
+#
+#         ## before we do anything
+#         if self.current_g is not None:
+#             # there is already object in hand
+#             return None
+#
+#         # get current robot configuration
+#         current_q = Conf(self.robot, get_se3_joints(self.robot))
+#
+#         obj_body = self.world.name_to_body(object_name)
+#         world_obj = self.world.name_to_object(object_name)
+#
+#         # get current pose and instantiate Pose()
+#         obj_pose = world_obj.get_link_pose(link=-1)
+#         obj_Pose = Pose(obj_body, get_pose(obj_body))
+#
+#         # return a list of tuple [(grasp, )]
+#         grasp_list = next(self.stream_map["sample-grasp"](body=obj_body))
+#         print("sample {} grasps for {}: {}".format(len(grasp_list), world_obj, grasp_list))
+#
+#         for grasp in grasp_list:
+#             print("find ik for grasp", grasp)
+#
+#             ## find ik
+#             for ik in self.stream_map["inverse-kinematics-hand"](a=None, o=obj_body, p=obj_Pose, g=grasp[0]):
+#                 if len(ik) == 0:
+#                     continue
+#
+#                 ## now we want to sample a trajectory from current position to next
+#                 q2 = ik[0][0]
+#                 for move_cmd in self.stream_map["plan-free-motion-hand"](q1=current_q, q2=q2):
+#                     print(move_cmd)
+#                     if len(move_cmd) == 0:
+#                         continue
+#
+#                     ## computes actions to step the world
+#                     pick_action = ('pick_hand', ('hand', obj_body, obj_Pose, grasp[0], None, ik[0][1]))
+#                     move_action = ('move_cartesian', (current_q, ik[0][0], move_cmd[0][0]))
+#                     commands = []
+#                     for action in [move_action, pick_action]:
+#                         commands += get_primitive_actions(action, self.world)
+#
+#                     ## update world state
+#                     self.current_g = grasp[0]
+#
+#                     return commands
+#
+#         return None
+#
+#     def _get_place_action(self, object_name, surface_name):
+#
+#         ## before we do anything
+#         if self.current_g is None:
+#             # there is nothing in hand to be placed
+#             return None
+#
+#         # get current robot configuration
+#         current_q = Conf(self.robot, get_se3_joints(self.robot))
+#
+#         surface = self.world.name_to_body(surface_name)
+#
+#         obj_body = self.world.name_to_body(object_name)
+#
+#         for placement_pose in self.stream_map["sample-pose-on"](body=obj_body, surface=surface):
+#
+#             print("find ik for placement pose", placement_pose)
+#
+#             for ik in self.stream_map["inverse-kinematics-hand"](a=None, o=obj_body, p=placement_pose[0][0], g=self.current_g):
+#                 print(ik)
+#                 if len(ik) == 0:
+#                     continue
+#
+#                 ## motion plan to place
+#                 q = ik[0][0]
+#                 for move_cmd in self.stream_map["plan-free-motion-hand"](q1=current_q, q2=q):
+#                     print(move_cmd)
+#                     if len(move_cmd) == 0:
+#                         continue
+#
+#                     ## computes actions to step the world
+#                     move_action = ('move_cartesian', (current_q, q, move_cmd[0][0]))
+#                     place_action = ('place_hand', ('hand', obj_body, placement_pose, self.current_g, None, ik[0][1]))
+#                     commands = []
+#                     for action in [move_action, place_action]:
+#                         commands += get_primitive_actions(action, self.world)
+#
+#                     ## update world state
+#                     self.current_g = None
+#
+#                     return commands
+#
+#         return None
 
 
 class CleanDishEnvV1(gym.Env):
@@ -1015,6 +1094,29 @@ class CleanDishEnvV1(gym.Env):
         info = self._get_info()
         return observation, info
 
+    def reset_to_state(self, commands_so_far=[], current_g=None, symbolic_state=None):
+        self.state.remove_gripper()
+        self.saver.restore()
+
+        # step through commands to recreate the state
+        if commands_so_far:
+            set_renderer(True)
+            apply_actions(self.state, commands_so_far, time_step=0, verbose=False)
+
+        self.commands_so_far = copy.deepcopy(commands_so_far)
+        self.current_g = copy.deepcopy(current_g)
+        if symbolic_state is None:
+            self.symbolic_state = {}
+            self.initialize_symbolic_state()
+            self.update_symbolic_state()
+        else:
+            self.symbolic_state = copy.deepcopy(symbolic_state)
+            print(f"\nCurrent symbolic state:\n{self.symbolic_state}\n")
+
+        observation = self._get_obs()
+        info = self._get_info()
+        return observation, info
+
     def render(self, mode='human'):
         camera_image = self._get_obs()
 
@@ -1050,13 +1152,13 @@ class CleanDishEnvV1(gym.Env):
             plt.imshow(camera_image.rgbPixels)
             plt.show()
 
-        if self.render_mode == "human":
-            plt.imshow(camera_image.depthPixels)
-            plt.show()
-
-        if self.render_mode == "human":
-            plt.imshow(camera_image.segmentationMaskBuffer)
-            plt.show()
+        # if self.render_mode == "human":
+        #     plt.imshow(camera_image.depthPixels)
+        #     plt.show()
+        #
+        # if self.render_mode == "human":
+        #     plt.imshow(camera_image.segmentationMaskBuffer)
+        #     plt.show()
 
         # https://github.com/valtsblukis/hlsm
         # https://colab.research.google.com/drive/1HAqemP4cE81SQ6QO1-N85j5bF4C0qLs0?usp=sharing#scrollTo=MIlYMxU-Jgn5
