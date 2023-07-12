@@ -7,6 +7,8 @@
 verbose: true
 seed:
 semantic_spec_seed:
+max_rollout_depth: 1
+max_rollouts: 1
 
 ## semantic spec related
 # semantic_specs_dir: ../pybullet_planning/nsplan_tools/debug_specs
@@ -49,7 +51,7 @@ world:
 
 
 data:
-  out_dir: /home/weiyu/data_drive/nsplan/test
+  out_dir: /home/weiyu/data_drive/nsplan/0711/data
   save_failed_plans: true
   save_log: true
   save_commands: true

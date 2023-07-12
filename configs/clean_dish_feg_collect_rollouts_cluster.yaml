@@ -7,6 +7,8 @@
 verbose: true
 seed:
 semantic_spec_seed:
+max_rollout_depth: 6
+max_rollouts: 3
 
 ## semantic spec related
 # semantic_specs_dir: ../pybullet_planning/nsplan_tools/debug_specs

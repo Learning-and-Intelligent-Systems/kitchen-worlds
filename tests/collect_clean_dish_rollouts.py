@@ -39,6 +39,7 @@ from test_utils import parallel_processing, get_config
 from test_world_builder import create_pybullet_world
 
 from nsplan_tools.generate_semantic_specification import get_semantic_specs, get_semantic_spec
+from nsplan_tools.utils.file import print_data_types
 
 # additional dependencies for using streams
 from pybullet_tools.bullet_utils import set_camera_target_body, visualize_camera_image, get_readable_list
@@ -115,8 +116,14 @@ def process(config):
     #     input("next?")
 
     # option 2
-    rollouts = random_rollouts(env, max_depth=6, max_rollouts=3, debug=False)
-    data_dict = {"rollouts": rollouts, "obj_dict": world.obj_dict}
+    rollouts = random_rollouts(env, max_depth=new_config.max_rollout_depth, max_rollouts=new_config.max_rollouts, debug=False, simple_data=True)
+
+    # convert the world entity obj to a simple str so we don't have problem unpickle it
+    obj_dict = copy.deepcopy(world.obj_dict)
+    for obj in obj_dict:
+        obj_dict[obj]["name"] = str(obj_dict[obj]["name"])
+
+    data_dict = {"rollouts": rollouts, "obj_dict": obj_dict}
     with open(os.path.join(exp_dir, "rollout_data.pkl"), "wb") as fh:
         pickle.dump(data_dict, fh)
 
@@ -273,7 +280,7 @@ def random_simulate_bfs(env, max_depth=1, debug=False):
     return visited
 
 
-def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False):
+def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=True):
     text_actions = sorted(env.get_admissible_text_actions())
     if debug:
         print(f"{len(text_actions)} available actions: {text_actions}")
@@ -341,7 +348,11 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False):
             if debug:
                 print(f"{len(motion_feasible_text_actions)} motion feasible actions: {motion_feasible_text_actions}")
 
-            rollout.append((cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth))
+            if simple_data:
+                rollout.append((cur_obs.rgbPixels, cur_obs.depthPixels, cur_obs.segmentationMaskBuffer, cur_obs.camera_pose, cur_obs.camera_matrix,
+                                symbolic_state, action_to_feasibility, depth))
+            else:
+                rollout.append((cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth))
 
             if candidate_next_nodes:
                 next_node = candidate_next_nodes[np.random.randint(0, len(candidate_next_nodes))]
@@ -356,8 +367,12 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False):
             print(f"rollout no.{ri}")
             for d in rollout:
                 print("\n" + "-" * 50)
-                cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth = d
-                print(cur_obs.rgbPixels)
+                if simple_data:
+                    rgbPixels, depthPixels, segmentationMaskBuffer, camera_pose, camera_matrix, symbolic_state, action_to_feasibility, depth = d
+                    print(d)
+                else:
+                    cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth = d
+                # print(cur_obs.rgbPixels)
                 # img = Image.fromarray(cur_obs.rgbPixels, 'RGBA')
                 # img.show()
                 plt.imshow(cur_obs.rgbPixels)
