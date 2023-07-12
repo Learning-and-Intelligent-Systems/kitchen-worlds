@@ -13,6 +13,7 @@ import json
 from os.path import join, abspath, dirname, isdir, isfile, basename
 from config import EXP_PATH, OUTPUT_PATH
 from itertools import product
+from PIL import Image
 
 
 from pddlstream.language.constants import Equal, AND, print_solution, PDDLProblem
@@ -55,7 +56,7 @@ from gymnasium.utils import seeding
 import numpy as np
 
 
-DEFAULT_YAML = 'clean_dish_feg.yaml'
+DEFAULT_YAML = 'clean_dish_feg_collect_rollouts.yaml'
 config = get_config(DEFAULT_YAML)
 
 
@@ -466,6 +467,13 @@ def process_v0(input_dict):
     disconnect()
 
 
+def safe_process(input_dict):
+    try:
+        process(input_dict)
+    except:
+        print("Error occurred")
+
+
 def process(input_dict):
     """ exist a version in cognitive-architectures for generating mini-datasets (single process),
         run in kitchen-worlds for parallelization, but no reliable planning time data
@@ -491,7 +499,7 @@ def process(input_dict):
     set_random_seed(seed)
     set_numpy_seed(seed)
 
-    exp_dir = abspath(join(config.data.out_dir, "semantic_spec_{}_seed_{}_time_".format(semantic_spec_seed, seed))) #+ get_datetime(TO_LISDF=True)))
+    exp_dir = abspath(join(config.data.out_dir, "semantic_spec_{}_seed_{}".format(semantic_spec_seed, seed))) #+ get_datetime(TO_LISDF=True)))
     print(exp_dir)
     os.makedirs(exp_dir, exist_ok=True)
     new_config.data.out_dir = exp_dir
@@ -505,9 +513,29 @@ def process(input_dict):
     # input("env initialized, next?")
     # play(env)
 
-    env = CleanDishEnvV1(world, goal, config, render_mode="human")
-    random_simulate_bfs(env, max_depth=2)
+    env = CleanDishEnvV1(world, goal, config, render_mode="bot")
+    # option 1
+    # data = random_simulate_bfs(env, max_depth=3, debug=False)
+    # print("\n\n" + "=" * 100)
+    # print("all states")
+    # for d in data:
+    #     print("\n" + "-" * 50)
+    #     cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth = d
+    #     print(cur_obs.rgbPixels)
+    #     # img = Image.fromarray(cur_obs.rgbPixels, 'RGBA')
+    #     # img.show()
+    #     plt.imshow(cur_obs.rgbPixels)
+    #     plt.show()
+    #     print(f"depth: {depth}")
+    #     for action in action_to_feasibility:
+    #         print(f"{action}: {action_to_feasibility[action]}")
+    #     input("next?")
 
+    # option 2
+    rollouts = random_rollouts(env, max_depth=6, max_rollouts=3, debug=False)
+    data_dict = {"rollouts": rollouts, "obj_dict": world.obj_dict}
+    with open(os.path.join(exp_dir, "rollout_data.pkl"), "wb") as fh:
+        pickle.dump(data_dict, fh)
 
 
 def play(env):
@@ -570,13 +598,14 @@ def random_simulate_single_step(env):
     print(f"{len(motion_feasible_text_actions)} motion feasible actions: {motion_feasible_text_actions}")
 
 
-def random_simulate_bfs(env, max_depth=1):
+def random_simulate_bfs(env, max_depth=1, debug=False):
 
     text_actions = sorted(env.get_admissible_text_actions())
-    print(f"{len(text_actions)} available actions: {text_actions}")
+    if debug:
+        print(f"{len(text_actions)} available actions: {text_actions}")
 
     obs, info = env.reset()
-    print(obs)
+    # print(obs)
 
     # the format of each node in the search tree
     # TODO: also add action_so_far so we can trace
@@ -593,10 +622,12 @@ def random_simulate_bfs(env, max_depth=1):
 
     # search begins
     # TODO: add heuristic to avoid cycles
+    # TODO: we can also track how many steps of actions need to be taken to get to the goal
     while queue:
         (cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth) = queue.pop(0)
-        print("\n\n" + "=" * 100)
-        print((cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth))
+        if debug:
+            print("\n\n" + "=" * 100)
+            print((cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth))
         # input("a node is popped from the queue")
 
         if depth >= max_depth:
@@ -610,10 +641,11 @@ def random_simulate_bfs(env, max_depth=1):
         for text_action in text_actions:
             symbolic_feasible = env.check_symbolic_action_feasibility(text_action[0], text_action[1], text_action[2])
             if not symbolic_feasible:
-                action_to_feasibility[text_action] = False
+                action_to_feasibility[text_action] = -1
             else:
                 symbolic_feasible_text_actions.append(text_action)
-        print(f"{len(symbolic_feasible_text_actions)} symbolic feasible actions: {symbolic_feasible_text_actions}")
+        if debug:
+            print(f"{len(symbolic_feasible_text_actions)} symbolic feasible actions: {symbolic_feasible_text_actions}")
 
         motion_feasible_text_actions = []  # bookkeeping
         for text_action in symbolic_feasible_text_actions:
@@ -623,9 +655,12 @@ def random_simulate_bfs(env, max_depth=1):
             new_obs, new_score, new_done, _, _ = env.step(action)
             if new_score == -1:
                 # not feasible
-                action_to_feasibility[text_action] = False
+                action_to_feasibility[text_action] = -1
             else:
-                action_to_feasibility[text_action] = True
+                if new_done:
+                    action_to_feasibility[text_action] = 100
+                else:
+                    action_to_feasibility[text_action] = 1
                 motion_feasible_text_actions.append(text_action)
                 # add new node to frontier
                 new_commands_so_far = env.commands_so_far
@@ -635,22 +670,121 @@ def random_simulate_bfs(env, max_depth=1):
                 new_depth = depth + 1
                 new_node = (new_obs, new_commands_so_far, new_current_g, new_symbolic_state, new_action_to_feasibility, new_depth)
                 queue.append(new_node)
-        print(f"{len(motion_feasible_text_actions)} motion feasible actions: {motion_feasible_text_actions}")
+        if debug:
+            print(f"{len(motion_feasible_text_actions)} motion feasible actions: {motion_feasible_text_actions}")
 
         visited.append((cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth))
 
-    print("\n\n" + "=" * 100)
-    print("all states")
-    for state in visited:
-        print("\n" + "-"*50)
-        cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth = state
-        print(cur_obs.rgbPixels)
-        print(f"depth: {depth}")
-        for action in action_to_feasibility:
-            print(f"{action}: {action_to_feasibility[action]}")
-        input("next?")
+    if debug:
+        print("\n\n" + "=" * 100)
+        print("all states")
+        for state in visited:
+            print("\n" + "-"*50)
+            cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth = state
+            print(cur_obs.rgbPixels)
+            print(f"depth: {depth}")
+            for action in action_to_feasibility:
+                print(f"{action}: {action_to_feasibility[action]}")
+            input("next?")
 
     return visited
+
+
+def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False):
+    text_actions = sorted(env.get_admissible_text_actions())
+    if debug:
+        print(f"{len(text_actions)} available actions: {text_actions}")
+
+    rollouts = []
+    for ri in range(max_rollouts):
+
+        rollout = []
+
+        obs, info = env.reset()
+
+        # the format of each node in the search tree
+        # TODO: also add action_so_far so we can trace
+        commands_so_far = []
+        current_g = None
+        symbolic_state = None
+        action_to_feasibility = {}
+        depth = 0
+        next_node = (obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth)
+
+        while True:
+            (cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth) = next_node
+            if debug:
+                print("\n\n" + "=" * 100)
+                print((cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth))
+
+            if depth >= max_depth:
+                break
+
+            candidate_next_nodes = []
+
+            symbolic_feasible_text_actions = []
+            for text_action in text_actions:
+                symbolic_feasible = env.check_symbolic_action_feasibility(text_action[0], text_action[1], text_action[2])
+                if not symbolic_feasible:
+                    action_to_feasibility[text_action] = -1
+                else:
+                    symbolic_feasible_text_actions.append(text_action)
+            if debug:
+                print(f"{len(symbolic_feasible_text_actions)} symbolic feasible actions: {symbolic_feasible_text_actions}")
+
+            motion_feasible_text_actions = []  # bookkeeping
+            for text_action in symbolic_feasible_text_actions:
+                reset_obs, _ = env.reset_to_state(commands_so_far, current_g, symbolic_state)
+                # debug: make sure cur_obs is the same as reset_obs
+                action = env.convert_text_to_action(text_action[0], text_action[1], text_action[2])
+                new_obs, new_score, new_done, _, _ = env.step(action)
+                if new_score == -1:
+                    # not feasible
+                    action_to_feasibility[text_action] = -1
+                else:
+                    if new_done:
+                        action_to_feasibility[text_action] = 100
+                    else:
+                        action_to_feasibility[text_action] = 1
+                    motion_feasible_text_actions.append(text_action)
+                    # add new node to frontier
+                    new_commands_so_far = env.commands_so_far
+                    new_current_g = env.current_g
+                    new_symbolic_state = env.symbolic_state
+                    new_action_to_feasibility = {}
+                    new_depth = depth + 1
+                    new_node = (new_obs, new_commands_so_far, new_current_g, new_symbolic_state, new_action_to_feasibility, new_depth)
+                    candidate_next_nodes.append(new_node)
+            if debug:
+                print(f"{len(motion_feasible_text_actions)} motion feasible actions: {motion_feasible_text_actions}")
+
+            rollout.append((cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth))
+
+            if candidate_next_nodes:
+                next_node = candidate_next_nodes[np.random.randint(0, len(candidate_next_nodes))]
+            else:
+                break
+
+        rollouts.append(rollout)
+
+    if debug:
+        for ri, rollout in enumerate(rollouts):
+            print("\n\n" + "=" * 100)
+            print(f"rollout no.{ri}")
+            for d in rollout:
+                print("\n" + "-" * 50)
+                cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth = d
+                print(cur_obs.rgbPixels)
+                # img = Image.fromarray(cur_obs.rgbPixels, 'RGBA')
+                # img.show()
+                plt.imshow(cur_obs.rgbPixels)
+                plt.show()
+                print(f"depth: {depth}")
+                for action in action_to_feasibility:
+                    print(f"{action}: {action_to_feasibility[action]}")
+                input("next?")
+
+    return rollouts
 
 
 def debug_play(env):
@@ -912,7 +1046,7 @@ class CleanDishEnvV1(gym.Env):
     # TODO: do we need to differentiate observation and render?
     #       observation may be low-level object and robot state
 
-    metadata = {'render_modes': ['human', 'rgb_array']}
+    metadata = {'render_modes': ['human', 'bot']}
 
     def __init__(self, world, goal, config, render_mode):
         print("Initializing env ...")
@@ -1133,8 +1267,8 @@ class CleanDishEnvV1(gym.Env):
     def _get_obs(self):
         # return {"agent": self._agent_location, "target": self._target_location}
 
-        width = 1280
-        height = 960
+        width = 640
+        height = 480
         fx = 800
         camera_matrix = get_camera_matrix(width=width, height=height, fx=fx)
         camera = StaticCamera(unit_pose(), camera_matrix=camera_matrix)
@@ -1501,6 +1635,7 @@ def get_facts(world, state):
 
     summarize_facts(facts, world, name='Facts', print_fn=print)
 
+
 def collect_for_fastamp():
 
     if config.env_seed is not None and config.semantic_spec is not None:
@@ -1508,11 +1643,11 @@ def collect_for_fastamp():
     else:
         semantic_specs = get_semantic_specs(config.semantic_specs_dir)
         inputs = []
-        for spec in semantic_specs[23:]:
+        for spec in semantic_specs:
             for env_seed in range(10):
                 inputs.append({"semantic_spec": spec, "env_seed": env_seed})
 
-    parallel_processing(process, inputs, parallel=config.parallel)
+    parallel_processing(safe_process, inputs, parallel=config.parallel)
 
 
 if __name__ == '__main__':
