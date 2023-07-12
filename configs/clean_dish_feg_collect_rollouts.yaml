@@ -7,7 +7,7 @@
 verbose: true
 seed:
 semantic_spec_seed:
-max_rollout_depth: 1
+max_rollout_depth: 5
 max_rollouts: 1
 
 ## semantic spec related

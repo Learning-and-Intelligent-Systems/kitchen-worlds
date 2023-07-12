@@ -302,10 +302,14 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
         next_node = (obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth)
 
         while True:
+
             (cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth) = next_node
             if debug:
                 print("\n\n" + "=" * 100)
-                print((cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth))
+                plt.imshow(cur_obs.rgbPixels)
+                plt.show()
+                # print((cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth))
+                print((symbolic_state, action_to_feasibility, depth))
 
             if depth >= max_depth:
                 break
@@ -324,6 +328,8 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
 
             motion_feasible_text_actions = []  # bookkeeping
             for text_action in symbolic_feasible_text_actions:
+                if debug:
+                    input(f"check motion feasibility for {text_action}")
                 reset_obs, _ = env.reset_to_state(commands_so_far, current_g, symbolic_state)
                 # debug: make sure cur_obs is the same as reset_obs
                 action = env.convert_text_to_action(text_action[0], text_action[1], text_action[2])
@@ -347,6 +353,7 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
                     candidate_next_nodes.append(new_node)
             if debug:
                 print(f"{len(motion_feasible_text_actions)} motion feasible actions: {motion_feasible_text_actions}")
+                input("next node?")
 
             if simple_data:
                 rollout.append((cur_obs.rgbPixels, cur_obs.depthPixels, cur_obs.segmentationMaskBuffer, cur_obs.camera_pose, cur_obs.camera_matrix,
@@ -649,7 +656,7 @@ class CleanDishEnvV1(gym.Env):
         camera_matrix = get_camera_matrix(width=width, height=height, fx=fx)
         camera = StaticCamera(unit_pose(), camera_matrix=camera_matrix)
         sink = self.world.name_to_body('sink#1')
-        camera_point, target_point = set_camera_target_body(sink, dx=3, dy=0, dz=1)
+        camera_point, target_point = set_camera_target_body(sink, dx=5, dy=0, dz=3)
         # we can set tiny to true when not using gui
         # https://github.com/bulletphysics/bullet3/issues/1157
 
@@ -1028,9 +1035,9 @@ def collect_for_fastamp():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="collect rollouts")
-    parser.add_argument("--seed", default=2, type=int)
-    parser.add_argument("--semantic_spec_seed", default=2, type=int)
-    parser.add_argument("--config_file", default='../configs/clean_dish_feg_collect_rollouts_cluster.yaml', type=str)
+    parser.add_argument("--seed", default=5, type=int)
+    parser.add_argument("--semantic_spec_seed", default=0, type=int)
+    parser.add_argument("--config_file", default='../configs/clean_dish_feg_collect_rollouts.yaml', type=str)
     args = parser.parse_args()
 
     config = parse_yaml(args.config_file)
