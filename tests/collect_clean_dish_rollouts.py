@@ -17,8 +17,8 @@ from itertools import product
 from PIL import Image
 
 
-from pddlstream.language.constants import Equal, AND, print_solution, PDDLProblem
-from pddlstream.algorithms.meta import solve, create_parser
+# from pddlstream.language.constants import Equal, AND, print_solution, PDDLProblem
+# from pddlstream.algorithms.meta import solve, create_parser
 
 from pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, wait_if_gui, \
     SEPARATOR, get_aabb, wait_for_duration, has_gui, reset_simulation, set_random_seed, \
@@ -1030,7 +1030,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="collect rollouts")
     parser.add_argument("--seed", default=2, type=int)
     parser.add_argument("--semantic_spec_seed", default=2, type=int)
-    parser.add_argument("--config_file", default='../configs/clean_dish_feg_collect_rollouts.yaml', type=str)
+    parser.add_argument("--config_file", default='../configs/clean_dish_feg_collect_rollouts_cluster.yaml', type=str)
     args = parser.parse_args()
 
     config = parse_yaml(args.config_file)
