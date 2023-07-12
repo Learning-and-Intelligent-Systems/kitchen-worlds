@@ -34,6 +34,33 @@ A library of long-horizon Task-and-Motion-Planning (TAMP) problems in kitchen an
 </table>
 -->
 
+## Notes for NS-Plan
+
+1. install gym
+```shell
+pip install gymnasium
+```
+2. checkout assets
+```shell
+cd ./assets/models
+git checkout ns_plan_acronym_object
+
+3. generate semantic specs
+```shell
+# from repo root
+cd ./pybullet_planning/nsplan_tools
+python generate_semantic_specification.py
+```
+
+4. collect rollouts
+First change yaml config files for data collection in `./configs/`, then run data collection code
+```shell
+# from repo root
+cd ./tests
+python prototype_clean_dish_gym.py
+```
+
+
 ## Setup
 
 1. Grab the submodules, may take a while

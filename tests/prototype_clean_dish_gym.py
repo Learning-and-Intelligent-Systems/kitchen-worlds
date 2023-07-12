@@ -44,6 +44,7 @@ from pybullet_tools.bullet_utils import set_camera_target_body, visualize_camera
 from pybullet_planning.pybullet_tools.utils import get_image_at_pose, get_image, unit_pose, get_camera_matrix
 import matplotlib.pyplot as plt
 from world_builder.entities import StaticCamera
+from world_builder.utils import parse_yaml
 from pybullet_tools.pr2_primitives import Pose, Conf
 from pybullet_tools.utils import get_pose, multiply, quat_from_euler, dump_world, get_bodies, remove_body
 from pybullet_tools.flying_gripper_utils import get_se3_joints, se3_from_pose
@@ -56,8 +57,8 @@ from gymnasium.utils import seeding
 import numpy as np
 
 
-DEFAULT_YAML = 'clean_dish_feg_collect_rollouts.yaml'
-config = get_config(DEFAULT_YAML)
+DEFAULT_YAML = '../configs/clean_dish_feg_collect_rollouts_cluster.yaml'
+config = parse_yaml(DEFAULT_YAML)
 
 
 #####################################
@@ -470,8 +471,8 @@ def process_v0(input_dict):
 def safe_process(input_dict):
     try:
         process(input_dict)
-    except:
-        print("Error occurred")
+    except Exception as e:
+        print(e)
 
 
 def process(input_dict):
