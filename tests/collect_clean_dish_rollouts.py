@@ -59,6 +59,26 @@ from gymnasium.utils import seeding
 import numpy as np
 
 
+def plot_images(image_dict):
+    # Determine the number of images
+    num_images = len(image_dict)
+
+    fig, axes = plt.subplots(1, num_images, figsize=(15,15))
+
+    # If there is only one image, axes won't be an array, so we need to convert it
+    if num_images == 1:
+        axes = [axes]
+
+    # Plot each image on the grid
+    for (image_name, image), ax in zip(image_dict.items(), axes):
+        ax.imshow(image)
+        ax.set_title(image_name)
+        ax.axis('off')
+
+    plt.tight_layout()
+    plt.show()
+
+
 def process(config):
     """ exist a version in cognitive-architectures for generating mini-datasets (single process),
         run in kitchen-worlds for parallelization, but no reliable planning time data
@@ -123,7 +143,7 @@ def process(config):
     for obj in obj_dict:
         obj_dict[obj]["name"] = str(obj_dict[obj]["name"])
 
-    data_dict = {"rollouts": rollouts, "obj_dict": obj_dict}
+    data_dict = {"rollouts": rollouts, "obj_dict": obj_dict, "pybullet_idx_to_name": {b: world.BODY_TO_OBJECT[b].name for b in world.BODY_TO_OBJECT}}
     with open(os.path.join(exp_dir, "rollout_data.pkl"), "wb") as fh:
         pickle.dump(data_dict, fh)
 
@@ -306,8 +326,9 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
             (cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth) = next_node
             if debug:
                 print("\n\n" + "=" * 100)
-                plt.imshow(cur_obs.rgbPixels)
-                plt.show()
+                # plt.imshow(cur_obs.rgbPixels)
+                # plt.show()
+                plot_images({view_name: Image.fromarray(cur_obs[view_name][0], 'RGBA') for view_name in cur_obs})
                 # print((cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth))
                 print((symbolic_state, action_to_feasibility, depth))
 
@@ -356,8 +377,7 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
                 input("next node?")
 
             if simple_data:
-                rollout.append((cur_obs.rgbPixels, cur_obs.depthPixels, cur_obs.segmentationMaskBuffer, cur_obs.camera_pose, cur_obs.camera_matrix,
-                                symbolic_state, action_to_feasibility, depth))
+                rollout.append((cur_obs, symbolic_state, action_to_feasibility, depth))
             else:
                 rollout.append((cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth))
 
@@ -375,15 +395,14 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
             for d in rollout:
                 print("\n" + "-" * 50)
                 if simple_data:
-                    rgbPixels, depthPixels, segmentationMaskBuffer, camera_pose, camera_matrix, symbolic_state, action_to_feasibility, depth = d
+                    cur_obs, symbolic_state, action_to_feasibility, depth = d
                     print(d)
                 else:
                     cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth = d
                 # print(cur_obs.rgbPixels)
                 # img = Image.fromarray(cur_obs.rgbPixels, 'RGBA')
                 # img.show()
-                plt.imshow(cur_obs.rgbPixels)
-                plt.show()
+                plot_images({view_name: Image.fromarray(cur_obs[view_name][0], 'RGBA') for view_name in cur_obs})
                 print(f"depth: {depth}")
                 for action in action_to_feasibility:
                     print(f"{action}: {action_to_feasibility[action]}")
@@ -650,24 +669,43 @@ class CleanDishEnvV1(gym.Env):
     def _get_obs(self):
         # return {"agent": self._agent_location, "target": self._target_location}
 
-        width = 640
-        height = 480
+        width = 512
+        height = 512
         fx = 800
-        camera_matrix = get_camera_matrix(width=width, height=height, fx=fx)
-        camera = StaticCamera(unit_pose(), camera_matrix=camera_matrix)
-        sink = self.world.name_to_body('sink#1')
-        camera_point, target_point = set_camera_target_body(sink, dx=5, dy=0, dz=3)
+
         # we can set tiny to true when not using gui
         # https://github.com/bulletphysics/bullet3/issues/1157
-
         # set tiny to True when we are not using GUI
         tiny = not self.config.viewer
-        camera_image = camera.get_image(camera_point=camera_point, target_point=target_point, tiny=tiny)
-        # CameraImage = namedtuple('CameraImage', ['rgbPixels', 'depthPixels', 'segmentationMaskBuffer', 'camera_pose', 'camera_matrix'])
 
-        if self.render_mode == "human":
-            plt.imshow(camera_image.rgbPixels)
-            plt.show()
+        camera_configs = {"scene": {"target_object": "sink#1", "dx": 5, "dy": 0, "dz": 3},
+                          "sink": {"target_object": "sink#1", "dx": 1, "dy": 0, "dz": 1.5},
+                          "cabinet": {"target_object": "cabinettop", "dx": 1, "dy": 0, "dz": 1.5},
+                          "shelf": {"target_object": "shelf_lower", "dx": 1, "dy": 0, "dz": 1.5},
+                          "counter_left": {"target_object": "sink_counter_left", "dx": 1.5, "dy": 0, "dz": 1.5},
+                          "counter_right": {"target_object": "sink_counter_right", "dx": 1.5, "dy": 0, "dz": 1.5}
+                          }
+
+        view_to_camera_image = {}
+        for view_name in camera_configs:
+            # print(view_name)
+            camera_matrix = get_camera_matrix(width=width, height=height, fx=fx)
+            camera = StaticCamera(unit_pose(), camera_matrix=camera_matrix)
+            obj = self.world.name_to_body(camera_configs[view_name]["target_object"])
+            # print(obj)
+            camera_point, target_point = set_camera_target_body(obj,
+                                                                dx=camera_configs[view_name]["dx"],
+                                                                dy=camera_configs[view_name]["dy"],
+                                                                dz=camera_configs[view_name]["dz"])
+            camera_image = camera.get_image(camera_point=camera_point, target_point=target_point, tiny=tiny)
+            # CameraImage = namedtuple('CameraImage', ['rgbPixels', 'depthPixels', 'segmentationMaskBuffer', 'camera_pose', 'camera_matrix'])
+            camera_image = (camera_image.rgbPixels, camera_image.depthPixels, camera_image.segmentationMaskBuffer, camera_image.camera_pose, camera_image.camera_matrix)
+
+            if self.render_mode == "human":
+                plt.imshow(camera_image[0])
+                plt.show()
+
+            view_to_camera_image[view_name] = camera_image
 
         # if self.render_mode == "human":
         #     plt.imshow(camera_image.depthPixels)
@@ -788,7 +826,7 @@ class CleanDishEnvV1(gym.Env):
         # # Once the visualizer is closed destroy the window and clean up
         # vis.destroy_window()
 
-        return camera_image
+        return view_to_camera_image
 
     def _get_info(self):
         # return {
@@ -1035,7 +1073,7 @@ def collect_for_fastamp():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="collect rollouts")
-    parser.add_argument("--seed", default=5, type=int)
+    parser.add_argument("--seed", default=0, type=int)
     parser.add_argument("--semantic_spec_seed", default=0, type=int)
     parser.add_argument("--config_file", default='../configs/clean_dish_feg_collect_rollouts.yaml', type=str)
     args = parser.parse_args()

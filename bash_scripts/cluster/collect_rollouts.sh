@@ -7,13 +7,14 @@ seed_end=$4
 
 base_dir="/svl/u/weiyul/Research/nsplan/kitchen-worlds"
 
-conda info
+# conda info
 # export PYTHONPATH="/svl/u/weiyul/Research/nsplan/kitchen_worlds:$PYTHONPATH"
 # export PYTHONPATH="/svl/u/weiyul/Research/nsplan/kitchen_worlds/pybullet_planning/pybullet_tools:$PYTHONPATH"
 # echo $PYTHONPATH
 
+# conda env is set up this way
 cd /svl/u/weiyul/Research/nsplan/kitchen-worlds/tests
-pwd
+# pwd
 for si in $(eval echo "{$semantic_spec_seed_start..$semantic_spec_seed_end}"); do
   for ei in $(eval echo "{$seed_start..$seed_end}"); do
     echo "Run semantic spec ${si}, env ${ei}"
