@@ -30,7 +30,7 @@ echo NPROCS=$NPROCS
 source /sailhome/weiyul/.bashrc
 conda activate kitchen
 
-cd /svl/u/weiyul/Research/kitchen/nsplan/kitchen-worlds
+cd /svl/u/weiyul/Research/nsplan/kitchen-worlds
 $1
 
 # done
