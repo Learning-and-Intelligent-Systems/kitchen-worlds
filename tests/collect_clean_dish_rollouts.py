@@ -335,8 +335,6 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
             if depth >= max_depth:
                 break
 
-            candidate_next_nodes = []
-
             symbolic_feasible_text_actions = []
             for text_action in text_actions:
                 symbolic_feasible = env.check_symbolic_action_feasibility(text_action[0], text_action[1], text_action[2])
@@ -347,6 +345,7 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
             if debug:
                 print(f"{len(symbolic_feasible_text_actions)} symbolic feasible actions: {symbolic_feasible_text_actions}")
 
+            candidate_next_nodes = []
             motion_feasible_text_actions = []  # bookkeeping
             for text_action in symbolic_feasible_text_actions:
                 if debug:
@@ -376,14 +375,18 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
                 print(f"{len(motion_feasible_text_actions)} motion feasible actions: {motion_feasible_text_actions}")
                 input("next node?")
 
-            if simple_data:
-                rollout.append((cur_obs, symbolic_state, action_to_feasibility, depth))
-            else:
-                rollout.append((cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth))
-
+            next_action = None
             if candidate_next_nodes:
-                next_node = candidate_next_nodes[np.random.randint(0, len(candidate_next_nodes))]
+                act_idx = np.random.randint(0, len(candidate_next_nodes))
+                next_node = candidate_next_nodes[act_idx]
+                next_action = motion_feasible_text_actions[act_idx]
+
+            if simple_data:
+                rollout.append((cur_obs, symbolic_state, action_to_feasibility, depth, next_action))
             else:
+                rollout.append((cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth, next_action))
+
+            if not candidate_next_nodes:
                 break
 
         rollouts.append(rollout)
@@ -395,10 +398,10 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
             for d in rollout:
                 print("\n" + "-" * 50)
                 if simple_data:
-                    cur_obs, symbolic_state, action_to_feasibility, depth = d
+                    cur_obs, symbolic_state, action_to_feasibility, depth, next_action = d
                     print(d)
                 else:
-                    cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth = d
+                    cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth, next_action = d
                 # print(cur_obs.rgbPixels)
                 # img = Image.fromarray(cur_obs.rgbPixels, 'RGBA')
                 # img.show()
@@ -406,6 +409,7 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
                 print(f"depth: {depth}")
                 for action in action_to_feasibility:
                     print(f"{action}: {action_to_feasibility[action]}")
+                print(f"next action: {next_action}")
                 input("next?")
 
     return rollouts
