@@ -1,0 +1,79 @@
+## debug related
+# seed: 594585
+# seed: 1
+#verbose: true
+#env_seed: 0
+#semantic_spec: 0.json
+verbose: true
+env_seed: 0
+semantic_spec: 0.json
+
+## semantic spec related
+# semantic_specs_dir: ../pybullet_planning/nsplan_tools/debug_specs
+semantic_specs_dir: ../outputs/0707/semantic_specs
+
+## pybullet related
+viewer: true  # default: true
+lock: true
+simulate: false
+teleport: false
+drive: true
+cfree: false
+time_step: 0.05
+camera: true
+segment: false
+monitoring: false
+
+## data collection mode
+parallel: false
+
+robot:
+  robot_name: pr2
+  builder_name: build_robot_from_args
+  builder_kwargs:
+    custom_limits:
+      x: [0, 6]
+      y: [0, 6]
+      torso: [0.1, 1.5]
+
+
+world:
+  ## method 1: use pre-specified builder inside world_builder/builders,
+  ##         followed by builder specific arguments
+  builder_name: test_clean_dish_feg
+  builder_kwargs:
+    ## sample assets in category from assets library, by default the 1st asset
+    sampling: true
+    movable_category: ['food']
+    goal_predicates: ['holding', 'on', 'in']
+    use_doors: false
+
+
+data:
+  out_dir: ../outputs/0711/data
+  save_failed_plans: true
+  save_log: true
+  save_commands: true
+  images:
+    save_rgb: true
+    save_depth: false
+  resolution: [1280, 720]
+  fx: 800
+  ## {name: pose} pairs
+  cameras:
+    ## pose format 1: (point, quaternion)
+    front: [[6.84, 2.9, 1.3], [0.5, 0.5, -0.5, -0.5]]
+    ## pose format 2: (camera_point, target_point)
+    top: [[2, 4, 3], [0, 4, 1]]
+    ## pose format 3: (object_name, delta_to_target)
+    zoomin1: ['minifridge', [2, 0, 2]]
+
+
+## configuration for PDDLStream
+planner:
+  timeout: 300
+  domain_pddl: ../assets/pddl/feg_kitchen_clean.pddl
+  stream_pddl: ../assets/pddl/feg_stream_kitchen_clean.pddl
+  diverse: true
+  downward_time: 0.02
+  dataset: false

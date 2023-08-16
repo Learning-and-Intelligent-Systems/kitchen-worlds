@@ -36,14 +36,17 @@ A library of long-horizon Task-and-Motion-Planning (TAMP) problems in kitchen an
 
 ## Notes for NS-Plan
 
-1. install gym
+1. install
 ```shell
 pip install gymnasium
+# compile ikfast
+pybullet-planning$ (cd pybullet_tools/ikfast/franka_panda; python setup.py)
 ```
 2. checkout assets
 ```shell
 cd ./assets/models
 git checkout ns_plan_acronym_object
+```
 
 3. generate semantic specs
 ```shell
