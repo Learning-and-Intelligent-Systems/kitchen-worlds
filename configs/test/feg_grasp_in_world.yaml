@@ -12,7 +12,7 @@ max_rollouts: 1
 
 ## semantic spec related
 # semantic_specs_dir: ../pybullet_planning/nsplan_tools/debug_specs
-semantic_specs_dir: /home/weiyu/Research/nsplan/original/kitchen-worlds/outputs/unittest/semantic_specs
+semantic_specs_dir: /home/weiyu/Research/nsplan/original/kitchen-worlds/test_data/unittest/semantic_specs/
 
 ## pybullet related
 viewer: true  # default: true

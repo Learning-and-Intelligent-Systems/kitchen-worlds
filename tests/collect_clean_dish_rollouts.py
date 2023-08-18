@@ -49,7 +49,7 @@ import matplotlib.pyplot as plt
 from world_builder.entities import StaticCamera
 from world_builder.utils import parse_yaml
 from pybullet_tools.pr2_primitives import Pose, Conf
-from pybullet_tools.utils import get_pose, multiply, quat_from_euler, dump_world, get_bodies, remove_body, get_bodies, remove_body, invert, Euler, Point
+from pybullet_tools.utils import get_pose, multiply, quat_from_euler, dump_world, get_bodies, remove_body, get_bodies, remove_body, invert, Euler, Point, pairwise_collisions, tform_from_pose
 from pybullet_tools.flying_gripper_utils import get_se3_joints, se3_from_pose, Grasp, se3_ik
 from world_builder.actions import get_primitive_actions
 
@@ -114,41 +114,41 @@ def process(config):
     """ STEP 1 -- GENERATE SCENES """
     world, goal = create_pybullet_world(new_config, SAVE_LISDF=False, SAVE_TESTCASE=True)
 
-    # --------------------------------
+    # # --------------------------------
     # env = CleanDishEnvV1(world, goal, config, render_mode="human")
     # input("env initialized, next?")
     # play(env)
 
-    # # --------------------------------
-    # env = CleanDishEnvV1(world, goal, config, render_mode="bot")
-    # # option 1
-    # # data = random_simulate_bfs(env, max_depth=3, debug=False)
-    # # print("\n\n" + "=" * 100)
-    # # print("all states")
-    # # for d in data:
-    # #     print("\n" + "-" * 50)
-    # #     cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth = d
-    # #     print(cur_obs.rgbPixels)
-    # #     # img = Image.fromarray(cur_obs.rgbPixels, 'RGBA')
-    # #     # img.show()
-    # #     plt.imshow(cur_obs.rgbPixels)
-    # #     plt.show()
-    # #     print(f"depth: {depth}")
-    # #     for action in action_to_feasibility:
-    # #         print(f"{action}: {action_to_feasibility[action]}")
-    # #     input("next?")
-    #
-    # # option 2
-    # rollouts = random_rollouts(env, max_depth=new_config.max_rollout_depth, max_rollouts=new_config.max_rollouts, debug=False, simple_data=True)
-    #
-    # # convert the world entity obj to a simple str so we don't have problem unpickle it
-    # obj_dict = copy.deepcopy(world.obj_dict)
-    # for obj in obj_dict:
-    #     obj_dict[obj]["name"] = str(obj_dict[obj]["name"])
-    #
-    # data_dict = {"rollouts": rollouts, "obj_dict": obj_dict, "pybullet_idx_to_name": {b: world.BODY_TO_OBJECT[b].name for b in world.BODY_TO_OBJECT}}
-    # with open(os.path.join(exp_dir, "rollout_data.pkl"), "wb") as fh:
-    #     pickle.dump(data_dict, fh)
+    # --------------------------------
+    env = CleanDishEnvV1(world, goal, config, render_mode="bot")
+    # option 1
+    # data = random_simulate_bfs(env, max_depth=3, debug=False)
+    # print("\n\n" + "=" * 100)
+    # print("all states")
+    # for d in data:
+    #     print("\n" + "-" * 50)
+    #     cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth = d
+    #     print(cur_obs.rgbPixels)
+    #     # img = Image.fromarray(cur_obs.rgbPixels, 'RGBA')
+    #     # img.show()
+    #     plt.imshow(cur_obs.rgbPixels)
+    #     plt.show()
+    #     print(f"depth: {depth}")
+    #     for action in action_to_feasibility:
+    #         print(f"{action}: {action_to_feasibility[action]}")
+    #     input("next?")
+
+    # option 2
+    rollouts = random_rollouts(env, max_depth=new_config.max_rollout_depth, max_rollouts=new_config.max_rollouts, debug=False, simple_data=True)
+
+    # convert the world entity obj to a simple str so we don't have problem unpickle it
+    obj_dict = copy.deepcopy(world.obj_dict)
+    for obj in obj_dict:
+        obj_dict[obj]["name"] = str(obj_dict[obj]["name"])
+
+    data_dict = {"rollouts": rollouts, "obj_dict": obj_dict, "pybullet_idx_to_name": {b: world.BODY_TO_OBJECT[b].name for b in world.BODY_TO_OBJECT}}
+    with open(os.path.join(exp_dir, "rollout_data.pkl"), "wb") as fh:
+        pickle.dump(data_dict, fh)
 
 
 def adjust_grasp(grasp, robot, obj_body):
@@ -160,6 +160,15 @@ def adjust_grasp(grasp, robot, obj_body):
                            robot.get_carry_conf(robot.arms[0], grasp_type, g))
     adjusted_grasp.grasp_width = grasp.grasp_width
     return adjusted_grasp
+
+
+def check_collisions_against_movable_objects(obj_body, p, moveable_bodies):
+    p0 = Pose(obj_body, get_pose(obj_body))
+    p.assign()
+    label = pairwise_collisions(obj_body, moveable_bodies)
+    # restore
+    p0.assign()
+    return label
 
 
 def play(env):
@@ -396,7 +405,9 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
                 next_action = motion_feasible_text_actions[act_idx]
 
             if simple_data:
-                rollout.append((cur_obs, symbolic_state, action_to_feasibility, depth, next_action))
+                if current_g is not None:
+                    current_g = current_g[1]
+                rollout.append((cur_obs, symbolic_state, current_g, action_to_feasibility, depth, next_action))
             else:
                 rollout.append((cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth, next_action))
 
@@ -412,7 +423,7 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
             for d in rollout:
                 print("\n" + "-" * 50)
                 if simple_data:
-                    cur_obs, symbolic_state, action_to_feasibility, depth, next_action = d
+                    cur_obs, symbolic_state, current_g, action_to_feasibility, depth, next_action = d
                     print(d)
                 else:
                     cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth, next_action = d
@@ -424,6 +435,21 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
                 for action in action_to_feasibility:
                     print(f"{action}: {action_to_feasibility[action]}")
                 print(f"next action: {next_action}")
+                print(f"current_g: {current_g}")
+                input("next?")
+
+    if True:
+        for ri, rollout in enumerate(rollouts):
+            print("\n\n" + "=" * 100)
+            print(f"rollout no.{ri}")
+            for d in rollout:
+                print("\n" + "-" * 50)
+                if simple_data:
+                    cur_obs, symbolic_state, current_g, action_to_feasibility, depth, next_action = d
+                else:
+                    cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth, next_action = d
+                print(f"next action: {next_action}")
+                print(f"current_g: {current_g}")
                 input("next?")
 
     return rollouts
@@ -491,6 +517,7 @@ class CleanDishEnvV1(gym.Env):
         moveable_bodies = world.cat_to_bodies('moveable')
         object_names = [world.body_to_name(b) for b in moveable_bodies]
         print("moveable objects", object_names)
+        self.moveable_bodies = moveable_bodies
 
         ## get locations
         locations = ["sink_counter_left", "sink_counter_right", "shelf_lower", "sink_bottom", "cabinettop_storage"]
@@ -520,6 +547,7 @@ class CleanDishEnvV1(gym.Env):
         # record some state information
         # TODO: maybe this information is redundant and we can get it from elsewhere, like world, saver, ..
         self.current_g = None
+
         self.commands_so_far = []
         # map from each object to its information
         self.symbolic_state = {}
@@ -879,6 +907,9 @@ class CleanDishEnvV1(gym.Env):
         for grasp in grasp_list:
             print("find ik for grasp", grasp)
 
+            grasp_world = multiply(obj_pose, grasp[0].value)
+            grasp_tform_world = tform_from_pose(grasp_world)
+
             # important:
             adjusted_grasp = adjust_grasp(grasp[0], self.robot, obj_pose)
 
@@ -902,7 +933,8 @@ class CleanDishEnvV1(gym.Env):
                         commands += get_primitive_actions(action, self.world)
 
                     ## update world state
-                    self.current_g = grasp[0]
+                    self.current_g = (adjusted_grasp, grasp_tform_world)
+                    # self.grasp_tform_world = grasp_tform_world
 
                     return commands
 
@@ -929,10 +961,13 @@ class CleanDishEnvV1(gym.Env):
 
         for placement_pose in placement_stream(obj_body, surface):
 
-            print("find ik for placement pose", placement_pose)
+            if check_collisions_against_movable_objects(obj_body, placement_pose[0][0], self.moveable_bodies):
+                print("found collisions between moveable objects")
+                continue
 
+            print("find ik for placement pose", placement_pose)
             for ik in self.stream_map["inverse-kinematics-hand"](a=None, o=obj_body, p=placement_pose[0][0],
-                                                                 g=self.current_g):
+                                                                 g=self.current_g[0]):
                 print(ik)
                 if len(ik) == 0:
                     continue
@@ -946,13 +981,14 @@ class CleanDishEnvV1(gym.Env):
 
                     ## computes actions to step the world
                     move_action = ('move_cartesian', (current_q, q, move_cmd[0][0]))
-                    place_action = ('place_hand', ('hand', obj_body, placement_pose, self.current_g, None, ik[0][1]))
+                    place_action = ('place_hand', ('hand', obj_body, placement_pose, self.current_g[0], None, ik[0][1]))
                     commands = []
                     for action in [move_action, place_action]:
                         commands += get_primitive_actions(action, self.world)
 
                     ## update world state
                     self.current_g = None
+                    self.grasp_tform_world = None
 
                     return commands
 
