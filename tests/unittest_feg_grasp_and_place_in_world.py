@@ -47,7 +47,7 @@ import matplotlib.pyplot as plt
 from world_builder.entities import StaticCamera
 from world_builder.utils import parse_yaml
 from pybullet_tools.pr2_primitives import Pose, Conf
-from pybullet_tools.utils import get_pose, multiply, quat_from_euler, dump_world, get_bodies, remove_body, invert, Euler, Point
+from pybullet_tools.utils import get_pose, multiply, quat_from_euler, dump_world, get_bodies, remove_body, invert, Euler, Point, pairwise_collision, pairwise_collisions
 from pybullet_tools.flying_gripper_utils import get_se3_joints, se3_from_pose
 from world_builder.actions import get_primitive_actions
 from pybullet_tools.flying_gripper_utils import se3_ik, Grasp
@@ -65,6 +65,35 @@ DEFAULT_YAML = '../configs/clean_dish_feg_collect_rollouts_cluster.yaml'
 config = parse_yaml(DEFAULT_YAML)
 
 #####################################
+
+def adjust_grasp(grasp, robot, obj_body):
+    grasp_type = 'hand'
+    tool_from_hand = (Point(), quat_from_euler(Euler(math.pi / 2, 0, -math.pi / 2)))
+    g = multiply(invert(tool_from_hand), grasp.value)
+    approach = multiply(invert(tool_from_hand), grasp.approach)
+    adjusted_grasp = Grasp(grasp_type, obj_body, g, approach,
+                           robot.get_carry_conf(robot.arms[0], grasp_type, g))
+    adjusted_grasp.grasp_width = grasp.grasp_width
+    return adjusted_grasp
+
+
+def clean_gripper(robot):
+    """helper function to remove cloned gripper for visualizing grasps"""
+    if "hand" in robot.grippers:
+        gripper_body = robot.grippers["hand"]
+        remove_body(gripper_body)
+        robot.remove_gripper()
+
+
+def check_collisions_against_movable_objects(obj_body, p, moveable_bodies):
+    p0 = Pose(obj_body, get_pose(obj_body))
+    p.assign()
+    label = pairwise_collisions(obj_body, moveable_bodies)
+    # restore
+    p0.assign()
+    return label
+
+
 
 def main(config):
 
@@ -111,9 +140,11 @@ def main(config):
     print("moveable objects", object_names)
 
     """ STEP 3 -- Sample a grasp for each object """
-    current_q = Conf(robot, get_se3_joints(robot))
+    # input parameter: object_name
+    object_name = "mug#1"
+    # object_name = np.random.choice(object_names)
 
-    object_name = np.random.choice(object_names)
+    current_q = Conf(robot, get_se3_joints(robot))
 
     instance_name = world.get_instance_name(object_name)
     print("instance name", instance_name)
@@ -133,102 +164,6 @@ def main(config):
     grasp_list = next(stream_map["sample-grasp"](body=obj_body))
     print("sample {} grasps for {}: {}".format(len(grasp_list), world_obj, grasp_list))
 
-    def clean_gripper(robot):
-        """helper function to remove cloned gripper for visualizing grasps"""
-        if "hand" in robot.grippers:
-            gripper_body = robot.grippers["hand"]
-            remove_body(gripper_body)
-            robot.remove_gripper()
-
-    # # ----------------------------------
-    # # test the grasp
-    # for grasp in grasp_list:
-    #
-    #     clean_gripper(robot)
-    #
-    #     grasp = grasp[0]
-    #     gripper_grasp = robot.visualize_grasp(obj_pose, grasp.value, body=grasp.body, width=grasp.grasp_width)
-    #     # gripper_approach = robot.visualize_grasp(body_pose, grasp.approach, color=RED)
-    #     input("next grasp?")
-    # # ----------------------------------
-
-    # # ----------------------------------
-    # # test ik stream
-    # for grasp in grasp_list:
-    #     print("find ik for grasp", grasp)
-    #     for ik in stream_map["inverse-kinematics-hand"](a=None, o=obj_body, p=obj_Pose, g=grasp[0]):
-    #         if len(ik) == 0:
-    #             continue
-    #         print("ik", ik)
-    #         input("confirm ik found")
-    # # ----------------------------------
-
-    # ----------------------------------
-    # test ik function which ik stream calls
-    # the problem is that the grasp pose is computed as grasp_pose = multiply(body_pose, grasp.value)
-    # however, in robots.visualize_grasp(), body_pose = robot.get_body_pose(body_pose, body=body, verbose=verbose)
-    # in ik function, flying_gripper_utils.get_approach_path(), body_pose = robot.get_body_pose(o, verbose=False)
-    # when body is none, body_pose is multiplied with robot.tool_from_hand, which is Pose(euler=Euler(math.pi / 2, 0, -math.pi / 2)). i.e., multiply(body_pose, r)
-
-
-    # for grasp in grasp_list:
-    #
-    #     # # =================================
-    #     # # before fixing the issue
-    #     # clean_gripper(robot)
-    #     #
-    #     # grasp = grasp[0]
-    #     # gripper_grasp = robot.visualize_grasp(obj_pose, grasp.value, body=grasp.body, width=grasp.grasp_width)
-    #     # input("confirm visualized grasp pose")
-    #     #
-    #     # clean_gripper(robot)
-    #     #
-    #     # print("find ik for grasp", grasp)
-    #     #
-    #     # body_pose = robot.get_body_pose(obj_body, verbose=False)
-    #     # print(f"robot.get_body_pose(obj_body, verbose=False): {body_pose}")
-    #     # approach_pose = multiply(body_pose, grasp.approach)
-    #     # grasp_pose = multiply(body_pose, grasp.value)
-    #     # print(f"multiply(body_pose, grasp.value): {grasp_pose}")
-    #     #
-    #     # seconf1 = se3_ik(robot, grasp_pose)
-    #     # input("confirm visualized ik for grasp")
-    #     #
-    #     # # =================================
-    #
-    #     # =================================
-    #     # after fixing the issue
-    #     clean_gripper(robot)
-    #
-    #     grasp = grasp[0]
-    #     robot.visualize_grasp(obj_pose, grasp.value, body=grasp.body, width=grasp.grasp_width)
-    #     input("confirm visualized grasp pose")
-    #
-    #     clean_gripper(robot)
-    #
-    #     print("find ik for grasp", grasp)
-    #
-    #     # let's adjust the grasp pose
-    #     grasp_type = 'hand'
-    #     tool_from_hand = (Point(), quat_from_euler(Euler(math.pi / 2, 0, -math.pi / 2)))
-    #     g = multiply(invert(tool_from_hand), grasp.value)
-    #     approach = multiply(invert(tool_from_hand), grasp.approach)
-    #     adjusted_grasp = Grasp(grasp_type, obj_body, g, approach, robot.get_carry_conf(robot.arms[0], grasp_type, g))
-    #     adjusted_grasp.grasp_width = grasp.grasp_width
-    #
-    #     body_pose = robot.get_body_pose(obj_body, verbose=False)
-    #     print(f"robot.get_body_pose(obj_body, verbose=False): {body_pose}")
-    #     approach_pose = multiply(body_pose, adjusted_grasp.approach)
-    #     grasp_pose = multiply(body_pose, adjusted_grasp.value)
-    #     print(f"multiply(body_pose, grasp.value): {grasp_pose}")
-    #
-    #     seconf1 = se3_ik(robot, grasp_pose)
-    #     print("grasp ik solution", seconf1)
-    #     input("confirm visualized ik for grasp")
-    #
-    #     # =================================
-    #
-    # # ----------------------------------
 
     def yield_grasp():
         for grasp in grasp_list:
@@ -236,14 +171,7 @@ def main(config):
 
             grasp = grasp[0]
 
-            # let's adjust the grasp pose
-            grasp_type = 'hand'
-            tool_from_hand = (Point(), quat_from_euler(Euler(math.pi / 2, 0, -math.pi / 2)))
-            g = multiply(invert(tool_from_hand), grasp.value)
-            approach = multiply(invert(tool_from_hand), grasp.approach)
-            adjusted_grasp = Grasp(grasp_type, obj_body, g, approach,
-                                   robot.get_carry_conf(robot.arms[0], grasp_type, g))
-            adjusted_grasp.grasp_width = grasp.grasp_width
+            adjusted_grasp = adjust_grasp(grasp, robot, obj_body)
 
             ## find ik
             for ik in stream_map["inverse-kinematics-hand"](a=None, o=obj_body, p=obj_Pose, g=adjusted_grasp):
@@ -268,27 +196,85 @@ def main(config):
 
                     ## update world state
                     current_g = adjusted_grasp
+                    yield (commands, current_g)
+
+    # important: current_g is used for placement
+    grasping_commands, current_g = next(yield_grasp())
+    print(grasping_commands)
+
+    state.remove_gripper()
+    saver.restore()
+    input("confirm that state has been restored")
+
+    apply_actions(state, grasping_commands, time_step=0, verbose=False)
+    input("confirm executed pick action")
+
+    """ STEP 4 -- Place object """
+    # input parameter: surface_name
+    locations = ["sink_counter_left", "sink_counter_right", "shelf_lower", "sink_bottom", "cabinettop_storage"]
+    # surface_name = np.random.choice(locations)
+    surface_name = "sink_bottom"
+
+    obj_body = world.name_to_body(object_name)
+
+    current_q = Conf(robot, get_se3_joints(robot))
+    surface = world.name_to_body(surface_name)
+    obj_body = world.name_to_body(object_name)
+
+    if surface_name == "cabinettop_storage":
+        placement_stream = stream_map["sample-pose-in"]
+    else:
+        placement_stream = stream_map["sample-pose-on"]
+
+    def yield_placement(current_g):
+        for placement_pose in placement_stream(obj_body, surface):
+
+            print("find ik for placement pose", placement_pose)
+
+            if check_collisions_against_movable_objects(obj_body, placement_pose[0][0], moveable_bodies):
+                print("found collisions between moveable objects")
+                continue
+
+            for ik in stream_map["inverse-kinematics-hand"](a=None, o=obj_body, p=placement_pose[0][0], g=current_g):
+                print(ik)
+                if len(ik) == 0:
+                    continue
+
+                ## motion plan to place
+                q = ik[0][0]
+                for move_cmd in stream_map["plan-free-motion-hand"](q1=current_q, q2=q):
+                    print(move_cmd)
+                    if len(move_cmd) == 0:
+                        continue
+
+                    ## computes actions to step the world
+                    move_action = ('move_cartesian', (current_q, q, move_cmd[0][0]))
+                    place_action = ('place_hand', ('hand', obj_body, placement_pose, current_g, None, ik[0][1]))
+                    commands = []
+                    for action in [move_action, place_action]:
+                        commands += get_primitive_actions(action, world)
+
+                    ## update world state
+                    current_g = None
+
                     yield commands
 
-    for commands in yield_grasp():
-        print(commands)
+    # important: current_g is used for placement
+    placement_commands = next(yield_placement(current_g))
+    print(placement_commands)
 
-        state.remove_gripper()
-        saver.restore()
-        input("confirm that state has been restored")
+    state.remove_gripper()
+    saver.restore()
+    input("confirm that state has been restored")
 
-        apply_actions(state, commands, time_step=0, verbose=False)
-        input("next?")
-
-    input("exit?")
-
-
-
+    commands_so_far = grasping_commands + placement_commands
+    apply_actions(state, commands_so_far, time_step=0, verbose=False)
+    input("confirm executed pick action")
 
 
 if __name__ == '__main__':
 
-    config_file = "/home/weiyu/Research/nsplan/original/kitchen-worlds/configs/test/feg_grasp_in_world.yaml"
+    config_file = "/home/weiyu/Research/nsplan/original/kitchen-worlds/configs/test/feg_grasp_place_in_world.yaml"
     config = parse_yaml(config_file)
     main(config)
 
