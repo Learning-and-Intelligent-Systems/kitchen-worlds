@@ -438,19 +438,19 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
                 print(f"current_g: {current_g}")
                 input("next?")
 
-    if True:
-        for ri, rollout in enumerate(rollouts):
-            print("\n\n" + "=" * 100)
-            print(f"rollout no.{ri}")
-            for d in rollout:
-                print("\n" + "-" * 50)
-                if simple_data:
-                    cur_obs, symbolic_state, current_g, action_to_feasibility, depth, next_action = d
-                else:
-                    cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth, next_action = d
-                print(f"next action: {next_action}")
-                print(f"current_g: {current_g}")
-                input("next?")
+    # if True:
+    #     for ri, rollout in enumerate(rollouts):
+    #         print("\n\n" + "=" * 100)
+    #         print(f"rollout no.{ri}")
+    #         for d in rollout:
+    #             print("\n" + "-" * 50)
+    #             if simple_data:
+    #                 cur_obs, symbolic_state, current_g, action_to_feasibility, depth, next_action = d
+    #             else:
+    #                 cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth, next_action = d
+    #             print(f"next action: {next_action}")
+    #             print(f"current_g: {current_g}")
+    #             input("next?")
 
     return rollouts
 
