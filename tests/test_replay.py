@@ -33,10 +33,10 @@ from mamao_tools.data_utils import get_plan, get_body_map, get_multiple_solution
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser, \
     get_sample_envs_for_rss
 
-USE_GYM = False
+USE_GYM = True
 SAVE_COMPOSED_JPG = False
 SAVE_GIF = False
-SAVE_JPG = True or SAVE_COMPOSED_JPG or SAVE_GIF
+SAVE_JPG = False or SAVE_COMPOSED_JPG or SAVE_GIF
 PREVIEW_SCENE = False
 SAVE_ANIMATION_JSON = False
 
@@ -47,7 +47,7 @@ CHECK_COLLISIONS = False
 CFREE_RANGE = 0.1
 VISUALIZE_COLLISIONS = False
 
-SAVE_MP4 = False
+SAVE_MP4 = True
 STEP_BY_STEP = True
 AUTO_PLAY = True
 EVALUATE_QUALITY = False
@@ -71,6 +71,16 @@ CASES = ['1']  ##
 
 GIVEN_PATH = '/home/yang/Documents/cognitive-architectures/bullet/experiments/' \
              'kitchen_food_cleaned/230401_142631_original'
+GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + '_demo/230207_214116_original_553'
+
+## for Jiayuan
+GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser_to_storage/105'
+CAMERA_KWARGS = dict(camera_point = (6, 3, 3), camera_target = (0, 3, 1))
+
+## RSS remake
+GIVEN_PATH = '/home/yang/Documents/fastamp-data-rss/' + 'mm_braiser_to_storage/34'
+CAMERA_MOVEMENT = dict(target_point_begin=[0.5, 3, 1], target_point_final=[0.5, 3, 1],
+                       camera_point_begin=[8, 3, 3], camera_point_final=[8, 3, 3])
 
 if GIVEN_PATH:
     VISUALIZE_COLLISIONS = True
@@ -144,7 +154,7 @@ def swap_microwave(run_dir, verbose=False):
 
 
 def run_one(run_dir_ori, task_name=TASK_NAME, save_gif=SAVE_GIF, save_mp4=SAVE_MP4, width=1440, height=1120, fx=600,
-            camera_point=(8.5, 2.5, 3), target_point=(0, 2.5, 0)):
+            camera_point=(8.5, 2.5, 3), target_point=(0, 2.5, 0), CAMERA_KWARGS=CAMERA_KWARGS):
 
     verbose = not SAVE_JPG
 
@@ -546,10 +556,10 @@ if __name__ == '__main__':
     # replay_all_in_gym(num_rows=32, num_cols=8, world_size=(4, 8), loading_effect=True,
     #                   frame_gap=1, save_mp4=True, save_gif=False, verbose=False, camera_motion='zoom')
 
-    # record 1 : 96+ worlds
+    ## record 1 : 96+ worlds
     # replay_all_in_gym(num_rows=32, num_cols=8, world_size=(4, 8), loading_effect=False,
     #                   frame_gap=1, save_mp4=True, save_gif=False, verbose=False, camera_motion='pan')
 
-    ## record 2 : robot execution
+    # # record 2 : robot execution
     # replay_all_in_gym(num_rows=8, num_cols=3, world_size=(4, 8), loading_effect=False,
     #                   frame_gap=2, save_mp4=True, save_gif=False, verbose=False, camera_motion='splotlight')
