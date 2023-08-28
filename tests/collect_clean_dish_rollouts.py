@@ -195,134 +195,6 @@ def play(env):
     print("*" * 100 + "\n")
 
 
-def random_simulate_single_step(env):
-
-    text_actions = sorted(env.get_admissible_text_actions())
-    print(f"{len(text_actions)} available actions: {text_actions}")
-
-    done = False
-    obs, info = env.reset()
-    print(obs)
-    num_moves = 0
-
-    # single_step feasibility
-
-    data = []  # (o, a, feasible)
-    symbolic_feasible_text_actions = []
-    for text_action in text_actions:
-        symbolic_feasible = env.check_symbolic_action_feasibility(text_action[0], text_action[1], text_action[2])
-        if not symbolic_feasible:
-            data.append((obs, text_action, False))
-        else:
-            symbolic_feasible_text_actions.append(text_action)
-    print(f"{len(symbolic_feasible_text_actions)} symbolic feasible actions: {symbolic_feasible_text_actions}")
-
-    motion_feasible_text_actions = []
-    for text_action in symbolic_feasible_text_actions:
-        obs, info = env.reset()
-        action = env.convert_text_to_action(text_action[0], text_action[1], text_action[2])
-        obs, score, done, _, info = env.step(action)
-        print(score, done)
-        if score == -1:
-            data.append((obs, action, False))
-        else:
-            data.append((obs, action, True))
-            motion_feasible_text_actions.append(text_action)
-    print(f"{len(motion_feasible_text_actions)} motion feasible actions: {motion_feasible_text_actions}")
-
-
-def random_simulate_bfs(env, max_depth=1, debug=False):
-
-    text_actions = sorted(env.get_admissible_text_actions())
-    if debug:
-        print(f"{len(text_actions)} available actions: {text_actions}")
-
-    obs, info = env.reset()
-    # print(obs)
-
-    # the format of each node in the search tree
-    # TODO: also add action_so_far so we can trace
-    commands_so_far = []
-    current_g = None
-    symbolic_state = None
-    action_to_feasibility = {}
-    depth = 0
-    root_node = (obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth)
-
-    # bfs tree
-    queue = [root_node]  # initialize a queue
-    visited = []
-
-    # search begins
-    # TODO: add heuristic to avoid cycles
-    # TODO: we can also track how many steps of actions need to be taken to get to the goal
-    while queue:
-        (cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth) = queue.pop(0)
-        if debug:
-            print("\n\n" + "=" * 100)
-            print((cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth))
-        # input("a node is popped from the queue")
-
-        if depth >= max_depth:
-            continue
-
-        # expansion
-        reset_obs, _ = env.reset_to_state(commands_so_far, current_g, symbolic_state)
-        # debug: make sure cur_obs is the same as reset_obs
-
-        symbolic_feasible_text_actions = []
-        for text_action in text_actions:
-            symbolic_feasible = env.check_symbolic_action_feasibility(text_action[0], text_action[1], text_action[2])
-            if not symbolic_feasible:
-                action_to_feasibility[text_action] = -1
-            else:
-                symbolic_feasible_text_actions.append(text_action)
-        if debug:
-            print(f"{len(symbolic_feasible_text_actions)} symbolic feasible actions: {symbolic_feasible_text_actions}")
-
-        motion_feasible_text_actions = []  # bookkeeping
-        for text_action in symbolic_feasible_text_actions:
-            reset_obs, _ = env.reset_to_state(commands_so_far, current_g, symbolic_state)
-            # debug: make sure cur_obs is the same as reset_obs
-            action = env.convert_text_to_action(text_action[0], text_action[1], text_action[2])
-            new_obs, new_score, new_done, _, _ = env.step(action)
-            if new_score == -1:
-                # not feasible
-                action_to_feasibility[text_action] = -1
-            else:
-                if new_done:
-                    action_to_feasibility[text_action] = 100
-                else:
-                    action_to_feasibility[text_action] = 1
-                motion_feasible_text_actions.append(text_action)
-                # add new node to frontier
-                new_commands_so_far = env.commands_so_far
-                new_current_g = env.current_g
-                new_symbolic_state = env.symbolic_state
-                new_action_to_feasibility = {}
-                new_depth = depth + 1
-                new_node = (new_obs, new_commands_so_far, new_current_g, new_symbolic_state, new_action_to_feasibility, new_depth)
-                queue.append(new_node)
-        if debug:
-            print(f"{len(motion_feasible_text_actions)} motion feasible actions: {motion_feasible_text_actions}")
-
-        visited.append((cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth))
-
-    if debug:
-        print("\n\n" + "=" * 100)
-        print("all states")
-        for state in visited:
-            print("\n" + "-"*50)
-            cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth = state
-            print(cur_obs.rgbPixels)
-            print(f"depth: {depth}")
-            for action in action_to_feasibility:
-                print(f"{action}: {action_to_feasibility[action]}")
-            input("next?")
-
-    return visited
-
-
 def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=True):
     text_actions = sorted(env.get_admissible_text_actions())
     if debug:
@@ -339,14 +211,15 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
         # TODO: also add action_so_far so we can trace
         commands_so_far = []
         current_g = None
+        current_gp = None
         symbolic_state = None
         action_to_feasibility = {}
         depth = 0
-        next_node = (obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth)
+        next_node = (obs, commands_so_far, current_g, current_gp, symbolic_state, action_to_feasibility, depth)
 
         while True:
 
-            (cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth) = next_node
+            (cur_obs, commands_so_far, current_g, current_gp, symbolic_state, action_to_feasibility, depth) = next_node
             if debug:
                 print("\n\n" + "=" * 100)
                 # plt.imshow(cur_obs.rgbPixels)
@@ -357,6 +230,9 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
 
             if depth >= max_depth:
                 break
+
+            # important: even for checking symbolic feasibility, we need to reset the env
+            env.reset_to_state(commands_so_far, current_g, current_gp, symbolic_state)
 
             symbolic_feasible_text_actions = []
             for text_action in text_actions:
@@ -372,8 +248,9 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
             motion_feasible_text_actions = []  # bookkeeping
             for text_action in symbolic_feasible_text_actions:
                 if debug:
+                    print("\n" + "-"*25)
                     input(f"check motion feasibility for {text_action}")
-                reset_obs, _ = env.reset_to_state(commands_so_far, current_g, symbolic_state)
+                reset_obs, _ = env.reset_to_state(commands_so_far, current_g, current_gp, symbolic_state)
                 # debug: make sure cur_obs is the same as reset_obs
                 action = env.convert_text_to_action(text_action[0], text_action[1], text_action[2])
                 new_obs, new_score, new_done, _, _ = env.step(action)
@@ -389,11 +266,21 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
                     # add new node to frontier
                     new_commands_so_far = env.commands_so_far
                     new_current_g = env.current_g
+                    new_current_gp = env.current_gp
                     new_symbolic_state = env.symbolic_state
                     new_action_to_feasibility = {}
                     new_depth = depth + 1
-                    new_node = (new_obs, new_commands_so_far, new_current_g, new_symbolic_state, new_action_to_feasibility, new_depth)
+                    new_node = (new_obs, new_commands_so_far, new_current_g, new_current_gp, new_symbolic_state, new_action_to_feasibility, new_depth)
                     candidate_next_nodes.append(new_node)
+
+                if debug:
+                    print(f"action_to_feasibility: {action_to_feasibility[text_action]}")
+                    print(f"current_g: {current_g}")
+                    print(f"current_gp: {current_gp}")
+                    print(f"new_current_g: {env.current_g}")
+                    print(f"new_current_gp: {env.current_gp}")
+                    input("next?")
+
             if debug:
                 print(f"{len(motion_feasible_text_actions)} motion feasible actions: {motion_feasible_text_actions}")
                 input("next node?")
@@ -406,10 +293,10 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
 
             if simple_data:
                 if current_g is not None:
-                    current_g = current_g[1]
-                rollout.append((cur_obs, symbolic_state, current_g, action_to_feasibility, depth, next_action))
+                    current_g = current_g[2]
+                rollout.append((cur_obs, symbolic_state, current_g, current_gp, action_to_feasibility, depth, next_action))
             else:
-                rollout.append((cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth, next_action))
+                rollout.append((cur_obs, commands_so_far, current_g, current_gp, symbolic_state, action_to_feasibility, depth, next_action))
 
             if not candidate_next_nodes:
                 break
@@ -423,10 +310,10 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
             for d in rollout:
                 print("\n" + "-" * 50)
                 if simple_data:
-                    cur_obs, symbolic_state, current_g, action_to_feasibility, depth, next_action = d
+                    cur_obs, symbolic_state, current_g, current_gp, action_to_feasibility, depth, next_action = d
                     print(d)
                 else:
-                    cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth, next_action = d
+                    cur_obs, commands_so_far, current_g, current_gp, symbolic_state, action_to_feasibility, depth, next_action = d
                 # print(cur_obs.rgbPixels)
                 # img = Image.fromarray(cur_obs.rgbPixels, 'RGBA')
                 # img.show()
@@ -436,6 +323,7 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
                     print(f"{action}: {action_to_feasibility[action]}")
                 print(f"next action: {next_action}")
                 print(f"current_g: {current_g}")
+                print(f"current_gp: {current_gp}")
                 input("next?")
 
     # if True:
@@ -546,7 +434,9 @@ class CleanDishEnvV1(gym.Env):
 
         # record some state information
         # TODO: maybe this information is redundant and we can get it from elsewhere, like world, saver, ..
+        # current grasp
         self.current_g = None
+        self.current_gp = None
 
         self.commands_so_far = []
         # map from each object to its information
@@ -604,6 +494,7 @@ class CleanDishEnvV1(gym.Env):
         manip_name, obj_name, loc_name = self.convert_action_to_text(action)
 
         symbolically_feasible = self.check_symbolic_action_feasibility(manip_name, obj_name, loc_name)
+        print(f"Action {action} is symbolically feasible: {symbolically_feasible}")
 
         if symbolically_feasible:
 
@@ -666,6 +557,7 @@ class CleanDishEnvV1(gym.Env):
         self.saver.restore()
 
         self.current_g = None
+        self.current_gp = None
         self.commands_so_far = []
         # map from each object to its information
         self.symbolic_state = {}
@@ -676,7 +568,7 @@ class CleanDishEnvV1(gym.Env):
         info = self._get_info()
         return observation, info
 
-    def reset_to_state(self, commands_so_far=[], current_g=None, symbolic_state=None):
+    def reset_to_state(self, commands_so_far=[], current_g=None, current_gp=None, symbolic_state=None):
         self.state.remove_gripper()
         self.saver.restore()
 
@@ -687,6 +579,7 @@ class CleanDishEnvV1(gym.Env):
 
         self.commands_so_far = copy.deepcopy(commands_so_far)
         self.current_g = copy.deepcopy(current_g)
+        self.current_gp = copy.deepcopy(current_gp)
         if symbolic_state is None:
             self.symbolic_state = {}
             self.initialize_symbolic_state()
@@ -753,125 +646,6 @@ class CleanDishEnvV1(gym.Env):
 
             view_to_camera_image[view_name] = camera_image
 
-        # if self.render_mode == "human":
-        #     plt.imshow(camera_image.depthPixels)
-        #     plt.show()
-        #
-        # if self.render_mode == "human":
-        #     plt.imshow(camera_image.segmentationMaskBuffer)
-        #     plt.show()
-
-        # https://github.com/valtsblukis/hlsm
-        # https://colab.research.google.com/drive/1HAqemP4cE81SQ6QO1-N85j5bF4C0qLs0?usp=sharing#scrollTo=MIlYMxU-Jgn5
-        # https://towardsdatascience.com/how-to-voxelize-meshes-and-point-clouds-in-python-ca94d403f81d
-
-        # # convert rgbd to point cloud
-        # import torch
-        # from nsplan_tools.rgbs_to_pc import lift
-        # import trimesh
-        # from pybullet_tools.utils import tform_from_pose, apply_alpha
-        #
-        # print(camera_image.camera_pose)
-        #
-        # H, W, C = camera_image.rgbPixels.shape
-        #
-        # y, x = torch.meshgrid(torch.arange(H), torch.arange(W))
-        # intrinsics = torch.from_numpy(camera_image.camera_matrix)
-        # depth = torch.from_numpy(camera_image.depthPixels.flatten().astype(np.float32))
-        # obj_xyz = lift(x.flatten(), y.flatten(), depth, intrinsics[None, :, :])
-        # obj_rgb = camera_image.rgbPixels.reshape(-1, 4).astype(np.float32)
-        # obj_xyz = trimesh.transform_points(obj_xyz, tform_from_pose(camera_image.camera_pose))
-        #
-        # # crop
-        # min_point = [0.0, 1.0, 0.0]
-        # max_point = [1.0, 5.0, 4.0]
-        #
-        # min_crop_mask = (obj_xyz[:, 0] > min_point[0]) & (obj_xyz[:, 1] > min_point[1]) & (
-        #         obj_xyz[:, 2] > min_point[2])
-        # max_crop_mask = (obj_xyz[:, 0] < max_point[0]) & (obj_xyz[:, 1] < max_point[1]) & (
-        #         obj_xyz[:, 2] < max_point[2])
-        # crop_mask = min_crop_mask & max_crop_mask
-        #
-        # obj_xyz = obj_xyz[crop_mask]
-        # obj_rgb = obj_rgb[crop_mask]
-        #
-        # print(f"number of points: {len(obj_xyz)}")
-        #
-        # subsample_idx = np.random.permutation(len(obj_xyz))[:50000]
-        # trimesh.PointCloud(obj_xyz, obj_rgb, axis=-1).show()
-        #
-        # trimesh.PointCloud(obj_xyz[subsample_idx], obj_rgb[subsample_idx], axis=-1).show()
-        #
-        #
-        # # voxelization
-        # # from nsplan_tools.voxelization_utils import visualise_voxel
-        # # from nsplan_tools.voxelization import VoxelGrid
-        # #
-        # # SCENE_BOUNDS = [0.0, 1.0, 0.0, 1.0, 5.0, 4.0]  # [x_min, y_min, z_min, x_max, y_max, z_max] - the metric volume to be voxelized
-        # # VOXEL_SIZES = [25]  # 100x100x100 voxels
-        # # device = "cpu"
-        # # BATCH_SIZE = 1
-        # # NUM_CAMERAS = 1
-        # #
-        # #
-        # # # initialize voxelizer
-        # # vox_grid = VoxelGrid(
-        # #     coord_bounds=SCENE_BOUNDS,
-        # #     voxel_size=VOXEL_SIZES[0],
-        # #     device=device,
-        # #     batch_size=BATCH_SIZE,
-        # #     feature_size=4,
-        # #     max_num_coords=np.prod([width, height]) * NUM_CAMERAS,
-        # # )
-        # #
-        # # # tensorize scene bounds
-        # # bounds = torch.tensor(SCENE_BOUNDS, device=device).unsqueeze(0)
-        # #
-        # # # voxelize!
-        # # # pcd_flat: B, P, 3
-        # # # flat_imag_features: B, P, C
-        # #
-        # # def _norm_rgb(x):
-        # #     return (x.float() / 255.0) * 2.0 - 1.0
-        # #
-        # # voxel_grid = vox_grid.coords_to_bounding_voxel_grid(torch.from_numpy(obj_xyz.astype(np.float32))[None, :, :],
-        # #                                                     coord_features=_norm_rgb(torch.from_numpy(obj_rgb)[None, :, :]),
-        # #                                                     coord_bounds=bounds)
-        # #
-        # # # swap to channels fist
-        # # vis_voxel_grid = voxel_grid.permute(0, 4, 1, 2, 3).detach().cpu().numpy()
-        # #
-        # # visualise_voxel(vis_voxel_grid[0], voxel_size=0.045, show=True)
-        #
-        #
-        # # o3d
-        # import open3d as o3d
-        #
-        # # Initialize a point cloud object
-        # pcd = o3d.geometry.PointCloud()
-        # # Add the points, colors and normals as Vectors
-        # pcd.points = o3d.utility.Vector3dVector(obj_xyz)
-        #
-        # pcd.colors = o3d.utility.Vector3dVector(obj_rgb[:, :3]/255.0)
-        #
-        # # # Create a voxel grid from the point cloud with a voxel_size of 0.01
-        # voxel_grid = o3d.geometry.VoxelGrid.create_from_point_cloud(pcd, voxel_size=0.02)
-        #
-        # print(f"number of voxels: {len(voxel_grid.get_voxels())}")
-        #
-        # # Initialize a visualizer object
-        # vis = o3d.visualization.Visualizer()
-        # # Create a window, name it and scale it
-        # vis.create_window()
-        #
-        # # Add the voxel grid to the visualizer
-        # vis.add_geometry(voxel_grid)
-        #
-        # # We run the visualizater
-        # vis.run()
-        # # Once the visualizer is closed destroy the window and clean up
-        # vis.destroy_window()
-
         return view_to_camera_image
 
     def _get_info(self):
@@ -907,11 +681,12 @@ class CleanDishEnvV1(gym.Env):
         for grasp in grasp_list:
             print("find ik for grasp", grasp)
 
-            grasp_world = multiply(obj_pose, grasp[0].value)
+            grasp = grasp[0]
+            grasp_world = multiply(obj_pose, grasp.value)
             grasp_tform_world = tform_from_pose(grasp_world)
 
             # important:
-            adjusted_grasp = adjust_grasp(grasp[0], self.robot, obj_pose)
+            adjusted_grasp = adjust_grasp(grasp, self.robot, obj_pose)
 
             ## find ik
             for ik in self.stream_map["inverse-kinematics-hand"](a=None, o=obj_body, p=obj_Pose, g=adjusted_grasp):
@@ -933,8 +708,8 @@ class CleanDishEnvV1(gym.Env):
                         commands += get_primitive_actions(action, self.world)
 
                     ## update world state
-                    self.current_g = (adjusted_grasp, grasp_tform_world)
-                    # self.grasp_tform_world = grasp_tform_world
+                    self.current_g = (adjusted_grasp, grasp, grasp_tform_world)
+                    self.current_gp = None
 
                     return commands
 
@@ -987,8 +762,9 @@ class CleanDishEnvV1(gym.Env):
                         commands += get_primitive_actions(action, self.world)
 
                     ## update world state
+                    self.current_gp = tform_from_pose(multiply(placement_pose[0][0].value, self.current_g[1].value))
+                    # after computing grasp pose for placement (gp), reset current_g
                     self.current_g = None
-                    self.grasp_tform_world = None
 
                     return commands
 

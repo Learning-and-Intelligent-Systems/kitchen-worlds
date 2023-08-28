@@ -138,7 +138,7 @@ def parallel_processing(process, inputs, parallel):
         import multiprocessing
         from multiprocessing import Pool
 
-        max_cpus = 11
+        max_cpus = 8
         num_cpus = min(multiprocessing.cpu_count(), max_cpus)
         print(f'using {num_cpus} cpus')
         with Pool(processes=num_cpus) as pool:

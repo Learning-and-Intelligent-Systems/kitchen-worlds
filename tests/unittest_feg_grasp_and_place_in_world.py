@@ -195,7 +195,7 @@ def main(config):
                         commands += get_primitive_actions(action, world)
 
                     ## update world state
-                    current_g = adjusted_grasp
+                    current_g = (adjusted_grasp, grasp)
                     yield (commands, current_g)
 
     # important: current_g is used for placement
@@ -227,6 +227,9 @@ def main(config):
         placement_stream = stream_map["sample-pose-on"]
 
     def yield_placement(current_g):
+
+        (adjusted_grasp, grasp) = current_g
+
         for placement_pose in placement_stream(obj_body, surface):
 
             print("find ik for placement pose", placement_pose)
@@ -235,7 +238,7 @@ def main(config):
                 print("found collisions between moveable objects")
                 continue
 
-            for ik in stream_map["inverse-kinematics-hand"](a=None, o=obj_body, p=placement_pose[0][0], g=current_g):
+            for ik in stream_map["inverse-kinematics-hand"](a=None, o=obj_body, p=placement_pose[0][0], g=adjusted_grasp):
                 print(ik)
                 if len(ik) == 0:
                     continue
@@ -249,18 +252,28 @@ def main(config):
 
                     ## computes actions to step the world
                     move_action = ('move_cartesian', (current_q, q, move_cmd[0][0]))
-                    place_action = ('place_hand', ('hand', obj_body, placement_pose, current_g, None, ik[0][1]))
+                    place_action = ('place_hand', ('hand', obj_body, placement_pose, adjusted_grasp, None, ik[0][1]))
                     commands = []
                     for action in [move_action, place_action]:
                         commands += get_primitive_actions(action, world)
 
+                    # important: we are using grasp.value instead of adjusted_grasp.value because of the following reason
+                    # the problem is that the grasp pose is computed as grasp_pose = multiply(body_pose, grasp.value)
+                    # however, in robots.visualize_grasp(), body_pose = robot.get_body_pose(body_pose, body=body, verbose=verbose)
+                    # in ik function, flying_gripper_utils.get_approach_path(), body_pose = robot.get_body_pose(o, verbose=False)
+                    # when body is none, body_pose is multiplied with robot.tool_from_hand, which is Pose(euler=Euler(math.pi / 2, 0, -math.pi / 2)). i.e., multiply(body_pose, r)
+                    placement_obj_pose = placement_pose[0][0].value
+                    placement_grasp_pose = multiply(placement_obj_pose, grasp.value)
+                    print("yield_placement | placement_obj_pose", placement_obj_pose)
+                    print("yield_placement | placement_grasp_pose", placement_grasp_pose)
+
                     ## update world state
                     current_g = None
 
-                    yield commands
+                    yield (commands, placement_grasp_pose)
 
     # important: current_g is used for placement
-    placement_commands = next(yield_placement(current_g))
+    placement_commands, placement_grasp_pose = next(yield_placement(current_g))
     print(placement_commands)
 
     state.remove_gripper()
