@@ -12,7 +12,7 @@ max_rollouts: 3
 
 ## semantic spec related
 # semantic_specs_dir: ../pybullet_planning/nsplan_tools/debug_specs
-semantic_specs_dir: /home/weiyu/data_drive/nsplan/0827_test_place/semantic_specs
+semantic_specs_dir: /home/weiyu/data_drive/nsplan/0828_test_policy/semantic_specs
 
 ## pybullet related
 viewer: false  # default: true
@@ -51,7 +51,7 @@ world:
 
 
 data:
-  out_dir: /home/weiyu/data_drive/nsplan/0827_test_place/data
+  out_dir: /home/weiyu/data_drive/nsplan/0828_test_policy/data
   save_failed_plans: true
   save_log: true
   save_commands: true
