@@ -137,16 +137,34 @@ def get_color_object_to_obj_name(obj_name_to_info):
     return color_object_to_obj_name
 
 
+# def check_reach_symbolic_goal(symbolic_goal, symbolic_state):
+#     # symbolic_goal = env.symbolic_goal
+#     at_goal = True
+#     for obj_name in symbolic_goal:
+#         if symbolic_goal[obj_name] != symbolic_state[obj_name]["location"]:
+#             at_goal = False
+#             break
+#     return at_goal
+
+def get_goal_actions(symbolic_goal):
+    # symbolic_goal = env.symbolic_goal
+    goal_actions = []
+    for obj_name in symbolic_goal:
+        goal_actions.append(("place", obj_name, symbolic_goal[obj_name]))
+    return goal_actions
+
+
 def load_model_and_cfg():
 
     # create a new argparser args object to store the model arguments
     args = argparse.Namespace()
     args.base_config_file = "/home/weiyu/Research/nsplan/nsplan/configs/base.yaml"
-    # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTFiLM1DDynamicsFeasibilityModel_subsample_trajectory.yaml"
-    # args.checkpoint_id = "gq6ui8m9"
 
-    args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTFiLM1DDynamicsFeasibilityModel.yaml"
-    args.checkpoint_id = "026qc2hq"
+    args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTFiLM1DDynamicsFeasibilityModel_subsample_trajectory.yaml"
+    args.checkpoint_id = "gq6ui8m9"
+
+    # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTFiLM1DDynamicsFeasibilityModel.yaml"
+    # args.checkpoint_id = "026qc2hq"
 
     base_cfg = OmegaConf.load(args.base_config_file)
     cfg = OmegaConf.load(args.config_file)
@@ -528,7 +546,7 @@ def plan_multi_step(model,
                     # model input
                      scene_xyzrgb, query_actions_concept_idxs, grasped,
                      # for logging
-                     query_actions,
+                     query_actions, goal_action,
                     # hyperparameters
                      num_scene_pts, device,
                      admissible_concept_actions=None, debug=False,
@@ -536,6 +554,10 @@ def plan_multi_step(model,
 
     # query_actions_concept_idxs: K, L
 
+    # we want to find a sequence of actions that leads to the goal action
+    goal_action_sequence = []
+
+    # to keep track of the beam search
     sampled_action_idx_sequences = None
     sampled_action_score_sequences = None
 
@@ -547,6 +569,7 @@ def plan_multi_step(model,
         else:
             admissible_action_mask.append(False)
     admissible_action_mask = np.array(admissible_action_mask, dtype=bool)  # K
+    goal_action_idx = query_actions.index(goal_action)
 
     for t in range(planning_horizon):
 
@@ -676,9 +699,27 @@ def plan_multi_step(model,
             sampled_action_idx_sequences = new_sampled_action_idx_sequences
             sampled_action_score_sequences = new_sampled_action_score_sequences
 
-        input("next???????")
+        # check for goal
+        # action sequences are already ranked
+        for bi in range(len(sampled_action_idx_sequences)):
+            action_idx_sequence = sampled_action_idx_sequences[bi]
+            if goal_action_idx in action_idx_sequence:
+                print("\n" + "*"*20)
+                print(f"plan for goal {goal_action} found!")
+                goal_action_sequence = [query_actions[ai] for ai in action_idx_sequence]
+                print(f"goal action sequence: {goal_action_sequence}")
+                print(f"goal action score sequence: {sampled_action_score_sequences[bi]}")
+                print("*" * 20 + "\n")
+                break
 
+        # if goal action sequence is found, break from planning
+        if goal_action_sequence:
+            break
 
+    print(f"Planning complete. Goal action sequence found: {len(goal_action_sequence) != 0}")
+    trimesh.PointCloud(scene_xyzrgb[:, :3], scene_xyzrgb[:, 3:]).show()
+
+    return goal_action_sequence
 
 
 def run_high_level_policy(env: CleanDishEnvV1, max_depth=10, debug=True):
@@ -722,11 +763,19 @@ def run_high_level_policy(env: CleanDishEnvV1, max_depth=10, debug=True):
     admissible_text_actions = sorted(env.get_admissible_text_actions())
     admissible_concept_actions = [get_concept_action_from_text_action(text_action, obj_name_to_info) for text_action in admissible_text_actions]
 
+    goal_actions = get_goal_actions(env.symbolic_goal)
+    assert len(goal_actions) == 1, "We currently assume one goal action."
+    goal_action = goal_actions[0]
+    goal_concept_action = get_concept_action_from_text_action(goal_action, obj_name_to_info)
+    print(f"Goal action: {goal_action}")
+    print(f"Goal concept action: {goal_concept_action}")
+
     # ----------------------------------
     # start acting
     cur_obs, info = env.reset()
-
-    symbolic_state = env.symbolic_state
+    cur_symbolic_state = env.symbolic_state
+    cur_done = False
+    cur_score = 0
 
     for t in range(max_depth):
 
@@ -740,12 +789,12 @@ def run_high_level_policy(env: CleanDishEnvV1, max_depth=10, debug=True):
         scene_xyzrgb = scene_xyzrgb[:, :6]  # ignore alpha
         scene_xyzrgb[:, :3] = pc_normalize(scene_xyzrgb[:, :3])
 
-        grasped = symbolic_state["grasped"]
+        grasped = cur_symbolic_state["grasped"]
 
         if debug:
             print("\n\n" + "=" * 100)
             print(f"timestep {t}")
-            print(f"symbolic state: {symbolic_state}")
+            print(f"symbolic state: {cur_symbolic_state}")
             # plot_images({view_name: Image.fromarray(cur_obs[view_name][0], 'RGBA') for view_name in cur_obs})
 
         # sorted_query_actions, sorted_query_actions_scores = plan_single_step(model,
@@ -754,23 +803,29 @@ def run_high_level_policy(env: CleanDishEnvV1, max_depth=10, debug=True):
         #                  num_scene_pts, device,
         #                  admissible_concept_actions=admissible_concept_actions, debug=True)
 
-        plan_multi_step(model,
+        goal_concept_action_sequence = plan_multi_step(model,
                         scene_xyzrgb, query_actions_concept_idxs, grasped,
-                        query_actions,
+                        query_actions, goal_concept_action,
                         num_scene_pts, device,
                         admissible_concept_actions=admissible_concept_actions, debug=True,
-                        action_score_threshold=0.3, planning_horizon=6)
+                        action_score_threshold=0.1, planning_horizon=6, max_beam_size=30)
 
         # --------------------------------
         # step the environment
-        # action = env.convert_text_to_action(text_action[0], text_action[1], text_action[2])
-        # new_obs, new_score, new_done, _, _ = env.step(action)
+        text_action = get_text_action_from_concept_action(goal_concept_action_sequence[0], color_object_to_obj_name)
+        action = env.convert_text_to_action(text_action[0], text_action[1], text_action[2])
+        cur_obs, cur_score, cur_done, _, _ = env.step(action)
+        cur_symbolic_state = env.symbolic_state
 
-        exit()
+        print(f"\nscore {cur_score}, done {cur_done}")
+        if cur_done:
+            break
+
+    print(f"Task completed: {cur_done}")
 
 
 if __name__ == '__main__':
     run_evaluation(env_config_file='../configs/clean_dish_feg_collect_rollouts.yaml',
-                   env_seed=0,
-                   semantic_spec_seed=0)
+                   env_seed=1,
+                   semantic_spec_seed=5)
 
