@@ -84,6 +84,9 @@ from nsplan.utils.data_conversions import move_to_gpu, repeat_batch, move_to_num
 from nsplan.utils.files import get_checkpoint_path_from_dir
 
 
+# ===============================================================================================
+# nsplan model related
+
 def filter_null_actions(candidate_actions, feasibility_matrix, debug=False):
     query_actions_concept_idxs = []
     query_actions = []
@@ -107,6 +110,32 @@ def filter_null_actions(candidate_actions, feasibility_matrix, debug=False):
 #     # for i, c in enumerate(concept_idx):
 #     #     action.append(id_to_concept_maps[i][c])
 #     return id_to_concept_maps
+
+def get_text_action_from_concept_action(concept_action, color_object_to_obj_name):
+    # concept action is ('place', 'brown', 'bottle', 'sink_counter_right')
+    # text action is (manip_name, obj_name, loc_name)
+    (manipulation, color, object_class, location) = concept_action
+    obj_name = color_object_to_obj_name[(color, object_class)]
+    return (manipulation, obj_name, location)
+
+
+def get_concept_action_from_text_action(text_action, obj_name_to_info):
+    # concept action is ('place', 'brown', 'bottle', 'sink_counter_right')
+    # text action is (manip_name, obj_name, loc_name)
+    (manipulation, object_name, location) = text_action
+    color = obj_name_to_info[object_name]["color"]
+    object_class = obj_name_to_info[object_name]["class"]
+    return (manipulation, color, object_class, location)
+
+
+def get_color_object_to_obj_name(obj_name_to_info):
+    color_object_to_obj_name = {}
+    for obj_name in obj_name_to_info:
+        color = obj_name_to_info[obj_name]["color"]
+        object_class = obj_name_to_info[obj_name]["class"]
+        color_object_to_obj_name[(color, object_class)] = obj_name
+    return color_object_to_obj_name
+
 
 def load_model_and_cfg():
 
@@ -134,6 +163,23 @@ def load_model_and_cfg():
     model.eval()
 
     return model, cfg
+
+
+# ===============================================================================================
+# env related
+
+def run_evaluation(env_config_file, env_seed, semantic_spec_seed):
+    env_config = parse_yaml(env_config_file)
+
+    # override
+    env_config.seed = env_seed
+    env_config.semantic_spec_seed = semantic_spec_seed
+
+    # change data.out_dir for storing evaluation data
+    env_config.data.out_dir = os.path.join(os.path.split(env_config.data.out_dir)[0], "evaluation")
+    print(f"Saving evaluation data to {abspath(env_config.data.out_dir)}")
+
+    process(env_config)
 
 
 def process(config):
@@ -200,6 +246,441 @@ def play(env):
     print("*" * 100 + "\n")
 
 
+# ===============================================================================================
+# rollouts
+
+def sort_query_actions(query_actions, query_actions_concept_idxs, query_actions_scores):
+    # sort query_actions and query_action_scores by query_action_scores
+    ranking_idx = np.argsort(query_actions_scores)[::-1]
+    sorted_query_actions = [query_actions[idx] for idx in ranking_idx]
+    sorted_query_actions_scores = query_actions_scores[ranking_idx]
+    sorted_query_actions_concept_idxs = query_actions_concept_idxs[ranking_idx]
+    return sorted_query_actions, sorted_query_actions_concept_idxs, sorted_query_actions_scores
+
+def print_scored_query_actions(query_actions, query_actions_scores, admissible_concept_actions):
+    if admissible_concept_actions is not None:
+        print(f"Only consider admissible_concept_actions")
+    for query_action, query_action_score in zip(query_actions, query_actions_scores):
+        if admissible_concept_actions is None or query_action in admissible_concept_actions:
+            print(f"{query_action}: {query_action_score}")
+
+def plan_single_step(model,
+                     scene_xyzrgb, query_actions_concept_idxs, grasped,
+                     query_actions,
+                     num_scene_pts, device,
+                     admissible_concept_actions=None, debug=False):
+    # --------------------------------
+    # build current data for model
+    # pcs: B, T (sequence length), P (number of pts), D (number of channels)
+    # next_action_concept_idxs: B, T, L (number of concepts)
+    # query_actions_concept_idxs: B, T, K (number of query actions), L
+    # gripper_states: B, T
+    B = 1
+    # debug: make one step inference
+    T = 1
+    P = num_scene_pts
+    D = 6
+    L = 4
+    # K = ?
+
+    # prepare single datum
+    if grasped is None:
+        gripper_states = np.array(vocab.gripper_state_to_id["empty"], dtype=np.int32)  # 1
+    else:
+        gripper_states = np.array(vocab.gripper_state_to_id["grasped"], dtype=np.int32)  # 1
+    next_action_concept_idxs = np.zeros((B, T, L), dtype=np.int32)
+    pcs = scene_xyzrgb.astype(np.float32)  # P, D
+
+    # repeat and convert to tensor
+    pcs = einops.repeat(pcs, "P D -> B T P D", B=B, T=T, P=P, D=D)
+    query_actions_concept_idxs = einops.repeat(query_actions_concept_idxs, "K L -> B T K L", B=B, T=T, L=L)
+    gripper_states = einops.repeat(gripper_states, " -> B T", B=B, T=T)
+
+    batch = {"pcs": pcs,
+             "query_actions_concept_idxs": query_actions_concept_idxs,
+             "next_action_concept_idxs": next_action_concept_idxs,
+             "gripper_states": gripper_states}
+
+    move_to_gpu(batch, device=device)
+
+    # the policy model should predict the next action given the current observation
+    with torch.no_grad():
+        query_actions_logits = model.model(batch["pcs"],
+                                           batch["gripper_states"],
+                                           batch["next_action_concept_idxs"],
+                                           batch["query_actions_concept_idxs"])  # B, T, K
+    query_actions_scores = model.model.convert_logit_to_binary(query_actions_logits).cpu().numpy()  # B, T, K
+    query_actions_scores = query_actions_scores[0][0]
+    if debug:
+        print(f"query_actions_scores shape: {query_actions_scores.shape}")
+
+    # sort query_actions and query_action_scores by query_action_scores
+    ranking_idx = np.argsort(query_actions_scores)[::-1]
+    sorted_query_actions = [query_actions[idx] for idx in ranking_idx]
+    sorted_query_actions_scores = query_actions_scores[ranking_idx]
+
+    if debug:
+        print("\n" + "-" * 100 + "\nranked query actions")
+        if admissible_concept_actions is not None:
+            print(f"Only consider admissible_concept_actions")
+        for query_action, query_action_score in zip(sorted_query_actions, sorted_query_actions_scores):
+            if admissible_concept_actions is None or query_action in admissible_concept_actions:
+                print(f"{query_action}: {query_action_score}")
+        trimesh.PointCloud(scene_xyzrgb[:, :3], scene_xyzrgb[:, 3:]).show()
+
+    return sorted_query_actions, sorted_query_actions_scores
+
+
+def plan_multi_step_debug(model,
+                    # model input
+                     scene_xyzrgb, query_actions_concept_idxs, grasped,
+                     # for logging
+                     query_actions,
+                    # hyperparameters
+                     num_scene_pts, device,
+                     admissible_concept_actions=None, debug=False,
+                    action_score_threshold=0.3):
+
+    # --------------------------------
+    # first step
+    print("\n\n" + "~" * 100)
+    print(f"planning timestep 0")
+
+    # build current data for model
+    # pcs: B, T (sequence length), P (number of pts), D (number of channels)
+    # next_action_concept_idxs: B, T, L (number of concepts)
+    # query_actions_concept_idxs: B, T, K (number of query actions), L
+    # gripper_states: B, T
+    B = 1
+    # debug: make one step inference
+    T = 1
+    P = num_scene_pts
+    D = 6
+    L = 4
+    # K = ?
+
+    # prepare single datum
+    if grasped is None:
+        gripper_states = np.array(vocab.gripper_state_to_id["empty"], dtype=np.int32)  # 1
+    else:
+        gripper_states = np.array(vocab.gripper_state_to_id["grasped"], dtype=np.int32)  # 1
+    batch_next_action_concept_idxs = np.zeros((B, T, L), dtype=np.int32)
+    pcs = scene_xyzrgb.astype(np.float32)  # P, D
+    # query_actions_concept_idxs: K, L
+
+    # repeat and convert to tensor
+    batch_pcs = einops.repeat(pcs, "P D -> B T P D", B=B, T=T, P=P, D=D)
+    batch_query_actions_concept_idxs = einops.repeat(query_actions_concept_idxs, "K L -> B T K L", B=B, T=T, L=L)
+    batch_gripper_states = einops.repeat(gripper_states, " -> B T", B=B, T=T)
+
+    batch = {"pcs": batch_pcs,
+             "query_actions_concept_idxs": batch_query_actions_concept_idxs,
+             "next_action_concept_idxs": batch_next_action_concept_idxs,
+             "gripper_states": batch_gripper_states}
+
+    move_to_gpu(batch, device=device)
+
+    # the policy model should predict the next action given the current observation
+    with torch.no_grad():
+        query_actions_logits = model.model(batch["pcs"],
+                                           batch["gripper_states"],
+                                           batch["next_action_concept_idxs"],
+                                           batch["query_actions_concept_idxs"])  # B, T, K
+    query_actions_scores = model.model.convert_logit_to_binary(query_actions_logits).cpu().numpy()  # B, T, K
+    query_actions_scores = query_actions_scores[0][0]
+    print(f"query_actions_scores shape: {query_actions_scores.shape}")
+
+    sorted_query_actions, sorted_query_actions_concept_idxs, sorted_query_actions_scores = sort_query_actions(query_actions, query_actions_concept_idxs, query_actions_scores)
+
+    print("\n" + "-" * 100 + "\nranked query actions")
+    print_scored_query_actions(sorted_query_actions, sorted_query_actions_scores, admissible_concept_actions)
+
+    # --------------------------------
+    # second step
+    print("\n\n" + "~" * 100)
+    print(f"planning timestep 1")
+
+    # find next actions we want to consider
+    next_action_concept_idxs = []
+    next_actions = []
+    next_action_scores = []
+    for query_action, query_action_score, query_action_concept_idxs in zip(sorted_query_actions,
+                                                                            sorted_query_actions_scores,
+                                                                            sorted_query_actions_concept_idxs):
+        if admissible_concept_actions is None or query_action in admissible_concept_actions:
+            if query_action_score > action_score_threshold:
+                next_actions.append(query_action)
+                next_action_concept_idxs.append(query_action_concept_idxs)
+                next_action_scores.append(query_action_score)
+
+    print(f"step 2: {len(next_action_concept_idxs)} next actions to consider with score threshold {action_score_threshold}: {next_actions}")
+
+    # build current data for model
+    B = len(next_action_concept_idxs)
+    T = 2
+
+    batch_next_action_concept_idxs = np.zeros((B, T, L), dtype=np.int32)
+    # the second action is zero
+    batch_next_action_concept_idxs[:, 0, :] = next_action_concept_idxs
+
+    # important: since the model will only use the current observation
+    # i.e., pcs_0 = pcs[:, 0, :, :]  # B, P, D
+    # i.e., gripper_states_0 = gripper_states[:, 0]  # B
+    # we will set T = 1 for batch_pcs and batch_gripper_states to save memory
+    batch_pcs = einops.repeat(pcs, "P D -> B T P D", B=B, T=1, P=P, D=D)
+    batch_gripper_states = einops.repeat(gripper_states, " -> B T", B=B, T=1)
+    batch_query_actions_concept_idxs = einops.repeat(query_actions_concept_idxs, "K L -> B T K L", B=B, T=T, L=L)
+
+    batch = {"pcs": batch_pcs,
+             "query_actions_concept_idxs": batch_query_actions_concept_idxs,
+             "next_action_concept_idxs": batch_next_action_concept_idxs,
+             "gripper_states": batch_gripper_states}
+
+    move_to_gpu(batch, device=device)
+
+    # the policy model should predict the next action given the current observation
+    with torch.no_grad():
+        query_actions_logits = model.model(batch["pcs"],
+                                           batch["gripper_states"],
+                                           batch["next_action_concept_idxs"],
+                                           batch["query_actions_concept_idxs"])  # B, T, K
+    query_actions_scores = model.model.convert_logit_to_binary(query_actions_logits).cpu().numpy()  # B, T, K
+    print(f"query_actions_scores shape: {query_actions_scores.shape}")
+
+    for nai in range(len(next_actions)):
+        print("\n" + "-" * 100)
+        # # This is only sanity check, the prediction of feasibility for first actions should be the same as first step
+        # print(f"\nnext_action: {next_actions[nai]} step: {0}")
+        # this_query_actions_scores = query_actions_scores[nai][0]
+        # this_sorted_query_actions, this_sorted_query_actions_concept_idxs, this_sorted_query_actions_scores = sort_query_actions(query_actions, query_actions_concept_idxs, this_query_actions_scores)
+        # print_scored_query_actions(this_sorted_query_actions, this_sorted_query_actions_scores, admissible_concept_actions)
+
+        print(f"\nnext_action: {next_actions[nai]} step: {1}")
+        this_query_actions_scores = query_actions_scores[nai][1]
+        this_sorted_query_actions, this_sorted_query_actions_concept_idxs, this_sorted_query_actions_scores = sort_query_actions(query_actions, query_actions_concept_idxs, this_query_actions_scores)
+        print_scored_query_actions(this_sorted_query_actions, this_sorted_query_actions_scores, admissible_concept_actions)
+
+    return
+
+
+def build_model_input(grasped, scene_xyzrgb, query_actions_concept_idxs,
+                      B, T, P, D, L, device,
+                      next_action_concept_idxs=None):
+    """
+    :param grasped:
+    :param scene_xyzrgb: P, D
+    :param query_actions_concept_idxs: K, L
+    :param B:
+    :param T:
+    :param P:
+    :param D:
+    :param L:
+    :param device:
+    next_action_concept_idxs: B, T-1, L
+    :return:
+    """
+
+    # build current data for model
+    # pcs: B, T (sequence length), P (number of pts), D (number of channels)
+    # next_action_concept_idxs: B, T, L (number of concepts)
+    # query_actions_concept_idxs: B, T, K (number of query actions), L
+    # gripper_states: B, T
+
+    # prepare single datum
+    if grasped is None:
+        gripper_states = np.array(vocab.gripper_state_to_id["empty"], dtype=np.int32)  # 1
+    else:
+        gripper_states = np.array(vocab.gripper_state_to_id["grasped"], dtype=np.int32)  # 1
+    pcs = scene_xyzrgb.astype(np.float32)  # P, D
+    # query_actions_concept_idxs: K, L
+
+    batch_next_action_concept_idxs = np.zeros((B, T, L), dtype=np.int32)
+    if next_action_concept_idxs is not None:
+        # e.g., if T = 2, we set the first next action so that we can get action feasibility for t=2
+        batch_next_action_concept_idxs[:, :T-1, :] = next_action_concept_idxs
+
+    # repeat and convert to tensor
+    # important: since the model will only use the current observation
+    # i.e., pcs_0 = pcs[:, 0, :, :]  # B, P, D
+    # i.e., gripper_states_0 = gripper_states[:, 0]  # B
+    # we will set T = 1 for batch_pcs and batch_gripper_states to save memory
+    batch_pcs = einops.repeat(pcs, "P D -> B T P D", B=B, T=1, P=P, D=D)
+    batch_gripper_states = einops.repeat(gripper_states, " -> B T", B=B, T=1)
+
+    batch_query_actions_concept_idxs = einops.repeat(query_actions_concept_idxs, "K L -> B T K L", B=B, T=T, L=L)
+
+    batch = {"pcs": batch_pcs,
+             "query_actions_concept_idxs": batch_query_actions_concept_idxs,
+             "next_action_concept_idxs": batch_next_action_concept_idxs,
+             "gripper_states": batch_gripper_states}
+
+    move_to_gpu(batch, device=device)
+
+    return batch
+
+
+def mask_list(list, mask):
+    assert len(list) == len(mask)
+    return [list[i] for i in range(len(list)) if mask[i]]
+
+
+def plan_multi_step(model,
+                    # model input
+                     scene_xyzrgb, query_actions_concept_idxs, grasped,
+                     # for logging
+                     query_actions,
+                    # hyperparameters
+                     num_scene_pts, device,
+                     admissible_concept_actions=None, debug=False,
+                    action_score_threshold=0.3, planning_horizon=1, max_beam_size=20):
+
+    # query_actions_concept_idxs: K, L
+
+    sampled_action_idx_sequences = None
+    sampled_action_score_sequences = None
+
+    all_action_idxs = np.arange(len(query_actions))  # K
+    admissible_action_mask = []
+    for action_idx, action in enumerate(query_actions):
+        if admissible_concept_actions is None or action in admissible_concept_actions:
+            admissible_action_mask.append(True)
+        else:
+            admissible_action_mask.append(False)
+    admissible_action_mask = np.array(admissible_action_mask, dtype=bool)  # K
+
+    for t in range(planning_horizon):
+
+        print("\n\n" + "~" * 100)
+        print(f"planning timestep {t}")
+
+        # sampled_action_concept_idx_sequences: B, t, L
+        if t == 0:
+            batch = build_model_input(grasped, scene_xyzrgb, query_actions_concept_idxs,
+                                      B=1, T=t+1, P=num_scene_pts, D=6, L=4, device=device,
+                                      next_action_concept_idxs=None)
+        else:
+            current_beam_size = len(sampled_action_idx_sequences)
+
+            # sampled_action_idx_sequences: B, T
+            # query_actions_concept_idxs: K, L
+            # next_action_concept_idxs: B, T, L
+            next_action_concept_idxs = query_actions_concept_idxs[sampled_action_idx_sequences]  # B, T, L
+
+            batch = build_model_input(grasped, scene_xyzrgb, query_actions_concept_idxs,
+                                      B=current_beam_size, T=t + 1, P=num_scene_pts, D=6, L=4, device=device,
+                                      next_action_concept_idxs=next_action_concept_idxs)
+
+        with torch.no_grad():
+            query_actions_logits = model.model(batch["pcs"],
+                                               batch["gripper_states"],
+                                               batch["next_action_concept_idxs"],
+                                               batch["query_actions_concept_idxs"])  # B, T, K
+        query_actions_scores = model.model.convert_logit_to_binary(query_actions_logits).cpu().numpy()  # B, T, K
+        # since we are decoding autoreressively, we only care about the last timestep
+        query_actions_scores = query_actions_scores[:, t]  # B, K
+        print(f"query_actions_scores shape: {query_actions_scores.shape}")
+
+        # # debug
+        # # print("\n" + "-" * 100 + "\nranked query actions")
+        # sorted_query_actions, sorted_query_actions_concept_idxs, sorted_query_actions_scores = sort_query_actions(query_actions, query_actions_concept_idxs, query_actions_scores)
+        # print_scored_query_actions(sorted_query_actions, sorted_query_actions_scores, admissible_concept_actions)
+
+        # # filter actions based on admissible actions and single-step feasibility score
+        # candidate_actions = []  # C
+        # candidate_action_concept_idxs = []   # C, L
+        # candidate_action_scores = []  # C
+        # for query_action, query_action_score, query_action_concept_idxs in zip(query_actions,
+        #                                                                        query_actions_scores,
+        #                                                                        query_actions_concept_idxs):
+        #     if admissible_concept_actions is None or query_action in admissible_concept_actions:
+        #         if query_action_score > action_score_threshold:
+        #             candidate_actions.append(query_action)
+        #             candidate_action_concept_idxs.append(query_action_concept_idxs)
+        #             candidate_action_scores.append(query_action_score)
+
+        if t == 0:
+
+            index_matrix = einops.rearrange(all_action_idxs, 'K -> 1 K')  # B, K
+
+            # TODO: perform more complicated filtering
+            score_threshold_mask = query_actions_scores > action_score_threshold
+            # Bool and admissible_action_mask and score_threshold_mask
+            keep_mask = np.logical_and(score_threshold_mask, einops.rearrange(admissible_action_mask, 'K -> 1 K'))
+            keep_mask = keep_mask.flatten()  # 1 * K
+
+            # find topk index from query_actions_scores with dim [B, K]
+            topk_idxs = np.argsort(query_actions_scores.flatten()[keep_mask])[::-1][:max_beam_size]  # B * beam_size
+
+            sampled_action_idxs = index_matrix.flatten()[keep_mask][topk_idxs]  # beam_size
+            sampled_action_scores = query_actions_scores.flatten()[keep_mask][topk_idxs]  # beam_size
+
+            sampled_actions = [mask_list(query_actions, keep_mask)[ki] for ki in topk_idxs]
+
+            for sa, sas in zip(sampled_actions, sampled_action_scores):
+                print(f"{sa}: {sas}")
+
+            sampled_action_idx_sequences = einops.rearrange(sampled_action_idxs, 'B -> B 1')  # B, T
+            sampled_action_score_sequences = einops.rearrange(sampled_action_scores, 'B -> B 1')  # B, T
+
+        else:
+
+            sequence_index_matrix = []  # B * K,
+            for bi in range(current_beam_size):
+                for ki in range(len(query_actions)):
+                    sequence_index_matrix.append([bi, ki])
+
+            sampled_sequence_scores = np.product(sampled_action_score_sequences, axis=1)  # B
+            sampled_sequence_scores = einops.repeat(sampled_sequence_scores, 'B -> B K', K=len(query_actions))  # B, K
+
+            accumulated_scores = sampled_sequence_scores * query_actions_scores  # B, K
+
+            # TODO: perform more complicated filtering
+            score_threshold_mask = query_actions_scores > action_score_threshold
+            # Bool and admissible_action_mask and score_threshold_mask
+            keep_mask = np.logical_and(score_threshold_mask, einops.repeat(admissible_action_mask, 'K -> B K', B=current_beam_size))
+            keep_mask = keep_mask.flatten()  # B * K
+            print("keep_mask.shape", keep_mask.shape)
+            print("np.sum(keep_mask)", np.sum(keep_mask))
+
+            topk_idxs = np.argsort(accumulated_scores.flatten()[keep_mask])[::-1][:max_beam_size]  # B * beam_size
+            print("topk_idxs", topk_idxs)
+
+            new_beam_size = len(topk_idxs)
+
+            sampled_accumulated_scores = accumulated_scores.flatten()[keep_mask][topk_idxs]  # beam_size
+            sampled_query_actions_scores = query_actions_scores.flatten()[keep_mask][topk_idxs]  # beam_size
+            keep_sequence_index_matrix = mask_list(sequence_index_matrix, keep_mask)
+            print("keep_sequence_index_matrix", keep_sequence_index_matrix)
+            sampled_action_idxs = [keep_sequence_index_matrix[ti][1] for ti in topk_idxs]
+            sampled_sequence_idxs = [keep_sequence_index_matrix[ti][0] for ti in topk_idxs]
+
+            # sampled_action_idx_sequences: B, T
+            # sampled_action_score_sequences: B, T
+
+            for bi in range(new_beam_size):
+                action_sequence = [query_actions[ai] for ai in sampled_action_idx_sequences[sampled_sequence_idxs[bi]]]
+                print(f"action sequence: {action_sequence}")
+                action = query_actions[sampled_action_idxs[bi]]
+                print(f"action: {action}")
+                score = sampled_accumulated_scores[bi]
+                print(f"score: {score}")
+
+            # debug: sequence assignment is wrong
+            new_sampled_action_idx_sequences = np.zeros((new_beam_size, t + 1), dtype=np.int32)
+            new_sampled_action_score_sequences = np.zeros((new_beam_size, t + 1), dtype=np.float32)
+            new_sampled_action_idx_sequences[:, :-1] = np.array([sampled_action_idx_sequences[ssi] for ssi in sampled_sequence_idxs], dtype=np.int32)
+            new_sampled_action_score_sequences[:, :-1] = np.array([sampled_action_score_sequences[ssi] for ssi in sampled_sequence_idxs], dtype=np.float32)
+            new_sampled_action_idx_sequences[:, -1] = np.array(sampled_action_idxs, dtype=np.int32)
+            new_sampled_action_score_sequences[:, -1] = np.array(sampled_query_actions_scores, dtype=np.float32)
+
+            sampled_action_idx_sequences = new_sampled_action_idx_sequences
+            sampled_action_score_sequences = new_sampled_action_score_sequences
+
+        input("next???????")
+
+
+
+
 def run_high_level_policy(env: CleanDishEnvV1, max_depth=10, debug=True):
 
     # TODO: load from model or data config
@@ -217,7 +698,10 @@ def run_high_level_policy(env: CleanDishEnvV1, max_depth=10, debug=True):
     obj_dict = env.world.obj_dict
     for obj in obj_dict:
         obj_dict[obj]["name"] = str(obj_dict[obj]["name"])
+    # for mapping from text_action to concept actions
     obj_name_to_info = MultiviewSequenceDataset.get_obj_name_to_info(obj_dict)
+    # for mapping from concept actions to text_action
+    color_object_to_obj_name = get_color_object_to_obj_name(obj_name_to_info)
 
     # {1: floor1, 2: sinkbase, 3: sink#1, 4: faucet, 7: sink_counter_front, 8: sink_counter_back, 9: dishwasherbox, 10: cabinetlower, 11: wall, 6: sink_counter_right, 5: sink_counter_left, 12: counter_back#1, 13: cabinettop, 14: cabinettop_filler, 15: shelf_lower, (3, None, 2): sink#1::sink_bottom, (13, 2): cabinettop::dagger_door_left_joint, (13, 6): cabinettop::dagger_door_right_joint, (13, None, 0): cabinettop::cabinettop_storage, 16: mug#1, 17: bowl#1}
     pybullet_idx_to_name = {b: env.world.BODY_TO_OBJECT[b].name for b in env.world.BODY_TO_OBJECT}
@@ -234,6 +718,9 @@ def run_high_level_policy(env: CleanDishEnvV1, max_depth=10, debug=True):
     # important: ignore gripper state
     query_actions_concept_idxs = query_actions_concept_idxs[:, :4].astype(np.int32)
     print(f"Action space: {len(query_actions_concept_idxs)}")
+
+    admissible_text_actions = sorted(env.get_admissible_text_actions())
+    admissible_concept_actions = [get_concept_action_from_text_action(text_action, obj_name_to_info) for text_action in admissible_text_actions]
 
     # ----------------------------------
     # start acting
@@ -253,84 +740,33 @@ def run_high_level_policy(env: CleanDishEnvV1, max_depth=10, debug=True):
         scene_xyzrgb = scene_xyzrgb[:, :6]  # ignore alpha
         scene_xyzrgb[:, :3] = pc_normalize(scene_xyzrgb[:, :3])
 
+        grasped = symbolic_state["grasped"]
+
         if debug:
             print("\n\n" + "=" * 100)
             print(f"timestep {t}")
             print(f"symbolic state: {symbolic_state}")
             # plot_images({view_name: Image.fromarray(cur_obs[view_name][0], 'RGBA') for view_name in cur_obs})
-            trimesh.PointCloud(scene_xyzrgb[:, :3], scene_xyzrgb[:, 3:]).show()
 
-        # --------------------------------
-        # build current data for model
-        # pcs: B, T (sequence length), P (number of pts), D (number of channels)
-        # next_action_concept_idxs: B, T, L (number of concepts)
-        # query_actions_concept_idxs: B, T, K (number of query actions), L
-        # gripper_states: B, T
-        B = 1
-        # debug: make one step inference
-        T = 1
-        P = num_scene_pts
-        D = 6
-        L = 4
-        # K = ?
+        # sorted_query_actions, sorted_query_actions_scores = plan_single_step(model,
+        #                  scene_xyzrgb, query_actions_concept_idxs, grasped,
+        #                  query_actions,
+        #                  num_scene_pts, device,
+        #                  admissible_concept_actions=admissible_concept_actions, debug=True)
 
-        # prepare single datum
-        if symbolic_state["grasped"] is None:
-            gripper_states = np.array(vocab.gripper_state_to_id["empty"], dtype=np.int32)  # 1
-        else:
-            gripper_states = np.array(vocab.gripper_state_to_id["grasped"], dtype=np.int32)  # 1
-        next_action_concept_idxs = np.zeros((B, T, L), dtype=np.int32)
-        pcs = scene_xyzrgb.astype(np.float32)  # P, D
-
-        # repeat and convert to tensor
-        pcs = einops.repeat(pcs, "P D -> B T P D", B=B, T=T, P=P, D=D)
-        query_actions_concept_idxs = einops.repeat(query_actions_concept_idxs, "K L -> B T K L", B=B, T=T, L=L)
-        gripper_states = einops.repeat(gripper_states, " -> B T", B=B, T=T)
-
-        batch = {"pcs": pcs,
-                 "query_actions_concept_idxs": query_actions_concept_idxs,
-                 "next_action_concept_idxs": next_action_concept_idxs,
-                 "gripper_states": gripper_states}
-
-        move_to_gpu(batch, device=device)
-
-        # the policy model should predict the next action given the current observation
-        with torch.no_grad():
-            query_actions_logits = model.model(batch["pcs"],
-                                           batch["gripper_states"],
-                                           batch["next_action_concept_idxs"],
-                                           batch["query_actions_concept_idxs"])  # B, T, K
-        query_actions_scores = model.model.convert_logit_to_binary(query_actions_logits).cpu().numpy()  # B, T, K
-        query_actions_scores = query_actions_scores[0][0]
-        print(query_actions_scores.shape)
-
-        # sort query_actions and query_action_scores by query_action_scores
-        ranking_idx = np.argsort(query_actions_scores)[::-1]
-        sorted_query_actions = [query_actions[idx] for idx in ranking_idx]
-        sorted_query_actions_scores = query_actions_scores[ranking_idx]
-
-        for query_action, query_action_score in zip(sorted_query_actions, sorted_query_actions_scores):
-            print(query_action, query_action_score)
-
-        input("next")
+        plan_multi_step(model,
+                        scene_xyzrgb, query_actions_concept_idxs, grasped,
+                        query_actions,
+                        num_scene_pts, device,
+                        admissible_concept_actions=admissible_concept_actions, debug=True,
+                        action_score_threshold=0.3, planning_horizon=6)
 
         # --------------------------------
         # step the environment
         # action = env.convert_text_to_action(text_action[0], text_action[1], text_action[2])
         # new_obs, new_score, new_done, _, _ = env.step(action)
 
-def run_evaluation(env_config_file, env_seed, semantic_spec_seed):
-    env_config = parse_yaml(env_config_file)
-
-    # override
-    env_config.seed = env_seed
-    env_config.semantic_spec_seed = semantic_spec_seed
-
-    # change data.out_dir for storing evaluation data
-    env_config.data.out_dir = os.path.join(os.path.split(env_config.data.out_dir)[0], "evaluation")
-    print(f"Saving evaluation data to {abspath(env_config.data.out_dir)}")
-
-    process(env_config)
+        exit()
 
 
 if __name__ == '__main__':
