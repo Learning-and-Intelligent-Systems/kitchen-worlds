@@ -76,12 +76,16 @@ import trimesh
 # sys.path.append("../../nsplan/src")  # adjust the path as necessary
 import nsplan.data.vocab2 as vocab
 from nsplan.data.dataset_sequence_multiview import MultiviewSequenceDataset
+from nsplan.data.dataset_placement_hf import PlacementDatasetBuilder, APPROACH_DISTANCE
 from nsplan.models.pl_models import DynamicsFeasibilityModel
+from nsplan.models.pl_models import PoseDiffusionModel
 
 from nsplan.utils.point_cloud import to_pc, extract_scene_xyzrgb, extract_multiview_img
 from nsplan.utils.pointnet import pc_normalize
 from nsplan.utils.data_conversions import move_to_gpu, repeat_batch, move_to_numpy
 from nsplan.utils.files import get_checkpoint_path_from_dir
+from nsplan.utils.acronym import create_gripper_marker
+import nsplan.utils.transformations as tra
 
 
 # ===============================================================================================
@@ -183,6 +187,33 @@ def load_model_and_cfg():
     return model, cfg
 
 
+def load_placement_model_and_cfg():
+
+    # create a new argparser args object to store the model arguments
+    args = argparse.Namespace()
+    args.base_config_file = "/home/weiyu/Research/nsplan/nsplan/configs/base.yaml"
+
+    args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTLanConTransformer6DNoisePlacementDiffusionModel.yaml"
+    args.checkpoint_id = "bgq64avn"
+
+
+    base_cfg = OmegaConf.load(args.base_config_file)
+    cfg = OmegaConf.load(args.config_file)
+    cfg = OmegaConf.merge(base_cfg, cfg)
+
+    # pl.seed_everything(cfg.random_seed)
+    device = (torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu"))
+
+    checkpoint_dir = os.path.join(cfg.WANDB.save_dir, cfg.WANDB.project, args.checkpoint_id, "checkpoints")
+    checkpoint_path = get_checkpoint_path_from_dir(checkpoint_dir)
+
+    model = PoseDiffusionModel.load_from_checkpoint(checkpoint_path)
+    model.to(device)
+    model.eval()
+
+    return model, cfg
+
+
 # ===============================================================================================
 # env related
 
@@ -262,6 +293,185 @@ def play(env):
     print("\n" + "*" * 100)
     print("Played {} steps, scoring {} points.".format(num_moves, score))
     print("*" * 100 + "\n")
+
+
+# ===============================================================================================
+# low-level
+
+
+def build_placement_model_input(scene_xyzrgb, grasp_tform, next_action_concept_idx,
+                                B, P, D, device):
+    """
+    :param grasp_tform: 4, 4
+    :param scene_xyzrgb: P, D
+    :param next_action_concept_idx: L
+    :param B:
+    :param P:
+    :param D:
+    :param device:
+    :return:
+    """
+
+    # build current data for model
+    # scene_xyzrgb: B, P, 6
+    # next_action_concept_idx: B, L
+    # grasp_tform: B, 4, 4
+    # t: B,
+
+    # process for placement model
+    scene_xyzrgb = scene_xyzrgb[:, :6]
+    xyz_centroid = np.mean(scene_xyzrgb[:, :3], axis=0)
+    xyz_scale = 1.0 / np.max(np.sqrt(np.sum((scene_xyzrgb[:, :3] - xyz_centroid) ** 2, axis=1)))
+
+    scene_xyzrgb[:, :3] = (scene_xyzrgb[:, :3] - xyz_centroid) * xyz_scale
+    grasp_tform[:3, 3] = (grasp_tform[:3, 3] - xyz_centroid) * xyz_scale
+
+    batch_scene_xyzrgb = einops.repeat(scene_xyzrgb, "P D -> B P D", B=B, P=P, D=D)
+    batch_next_action_concept_idxs = einops.repeat(next_action_concept_idx, "L -> B L", B=B)
+    grasp_tform = einops.repeat(grasp_tform, "4 4 -> B 4 4", B=B)
+
+    batch = {"scene_xyzrgb": batch_scene_xyzrgb,
+             "next_action_concept_idx": batch_next_action_concept_idxs,
+             "condition_tform": grasp_tform}
+
+    move_to_gpu(batch, device=device)
+
+    return batch
+
+
+def predict_placement(model,
+                    # model input
+                     scene_xyzrgb, next_action_concept_idx, grasp_tform,
+                    # hyperparameters
+                     num_scene_pts, device, num_samples=20):
+    # 1. build data
+    batch = build_placement_model_input(scene_xyzrgb, grasp_tform, next_action_concept_idx,
+                                        B=num_samples, P=num_scene_pts, D=6, device=device)
+
+    # 2. inference
+    if model.model.output_head_type == "se3_energy":
+        target_tforms, last_energy = model.sample(batch, debug=True)
+        # print("last_energy.shape:", last_energy.shape)
+        # print("grasp_tform.shape:", grasp_tform.shape)
+    elif model.model.output_head_type == "6d_noise":
+        target_tforms = model.sample(batch)
+        print("grasp_tform.shape:", target_tforms.shape)
+    else:
+        raise NotImplementedError
+
+    target_tforms = target_tforms.cpu().numpy()  # B, 4, 4
+
+    # 3. visualization
+    move_to_numpy(batch)
+    scene_xyzrgb = batch["scene_xyzrgb"][0]
+    next_action_concept_idx = batch["next_action_concept_idx"][0]
+    xyz_scale = batch["xyz_scale"][0]
+
+    # need to rescale grasp
+
+
+def run_low_level_placement_policy(env: CleanDishEnvV1, max_depth=10, debug=True):
+
+    # TODO: load from model or data config
+
+    model, cfg = load_placement_model_and_cfg()
+    device = model.device
+
+    # ----------------------------------
+    # hyperparams:
+    num_obj_pts = cfg.DATASET.num_obj_pts
+    num_scene_pts = cfg.DATASET.num_scene_pts
+
+    # ----------------------------------
+    # meta data
+    obj_dict = env.world.obj_dict
+    for obj in obj_dict:
+        obj_dict[obj]["name"] = str(obj_dict[obj]["name"])
+    # for mapping from text_action to concept actions
+    obj_name_to_info = PlacementDatasetBuilder.get_obj_name_to_info(obj_dict)
+    # for mapping from concept actions to text_action
+    color_object_to_obj_name = get_color_object_to_obj_name(obj_name_to_info)
+
+    # {1: floor1, 2: sinkbase, 3: sink#1, 4: faucet, 7: sink_counter_front, 8: sink_counter_back, 9: dishwasherbox, 10: cabinetlower, 11: wall, 6: sink_counter_right, 5: sink_counter_left, 12: counter_back#1, 13: cabinettop, 14: cabinettop_filler, 15: shelf_lower, (3, None, 2): sink#1::sink_bottom, (13, 2): cabinettop::dagger_door_left_joint, (13, 6): cabinettop::dagger_door_right_joint, (13, None, 0): cabinettop::cabinettop_storage, 16: mug#1, 17: bowl#1}
+    pybullet_idx_to_name = {b: env.world.BODY_TO_OBJECT[b].name for b in env.world.BODY_TO_OBJECT}
+    obj_name_to_pybullet_idx = {pybullet_idx_to_name[pbid]: pbid for pbid in pybullet_idx_to_name}
+    obj_name_to_pybullet_idx["robot"] = 0
+
+    cached_candidate_actions, cached_feasibility_matrix, orderer_vocabs = PlacementDatasetBuilder.cache_candidate_actions_and_feasibility_matrix(vocab)
+    # important: for placement, ignore gripper state
+    # orderer_vocabs += [vocab.gripper_state_to_id]
+
+    # query_actions_concept_idxs = np.copy(cached_feasibility_matrix)  # K, L
+    # filter "null" actions
+    query_actions_concept_idxs, query_actions = filter_null_actions(cached_candidate_actions, cached_feasibility_matrix)
+    # important: ignore gripper state
+    query_actions_concept_idxs = query_actions_concept_idxs[:, :4].astype(np.int32)
+    print(f"Action space: {len(query_actions_concept_idxs)}")
+
+    admissible_text_actions = sorted(env.get_admissible_text_actions())
+    admissible_concept_actions = [get_concept_action_from_text_action(text_action, obj_name_to_info) for text_action in admissible_text_actions]
+
+    # since we are testing low-level policy, we don't care about goal
+    # goal_actions = get_goal_actions(env.symbolic_goal)
+    # assert len(goal_actions) == 1, "We currently assume one goal action."
+    # goal_action = goal_actions[0]
+    # goal_concept_action = get_concept_action_from_text_action(goal_action, obj_name_to_info)
+    # print(f"Goal action: {goal_action} | Goal concept action: {goal_concept_action}")
+
+    # ----------------------------------
+    # start acting
+    cur_obs, info = env.reset()
+    cur_symbolic_state = env.symbolic_state
+    cur_done = False
+    cur_score = 0
+
+    for t in range(max_depth):
+
+        # --------------------------------
+        # build current observation
+        furniture_names = ["sink#1", "sink_counter_left", "sink_counter_right", "cabinettop", "shelf_lower"]
+        obj_names = ["scene"] + ["robot"] + furniture_names + sorted(obj_name_to_info.keys())
+        scene_xyzrgb = extract_scene_xyzrgb(cur_obs, obj_names, obj_name_to_pybullet_idx,
+                                            num_pts_object=num_obj_pts,
+                                            num_pts_scene=num_scene_pts, visualize=False)
+
+        grasp_tform = grasp_tform @ tra.translation_matrix([0, 0, -APPROACH_DISTANCE])
+
+        if debug:
+            print("\n\n" + "=" * 100)
+            print(f"timestep {t}")
+            print(f"symbolic state: {cur_symbolic_state}")
+            # plot_images({view_name: Image.fromarray(cur_obs[view_name][0], 'RGBA') for view_name in cur_obs})
+
+        # sorted_query_actions, sorted_query_actions_scores = plan_single_step(model,
+        #                  scene_xyzrgb, query_actions_concept_idxs, grasped,
+        #                  query_actions,
+        #                  num_scene_pts, device,
+        #                  admissible_concept_actions=admissible_concept_actions, debug=True)
+
+        goal_concept_action_sequence = plan_multi_step(model,
+                        scene_xyzrgb, query_actions_concept_idxs, grasped,
+                        query_actions, goal_concept_action,
+                        num_scene_pts, device,
+                        admissible_concept_actions=admissible_concept_actions, debug=True,
+                        action_score_threshold=0.1, planning_horizon=6, max_beam_size=100)
+
+        # --------------------------------
+        # step the environment
+        text_action = get_text_action_from_concept_action(goal_concept_action_sequence[0], color_object_to_obj_name)
+        if debug:
+            print(f"Take action: {text_action} | concept action: {goal_concept_action_sequence[0]}")
+
+        action = env.convert_text_to_action(text_action[0], text_action[1], text_action[2])
+        cur_obs, cur_score, cur_done, _, _ = env.step(action)
+        cur_symbolic_state = env.symbolic_state
+
+        print(f"\nscore {cur_score}, done {cur_done}")
+        if cur_done:
+            break
+
+    print(f"Task completed: {cur_done}")
+
 
 
 # ===============================================================================================
