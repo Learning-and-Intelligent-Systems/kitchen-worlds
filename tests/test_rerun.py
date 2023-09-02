@@ -43,14 +43,14 @@ GENERATE_MULTIPLE_SOLUTIONS = False
 GENERATE_SKELETONS = False
 GENERATE_NEW_PROBLEM = False
 GENERATE_NEW_LABELS = False
-USE_LARGE_WORLD = True
+USE_LARGE_WORLD = False  ## for increased difficulty
 CLEAN_LARGE_WORLD = False
 
-USE_VIEWER = False
+USE_VIEWER = True
 LOCK_VIEWER = True
 DIVERSE = True
 PREFIX = 'diverse_' if DIVERSE else ''
-RERUN_SUBDIR = 'rerun_4'
+RERUN_SUBDIR = 'rerun'
 
 SKIP_IF_SOLVED = True and not GENERATE_SKELETONS
 SKIP_IF_SOLVED_RECENTLY = True and not GENERATE_SKELETONS
@@ -58,6 +58,7 @@ RETRY_IF_FAILED = True
 check_time = 1675220260  ## for 12 sec of FD
 
 TASK_NAME = 'tt_storage'
+TASK_NAME = 'hh_braiser'
 
 evaluation_time = {
     'tt_storage': 90,
@@ -69,14 +70,14 @@ evaluation_time = {
 evaluation_time.update({n.replace('tt', 'mm'): v for n, v in evaluation_time.items()})
 evaluation_time.update({n.replace('tt', 'hh'): v for n, v in evaluation_time.items()})
 evaluation_time.update({n.replace('tt', 'val'): v for n, v in evaluation_time.items()})
-evaluation_time = evaluation_time[TASK_NAME]
+evaluation_time = evaluation_time[TASK_NAME] if TASK_NAME in evaluation_time else 60
 
 downward_time = 3
 if '_to_storage' in TASK_NAME:
     downward_time = 60
 
 CASES = None  ##
-CASES = ['13']
+# CASES = ['13']
 
 if CASES is not None:
     SKIP_IF_SOLVED = False
