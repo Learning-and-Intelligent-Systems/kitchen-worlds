@@ -49,7 +49,7 @@ import matplotlib.pyplot as plt
 from world_builder.entities import StaticCamera
 from world_builder.utils import parse_yaml
 from pybullet_tools.pr2_primitives import Pose, Conf
-from pybullet_tools.utils import get_pose, multiply, quat_from_euler, dump_world, get_bodies, remove_body, get_bodies, remove_body, invert, Euler, Point, pairwise_collisions, tform_from_pose
+from pybullet_tools.utils import get_pose, multiply, quat_from_euler, dump_world, get_bodies, remove_body, get_bodies, remove_body, invert, Euler, Point, pairwise_collisions, tform_from_pose, pose_from_tform
 from pybullet_tools.flying_gripper_utils import get_se3_joints, se3_from_pose, Grasp, se3_ik
 from world_builder.actions import get_primitive_actions
 
@@ -549,6 +549,72 @@ class CleanDishEnvV1(gym.Env):
 
         return observation, reward, terminated, False, info
 
+    def step_with_target_tforms(self, action, target_tforms):
+        # return observation, reward, terminated, False, info
+
+        ## compute env commands
+        commands = None
+
+        # TODO: it seems like these stream functions will also change the world state, we need to be able to save state
+        #       before planning and revert after planning
+        manip_name, obj_name, loc_name = self.convert_action_to_text(action)
+
+        symbolically_feasible = self.check_symbolic_action_feasibility(manip_name, obj_name, loc_name)
+        print(f"Action {action} is symbolically feasible: {symbolically_feasible}")
+
+        if symbolically_feasible:
+
+            bodies_before = get_bodies()
+            # saver = WorldSaver()
+            # with LockRenderer(lock=True):
+            if manip_name == "pick":
+                # execute pick
+                commands = self._get_pick_action(obj_name)
+            elif manip_name == "place":
+                # execute place
+                commands = self._get_place_action_with_target_tforms(obj_name, loc_name, target_tforms)
+            # TODO: we want to be able to restore to the state before planning, but right not grasp attachements are not
+            #       correctly restored.
+            # saver.restore()
+            # self.state.assign()
+
+            # important: cleanup
+            bodies_after = get_bodies()
+            aux_bodies = set(bodies_after) - set(bodies_before)
+            print("new bodies created in finding motion", aux_bodies)
+            for body in aux_bodies:
+                remove_body(body)
+            if "hand" in self.robot.grippers:
+                self.robot.remove_gripper("hand")
+
+        ## step env and compute reward
+        if symbolically_feasible is False or commands is None:
+            terminated = False
+            reward = -1
+        else:
+            # set_renderer(True)
+            # apply_actions(self.state, commands, time_step=config.time_step, verbose=False)
+
+            # debug: right now we are restoring the world to the initial state and execute all actions planned so far.
+            #        once we have way to restore to any particular time of the execution, we don't need to do this anymore.
+            self.commands_so_far += commands
+            self.state.remove_gripper()
+            self.saver.restore()
+            set_renderer(True)
+            apply_actions(self.state, self.commands_so_far, time_step=0, verbose=False)
+
+            # update symbolic state
+            self.update_symbolic_state(target_obj_name=obj_name)
+
+            terminated = self.check_reach_symbolic_goal()
+            reward = 100 if terminated else 0  # Binary sparse rewards
+
+        ## update observation
+        observation = self._get_obs()
+        info = self._get_info()
+
+        return observation, reward, terminated, False, info
+
     def reset(self):
 
         print(self.robot.grippers)
@@ -770,6 +836,62 @@ class CleanDishEnvV1(gym.Env):
 
         return None
 
+    def _get_place_action_with_target_tforms(self, object_name, surface_name, target_tforms):
+
+        ## before we do anything
+        if self.current_g is None:
+            # there is nothing in hand to be placed
+            return None
+
+        # get current robot configuration
+        current_q = Conf(self.robot, get_se3_joints(self.robot))
+
+        surface = self.world.name_to_body(surface_name)
+
+        obj_body = self.world.name_to_body(object_name)
+
+        placement_poses = []
+        for target_tform in target_tforms:
+            placement_poses.append(multiply(pose_from_tform(target_tform), invert(self.current_g[1].value)))
+
+        for pi, placement_pose in enumerate(placement_poses):
+
+            print(f"find ik for No.{pi} placement pose: {placement_pose}")
+
+            if check_collisions_against_movable_objects(obj_body, placement_pose[0][0], self.moveable_bodies):
+                print("found collisions between moveable objects")
+                continue
+
+            print("find ik for placement pose", placement_pose)
+            for ik in self.stream_map["inverse-kinematics-hand"](a=None, o=obj_body, p=placement_pose[0][0],
+                                                                 g=self.current_g[0]):
+                print(ik)
+                if len(ik) == 0:
+                    continue
+
+                ## motion plan to place
+                q = ik[0][0]
+                for move_cmd in self.stream_map["plan-free-motion-hand"](q1=current_q, q2=q):
+                    print(move_cmd)
+                    if len(move_cmd) == 0:
+                        continue
+
+                    ## computes actions to step the world
+                    move_action = ('move_cartesian', (current_q, q, move_cmd[0][0]))
+                    place_action = ('place_hand', ('hand', obj_body, placement_pose, self.current_g[0], None, ik[0][1]))
+                    commands = []
+                    for action in [move_action, place_action]:
+                        commands += get_primitive_actions(action, self.world)
+
+                    ## update world state
+                    self.current_gp = tform_from_pose(multiply(placement_pose[0][0].value, self.current_g[1].value))
+                    # after computing grasp pose for placement (gp), reset current_g
+                    self.current_g = None
+
+                    return commands
+
+        return None
+
     #-------------------------------------------------------------------------------------------------------------------
     def initialize_symbolic_state(self):
         for obj in self.world.OBJECTS_BY_CATEGORY["moveable"]:
@@ -907,7 +1029,7 @@ def collect_for_fastamp():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="collect rollouts")
     parser.add_argument("--seed", default=0, type=int)
-    parser.add_argument("--semantic_spec_seed", default=0, type=int)
+    parser.add_argument("--semantic_spec_seed", default=800, type=int)
     parser.add_argument("--config_file", default='../configs/clean_dish_feg_collect_rollouts.yaml', type=str)
     args = parser.parse_args()
 

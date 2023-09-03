@@ -132,6 +132,13 @@ def get_concept_action_from_text_action(text_action, obj_name_to_info):
     return (manipulation, color, object_class, location)
 
 
+def get_concept_action_idx_from_concept_action(concept_action, query_actions_concept_idxs, query_actions):
+    for i, action in enumerate(query_actions):
+        if action == concept_action:
+            return query_actions_concept_idxs[i]
+    return None
+
+
 def get_color_object_to_obj_name(obj_name_to_info):
     color_object_to_obj_name = {}
     for obj_name in obj_name_to_info:
@@ -268,7 +275,8 @@ def process(config):
     env = CleanDishEnvV1(world, goal, config, render_mode="bot")
     # input("env initialized, next?")
     # play(env)
-    run_high_level_policy(env)
+    # run_high_level_policy(env)
+    run_low_level_placement_policy(env)
 
 
 def play(env):
@@ -318,6 +326,8 @@ def build_placement_model_input(scene_xyzrgb, grasp_tform, next_action_concept_i
     # grasp_tform: B, 4, 4
     # t: B,
 
+    grasp_tform = grasp_tform @ tra.translation_matrix([0, 0, -APPROACH_DISTANCE])
+
     # process for placement model
     scene_xyzrgb = scene_xyzrgb[:, :6]
     xyz_centroid = np.mean(scene_xyzrgb[:, :3], axis=0)
@@ -328,18 +338,20 @@ def build_placement_model_input(scene_xyzrgb, grasp_tform, next_action_concept_i
 
     batch_scene_xyzrgb = einops.repeat(scene_xyzrgb, "P D -> B P D", B=B, P=P, D=D)
     batch_next_action_concept_idxs = einops.repeat(next_action_concept_idx, "L -> B L", B=B)
-    grasp_tform = einops.repeat(grasp_tform, "4 4 -> B 4 4", B=B)
+    grasp_tform = einops.repeat(grasp_tform, "i j -> B i j", B=B)
+    xyz_scale = einops.repeat(np.array([xyz_scale]), "i -> B i", B=B)
 
-    batch = {"scene_xyzrgb": batch_scene_xyzrgb,
-             "next_action_concept_idx": batch_next_action_concept_idxs,
-             "condition_tform": grasp_tform}
+    batch = {"scene_xyzrgb": batch_scene_xyzrgb.astype(np.float32),
+             "next_action_concept_idx": batch_next_action_concept_idxs.astype(np.int32),
+             "condition_tform": grasp_tform.astype(np.float32),
+             "xyz_scale": xyz_scale.astype(np.float32)}
 
     move_to_gpu(batch, device=device)
 
     return batch
 
 
-def predict_placement(model,
+def sample_placements(model,
                     # model input
                      scene_xyzrgb, next_action_concept_idx, grasp_tform,
                     # hyperparameters
@@ -367,7 +379,25 @@ def predict_placement(model,
     next_action_concept_idx = batch["next_action_concept_idx"][0]
     xyz_scale = batch["xyz_scale"][0]
 
-    # need to rescale grasp
+    gripper_viss = []
+    for gi, target_tform in enumerate(target_tforms[:5]):
+        # create a rgba color for each gi by using heat map color
+        g_color = plt.cm.jet((5 - gi) / 5.0)[:3]
+        g_color = [int(255 * c) for c in g_color] + [255.0 * (5 - gi) / 5]
+        gripper_vis = create_gripper_marker(color=g_color, tube_radius=0.005)
+        # gripper_vis = create_gripper_marker(color=[0, 0, 255, 255.0 * (5 - gi)/ 5], tube_radius=0.005)
+        # important: for visualization, it's important to scale the gripper as well
+        gripper_vis = gripper_vis.apply_scale(xyz_scale)
+        gripper_vis = gripper_vis.apply_transform(target_tform @ tra.euler_matrix(0, 0, -np.pi / 2))
+        gripper_viss.append(gripper_vis)
+
+    # # add a unit length transparent box to indicate region
+    box = trimesh.creation.box(extents=[2.0, 2.0, 2.0])
+    box.visual.face_colors = [0, 0, 0, 0.01]
+
+    trimesh.Scene([trimesh.PointCloud(scene_xyzrgb[:, :3], scene_xyzrgb[:, 3:])] + gripper_viss + [box]).show()
+
+    return target_tforms
 
 
 def run_low_level_placement_policy(env: CleanDishEnvV1, max_depth=10, debug=True):
@@ -424,51 +454,90 @@ def run_low_level_placement_policy(env: CleanDishEnvV1, max_depth=10, debug=True
     cur_symbolic_state = env.symbolic_state
     cur_done = False
     cur_score = 0
+    commands_so_far = []
+    cur_g = None
+    cur_gp = None
 
     for t in range(max_depth):
 
+        # first find a feasible action
+        symbolic_feasible_text_actions = []
+        for text_action in admissible_text_actions:
+            symbolic_feasible = env.check_symbolic_action_feasibility(text_action[0], text_action[1], text_action[2])
+            if symbolic_feasible:
+                symbolic_feasible_text_actions.append(text_action)
+        if debug:
+            print(f"{len(symbolic_feasible_text_actions)} symbolic feasible actions: {symbolic_feasible_text_actions}")
+
+        grasp_success = False
+        for text_action in symbolic_feasible_text_actions:
+            reset_obs, _ = env.reset_to_state(commands_so_far, cur_g, cur_gp, cur_symbolic_state)
+            action = env.convert_text_to_action(text_action[0], text_action[1], text_action[2])
+            new_obs, new_score, new_done, _, _ = env.step(action)
+            if new_score != -1:
+                print(f"Found feasible action: {text_action}")
+                grasp_success = True
+                break
+
+        assert grasp_success, "No feasible action found."
+        assert env.current_g is not None, "No grasp found."
+
         # --------------------------------
         # build current observation
+
+        symbolic_feasible_text_actions = []
+        for text_action in admissible_text_actions:
+            symbolic_feasible = env.check_symbolic_action_feasibility(text_action[0], text_action[1], text_action[2])
+            if symbolic_feasible:
+                symbolic_feasible_text_actions.append(text_action)
+        if debug:
+            print(f"{len(symbolic_feasible_text_actions)} symbolic feasible actions: {symbolic_feasible_text_actions}")
+
+        cur_obs = new_obs
+        cur_symbolic_state = env.symbolic_state
+        chosen_grasp_tform = env.current_g[2]
+
+        # choose an action randomly from symbolic_feasible_text_actions
+        chosen_text_action = random.choice(symbolic_feasible_text_actions)
+        chosen_concept_action = get_concept_action_from_text_action(chosen_text_action, obj_name_to_info)
+        chosen_concept_action_idx = get_concept_action_idx_from_concept_action(chosen_concept_action, query_actions_concept_idxs, query_actions)
+
         furniture_names = ["sink#1", "sink_counter_left", "sink_counter_right", "cabinettop", "shelf_lower"]
         obj_names = ["scene"] + ["robot"] + furniture_names + sorted(obj_name_to_info.keys())
         scene_xyzrgb = extract_scene_xyzrgb(cur_obs, obj_names, obj_name_to_pybullet_idx,
                                             num_pts_object=num_obj_pts,
                                             num_pts_scene=num_scene_pts, visualize=False)
 
-        grasp_tform = grasp_tform @ tra.translation_matrix([0, 0, -APPROACH_DISTANCE])
-
         if debug:
             print("\n\n" + "=" * 100)
             print(f"timestep {t}")
             print(f"symbolic state: {cur_symbolic_state}")
+            print(f"chosen action: {chosen_text_action} | concept action: {chosen_concept_action}")
             # plot_images({view_name: Image.fromarray(cur_obs[view_name][0], 'RGBA') for view_name in cur_obs})
 
-        # sorted_query_actions, sorted_query_actions_scores = plan_single_step(model,
-        #                  scene_xyzrgb, query_actions_concept_idxs, grasped,
-        #                  query_actions,
-        #                  num_scene_pts, device,
-        #                  admissible_concept_actions=admissible_concept_actions, debug=True)
+        target_tforms = sample_placements(model,
+                          # model input
+                          scene_xyzrgb, chosen_concept_action_idx, chosen_grasp_tform,
+                          # hyperparameters
+                          num_scene_pts, device, num_samples=20)
 
-        goal_concept_action_sequence = plan_multi_step(model,
-                        scene_xyzrgb, query_actions_concept_idxs, grasped,
-                        query_actions, goal_concept_action,
-                        num_scene_pts, device,
-                        admissible_concept_actions=admissible_concept_actions, debug=True,
-                        action_score_threshold=0.1, planning_horizon=6, max_beam_size=100)
+        # TODO: need to be able to execute the placement action
+        # TODO: we can replace placement sampling stream with our placement diffusion model
 
         # --------------------------------
         # step the environment
-        text_action = get_text_action_from_concept_action(goal_concept_action_sequence[0], color_object_to_obj_name)
-        if debug:
-            print(f"Take action: {text_action} | concept action: {goal_concept_action_sequence[0]}")
-
-        action = env.convert_text_to_action(text_action[0], text_action[1], text_action[2])
-        cur_obs, cur_score, cur_done, _, _ = env.step(action)
+        action = env.convert_text_to_action(chosen_text_action[0], chosen_text_action[1], chosen_text_action[2])
+        cur_obs, cur_score, cur_done, _, _ = env.step_with_target_tforms(action, target_tforms)
         cur_symbolic_state = env.symbolic_state
 
         print(f"\nscore {cur_score}, done {cur_done}")
-        if cur_done:
-            break
+
+        furniture_names = ["sink#1", "sink_counter_left", "sink_counter_right", "cabinettop", "shelf_lower"]
+        obj_names = ["scene"] + ["robot"] + furniture_names + sorted(obj_name_to_info.keys())
+        scene_xyzrgb = extract_scene_xyzrgb(cur_obs, obj_names, obj_name_to_pybullet_idx,
+                                            num_pts_object=num_obj_pts,
+                                            num_pts_scene=num_scene_pts, visualize=False)
+        trimesh.PointCloud(scene_xyzrgb[:, :3], scene_xyzrgb[:, 3:]).show()
 
     print(f"Task completed: {cur_done}")
 
