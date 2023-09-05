@@ -852,7 +852,22 @@ class CleanDishEnvV1(gym.Env):
 
         placement_poses = []
         for target_tform in target_tforms:
-            placement_poses.append(multiply(pose_from_tform(target_tform), invert(self.current_g[1].value)))
+            placement_pose = multiply(pose_from_tform(target_tform), invert(self.current_g[1].value))
+            # placement_pose = Pose(obj_body, value=placement_pose, support=surface)
+            placement_pose = Pose(obj_body, value=placement_pose)
+            # follow the same format as placement_stream
+            placement_poses.append([(placement_pose,)])
+            print("self.current_g[1].value", self.current_g[1].value)
+            print("target_tform", target_tform)
+            print("placement_pose", placement_pose)
+
+        if surface_name == "cabinettop_storage":
+            placement_stream = self.stream_map["sample-pose-in"]
+        else:
+            placement_stream = self.stream_map["sample-pose-on"]
+        for placement_pose in placement_stream(obj_body, surface):
+            print("gt placement_pose", placement_pose)
+            print("gt current_gp", tform_from_pose(multiply(placement_pose[0][0].value, self.current_g[1].value)))
 
         for pi, placement_pose in enumerate(placement_poses):
 

@@ -82,6 +82,7 @@ from nsplan.utils.point_cloud import to_pc, extract_scene_xyzrgb, extract_multiv
 from nsplan.utils.pointnet import pc_normalize
 from nsplan.utils.data_conversions import move_to_gpu, repeat_batch, move_to_numpy
 from nsplan.utils.files import get_checkpoint_path_from_dir
+from nsplan.utils.visualization import adjust_scene_camera, scene_to_img, visualize_image_text_pairs, generate_html
 
 
 # ===============================================================================================
@@ -166,6 +167,9 @@ def load_model_and_cfg():
     # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTFiLM1DDynamicsFeasibilityModel.yaml"
     # args.checkpoint_id = "026qc2hq"
 
+    # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTFiLM1DDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions.yaml"
+    # args.checkpoint_id = "0yjlzwp2"
+
     base_cfg = OmegaConf.load(args.base_config_file)
     cfg = OmegaConf.load(args.config_file)
     cfg = OmegaConf.merge(base_cfg, cfg)
@@ -237,7 +241,7 @@ def process(config):
     env = CleanDishEnvV1(world, goal, config, render_mode="bot")
     # input("env initialized, next?")
     # play(env)
-    run_high_level_policy(env)
+    run_high_level_policy(env, exp_dir)
 
 
 def play(env):
@@ -574,10 +578,14 @@ def plan_multi_step(model,
     admissible_action_mask = np.array(admissible_action_mask, dtype=bool)  # K
     goal_action_idx = query_actions.index(goal_action)
 
+    texts = []
+
     for t in range(planning_horizon):
 
         print("\n\n" + "~" * 100)
         print(f"planning timestep {t}")
+        texts.append("\n\n" + "~" * 50)
+        texts.append(f"planning timestep {t}")
 
         # sampled_action_concept_idx_sequences: B, t, L
         if t == 0:
@@ -644,6 +652,7 @@ def plan_multi_step(model,
 
             for sa, sas in zip(sampled_actions, sampled_action_scores):
                 print(f"{sa}: {sas}")
+                texts.append(f"{sa}: {sas}")
 
             sampled_action_idx_sequences = einops.rearrange(sampled_action_idxs, 'B -> B 1')  # B, T
             sampled_action_score_sequences = einops.rearrange(sampled_action_scores, 'B -> B 1')  # B, T
@@ -692,6 +701,9 @@ def plan_multi_step(model,
                 print(f"action: {action}")
                 score = sampled_accumulated_scores[bi]
                 print(f"score: {score}")
+                texts.append(f"action sequence: {action_sequence}")
+                texts.append(f"action: {action}")
+                texts.append(f"score: {score}")
 
             # debug: sequence assignment is wrong
             new_sampled_action_idx_sequences = np.zeros((new_beam_size, t + 1), dtype=np.int32)
@@ -715,17 +727,19 @@ def plan_multi_step(model,
                 print(f"goal action sequence: {goal_action_sequence}")
                 print(f"goal action score sequence: {sampled_action_score_sequences[bi]}")
                 print("*" * 20 + "\n")
+                texts.append(f"plan for goal {goal_action} found!")
+                texts.append(f"goal action sequence: {goal_action_sequence}")
+                texts.append(f"goal action score sequence: {sampled_action_score_sequences[bi]}")
                 break
 
         # if goal action sequence is found, break from planning
         if goal_action_sequence:
             break
 
+
     if goal_action_sequence:
         print(f"Planning complete. Goal action sequence found: {len(goal_action_sequence) != 0}")
-        if debug:
-            trimesh.PointCloud(scene_xyzrgb[:, :3], scene_xyzrgb[:, 3:]).show()
-        return goal_action_sequence
+        texts.append(f"Planning complete. Goal action sequence found: {len(goal_action_sequence) != 0}")
     else:
         print(f"Scored scored first feasible actions: {scored_first_feasible_actions}")
         first_feasible_actions = [a[0] for a in scored_first_feasible_actions if a[1] > 0.5]
@@ -734,12 +748,25 @@ def plan_multi_step(model,
         random_action = first_feasible_actions[np.random.choice(len(first_feasible_actions))]
         print(f"Planning reached max horizon. Goal action sequence not found")
         print(f"Taking random action: {random_action}")
+        texts.append(f"Scored scored first feasible actions: {scored_first_feasible_actions}")
+        texts.append(f"Planning reached max horizon. Goal action sequence not found")
+        texts.append(f"Taking random action: {random_action}")
         if debug:
             trimesh.PointCloud(scene_xyzrgb[:, :3], scene_xyzrgb[:, 3:]).show()
-        return [random_action]
+        goal_action_sequence = [random_action]
+
+    # if debug:
+    #     trimesh.PointCloud(scene_xyzrgb[:, :3], scene_xyzrgb[:, 3:]).show()
+
+    scene = trimesh.PointCloud(scene_xyzrgb[:, :3], scene_xyzrgb[:, 3:]).scene()
+    adjust_scene_camera(scene, camera_location=[1.5, 0.75, 0.75], look_at=[0, 0, 0])
+    img = scene_to_img(scene, resolution=[1080, 1080])
+    log_img_text_pair = (img, "\n".join(texts))
+
+    return goal_action_sequence, log_img_text_pair
 
 
-def run_high_level_policy(env: CleanDishEnvV1, max_depth=10, debug=True):
+def run_high_level_policy(env: CleanDishEnvV1, exp_dir, max_depth=5, debug=True, only_consider_feasible=True):
 
     # TODO: load from model or data config
 
@@ -777,8 +804,11 @@ def run_high_level_policy(env: CleanDishEnvV1, max_depth=10, debug=True):
     query_actions_concept_idxs = query_actions_concept_idxs[:, :4].astype(np.int32)
     print(f"Action space: {len(query_actions_concept_idxs)}")
 
-    admissible_text_actions = sorted(env.get_admissible_text_actions())
-    admissible_concept_actions = [get_concept_action_from_text_action(text_action, obj_name_to_info) for text_action in admissible_text_actions]
+    if only_consider_feasible:
+        admissible_text_actions = sorted(env.get_admissible_text_actions())
+        admissible_concept_actions = [get_concept_action_from_text_action(text_action, obj_name_to_info) for text_action in admissible_text_actions]
+    else:
+        admissible_concept_actions = None
 
     goal_actions = get_goal_actions(env.symbolic_goal)
     assert len(goal_actions) == 1, "We currently assume one goal action."
@@ -793,7 +823,11 @@ def run_high_level_policy(env: CleanDishEnvV1, max_depth=10, debug=True):
     cur_done = False
     cur_score = 0
 
+    log_img_text_pairs = []
     for t in range(max_depth):
+
+        before_texts = []
+        after_texts = []
 
         # --------------------------------
         # build current observation
@@ -812,6 +846,9 @@ def run_high_level_policy(env: CleanDishEnvV1, max_depth=10, debug=True):
             print(f"timestep {t}")
             print(f"symbolic state: {cur_symbolic_state}")
             # plot_images({view_name: Image.fromarray(cur_obs[view_name][0], 'RGBA') for view_name in cur_obs})
+            before_texts.append("\n\n" + "=" * 100)
+            before_texts.append(f"timestep {t}")
+            before_texts.append(f"symbolic state: {cur_symbolic_state}")
 
         # sorted_query_actions, sorted_query_actions_scores = plan_single_step(model,
         #                  scene_xyzrgb, query_actions_concept_idxs, grasped,
@@ -819,7 +856,7 @@ def run_high_level_policy(env: CleanDishEnvV1, max_depth=10, debug=True):
         #                  num_scene_pts, device,
         #                  admissible_concept_actions=admissible_concept_actions, debug=True)
 
-        goal_concept_action_sequence = plan_multi_step(model,
+        goal_concept_action_sequence, log_img_text_pair = plan_multi_step(model,
                         scene_xyzrgb, query_actions_concept_idxs, grasped,
                         query_actions, goal_concept_action,
                         num_scene_pts, device,
@@ -831,22 +868,29 @@ def run_high_level_policy(env: CleanDishEnvV1, max_depth=10, debug=True):
         text_action = get_text_action_from_concept_action(goal_concept_action_sequence[0], color_object_to_obj_name)
         if debug:
             print(f"Take action: {text_action} | concept action: {goal_concept_action_sequence[0]}")
+            after_texts.append(f"Take action: {text_action} | concept action: {goal_concept_action_sequence[0]}")
+            # input("Press Enter to continue...")
 
         action = env.convert_text_to_action(text_action[0], text_action[1], text_action[2])
         cur_obs, cur_score, cur_done, _, _ = env.step(action)
         cur_symbolic_state = env.symbolic_state
 
         print(f"\nscore {cur_score}, done {cur_done}")
+        after_texts.append(f"\nscore {cur_score}, done {cur_done}")
+
+        log_img_text_pairs += [(None, "\n".join(before_texts)), log_img_text_pair, (None, "\n".join(after_texts))]
         if cur_done:
             break
+
+    generate_html(log_img_text_pairs, save_dir=exp_dir, filename="rollout.html")
 
     print(f"Task completed: {cur_done}")
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="collect rollouts")
-    parser.add_argument("--seed", default=1, type=int)
-    parser.add_argument("--semantic_spec_seed", default=3, type=int)
+    parser.add_argument("--seed", default=0, type=int)
+    parser.add_argument("--semantic_spec_seed", default=0, type=int)
     parser.add_argument("--config_file", default='../configs/clean_dish_feg_collect_rollouts.yaml', type=str)
     args = parser.parse_args()
 

@@ -340,11 +340,13 @@ def build_placement_model_input(scene_xyzrgb, grasp_tform, next_action_concept_i
     batch_next_action_concept_idxs = einops.repeat(next_action_concept_idx, "L -> B L", B=B)
     grasp_tform = einops.repeat(grasp_tform, "i j -> B i j", B=B)
     xyz_scale = einops.repeat(np.array([xyz_scale]), "i -> B i", B=B)
+    xyz_centroid = einops.repeat(xyz_centroid, "i -> B i", B=B)
 
     batch = {"scene_xyzrgb": batch_scene_xyzrgb.astype(np.float32),
              "next_action_concept_idx": batch_next_action_concept_idxs.astype(np.int32),
              "condition_tform": grasp_tform.astype(np.float32),
-             "xyz_scale": xyz_scale.astype(np.float32)}
+             "xyz_scale": xyz_scale.astype(np.float32),
+             "xyz_centroid": xyz_centroid.astype(np.float32)}
 
     move_to_gpu(batch, device=device)
 
@@ -378,6 +380,11 @@ def sample_placements(model,
     scene_xyzrgb = batch["scene_xyzrgb"][0]
     next_action_concept_idx = batch["next_action_concept_idx"][0]
     xyz_scale = batch["xyz_scale"][0]
+    xyz_centroid = batch["xyz_centroid"][0]
+
+    scene_xyzrgb[:, :3] = scene_xyzrgb[:, :3] / xyz_scale + xyz_centroid
+    for target_tform in target_tforms:
+        target_tform[:3, 3] = target_tform[:3, 3] / xyz_scale + xyz_centroid
 
     gripper_viss = []
     for gi, target_tform in enumerate(target_tforms[:5]):
@@ -387,15 +394,15 @@ def sample_placements(model,
         gripper_vis = create_gripper_marker(color=g_color, tube_radius=0.005)
         # gripper_vis = create_gripper_marker(color=[0, 0, 255, 255.0 * (5 - gi)/ 5], tube_radius=0.005)
         # important: for visualization, it's important to scale the gripper as well
-        gripper_vis = gripper_vis.apply_scale(xyz_scale)
+        # gripper_vis = gripper_vis.apply_scale(xyz_scale)
         gripper_vis = gripper_vis.apply_transform(target_tform @ tra.euler_matrix(0, 0, -np.pi / 2))
         gripper_viss.append(gripper_vis)
 
     # # add a unit length transparent box to indicate region
-    box = trimesh.creation.box(extents=[2.0, 2.0, 2.0])
-    box.visual.face_colors = [0, 0, 0, 0.01]
+    # box = trimesh.creation.box(extents=[2.0, 2.0, 2.0])
+    # box.visual.face_colors = [0, 0, 0, 0.01]
 
-    trimesh.Scene([trimesh.PointCloud(scene_xyzrgb[:, :3], scene_xyzrgb[:, 3:])] + gripper_viss + [box]).show()
+    trimesh.Scene([trimesh.PointCloud(scene_xyzrgb[:, :3], scene_xyzrgb[:, 3:])] + gripper_viss).show() # + [box]).show()
 
     return target_tforms
 
@@ -519,7 +526,7 @@ def run_low_level_placement_policy(env: CleanDishEnvV1, max_depth=10, debug=True
                           # model input
                           scene_xyzrgb, chosen_concept_action_idx, chosen_grasp_tform,
                           # hyperparameters
-                          num_scene_pts, device, num_samples=20)
+                          num_scene_pts, device, num_samples=100)
 
         # TODO: need to be able to execute the placement action
         # TODO: we can replace placement sampling stream with our placement diffusion model
@@ -1124,8 +1131,8 @@ def run_high_level_policy(env: CleanDishEnvV1, max_depth=10, debug=True):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="collect rollouts")
-    parser.add_argument("--seed", default=1, type=int)
-    parser.add_argument("--semantic_spec_seed", default=3, type=int)
+    parser.add_argument("--seed", default=0, type=int)
+    parser.add_argument("--semantic_spec_seed", default=2, type=int)
     parser.add_argument("--config_file", default='../configs/clean_dish_feg_collect_rollouts.yaml', type=str)
     args = parser.parse_args()
 

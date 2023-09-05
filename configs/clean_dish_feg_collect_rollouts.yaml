@@ -15,7 +15,7 @@ max_rollouts: 3
 semantic_specs_dir: /home/weiyu/data_drive/nsplan/0828_test_policy/semantic_specs
 
 ## pybullet related
-viewer: false  # default: true
+viewer: true  # default: true
 lock: true
 simulate: false
 teleport: false
