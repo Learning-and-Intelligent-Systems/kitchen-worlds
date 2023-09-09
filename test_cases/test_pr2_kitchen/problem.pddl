@@ -71,8 +71,8 @@
   )
 
   (:goal (and
-    (on braiserlid counter#1)
-    (on veggiezucchini braiserbody#1::braiser_bottom)
+    (holding left braiserlid)
+    ; (on braiserlid counter#1)
+    ;(on veggiezucchini braiserbody#1::braiser_bottom)
   ))
 )
-        
