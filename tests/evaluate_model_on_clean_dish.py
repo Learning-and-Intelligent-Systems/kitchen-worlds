@@ -82,7 +82,7 @@ from nsplan.utils.point_cloud import to_pc, extract_scene_xyzrgb, extract_multiv
 from nsplan.utils.pointnet import pc_normalize
 from nsplan.utils.data_conversions import move_to_gpu, repeat_batch, move_to_numpy
 from nsplan.utils.files import get_checkpoint_path_from_dir
-from nsplan.utils.visualization import adjust_scene_camera, scene_to_img, visualize_image_text_pairs, generate_html
+from nsplan.utils.visualization import adjust_scene_camera, scene_to_img, visualize_image_text_pairs, generate_html, visualize_xyzrgbs
 
 
 # ===============================================================================================
@@ -161,14 +161,20 @@ def load_model_and_cfg():
     args = argparse.Namespace()
     args.base_config_file = "/home/weiyu/Research/nsplan/nsplan/configs/base.yaml"
 
-    args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTFiLM1DDynamicsFeasibilityModel_subsample_trajectory.yaml"
-    args.checkpoint_id = "gq6ui8m9"
+    # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTFiLM1DDynamicsFeasibilityModel_subsample_trajectory.yaml"
+    # args.checkpoint_id = "gq6ui8m9"
 
     # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTFiLM1DDynamicsFeasibilityModel.yaml"
     # args.checkpoint_id = "026qc2hq"
 
     # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTFiLM1DDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions.yaml"
     # args.checkpoint_id = "0yjlzwp2"
+
+    # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_XL_lr.yaml"
+    # args.checkpoint_id = "6ixjer9q"
+
+    args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTFiLM1DDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions.yaml"
+    args.checkpoint_id = "w6lzkv52"
 
     base_cfg = OmegaConf.load(args.base_config_file)
     cfg = OmegaConf.load(args.config_file)
@@ -485,12 +491,12 @@ def plan_multi_step_debug(model,
     return
 
 
-def build_model_input(grasped, scene_xyzrgb, query_actions_concept_idxs,
-                      B, T, P, D, L, device,
-                      next_action_concept_idxs=None):
+def build_model_input(observation_mode, grasped, observation, query_actions_concept_idxs,
+                      B, T, D, L, device, num_obj_pts=None, num_scene_pts=None,
+                      next_action_concept_idxs=None, observation_mask=None):
     """
     :param grasped:
-    :param scene_xyzrgb: P, D
+    :param observation: P, D or N, P, D
     :param query_actions_concept_idxs: K, L
     :param B:
     :param T:
@@ -498,12 +504,13 @@ def build_model_input(grasped, scene_xyzrgb, query_actions_concept_idxs,
     :param D:
     :param L:
     :param device:
-    next_action_concept_idxs: B, T-1, L
+    :param next_action_concept_idxs: B, T-1, L
+    :param observation_mask: N
     :return:
     """
 
     # build current data for model
-    # pcs: B, T (sequence length), P (number of pts), D (number of channels)
+    # pcs: B, T (sequence length), P (number of pts), D (number of channels) or B, T, N, P, D
     # next_action_concept_idxs: B, T, L (number of concepts)
     # query_actions_concept_idxs: B, T, K (number of query actions), L
     # gripper_states: B, T
@@ -513,7 +520,7 @@ def build_model_input(grasped, scene_xyzrgb, query_actions_concept_idxs,
         gripper_states = np.array(vocab.gripper_state_to_id["empty"], dtype=np.int32)  # 1
     else:
         gripper_states = np.array(vocab.gripper_state_to_id["grasped"], dtype=np.int32)  # 1
-    pcs = scene_xyzrgb.astype(np.float32)  # P, D
+    pcs = observation.astype(np.float32)  # P, D or N, P, D
     # query_actions_concept_idxs: K, L
 
     batch_next_action_concept_idxs = np.zeros((B, T, L), dtype=np.int32)
@@ -526,7 +533,13 @@ def build_model_input(grasped, scene_xyzrgb, query_actions_concept_idxs,
     # i.e., pcs_0 = pcs[:, 0, :, :]  # B, P, D
     # i.e., gripper_states_0 = gripper_states[:, 0]  # B
     # we will set T = 1 for batch_pcs and batch_gripper_states to save memory
-    batch_pcs = einops.repeat(pcs, "P D -> B T P D", B=B, T=1, P=P, D=D)
+    if observation_mode == "pc":
+        batch_pcs = einops.repeat(pcs, "P D -> B T P D", B=B, T=1, P=num_scene_pts, D=D)
+    elif observation_mode == "pcs":
+        batch_pcs = einops.repeat(pcs, "N P D -> B T N P D", B=B, T=1, N=observation.shape[0], P=num_obj_pts, D=D)
+        batch_observation_masks = einops.repeat(observation_mask, "N -> B T N", B=B, T=T)
+    else:
+        raise KeyError
     batch_gripper_states = einops.repeat(gripper_states, " -> B T", B=B, T=1)
 
     batch_query_actions_concept_idxs = einops.repeat(query_actions_concept_idxs, "K L -> B T K L", B=B, T=T, L=L)
@@ -536,7 +549,15 @@ def build_model_input(grasped, scene_xyzrgb, query_actions_concept_idxs,
              "next_action_concept_idxs": batch_next_action_concept_idxs,
              "gripper_states": batch_gripper_states}
 
+    if observation_mode == "pcs":
+        batch["pc_masks"] = batch_observation_masks
+
     move_to_gpu(batch, device=device)
+
+    # # print shape for element in batch
+    # for k, v in batch.items():
+    #     print(f"{k}: {v.shape}")
+    # input("next")
 
     return batch
 
@@ -548,11 +569,12 @@ def mask_list(list, mask):
 
 def plan_multi_step(model,
                     # model input
-                     scene_xyzrgb, query_actions_concept_idxs, grasped,
+                    observation_mode, observation, query_actions_concept_idxs, grasped,
                      # for logging
                      query_actions, goal_action,
                     # hyperparameters
-                     num_scene_pts, device,
+                     num_obj_pts, num_scene_pts, device,
+                    observation_mask=None,
                      admissible_concept_actions=None, debug=False,
                     action_score_threshold=0.3, planning_horizon=1, max_beam_size=20):
 
@@ -589,9 +611,9 @@ def plan_multi_step(model,
 
         # sampled_action_concept_idx_sequences: B, t, L
         if t == 0:
-            batch = build_model_input(grasped, scene_xyzrgb, query_actions_concept_idxs,
-                                      B=1, T=t+1, P=num_scene_pts, D=6, L=4, device=device,
-                                      next_action_concept_idxs=None)
+            batch = build_model_input(observation_mode, grasped, observation, query_actions_concept_idxs,
+                                      B=1, T=t+1, D=6, L=4, device=device, num_obj_pts=num_obj_pts, num_scene_pts=num_scene_pts,
+                                      next_action_concept_idxs=None, observation_mask=observation_mask)
         else:
             current_beam_size = len(sampled_action_idx_sequences)
 
@@ -600,15 +622,27 @@ def plan_multi_step(model,
             # next_action_concept_idxs: B, T, L
             next_action_concept_idxs = query_actions_concept_idxs[sampled_action_idx_sequences]  # B, T, L
 
-            batch = build_model_input(grasped, scene_xyzrgb, query_actions_concept_idxs,
-                                      B=current_beam_size, T=t + 1, P=num_scene_pts, D=6, L=4, device=device,
-                                      next_action_concept_idxs=next_action_concept_idxs)
+            batch = build_model_input(observation_mode, grasped, observation, query_actions_concept_idxs,
+                                      B=current_beam_size, T=t + 1, D=6, L=4, device=device, num_obj_pts=num_obj_pts, num_scene_pts=num_scene_pts,
+                                      next_action_concept_idxs=next_action_concept_idxs, observation_mask=observation_mask)
 
         with torch.no_grad():
-            query_actions_logits = model.model(batch["pcs"],
-                                               batch["gripper_states"],
-                                               batch["next_action_concept_idxs"],
-                                               batch["query_actions_concept_idxs"])  # B, T, K
+            if model.model_cfg.name == "PCTTransformer":
+                # debug: we are using training mode because there is a bug in pytorch for transformer.
+                #        we can upgrade pytorch version.
+                #        https://discuss.pytorch.org/t/model-evaluation-fails-when-using-gpus-but-works-well-on-cpu/158796
+                model.train()
+                query_actions_logits = model.model(batch["pcs"],
+                                                   batch["pc_masks"],
+                                                   batch["gripper_states"],
+                                                   batch["next_action_concept_idxs"],
+                                                   batch["query_actions_concept_idxs"])  # B, T, K
+                model.eval()
+            else:
+                query_actions_logits = model.model(batch["pcs"],
+                                                   batch["gripper_states"],
+                                                   batch["next_action_concept_idxs"],
+                                                   batch["query_actions_concept_idxs"])  # B, T, K
         query_actions_scores = model.model.convert_logit_to_binary(query_actions_logits).cpu().numpy()  # B, T, K
         # since we are decoding autoreressively, we only care about the last timestep
         query_actions_scores = query_actions_scores[:, t]  # B, K
@@ -751,14 +785,20 @@ def plan_multi_step(model,
         texts.append(f"Scored scored first feasible actions: {scored_first_feasible_actions}")
         texts.append(f"Planning reached max horizon. Goal action sequence not found")
         texts.append(f"Taking random action: {random_action}")
-        if debug:
-            trimesh.PointCloud(scene_xyzrgb[:, :3], scene_xyzrgb[:, 3:]).show()
+        # if debug:
+        #     trimesh.PointCloud(scene_xyzrgb[:, :3], scene_xyzrgb[:, 3:]).show()
         goal_action_sequence = [random_action]
 
-    # if debug:
-    #     trimesh.PointCloud(scene_xyzrgb[:, :3], scene_xyzrgb[:, 3:]).show()
+    if debug:
+        if observation_mode == "pc":
+            trimesh.PointCloud(observation[:, :3], observation[:, 3:]).show()
+        elif observation_mode == "pcs":
+            visualize_xyzrgbs(observation, show_instance_seg=False).show()
 
-    scene = trimesh.PointCloud(scene_xyzrgb[:, :3], scene_xyzrgb[:, 3:]).scene()
+    if observation_mode == "pc":
+        scene = trimesh.PointCloud(observation[:, :3], observation[:, 3:]).scene()
+    elif observation_mode == "pcs":
+        scene = visualize_xyzrgbs(observation, show_instance_seg=False)
     adjust_scene_camera(scene, camera_location=[1.5, 0.75, 0.75], look_at=[0, 0, 0])
     img = scene_to_img(scene, resolution=[1080, 1080])
     log_img_text_pair = (img, "\n".join(texts))
@@ -776,7 +816,9 @@ def run_high_level_policy(env: CleanDishEnvV1, exp_dir, max_depth=5, debug=True,
     # ----------------------------------
     # hyperparams:
     num_obj_pts = cfg.DATASET.num_obj_pts
-    num_scene_pts = cfg.DATASET.num_scene_pts
+    num_scene_pts = cfg.DATASET.num_scene_pts if "num_scene_pts" in cfg.DATASET else None
+    observation_mode = cfg.DATASET.observation_mode
+    max_num_objs = cfg.DATASET.max_num_objs if "max_num_objs" in cfg.DATASET else None
 
     # ----------------------------------
     # meta data
@@ -826,18 +868,54 @@ def run_high_level_policy(env: CleanDishEnvV1, exp_dir, max_depth=5, debug=True,
     log_img_text_pairs = []
     for t in range(max_depth):
 
-        before_texts = []
+        if t == 0:
+            before_texts = [f"Goal action: {goal_action} | Goal concept action: {goal_concept_action}"]
+        else:
+            before_texts = []
         after_texts = []
 
         # --------------------------------
         # build current observation
-        furniture_names = ["sink#1", "sink_counter_left", "sink_counter_right", "cabinettop", "shelf_lower"]
-        obj_names = ["scene"] + ["robot"] + furniture_names + sorted(obj_name_to_info.keys())
-        scene_xyzrgb = extract_scene_xyzrgb(cur_obs, obj_names, obj_name_to_pybullet_idx,
-                                            num_pts_object=num_obj_pts,
-                                            num_pts_scene=num_scene_pts, visualize=False)
-        scene_xyzrgb = scene_xyzrgb[:, :6]  # ignore alpha
-        scene_xyzrgb[:, :3] = pc_normalize(scene_xyzrgb[:, :3])
+        if observation_mode == "pc":
+            furniture_names = ["sink#1", "sink_counter_left", "sink_counter_right", "cabinettop", "shelf_lower"]
+            obj_names = ["scene"] + ["robot"] + furniture_names + sorted(obj_name_to_info.keys())
+            scene_xyzrgb = extract_scene_xyzrgb(cur_obs, obj_names, obj_name_to_pybullet_idx,
+                                                num_pts_object=num_obj_pts,
+                                                num_pts_scene=num_scene_pts, visualize=False)
+            scene_xyzrgb = scene_xyzrgb[:, :6]  # ignore alpha
+            scene_xyzrgb[:, :3] = pc_normalize(scene_xyzrgb[:, :3])
+            observation = scene_xyzrgb
+            observation_mask = None
+        elif observation_mode == "pcs":
+            furniture_names = ["sink#1", "sink_counter_left", "sink_counter_right", "cabinettop",
+                               "shelf_lower"]
+            obj_names = ["scene"] + ["robot"] + furniture_names + sorted(obj_name_to_info.keys())
+            obj_name_to_xyzrgb = extract_scene_xyzrgb(cur_obs, obj_names, obj_name_to_pybullet_idx,
+                                                      num_pts_object=num_obj_pts, visualize=False,
+                                                      return_obj_name_to_xyzrgb=True)
+            obj_xyzrgbs = []
+            # important: the key is ordered in a specific order
+            for obj in obj_names:
+                if obj not in obj_name_to_xyzrgb:
+                    continue
+                obj_xyzrgbs.append(obj_name_to_xyzrgb[obj][:, :6])
+            scene_xyzrgb = np.concatenate(obj_xyzrgbs, axis=0)
+            xyz_centroid = np.mean(scene_xyzrgb[:, :3], axis=0)
+            xyz_scale = 1.0 / np.max(np.sqrt(np.sum((scene_xyzrgb[:, :3] - xyz_centroid) ** 2, axis=1)))
+            xyz_scale_translation = np.array([xyz_scale, xyz_centroid[0], xyz_centroid[1], xyz_centroid[2]])
+            for obj_xyzrgb in obj_xyzrgbs:
+                obj_xyzrgb[:, :3] = (obj_xyzrgb[:, :3] - xyz_centroid) * xyz_scale
+            assert len(
+                obj_name_to_xyzrgb) <= max_num_objs, "Too many objects in the scene. Max num obj is set to {}".format(max_num_objs)
+            for _ in range(max_num_objs - len(obj_name_to_xyzrgb)):
+                obj_xyzrgbs.append(np.zeros([num_obj_pts, 6]))
+            observation = np.stack(obj_xyzrgbs, axis=0)  # O, P, 6
+            observation_mask = np.concatenate([np.zeros([len(obj_name_to_xyzrgb)], dtype=np.int32),
+                                               np.ones([max_num_objs - len(obj_name_to_xyzrgb)], dtype=np.int32)], axis=0)
+            # visualize_xyzrgbs(observation, show_instance_seg=True).show()
+            # visualize_xyzrgbs(observation, show_instance_seg=False).show()
+        else:
+            raise KeyError
 
         grasped = cur_symbolic_state["grasped"]
 
@@ -857,10 +935,12 @@ def run_high_level_policy(env: CleanDishEnvV1, exp_dir, max_depth=5, debug=True,
         #                  admissible_concept_actions=admissible_concept_actions, debug=True)
 
         goal_concept_action_sequence, log_img_text_pair = plan_multi_step(model,
-                        scene_xyzrgb, query_actions_concept_idxs, grasped,
+                                                                          observation_mode,
+                        observation, query_actions_concept_idxs, grasped,
                         query_actions, goal_concept_action,
-                        num_scene_pts, device,
-                        admissible_concept_actions=admissible_concept_actions, debug=True,
+                        num_obj_pts, num_scene_pts, device,
+                        observation_mask=observation_mask,
+                        admissible_concept_actions=admissible_concept_actions, debug=False,
                         action_score_threshold=0.1, planning_horizon=6, max_beam_size=100)
 
         # --------------------------------
@@ -875,12 +955,26 @@ def run_high_level_policy(env: CleanDishEnvV1, exp_dir, max_depth=5, debug=True,
         cur_obs, cur_score, cur_done, _, _ = env.step(action)
         cur_symbolic_state = env.symbolic_state
 
-        print(f"\nscore {cur_score}, done {cur_done}")
-        after_texts.append(f"\nscore {cur_score}, done {cur_done}")
-
-        log_img_text_pairs += [(None, "\n".join(before_texts)), log_img_text_pair, (None, "\n".join(after_texts))]
         if cur_done:
+            print(f"\nscore {cur_score}, done {cur_done}")
+            after_texts.append(f"\nscore {cur_score}, done {cur_done}")
+            log_img_text_pairs += [(None, "\n".join(before_texts)), log_img_text_pair, (None, "\n".join(after_texts))]
             break
+
+        # debug: need to fix goal check in env.step(action). This is a temporary fix.
+        # print(text_action)
+        # print(goal_action)
+        # input("here")
+        if text_action == goal_action and cur_score != -1:
+            cur_score = 100
+            cur_done = True
+            print(f"\nscore {cur_score}, done {cur_done}")
+            after_texts.append(f"\nscore {cur_score}, done {cur_done}")
+            log_img_text_pairs += [(None, "\n".join(before_texts)), log_img_text_pair, (None, "\n".join(after_texts))]
+            break
+
+        after_texts.append(f"\nscore {cur_score}, done {cur_done}")
+        log_img_text_pairs += [(None, "\n".join(before_texts)), log_img_text_pair, (None, "\n".join(after_texts))]
 
     generate_html(log_img_text_pairs, save_dir=exp_dir, filename="rollout.html")
 
