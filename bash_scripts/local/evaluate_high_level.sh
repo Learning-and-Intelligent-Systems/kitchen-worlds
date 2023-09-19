@@ -7,13 +7,13 @@ echo $PYTHONPATH
 
 export QT_QPA_PLATFORM=offscreen
 
-cd /home/weiyu/Research/nsplan/kitchen-worlds/tests
+cd /home/weiyu/Research/nsplan/original/kitchen-worlds/tests
 
-for si in {800..809}; do
-  for ei in {0..4}; do
+for si in {0..20}; do
+  for ei in {0..5}; do
     echo "Run semantic spec ${si}, env ${ei}"
     python evaluate_model_on_clean_dish.py \
-        --config_file /home/weiyu/Research/nsplan/kitchen-worlds/configs/clean_dish_feg_collect_rollouts.yaml \
+        --config_file /home/weiyu/Research/nsplan/original/kitchen-worlds/configs/clean_dish_feg_collect_rollouts.yaml \
         --seed $ei \
         --semantic_spec_seed $si
   done
