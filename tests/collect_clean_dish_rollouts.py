@@ -1044,7 +1044,7 @@ def collect_for_fastamp():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="collect rollouts")
     parser.add_argument("--seed", default=0, type=int)
-    parser.add_argument("--semantic_spec_seed", default=800, type=int)
+    parser.add_argument("--semantic_spec_seed", default=1, type=int)
     parser.add_argument("--config_file", default='../configs/clean_dish_feg_collect_rollouts.yaml', type=str)
     args = parser.parse_args()
 
