@@ -173,8 +173,20 @@ def load_model_and_cfg():
     # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_XL_lr.yaml"
     # args.checkpoint_id = "6ixjer9q"
 
-    args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTFiLM1DDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions.yaml"
-    args.checkpoint_id = "w6lzkv52"
+    # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTFiLM1DDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions.yaml"
+    # args.checkpoint_id = "w6lzkv52"
+
+    # trained on 0919 data
+    # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_XL_lr.yaml"
+    # args.checkpoint_id = "k6sxfz7r"
+
+    # # trained on 0828 data witheld red bowl
+    # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_XL_lr.yaml"
+    # args.checkpoint_id = "c7ycj2eh"
+
+    # trained on 0828 data witheld red bowl
+    args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTFiLM1DDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_large_lr.yaml"
+    args.checkpoint_id = "ztgus1dc"
 
     base_cfg = OmegaConf.load(args.base_config_file)
     cfg = OmegaConf.load(args.config_file)
@@ -914,6 +926,12 @@ def run_high_level_policy(env: CleanDishEnvV1, exp_dir, max_depth=5, debug=True,
                                                np.ones([max_num_objs - len(obj_name_to_xyzrgb)], dtype=np.int32)], axis=0)
             # visualize_xyzrgbs(observation, show_instance_seg=True).show()
             # visualize_xyzrgbs(observation, show_instance_seg=False).show()
+
+            # for obs, obs_mask in zip(observation, observation_mask):
+            #     print(obs)
+            #     print(obs_mask)
+            #     # trimesh.PointCloud(obs[:, :3]).show()
+
         else:
             raise KeyError
 
@@ -940,7 +958,7 @@ def run_high_level_policy(env: CleanDishEnvV1, exp_dir, max_depth=5, debug=True,
                         query_actions, goal_concept_action,
                         num_obj_pts, num_scene_pts, device,
                         observation_mask=observation_mask,
-                        admissible_concept_actions=admissible_concept_actions, debug=False,
+                        admissible_concept_actions=admissible_concept_actions, debug=True,
                         action_score_threshold=0.1, planning_horizon=6, max_beam_size=100)
 
         # --------------------------------
@@ -984,8 +1002,8 @@ def run_high_level_policy(env: CleanDishEnvV1, exp_dir, max_depth=5, debug=True,
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="collect rollouts")
     parser.add_argument("--seed", default=0, type=int)
-    parser.add_argument("--semantic_spec_seed", default=0, type=int)
-    parser.add_argument("--config_file", default='../configs/clean_dish_feg_collect_rollouts.yaml', type=str)
+    parser.add_argument("--semantic_spec_seed", default=2, type=int)
+    parser.add_argument("--config_file", default='../configs/evaluate_clean_dish_feg_collect_rollouts_0922.yaml', type=str)
     args = parser.parse_args()
 
     run_evaluation(args)

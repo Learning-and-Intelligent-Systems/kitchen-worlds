@@ -69,7 +69,6 @@ from collect_clean_dish_rollouts import plot_images, CleanDishEnvV1
 
 # import from nsplan
 import torch
-import torch.nn.functional as F
 import pytorch_lightning as pl
 from omegaconf import OmegaConf
 import trimesh
@@ -77,7 +76,7 @@ import trimesh
 # sys.path.append("../../nsplan/src")  # adjust the path as necessary
 import nsplan.data.vocab2 as vocab
 from nsplan.data.dataset_sequence_multiview import MultiviewSequenceDataset
-from nsplan.models.pl_models import GoalBCModel
+from nsplan.models.pl_models import DynamicsFeasibilityModel
 
 from nsplan.utils.point_cloud import to_pc, extract_scene_xyzrgb, extract_multiview_img
 from nsplan.utils.pointnet import pc_normalize
@@ -162,16 +161,32 @@ def load_model_and_cfg():
     args = argparse.Namespace()
     args.base_config_file = "/home/weiyu/Research/nsplan/nsplan/configs/base.yaml"
 
-    # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerGoalBCModel_lr.yaml"
-    # args.checkpoint_id = "cctp6l33"
+    # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTFiLM1DDynamicsFeasibilityModel_subsample_trajectory.yaml"
+    # args.checkpoint_id = "gq6ui8m9"
+
+    # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTFiLM1DDynamicsFeasibilityModel.yaml"
+    # args.checkpoint_id = "026qc2hq"
+
+    # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTFiLM1DDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions.yaml"
+    # args.checkpoint_id = "0yjlzwp2"
+
+    # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_XL_lr.yaml"
+    # args.checkpoint_id = "6ixjer9q"
+
+    # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTFiLM1DDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions.yaml"
+    # args.checkpoint_id = "w6lzkv52"
 
     # trained on 0919 data
-    args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerGoalBCModel_lr.yaml"
-    args.checkpoint_id = "tokan8na"
+    args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_XL_lr.yaml"
+    args.checkpoint_id = "k6sxfz7r"
 
-    # # trained on 0828 data withheld red mug
-    # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerGoalBCModel_lr.yaml"
-    # args.checkpoint_id = "uitl8lyo"
+    # # trained on 0828 data witheld red bowl
+    # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_XL_lr.yaml"
+    # args.checkpoint_id = "c7ycj2eh"
+
+    # trained on 0828 data witheld red bowl
+    # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTFiLM1DDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_large_lr.yaml"
+    # args.checkpoint_id = "ztgus1dc"
 
     base_cfg = OmegaConf.load(args.base_config_file)
     cfg = OmegaConf.load(args.config_file)
@@ -183,7 +198,7 @@ def load_model_and_cfg():
     checkpoint_dir = os.path.join(cfg.WANDB.save_dir, cfg.WANDB.project, args.checkpoint_id, "checkpoints")
     checkpoint_path = get_checkpoint_path_from_dir(checkpoint_dir)
 
-    model = GoalBCModel.load_from_checkpoint(checkpoint_path)
+    model = DynamicsFeasibilityModel.load_from_checkpoint(checkpoint_path)
     model.to(device)
     model.eval()
 
@@ -490,7 +505,7 @@ def plan_multi_step_debug(model,
 
 def build_model_input(observation_mode, grasped, observation, query_actions_concept_idxs,
                       B, T, D, L, device, num_obj_pts=None, num_scene_pts=None,
-                      next_action_concept_idxs=None, observation_mask=None, goal_action_concept_idx=None):
+                      next_action_concept_idxs=None, observation_mask=None):
     """
     :param grasped:
     :param observation: P, D or N, P, D
@@ -559,76 +574,6 @@ def build_model_input(observation_mode, grasped, observation, query_actions_conc
     return batch
 
 
-def build_sequence_model_input(observation_mode, grasped, observation, goal_action_concept_idx,
-                               B, T, D, L, device, num_obj_pts=None, num_scene_pts=None,
-                               next_action_concept_idxs=None, observation_mask=None):
-    """
-    :param grasped:
-    :param observation: P, D or N, P, D
-    :param query_actions_concept_idxs: K, L
-    :param B:
-    :param T:
-    :param P:
-    :param D:
-    :param L:
-    :param device:
-    :param next_action_concept_idxs: B, T-1, L
-    :param observation_mask: N
-    :return:
-    """
-
-    # build current data for model
-    # pcs: B, T (sequence length), P (number of pts), D (number of channels) or B, T, N, P, D
-    # next_action_concept_idxs: B, T, L (number of concepts)
-    # query_actions_concept_idxs: B, T, K (number of query actions), L
-    # gripper_states: B, T
-
-    # prepare single datum
-    if grasped is None:
-        gripper_states = np.array(vocab.gripper_state_to_id["empty"], dtype=np.int32)  # 1
-    else:
-        gripper_states = np.array(vocab.gripper_state_to_id["grasped"], dtype=np.int32)  # 1
-    pcs = observation.astype(np.float32)  # P, D or N, P, D
-    # query_actions_concept_idxs: K, L
-
-    batch_next_action_concept_idxs = np.zeros((B, T, L), dtype=np.int32)
-    # TODO: add previous action
-
-    # repeat and convert to tensor
-    # important: since the model will only use the current observation
-    # i.e., pcs_0 = pcs[:, 0, :, :]  # B, P, D
-    # i.e., gripper_states_0 = gripper_states[:, 0]  # B
-    # i.e., pc_mask_0 = pc_masks[:, 0, :]  # B, O
-    # we will set T = 1 for batch_pcs and batch_gripper_states to save memory
-    if observation_mode == "pc":
-        batch_pcs = einops.repeat(pcs, "P D -> B T P D", B=B, T=1, P=num_scene_pts, D=D)
-    elif observation_mode == "pcs":
-        batch_pcs = einops.repeat(pcs, "N P D -> B T N P D", B=B, T=1, N=observation.shape[0], P=num_obj_pts, D=D)
-        batch_observation_masks = einops.repeat(observation_mask, "N -> B T N", B=B, T=1)
-    else:
-        raise KeyError
-    batch_gripper_states = einops.repeat(gripper_states, " -> B T", B=B, T=1)
-
-    batch_goal_action_concept_idx = einops.repeat(goal_action_concept_idx, "L -> B L", B=B)
-
-    batch = {"pcs": batch_pcs,
-             "goal_action_concept_idx": batch_goal_action_concept_idx,
-             "next_action_concept_idxs": batch_next_action_concept_idxs,
-             "gripper_states": batch_gripper_states}
-
-    if observation_mode == "pcs":
-        batch["pc_masks"] = batch_observation_masks
-
-    move_to_gpu(batch, device=device)
-
-    # # print shape for element in batch
-    # for k, v in batch.items():
-    #     print(f"{k}: {v.shape}")
-    # input("next")
-
-    return batch
-
-
 def mask_list(list, mask):
     assert len(list) == len(mask)
     return [list[i] for i in range(len(list)) if mask[i]]
@@ -643,7 +588,9 @@ def plan_multi_step(model,
                      num_obj_pts, num_scene_pts, device,
                     observation_mask=None,
                      admissible_concept_actions=None, debug=False,
-                    action_score_threshold=0.3, planning_horizon=1, max_beam_size=20):
+                    action_score_threshold=0.3, planning_horizon=1, max_beam_size=20, rank_method="min"):
+
+    assert rank_method in ["product", "min", "max"]
 
     # query_actions_concept_idxs: K, L
 
@@ -656,6 +603,9 @@ def plan_multi_step(model,
     # to keep track of the beam search
     sampled_action_idx_sequences = None
     sampled_action_score_sequences = None
+
+    all_action_idx_sequences = []
+    all_action_score_sequences = []
 
     all_action_idxs = np.arange(len(query_actions))  # K
     admissible_action_mask = []
@@ -767,10 +717,20 @@ def plan_multi_step(model,
                 for ki in range(len(query_actions)):
                     sequence_index_matrix.append([bi, ki])
 
-            sampled_sequence_scores = np.product(sampled_action_score_sequences, axis=1)  # B
-            sampled_sequence_scores = einops.repeat(sampled_sequence_scores, 'B -> B K', K=len(query_actions))  # B, K
-
-            accumulated_scores = sampled_sequence_scores * query_actions_scores  # B, K
+            if rank_method == "min":
+                sampled_sequence_scores = np.min(sampled_action_score_sequences, axis=1)  # B
+                sampled_sequence_scores = einops.repeat(sampled_sequence_scores, 'B -> B K', K=len(query_actions))  # B, K
+                # give two matrices of size B, K, return a matrix of size B, K, where each element is the min of the two
+                accumulated_scores = np.minimum(sampled_sequence_scores, query_actions_scores)  # B, K
+            elif rank_method == "max":
+                sampled_sequence_scores = np.max(sampled_action_score_sequences, axis=1)  # B
+                sampled_sequence_scores = einops.repeat(sampled_sequence_scores, 'B -> B K', K=len(query_actions))  # B, K
+                # give two matrices of size B, K, return a matrix of size B, K, where each element is the min of the two
+                accumulated_scores = np.maximum(sampled_sequence_scores, query_actions_scores)  # B, K
+            elif rank_method == "product":
+                sampled_sequence_scores = np.product(sampled_action_score_sequences, axis=1)  # B
+                sampled_sequence_scores = einops.repeat(sampled_sequence_scores, 'B -> B K', K=len(query_actions))  # B, K
+                accumulated_scores = sampled_sequence_scores * query_actions_scores  # B, K
 
             # TODO: perform more complicated filtering
             score_threshold_mask = query_actions_scores > action_score_threshold
@@ -817,25 +777,51 @@ def plan_multi_step(model,
             sampled_action_idx_sequences = new_sampled_action_idx_sequences
             sampled_action_score_sequences = new_sampled_action_score_sequences
 
-        # check for goal
-        # action sequences are already ranked
-        for bi in range(len(sampled_action_idx_sequences)):
-            action_idx_sequence = sampled_action_idx_sequences[bi]
-            if goal_action_idx in action_idx_sequence:
-                print("\n" + "*"*20)
-                print(f"plan for goal {goal_action} found!")
-                goal_action_sequence = [query_actions[ai] for ai in action_idx_sequence]
-                print(f"goal action sequence: {goal_action_sequence}")
-                print(f"goal action score sequence: {sampled_action_score_sequences[bi]}")
-                print("*" * 20 + "\n")
-                texts.append(f"plan for goal {goal_action} found!")
-                texts.append(f"goal action sequence: {goal_action_sequence}")
-                texts.append(f"goal action score sequence: {sampled_action_score_sequences[bi]}")
-                break
+        # # check for goal
+        # # action sequences are already ranked
+        # for bi in range(len(sampled_action_idx_sequences)):
+        #     action_idx_sequence = sampled_action_idx_sequences[bi]
+        #     if goal_action_idx in action_idx_sequence:
+        #         print("\n" + "*"*20)
+        #         print(f"plan for goal {goal_action} found!")
+        #         goal_action_sequence = [query_actions[ai] for ai in action_idx_sequence]
+        #         print(f"goal action sequence: {goal_action_sequence}")
+        #         print(f"goal action score sequence: {sampled_action_score_sequences[bi]}")
+        #         print("*" * 20 + "\n")
+        #         texts.append(f"plan for goal {goal_action} found!")
+        #         texts.append(f"goal action sequence: {goal_action_sequence}")
+        #         texts.append(f"goal action score sequence: {sampled_action_score_sequences[bi]}")
+        #         break
+        #
+        # # if goal action sequence is found, break from planning
+        # if goal_action_sequence:
+        #     break
 
-        # if goal action sequence is found, break from planning
-        if goal_action_sequence:
-            break
+            all_action_idx_sequences.extend(sampled_action_idx_sequences)
+            all_action_score_sequences.extend(sampled_action_score_sequences)
+
+    # sort all action sequences by score
+    if rank_method == "min":
+        all_action_accumulated_scores = np.array([np.min(a) for a in all_action_score_sequences])
+    elif rank_method == "max":
+        all_action_accumulated_scores = np.array([np.max(a) for a in all_action_score_sequences])
+    elif rank_method == "product":
+        all_action_accumulated_scores = np.array([np.product(a) for a in all_action_score_sequences])
+    sorted_idxs = np.argsort(all_action_accumulated_scores)[::-1]
+    all_action_idx_sequences = [all_action_idx_sequences[si] for si in sorted_idxs]
+    all_action_score_sequences = [all_action_score_sequences[si] for si in sorted_idxs]
+    all_action_accumulated_scores = [all_action_accumulated_scores[si] for si in sorted_idxs]
+
+    goal_action_sequence = None
+    print("\n\n" + "~" * 100)
+    for bi in range(len(all_action_idx_sequences)):
+        action_idx_sequence = all_action_idx_sequences[bi]
+        if goal_action_idx in action_idx_sequence:
+            action_sequence = [query_actions[ai] for ai in action_idx_sequence]
+            if goal_action_sequence is None:
+                goal_action_sequence = action_sequence
+            print(f"{all_action_accumulated_scores[bi]}: {action_sequence}")
+    input("here")
 
 
     if goal_action_sequence:
@@ -871,242 +857,6 @@ def plan_multi_step(model,
     log_img_text_pair = (img, "\n".join(texts))
 
     return goal_action_sequence, log_img_text_pair
-
-
-def plan_multi_step_with_sequence_model(model,
-                    # model input
-                    observation_mode, observation, query_actions_concept_idxs, grasped,
-                     query_actions, goal_action,
-                    # hyperparameters
-                     num_obj_pts, num_scene_pts, device,
-                    observation_mask=None,
-                     debug=False,
-                    action_score_threshold=0.3, planning_horizon=1, max_beam_size=20):
-
-    def print_if_debug(str):
-        if debug:
-            print(str)
-
-    goal_action_sequence = []
-
-    print("goal action", goal_action)
-    goal_action_idx = query_actions.index(goal_action)
-    goal_action_concept_idx = query_actions_concept_idxs[goal_action_idx]
-
-    texts = []
-
-    concepts_idx_to_name = []
-    for vocab in model.vocabs:
-        concept_idx_to_name = {vocab[name]: name for name in vocab}
-        concepts_idx_to_name.append(concept_idx_to_name)
-
-    # -------------------------------
-    batch = build_sequence_model_input(observation_mode, grasped, observation, goal_action_concept_idx,
-                                       B=1, T=1, D=6, L=model.model.num_concepts, device=device, num_obj_pts=num_obj_pts, num_scene_pts=num_scene_pts,
-                                       next_action_concept_idxs=None, observation_mask=observation_mask)
-
-    with torch.no_grad():
-        if model.model_cfg.name == "PCTTransformer":
-            # debug: we are using training mode because there is a bug in pytorch for transformer.
-            #        we can upgrade pytorch version.
-            #        https://discuss.pytorch.org/t/model-evaluation-fails-when-using-gpus-but-works-well-on-cpu/158796
-            model.train()
-            next_action_concept_logits = model.model(batch["pcs"],
-                                               batch["pc_masks"],
-                                               batch["gripper_states"],
-                                               batch["next_action_concept_idxs"],
-                                               batch["goal_action_concept_idx"])  # L [B, T, V for the concept]
-            model.eval()
-
-    next_action_concept_logit = next_action_concept_logits[0][:, 0]  # B=1, V
-    pred_a_prob = F.softmax(next_action_concept_logit, dim=1)  # B, V
-
-    k_a = min(max_beam_size, len(concepts_idx_to_name[0]))
-    print_if_debug(f"k action: {k_a}")
-    sampled_a_prob, sampled_a = torch.topk(pred_a_prob[0], k=k_a)  # k_a
-    print_if_debug(f"sampled_a_prob ({sampled_a_prob.shape}): {sampled_a_prob}")
-    print_if_debug(f"sampled_a ({sampled_a.shape}): {sampled_a}")
-
-    for a, p in zip(sampled_a.cpu().numpy(), sampled_a_prob):
-        a = concepts_idx_to_name[0][a]
-        print(f"{a}: {p}")
-        texts.append(f"{a}: {p}")
-
-    # 2 find top k (action, color)
-    batch = build_sequence_model_input(observation_mode, grasped, observation, goal_action_concept_idx,
-                                       B=k_a, T=1, D=6, L=model.model.num_concepts, device=device,
-                                       num_obj_pts=num_obj_pts, num_scene_pts=num_scene_pts,
-                                       next_action_concept_idxs=None, observation_mask=observation_mask)
-
-    # batch["next_action_concept_idxs"]: B=ka, T, L
-    batch["next_action_concept_idxs"][:, 0, 0] = sampled_a
-
-    with torch.no_grad():
-        if model.model_cfg.name == "PCTTransformer":
-            model.train()
-            next_action_concept_logits = model.model(batch["pcs"],
-                                                     batch["pc_masks"],
-                                                     batch["gripper_states"],
-                                                     batch["next_action_concept_idxs"],
-                                                     batch["goal_action_concept_idx"])  # L [B, T, V for the concept]
-            model.eval()
-
-    next_action_concept_logit = next_action_concept_logits[1][:, 0]  # B, V
-    pred_c_prob = F.softmax(next_action_concept_logit, dim=1)  # k_action, V
-    print_if_debug(f"pred_c_prob ({pred_c_prob.shape}): {pred_c_prob}")
-
-    # compute joint probabilities
-    pred_ac_prob = einops.repeat(sampled_a_prob, 'k -> k v', v=len(concepts_idx_to_name[1])) * pred_c_prob  # k, v_color
-    print_if_debug(f"pred_ac_prob ({pred_ac_prob.shape}): {pred_ac_prob}")
-
-    k_ac = min(max_beam_size, len(concepts_idx_to_name[0]) * len(concepts_idx_to_name[1]))
-    print_if_debug(f"k action-color: {k_ac}")
-    sampled_ac_prob, sampled_ac = torch.topk(pred_ac_prob.view(-1), k=k_ac)  # k_ar
-
-    sampled_a_idx = sampled_ac // len(concepts_idx_to_name[1])  # k
-    sampled_c = sampled_ac % len(concepts_idx_to_name[1])  # k
-    sampled_a = sampled_a[sampled_a_idx]  # k
-
-    print_if_debug(f"sampled_ac_prob ({sampled_ac_prob.shape}): {sampled_ac_prob}")
-    print_if_debug(f"sampled_a_idx ({sampled_a_idx.shape}): {sampled_a_idx}")
-    print_if_debug(f"sampled_a ({sampled_a.shape}): {sampled_a}")
-    print_if_debug(f"sampled_c ({sampled_c.shape}): {sampled_c}")
-
-    print("\n\n" + "~" * 50)
-    texts.append("\n\n" + "~" * 50)
-    for a, c, p in zip(sampled_a.cpu().numpy(), sampled_c.cpu().numpy(), sampled_ac_prob):
-        a = concepts_idx_to_name[0][a]
-        c = concepts_idx_to_name[1][c]
-        print(f"{a} {c}: {p}")
-        texts.append(f"{a} {c}: {p}")
-
-    # 3 find top k (action, color, object)
-    batch = build_sequence_model_input(observation_mode, grasped, observation, goal_action_concept_idx,
-                                       B=k_ac, T=1, D=6, L=model.model.num_concepts, device=device,
-                                       num_obj_pts=num_obj_pts, num_scene_pts=num_scene_pts,
-                                       next_action_concept_idxs=None, observation_mask=observation_mask)
-
-    # batch["next_action_concept_idxs"]: B=k_ac, T, L
-    batch["next_action_concept_idxs"][:, 0, 0] = sampled_a
-    batch["next_action_concept_idxs"][:, 0, 1] = sampled_c
-
-    with torch.no_grad():
-        if model.model_cfg.name == "PCTTransformer":
-            model.train()
-            next_action_concept_logits = model.model(batch["pcs"],
-                                                     batch["pc_masks"],
-                                                     batch["gripper_states"],
-                                                     batch["next_action_concept_idxs"],
-                                                     batch["goal_action_concept_idx"])  # L [B, T, V for the concept]
-            model.eval()
-
-    next_action_concept_logit = next_action_concept_logits[2][:, 0]  # B, V
-    pred_o_prob = F.softmax(next_action_concept_logit, dim=1)  # k_ac, V
-    print_if_debug(f"pred_f_prob ({pred_o_prob.shape}): {pred_o_prob}")
-
-    # compute joint probabilities
-    # note that furniture uses the object vocab
-    pred_aco_prob = einops.repeat(sampled_ac_prob, 'k -> k v', v=len(concepts_idx_to_name[2])) * pred_o_prob  # k, v_object
-    print_if_debug(f"pred_aco_prob ({pred_aco_prob.shape}): {pred_aco_prob}")
-
-    k_aco = min(max_beam_size, len(concepts_idx_to_name[0]) * len(concepts_idx_to_name[1]) * len(concepts_idx_to_name[2]))
-    print_if_debug(f"k action-color-object: {k_aco}")
-    sampled_aco_prob, sampled_aco = torch.topk(pred_aco_prob.view(-1), k=k_aco)  # k_aco
-
-    sampled_ac_idx = sampled_aco // len(concepts_idx_to_name[2])
-    sampled_o = sampled_aco % len(concepts_idx_to_name[2])
-    sampled_c = sampled_c[sampled_ac_idx]
-    sampled_a = sampled_a[sampled_ac_idx]
-
-    print_if_debug(f"sampled_aco_prob ({sampled_aco_prob.shape}): {sampled_aco_prob}")
-    print_if_debug(f"sampled_ac_idx ({sampled_ac_idx.shape}): {sampled_ac_idx}")
-    print_if_debug(f"sampled_a ({sampled_a.shape}): {sampled_a}")
-    print_if_debug(f"sampled_c ({sampled_c.shape}): {sampled_c}")
-    print_if_debug(f"sampled_o ({sampled_o.shape}): {sampled_o}")
-
-    print("\n\n" + "~" * 50)
-    texts.append("\n\n" + "~" * 50)
-    for a, c, o, p in zip(sampled_a.cpu().numpy(), sampled_c.cpu().numpy(), sampled_o.cpu().numpy(), sampled_aco_prob):
-        a = concepts_idx_to_name[0][a]
-        c = concepts_idx_to_name[1][c]
-        o = concepts_idx_to_name[2][o]
-        print(f"{a} {c} {o}: {p}")
-        texts.append(f"{a} {c} {o}: {p}")
-
-    # 3 find top k (action, color, object, location)
-    batch = build_sequence_model_input(observation_mode, grasped, observation, goal_action_concept_idx,
-                                       B=k_aco, T=1, D=6, L=model.model.num_concepts, device=device,
-                                       num_obj_pts=num_obj_pts, num_scene_pts=num_scene_pts,
-                                       next_action_concept_idxs=None, observation_mask=observation_mask)
-
-    # batch["next_action_concept_idxs"]: B=k_aco, T, L
-    batch["next_action_concept_idxs"][:, 0, 0] = sampled_a
-    batch["next_action_concept_idxs"][:, 0, 1] = sampled_c
-    batch["next_action_concept_idxs"][:, 0, 2] = sampled_o
-
-    with torch.no_grad():
-        if model.model_cfg.name == "PCTTransformer":
-            model.train()
-            next_action_concept_logits = model.model(batch["pcs"],
-                                                     batch["pc_masks"],
-                                                     batch["gripper_states"],
-                                                     batch["next_action_concept_idxs"],
-                                                     batch[
-                                                         "goal_action_concept_idx"])  # L [B, T, V for the concept]
-            model.eval()
-
-    next_action_concept_logit = next_action_concept_logits[3][:, 0]  # B, V
-    pred_l_prob = F.softmax(next_action_concept_logit, dim=1)  # k_aco, V
-    print_if_debug(f"pred_l_prob ({pred_l_prob.shape}): {pred_l_prob}")
-
-    # compute joint probabilities
-    # note that furniture uses the object vocab
-    pred_acol_prob = einops.repeat(sampled_aco_prob, 'k -> k v', v=len(concepts_idx_to_name[3])) * pred_l_prob  # k, v_location
-    print_if_debug(f"pred_acol_prob ({pred_acol_prob.shape}): {pred_acol_prob}")
-
-    k_acol = min(max_beam_size, len(concepts_idx_to_name[0]) * len(concepts_idx_to_name[1]) * len(concepts_idx_to_name[2]) * len(concepts_idx_to_name[3]))
-    print_if_debug(f"k action-color-object-location: {k_acol}")
-    sampled_acol_prob, sampled_acol = torch.topk(pred_acol_prob.view(-1), k=k_acol)  # k_acol
-
-    sampled_aco_idx = sampled_acol // len(concepts_idx_to_name[3])
-    sampled_l = sampled_acol % len(concepts_idx_to_name[3])
-    sampled_a = sampled_a[sampled_aco_idx]
-    sampled_c = sampled_c[sampled_aco_idx]
-    sampled_o = sampled_o[sampled_aco_idx]
-
-    print_if_debug(f"sampled_acol_prob ({sampled_acol_prob.shape}): {sampled_acol_prob}")
-    print_if_debug(f"sampled_aco_idx ({sampled_aco_idx.shape}): {sampled_aco_idx}")
-    print_if_debug(f"sampled_a ({sampled_a.shape}): {sampled_a}")
-    print_if_debug(f"sampled_c ({sampled_c.shape}): {sampled_c}")
-    print_if_debug(f"sampled_o ({sampled_o.shape}): {sampled_o}")
-    print_if_debug(f"sampled_o ({sampled_l.shape}): {sampled_l}")
-
-    print("\n\n" + "~" * 50)
-    texts.append("\n\n" + "~" * 50)
-    next_action = None
-    for a, c, o, l, p in zip(sampled_a.cpu().numpy(), sampled_c.cpu().numpy(), sampled_o.cpu().numpy(),
-                             sampled_l.cpu().numpy(),
-                          sampled_acol_prob):
-        a = concepts_idx_to_name[0][a]
-        c = concepts_idx_to_name[1][c]
-        o = concepts_idx_to_name[2][o]
-        l = concepts_idx_to_name[3][l]
-        if next_action is None:
-            next_action = (a, c, o, l)
-        print(f"{a} {c} {o} {l}: {p}")
-        texts.append(f"{a} {c} {o} {l}: {p}")
-
-    visualize_xyzrgbs(observation, show_instance_seg=False).show()
-
-    if observation_mode == "pc":
-        scene = trimesh.PointCloud(observation[:, :3], observation[:, 3:]).scene()
-    elif observation_mode == "pcs":
-        scene = visualize_xyzrgbs(observation, show_instance_seg=False)
-    adjust_scene_camera(scene, camera_location=[1.5, 0.75, 0.75], look_at=[0, 0, 0])
-    img = scene_to_img(scene, resolution=[1080, 1080])
-    log_img_text_pair = (img, "\n".join(texts))
-
-    return next_action, log_img_text_pair
 
 
 def run_high_level_policy(env: CleanDishEnvV1, exp_dir, max_depth=5, debug=True, only_consider_feasible=True):
@@ -1208,7 +958,8 @@ def run_high_level_policy(env: CleanDishEnvV1, exp_dir, max_depth=5, debug=True,
             xyz_scale_translation = np.array([xyz_scale, xyz_centroid[0], xyz_centroid[1], xyz_centroid[2]])
             for obj_xyzrgb in obj_xyzrgbs:
                 obj_xyzrgb[:, :3] = (obj_xyzrgb[:, :3] - xyz_centroid) * xyz_scale
-            assert len(obj_name_to_xyzrgb) <= max_num_objs, "Too many objects in the scene. Max num obj is set to {}".format(max_num_objs)
+            assert len(
+                obj_name_to_xyzrgb) <= max_num_objs, "Too many objects in the scene. Max num obj is set to {}".format(max_num_objs)
             for _ in range(max_num_objs - len(obj_name_to_xyzrgb)):
                 obj_xyzrgbs.append(np.zeros([num_obj_pts, 6]))
             observation = np.stack(obj_xyzrgbs, axis=0)  # O, P, 6
@@ -1216,6 +967,12 @@ def run_high_level_policy(env: CleanDishEnvV1, exp_dir, max_depth=5, debug=True,
                                                np.ones([max_num_objs - len(obj_name_to_xyzrgb)], dtype=np.int32)], axis=0)
             # visualize_xyzrgbs(observation, show_instance_seg=True).show()
             # visualize_xyzrgbs(observation, show_instance_seg=False).show()
+
+            # for obs, obs_mask in zip(observation, observation_mask):
+            #     print(obs)
+            #     print(obs_mask)
+            #     # trimesh.PointCloud(obs[:, :3]).show()
+
         else:
             raise KeyError
 
@@ -1236,20 +993,21 @@ def run_high_level_policy(env: CleanDishEnvV1, exp_dir, max_depth=5, debug=True,
         #                  num_scene_pts, device,
         #                  admissible_concept_actions=admissible_concept_actions, debug=True)
 
-        next_action, log_img_text_pair = plan_multi_step_with_sequence_model(model,
+        goal_concept_action_sequence, log_img_text_pair = plan_multi_step(model,
                                                                           observation_mode,
                         observation, query_actions_concept_idxs, grasped,
                         query_actions, goal_concept_action,
                         num_obj_pts, num_scene_pts, device,
-                        observation_mask=observation_mask, debug=False,
-                        action_score_threshold=0.1, planning_horizon=6, max_beam_size=10)
+                        observation_mask=observation_mask,
+                        admissible_concept_actions=admissible_concept_actions, debug=True,
+                        action_score_threshold=0.0, planning_horizon=4, max_beam_size=100)
 
         # --------------------------------
         # step the environment
-        text_action = get_text_action_from_concept_action(next_action, color_object_to_obj_name)
+        text_action = get_text_action_from_concept_action(goal_concept_action_sequence[0], color_object_to_obj_name)
         if debug:
-            print(f"Take action: {text_action} | concept action: {next_action}")
-            after_texts.append(f"Take action: {text_action} | concept action: {next_action}")
+            print(f"Take action: {text_action} | concept action: {goal_concept_action_sequence[0]}")
+            after_texts.append(f"Take action: {text_action} | concept action: {goal_concept_action_sequence[0]}")
             # input("Press Enter to continue...")
 
         action = env.convert_text_to_action(text_action[0], text_action[1], text_action[2])
@@ -1285,7 +1043,7 @@ def run_high_level_policy(env: CleanDishEnvV1, exp_dir, max_depth=5, debug=True,
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="collect rollouts")
     parser.add_argument("--seed", default=0, type=int)
-    parser.add_argument("--semantic_spec_seed", default=1, type=int)
+    parser.add_argument("--semantic_spec_seed", default=2, type=int)
     parser.add_argument("--config_file", default='../configs/evaluate_clean_dish_feg_collect_rollouts_0922.yaml', type=str)
     args = parser.parse_args()
 
