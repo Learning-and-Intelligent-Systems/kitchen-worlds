@@ -25,5 +25,5 @@ def compute_success_rate(save_dir):
 
 
 if __name__ == "__main__":
-    save_dir = "/home/weiyu/data_drive/nsplan/0828_test_policy/evaluation_transformer"
+    save_dir = "/home/weiyu/data_drive/nsplan/0922_red_bowl/evaluation_transformer_gt_admissible"
     compute_success_rate(save_dir)

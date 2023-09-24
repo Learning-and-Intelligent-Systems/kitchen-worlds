@@ -177,24 +177,16 @@ def load_model_and_cfg():
     # args.checkpoint_id = "w6lzkv52"
 
     # trained on 0919 data
-    # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_XL_lr.yaml"
-    # args.checkpoint_id = "k6sxfz7r"
+    args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_XL_lr.yaml"
+    args.checkpoint_id = "k6sxfz7r"
 
     # # trained on 0828 data witheld red bowl
     # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_XL_lr.yaml"
     # args.checkpoint_id = "c7ycj2eh"
 
-    # # trained on 0828 data witheld red bowl
+    # trained on 0828 data witheld red bowl
     # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTFiLM1DDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_large_lr.yaml"
     # args.checkpoint_id = "ztgus1dc"
-
-    # # trained on 0828 data witheld red bowl early stopping
-    # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_XL_lr.yaml"
-    # args.checkpoint_id = "p2x6mogg"
-
-    # # trained on 0828 data witheld red bowl early stopping
-    args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTFiLM1DDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_large_lr.yaml"
-    args.checkpoint_id = "z1n90nmf"
 
     base_cfg = OmegaConf.load(args.base_config_file)
     cfg = OmegaConf.load(args.config_file)
@@ -596,7 +588,9 @@ def plan_multi_step(model,
                      num_obj_pts, num_scene_pts, device,
                     observation_mask=None,
                      admissible_concept_actions=None, debug=False,
-                    action_score_threshold=0.3, planning_horizon=1, max_beam_size=20, failed_next_actions=None):
+                    action_score_threshold=0.3, planning_horizon=1, max_beam_size=20, rank_method="min"):
+
+    assert rank_method in ["product", "min", "max"]
 
     # query_actions_concept_idxs: K, L
 
@@ -610,14 +604,14 @@ def plan_multi_step(model,
     sampled_action_idx_sequences = None
     sampled_action_score_sequences = None
 
+    all_action_idx_sequences = []
+    all_action_score_sequences = []
+
     all_action_idxs = np.arange(len(query_actions))  # K
     admissible_action_mask = []
     for action_idx, action in enumerate(query_actions):
         if admissible_concept_actions is None or action in admissible_concept_actions:
-            if failed_next_actions is None or action not in failed_next_actions:
-                admissible_action_mask.append(True)
-            else:
-                admissible_action_mask.append(False)
+            admissible_action_mask.append(True)
         else:
             admissible_action_mask.append(False)
     admissible_action_mask = np.array(admissible_action_mask, dtype=bool)  # K
@@ -723,10 +717,20 @@ def plan_multi_step(model,
                 for ki in range(len(query_actions)):
                     sequence_index_matrix.append([bi, ki])
 
-            sampled_sequence_scores = np.product(sampled_action_score_sequences, axis=1)  # B
-            sampled_sequence_scores = einops.repeat(sampled_sequence_scores, 'B -> B K', K=len(query_actions))  # B, K
-
-            accumulated_scores = sampled_sequence_scores * query_actions_scores  # B, K
+            if rank_method == "min":
+                sampled_sequence_scores = np.min(sampled_action_score_sequences, axis=1)  # B
+                sampled_sequence_scores = einops.repeat(sampled_sequence_scores, 'B -> B K', K=len(query_actions))  # B, K
+                # give two matrices of size B, K, return a matrix of size B, K, where each element is the min of the two
+                accumulated_scores = np.minimum(sampled_sequence_scores, query_actions_scores)  # B, K
+            elif rank_method == "max":
+                sampled_sequence_scores = np.max(sampled_action_score_sequences, axis=1)  # B
+                sampled_sequence_scores = einops.repeat(sampled_sequence_scores, 'B -> B K', K=len(query_actions))  # B, K
+                # give two matrices of size B, K, return a matrix of size B, K, where each element is the min of the two
+                accumulated_scores = np.maximum(sampled_sequence_scores, query_actions_scores)  # B, K
+            elif rank_method == "product":
+                sampled_sequence_scores = np.product(sampled_action_score_sequences, axis=1)  # B
+                sampled_sequence_scores = einops.repeat(sampled_sequence_scores, 'B -> B K', K=len(query_actions))  # B, K
+                accumulated_scores = sampled_sequence_scores * query_actions_scores  # B, K
 
             # TODO: perform more complicated filtering
             score_threshold_mask = query_actions_scores > action_score_threshold
@@ -773,26 +777,52 @@ def plan_multi_step(model,
             sampled_action_idx_sequences = new_sampled_action_idx_sequences
             sampled_action_score_sequences = new_sampled_action_score_sequences
 
-        # check for goal
-        # action sequences are already ranked
-        for bi in range(len(sampled_action_idx_sequences)):
-            action_idx_sequence = sampled_action_idx_sequences[bi]
-            if goal_action_idx in action_idx_sequence:
-                print("\n" + "*"*20)
-                print(f"plan for goal {goal_action} found!")
-                goal_action_sequence = [query_actions[ai] for ai in action_idx_sequence]
-                print(f"goal action sequence: {goal_action_sequence}")
-                print(f"goal action score sequence: {sampled_action_score_sequences[bi]}")
-                print("*" * 20 + "\n")
-                texts.append(f"plan for goal {goal_action} found!")
-                texts.append(f"goal action sequence: {goal_action_sequence}")
-                texts.append(f"goal action score sequence: {sampled_action_score_sequences[bi]}")
-                break
+        # # check for goal
+        # # action sequences are already ranked
+        # for bi in range(len(sampled_action_idx_sequences)):
+        #     action_idx_sequence = sampled_action_idx_sequences[bi]
+        #     if goal_action_idx in action_idx_sequence:
+        #         print("\n" + "*"*20)
+        #         print(f"plan for goal {goal_action} found!")
+        #         goal_action_sequence = [query_actions[ai] for ai in action_idx_sequence]
+        #         print(f"goal action sequence: {goal_action_sequence}")
+        #         print(f"goal action score sequence: {sampled_action_score_sequences[bi]}")
+        #         print("*" * 20 + "\n")
+        #         texts.append(f"plan for goal {goal_action} found!")
+        #         texts.append(f"goal action sequence: {goal_action_sequence}")
+        #         texts.append(f"goal action score sequence: {sampled_action_score_sequences[bi]}")
+        #         break
+        #
+        # # if goal action sequence is found, break from planning
+        # if goal_action_sequence:
+        #     break
 
-        # if goal action sequence is found, break from planning
-        if goal_action_sequence:
-            break
+            all_action_idx_sequences.extend(sampled_action_idx_sequences)
+            all_action_score_sequences.extend(sampled_action_score_sequences)
 
+    # sort all action sequences by score
+    if rank_method == "min":
+        all_action_accumulated_scores = np.array([np.min(a) for a in all_action_score_sequences])
+    elif rank_method == "max":
+        all_action_accumulated_scores = np.array([np.max(a) for a in all_action_score_sequences])
+    elif rank_method == "product":
+        all_action_accumulated_scores = np.array([np.product(a) for a in all_action_score_sequences])
+    sorted_idxs = np.argsort(all_action_accumulated_scores)[::-1]
+    all_action_idx_sequences = [all_action_idx_sequences[si] for si in sorted_idxs]
+    all_action_score_sequences = [all_action_score_sequences[si] for si in sorted_idxs]
+    all_action_accumulated_scores = [all_action_accumulated_scores[si] for si in sorted_idxs]
+
+    goal_action_sequence = None
+    print("\n\n" + "~" * 100)
+    for bi in range(len(all_action_idx_sequences)):
+        action_idx_sequence = all_action_idx_sequences[bi]
+        if goal_action_idx in action_idx_sequence:
+            action_sequence = [query_actions[ai] for ai in action_idx_sequence]
+            if goal_action_sequence is None:
+                goal_action_sequence = action_sequence
+            # print(f"{all_action_accumulated_scores[bi]}: {action_sequence}")
+            print(f"{all_action_score_sequences[bi]} ({all_action_accumulated_scores[bi]}): {action_sequence}")
+    input("here")
 
     if goal_action_sequence:
         print(f"Planning complete. Goal action sequence found: {len(goal_action_sequence) != 0}")
@@ -829,7 +859,7 @@ def plan_multi_step(model,
     return goal_action_sequence, log_img_text_pair
 
 
-def run_high_level_policy(env: CleanDishEnvV1, exp_dir, max_depth=5, debug=False, only_consider_feasible=True):
+def run_high_level_policy(env: CleanDishEnvV1, exp_dir, max_depth=5, debug=True, only_consider_feasible=True):
 
     # TODO: load from model or data config
 
@@ -889,7 +919,6 @@ def run_high_level_policy(env: CleanDishEnvV1, exp_dir, max_depth=5, debug=False
     cur_score = 0
 
     log_img_text_pairs = []
-    failed_next_actions = []
     for t in range(max_depth):
 
         if t == 0:
@@ -970,16 +999,15 @@ def run_high_level_policy(env: CleanDishEnvV1, exp_dir, max_depth=5, debug=False
                         query_actions, goal_concept_action,
                         num_obj_pts, num_scene_pts, device,
                         observation_mask=observation_mask,
-                        admissible_concept_actions=admissible_concept_actions, debug=debug,
-                        action_score_threshold=0.1, planning_horizon=6, max_beam_size=100, failed_next_actions=failed_next_actions)
+                        admissible_concept_actions=admissible_concept_actions, debug=True,
+                        action_score_threshold=0.0, planning_horizon=4, max_beam_size=200)
 
         # --------------------------------
         # step the environment
-        concept_action = goal_concept_action_sequence[0]
-        text_action = get_text_action_from_concept_action(concept_action, color_object_to_obj_name)
+        text_action = get_text_action_from_concept_action(goal_concept_action_sequence[0], color_object_to_obj_name)
         if debug:
-            print(f"Take action: {text_action} | concept action: {concept_action}")
-            after_texts.append(f"Take action: {text_action} | concept action: {concept_action}")
+            print(f"Take action: {text_action} | concept action: {goal_concept_action_sequence[0]}")
+            after_texts.append(f"Take action: {text_action} | concept action: {goal_concept_action_sequence[0]}")
             # input("Press Enter to continue...")
 
         action = env.convert_text_to_action(text_action[0], text_action[1], text_action[2])
@@ -1007,12 +1035,6 @@ def run_high_level_policy(env: CleanDishEnvV1, exp_dir, max_depth=5, debug=False
         after_texts.append(f"\nscore {cur_score}, done {cur_done}")
         log_img_text_pairs += [(None, "\n".join(before_texts)), log_img_text_pair, (None, "\n".join(after_texts))]
 
-        # remember all failed actions that does not progress state
-        if cur_score == -1:
-            failed_next_actions.append(concept_action)
-        else:
-            failed_next_actions = []
-
     generate_html(log_img_text_pairs, save_dir=exp_dir, filename="rollout.html")
 
     print(f"Task completed: {cur_done}")
@@ -1021,8 +1043,8 @@ def run_high_level_policy(env: CleanDishEnvV1, exp_dir, max_depth=5, debug=False
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="collect rollouts")
     parser.add_argument("--seed", default=0, type=int)
-    parser.add_argument("--semantic_spec_seed", default=0, type=int)
-    parser.add_argument("--config_file", default='../configs/evaluate_clean_dish_feg_collect_rollouts_0922_red_bowl.yaml', type=str)
+    parser.add_argument("--semantic_spec_seed", default=4, type=int)
+    parser.add_argument("--config_file", default='../configs/evaluate_clean_dish_feg_collect_rollouts_0922.yaml', type=str)
     args = parser.parse_args()
 
     run_evaluation(args)

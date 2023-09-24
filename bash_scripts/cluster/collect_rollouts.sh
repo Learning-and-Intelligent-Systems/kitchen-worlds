@@ -18,7 +18,7 @@ cd /svl/u/weiyul/Research/nsplan/kitchen-worlds/tests
 for si in $(eval echo "{$semantic_spec_seed_start..$semantic_spec_seed_end}"); do
   for ei in $(eval echo "{$seed_start..$seed_end}"); do
     echo "Run semantic spec ${si}, env ${ei}"
-    python collect_clean_dish_rollouts.py \
+    python collect_clean_dish_rollouts_cache.py \
         --config_file $base_dir/configs/clean_dish_feg_collect_rollouts_cluster.yaml \
         --seed $ei \
         --semantic_spec_seed $si

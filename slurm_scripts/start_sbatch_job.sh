@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --partition=viscam
+#SBATCH --partition=svl
 #SBATCH --cpus-per-task=8
 #SBATCH --nodes=1
 #SBATCH --mem=32G
@@ -29,6 +29,8 @@ echo NPROCS=$NPROCS
 
 source /sailhome/weiyul/.bashrc
 conda activate kitchen
+
+export PYTHONPATH="/svl/u/weiyul/Research/nsplan/nsplan/src:$PYTHONPATH"
 
 cd /svl/u/weiyul/Research/nsplan/kitchen-worlds
 $1

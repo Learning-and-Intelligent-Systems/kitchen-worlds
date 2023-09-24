@@ -165,13 +165,17 @@ def load_model_and_cfg():
     # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerGoalBCModel_lr.yaml"
     # args.checkpoint_id = "cctp6l33"
 
-    # trained on 0919 data
-    args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerGoalBCModel_lr.yaml"
-    args.checkpoint_id = "tokan8na"
+    # # trained on 0919 data
+    # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerGoalBCModel_lr.yaml"
+    # args.checkpoint_id = "tokan8na"
 
     # # trained on 0828 data withheld red mug
     # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerGoalBCModel_lr.yaml"
     # args.checkpoint_id = "uitl8lyo"
+
+    # trained on 0828 data withheld red mug early stopping
+    args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerGoalBCModel_lr.yaml"
+    args.checkpoint_id = "840nk4xq"
 
     base_cfg = OmegaConf.load(args.base_config_file)
     cfg = OmegaConf.load(args.config_file)
@@ -879,21 +883,19 @@ def plan_multi_step_with_sequence_model(model,
                      query_actions, goal_action,
                     # hyperparameters
                      num_obj_pts, num_scene_pts, device,
-                    observation_mask=None,
-                     debug=False,
-                    action_score_threshold=0.3, planning_horizon=1, max_beam_size=20):
+                    observation_mask=None, admissible_concept_actions=None,
+                     debug=False, max_beam_size=20, failed_next_actions=None):
 
     def print_if_debug(str):
         if debug:
             print(str)
 
-    goal_action_sequence = []
-
+    texts = []
+    texts.append(f"Decode action for goal action: {goal_action}")
     print("goal action", goal_action)
+
     goal_action_idx = query_actions.index(goal_action)
     goal_action_concept_idx = query_actions_concept_idxs[goal_action_idx]
-
-    texts = []
 
     concepts_idx_to_name = []
     for vocab in model.vocabs:
@@ -1091,12 +1093,15 @@ def plan_multi_step_with_sequence_model(model,
         c = concepts_idx_to_name[1][c]
         o = concepts_idx_to_name[2][o]
         l = concepts_idx_to_name[3][l]
-        if next_action is None:
-            next_action = (a, c, o, l)
-        print(f"{a} {c} {o} {l}: {p}")
-        texts.append(f"{a} {c} {o} {l}: {p}")
+        candidate_action = (a, c, o, l)
+        if admissible_concept_actions is None or candidate_action in admissible_concept_actions:
+            if failed_next_actions is None or candidate_action not in failed_next_actions:
+                if next_action is None:
+                    next_action = candidate_action
+                print(f"{a} {c} {o} {l}: {p}")
+                texts.append(f"{a} {c} {o} {l}: {p}")
 
-    visualize_xyzrgbs(observation, show_instance_seg=False).show()
+    # visualize_xyzrgbs(observation, show_instance_seg=False).show()
 
     if observation_mode == "pc":
         scene = trimesh.PointCloud(observation[:, :3], observation[:, 3:]).scene()
@@ -1169,6 +1174,7 @@ def run_high_level_policy(env: CleanDishEnvV1, exp_dir, max_depth=5, debug=True,
     cur_score = 0
 
     log_img_text_pairs = []
+    failed_next_actions = []
     for t in range(max_depth):
 
         if t == 0:
@@ -1241,11 +1247,12 @@ def run_high_level_policy(env: CleanDishEnvV1, exp_dir, max_depth=5, debug=True,
                         observation, query_actions_concept_idxs, grasped,
                         query_actions, goal_concept_action,
                         num_obj_pts, num_scene_pts, device,
-                        observation_mask=observation_mask, debug=False,
-                        action_score_threshold=0.1, planning_horizon=6, max_beam_size=10)
+                        observation_mask=observation_mask, admissible_concept_actions=admissible_concept_actions,
+                                                                             debug=False, max_beam_size=100, failed_next_actions=failed_next_actions)
 
         # --------------------------------
         # step the environment
+        concept_action = next_action
         text_action = get_text_action_from_concept_action(next_action, color_object_to_obj_name)
         if debug:
             print(f"Take action: {text_action} | concept action: {next_action}")
@@ -1277,6 +1284,12 @@ def run_high_level_policy(env: CleanDishEnvV1, exp_dir, max_depth=5, debug=True,
         after_texts.append(f"\nscore {cur_score}, done {cur_done}")
         log_img_text_pairs += [(None, "\n".join(before_texts)), log_img_text_pair, (None, "\n".join(after_texts))]
 
+        # remember all failed actions that does not progress state
+        if cur_score == -1:
+            failed_next_actions.append(concept_action)
+        else:
+            failed_next_actions = []
+
     generate_html(log_img_text_pairs, save_dir=exp_dir, filename="rollout.html")
 
     print(f"Task completed: {cur_done}")
@@ -1285,8 +1298,8 @@ def run_high_level_policy(env: CleanDishEnvV1, exp_dir, max_depth=5, debug=True,
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="collect rollouts")
     parser.add_argument("--seed", default=0, type=int)
-    parser.add_argument("--semantic_spec_seed", default=1, type=int)
-    parser.add_argument("--config_file", default='../configs/evaluate_clean_dish_feg_collect_rollouts_0922.yaml', type=str)
+    parser.add_argument("--semantic_spec_seed", default=0, type=int)
+    parser.add_argument("--config_file", default='../configs/evaluate_clean_dish_feg_collect_rollouts_0922_red_bowl.yaml', type=str)
     args = parser.parse_args()
 
     run_evaluation(args)
