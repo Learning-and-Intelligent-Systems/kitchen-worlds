@@ -85,6 +85,13 @@ from nsplan.utils.files import get_checkpoint_path_from_dir
 from nsplan.utils.visualization import adjust_scene_camera, scene_to_img, visualize_image_text_pairs, generate_html, visualize_xyzrgbs
 
 
+def sort_by_length_and_score(lengths, scores):
+    # Create a list of indices
+    idx = list(range(len(lengths)))
+    # Sort the indices based on lengths and then scores
+    idx_sorted = sorted(idx, key=lambda x: (lengths[x], scores[x]))
+    return idx_sorted
+
 # ===============================================================================================
 # nsplan model related
 
@@ -811,22 +818,31 @@ def plan_multi_step(model,
         all_action_accumulated_scores = np.array([np.max(a) for a in all_action_score_sequences])
     elif rank_method == "product":
         all_action_accumulated_scores = np.array([np.product(a) for a in all_action_score_sequences])
+    else:
+        raise NotImplementedError
+    all_action_lengths = [len(a) for a in all_action_idx_sequences]
+
     sorted_idxs = np.argsort(all_action_accumulated_scores)[::-1]
+    # sorted_idxs = sort_by_length_and_score(all_action_lengths, all_action_accumulated_scores)
     all_action_idx_sequences = [all_action_idx_sequences[si] for si in sorted_idxs]
     all_action_score_sequences = [all_action_score_sequences[si] for si in sorted_idxs]
     all_action_accumulated_scores = [all_action_accumulated_scores[si] for si in sorted_idxs]
 
     goal_action_sequence = None
     print("\n\n" + "~" * 100)
+    texts.append("\n\n" + "~" * 100)
     for bi in range(len(all_action_idx_sequences)):
         action_idx_sequence = all_action_idx_sequences[bi]
-        if goal_action_idx in action_idx_sequence:
+        action_score_sequence = all_action_score_sequences[bi]
+        if goal_action_idx == action_idx_sequence[-1]:
             action_sequence = [query_actions[ai] for ai in action_idx_sequence]
             if goal_action_sequence is None:
                 goal_action_sequence = action_sequence
             # print(f"{all_action_accumulated_scores[bi]}: {action_sequence}")
             print(f"{all_action_score_sequences[bi]} ({all_action_accumulated_scores[bi]}): {action_sequence}")
-    input("here")
+            texts.append(f"{all_action_score_sequences[bi]} ({all_action_accumulated_scores[bi]}): {action_sequence}")
+    print("\n\n" + "~" * 100)
+    texts.append("\n\n" + "~" * 100)
 
     if goal_action_sequence:
         print(f"Planning complete. Goal action sequence found: {len(goal_action_sequence) != 0}")
@@ -1003,7 +1019,7 @@ def run_high_level_policy(env: CleanDishEnvV1, exp_dir, max_depth=5, debug=True,
                         query_actions, goal_concept_action,
                         num_obj_pts, num_scene_pts, device,
                         observation_mask=observation_mask,
-                        admissible_concept_actions=admissible_concept_actions, debug=True,
+                        admissible_concept_actions=admissible_concept_actions, debug=False,
                         action_score_threshold=0.0, planning_horizon=4, max_beam_size=200)
 
         # --------------------------------
@@ -1046,9 +1062,9 @@ def run_high_level_policy(env: CleanDishEnvV1, exp_dir, max_depth=5, debug=True,
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="collect rollouts")
-    parser.add_argument("--seed", default=12, type=int)
-    parser.add_argument("--semantic_spec_seed", default=853, type=int)
-    parser.add_argument("--config_file", default='../configs/evaluate_clean_dish_feg_collect_rollouts_0922.yaml', type=str)
+    parser.add_argument("--seed", default=20, type=int)
+    parser.add_argument("--semantic_spec_seed", default=1000, type=int)
+    parser.add_argument("--config_file", default='../configs/evaluate_clean_dish_feg_collect_rollouts_0923_constrained_placing.yaml', type=str)
     args = parser.parse_args()
 
     run_evaluation(args)

@@ -1253,7 +1253,7 @@ def run_high_level_policy(env: CleanDishEnvV1, exp_dir, max_depth=5, debug=True,
                         query_actions, goal_concept_action,
                         num_obj_pts, num_scene_pts, device,
                         observation_mask=observation_mask, admissible_concept_actions=admissible_concept_actions,
-                                                                             debug=True, max_beam_size=100, failed_next_actions=failed_next_actions)
+                                                                             debug=False, max_beam_size=200, failed_next_actions=failed_next_actions)
 
         # --------------------------------
         # step the environment
@@ -1304,7 +1304,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="collect rollouts")
     parser.add_argument("--seed", default=0, type=int)
     parser.add_argument("--semantic_spec_seed", default=0, type=int)
-    parser.add_argument("--config_file", default='../configs/evaluate_clean_dish_feg_collect_rollouts_0922.yaml', type=str)
+    parser.add_argument("--config_file", default='../configs/evaluate_clean_dish_feg_collect_rollouts_0923_constrained_placing.yaml', type=str)
     args = parser.parse_args()
 
     run_evaluation(args)
