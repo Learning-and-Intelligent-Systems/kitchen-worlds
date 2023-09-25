@@ -26,8 +26,8 @@ for ((i=0; i<N; i++)); do
     arg2=10
     echo "Calling script with semantic_spec_seed_start=$arg1 and num_semantic_spec_seed=$arg2 and num_seed=$3 and config_file=$base_dir/configs/$config_filename"
     python collect_clean_dish_rollouts_cache_parallel.py \
-      --semantic_spec_seed_start $1 \
-      --num_semantic_spec_seed $2 \
+      --semantic_spec_seed_start $arg1 \
+      --num_semantic_spec_seed $arg2 \
       --num_seed $3 \
       --config_file $base_dir/configs/$config_filename
 done
