@@ -9,8 +9,8 @@
 #SBATCH --gres=gpu:1
 
 #SBATCH --job-name=ns_plan
-#SBATCH --output=/svl/u/weiyul/test_output.out
-#SBATCH --error=/svl/u/weiyul/test_output.err
+#SBATCH --output=/svl/u/weiyul/test_output/%j.out
+#SBATCH --error=/svl/u/weiyul/test_output/%j.err
 
 
 # list out some useful information (optional)

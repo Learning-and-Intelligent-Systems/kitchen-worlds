@@ -59,6 +59,8 @@ from gymnasium import error, spaces, utils
 from gymnasium.utils import seeding
 import numpy as np
 
+from nsplan.data.dataset_sequence_multiview_v2 import load_cache_data_builder
+
 
 def plot_images(image_dict):
     # Determine the number of images
@@ -114,42 +116,46 @@ def process(config):
     """ STEP 1 -- GENERATE SCENES """
     world, goal = create_pybullet_world(new_config, SAVE_LISDF=False, SAVE_TESTCASE=True)
 
-    # # --------------------------------
-    # env = CleanDishEnvV1(world, goal, config, render_mode="human")
-    # input("env initialized, next?")
-    # play(env)
-
     # --------------------------------
     env = CleanDishEnvV1(world, goal, config, render_mode="bot")
-    # option 1
-    # data = random_simulate_bfs(env, max_depth=3, debug=False)
-    # print("\n\n" + "=" * 100)
-    # print("all states")
-    # for d in data:
-    #     print("\n" + "-" * 50)
-    #     cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth = d
-    #     print(cur_obs.rgbPixels)
-    #     # img = Image.fromarray(cur_obs.rgbPixels, 'RGBA')
-    #     # img.show()
-    #     plt.imshow(cur_obs.rgbPixels)
-    #     plt.show()
-    #     print(f"depth: {depth}")
-    #     for action in action_to_feasibility:
-    #         print(f"{action}: {action_to_feasibility[action]}")
-    #     input("next?")
 
-    # option 2
-    rollouts = random_rollouts(env, max_depth=new_config.max_rollout_depth, max_rollouts=new_config.max_rollouts, debug=False, simple_data=True)
+    # --------------------------------
+    if not config.replay:
+        rollouts = random_rollouts(env, max_depth=new_config.max_rollout_depth, max_rollouts=new_config.max_rollouts, debug=False)
+        # save rollouts to pickle file
+        with open(os.path.join(exp_dir, "rollouts.pkl"), "wb") as f:
+            pickle.dump(rollouts, f)
+    else:
+        rollout_file = os.path.join(exp_dir, "rollouts.pkl")
+        if not os.path.exists(rollout_file):
+            print("Replay mode but no rollouts.pkl file found in {}".format(exp_dir))
 
-    # convert the world entity obj to a simple str so we don't have problem unpickle it
-    obj_dict = copy.deepcopy(world.obj_dict)
-    for obj in obj_dict:
-        obj_dict[obj]["name"] = str(obj_dict[obj]["name"])
+            reset_simulation()
+            disconnect()
+            return
 
-    data_dict = {"rollouts": rollouts, "obj_dict": obj_dict, "pybullet_idx_to_name": {b: world.BODY_TO_OBJECT[b].name for b in world.BODY_TO_OBJECT}}
-    with open(os.path.join(exp_dir, "rollout_data.pkl"), "wb") as fh:
-        pickle.dump(data_dict, fh)
+        with open(os.path.join(exp_dir, "rollouts.pkl"), "rb") as f:
+            rollouts_without_obs = pickle.load(f)
 
+        rollouts = replay_rollout(env, rollouts_without_obs, debug=False, simple_data=True)
+
+        cache_save_dir = os.path.dirname(config.data.out_dir)
+        pcs_cache_data_builder = load_cache_data_builder(cache_save_dir, config.cache_data["pcs_config_file"])
+        pc_cache_data_builder = load_cache_data_builder(cache_save_dir, config.cache_data["pc_config_file"])
+
+        # convert the world entity obj to a simple str so we don't have problem unpickle it
+        obj_dict = copy.deepcopy(world.obj_dict)
+        for obj in obj_dict:
+            obj_dict[obj]["name"] = str(obj_dict[obj]["name"])
+
+        data_dict = {"rollouts": rollouts, "obj_dict": obj_dict,
+                     "pybullet_idx_to_name": {b: world.BODY_TO_OBJECT[b].name for b in world.BODY_TO_OBJECT}}
+        pcs_cache_data_builder.cache_datum(data_dict, save_filename=f"semantic_spec_{semantic_spec_seed}_seed_{seed}.pkl")
+        pc_cache_data_builder.cache_datum(data_dict, save_filename=f"semantic_spec_{semantic_spec_seed}_seed_{seed}.pkl")
+
+    reset_simulation()
+    disconnect()
+    return
 
 def adjust_grasp(grasp, robot, obj_body):
     grasp_type = 'hand'
@@ -195,7 +201,7 @@ def play(env):
     print("*" * 100 + "\n")
 
 
-def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=True):
+def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False):
     text_actions = sorted(env.get_admissible_text_actions())
     if debug:
         print(f"{len(text_actions)} available actions: {text_actions}")
@@ -205,7 +211,7 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
 
         rollout = []
 
-        obs, info = env.reset()
+        _, info = env.reset()
 
         # the format of each node in the search tree
         # TODO: also add action_so_far so we can trace
@@ -215,17 +221,13 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
         symbolic_state = None
         action_to_feasibility = {}
         depth = 0
-        next_node = (obs, commands_so_far, current_g, current_gp, symbolic_state, action_to_feasibility, depth)
+        next_node = (commands_so_far, current_g, current_gp, symbolic_state, action_to_feasibility, depth)
 
         while True:
 
-            (cur_obs, commands_so_far, current_g, current_gp, symbolic_state, action_to_feasibility, depth) = next_node
+            (commands_so_far, current_g, current_gp, symbolic_state, action_to_feasibility, depth) = next_node
             if debug:
                 print("\n\n" + "=" * 100)
-                # plt.imshow(cur_obs.rgbPixels)
-                # plt.show()
-                plot_images({view_name: Image.fromarray(cur_obs[view_name][0], 'RGBA') for view_name in cur_obs})
-                # print((cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth))
                 print((symbolic_state, action_to_feasibility, depth))
 
             if depth >= max_depth:
@@ -250,10 +252,10 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
                 if debug:
                     print("\n" + "-"*25)
                     input(f"check motion feasibility for {text_action}")
-                reset_obs, _ = env.reset_to_state(commands_so_far, current_g, current_gp, symbolic_state)
+                _, _ = env.reset_to_state(commands_so_far, current_g, current_gp, symbolic_state)
                 # debug: make sure cur_obs is the same as reset_obs
                 action = env.convert_text_to_action(text_action[0], text_action[1], text_action[2])
-                new_obs, new_score, new_done, _, _ = env.step(action)
+                _, new_score, new_done, _, _ = env.step(action)
                 if new_score == -1:
                     # not feasible
                     action_to_feasibility[text_action] = -1
@@ -270,7 +272,7 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
                     new_symbolic_state = env.symbolic_state
                     new_action_to_feasibility = {}
                     new_depth = depth + 1
-                    new_node = (new_obs, new_commands_so_far, new_current_g, new_current_gp, new_symbolic_state, new_action_to_feasibility, new_depth)
+                    new_node = (new_commands_so_far, new_current_g, new_current_gp, new_symbolic_state, new_action_to_feasibility, new_depth)
                     candidate_next_nodes.append(new_node)
 
                 if debug:
@@ -291,16 +293,46 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
                 next_node = candidate_next_nodes[act_idx]
                 next_action = motion_feasible_text_actions[act_idx]
 
-            if simple_data:
-                if current_g is not None:
-                    current_g = current_g[2]
-                rollout.append((cur_obs, symbolic_state, current_g, current_gp, action_to_feasibility, depth, next_action))
-            else:
-                rollout.append((cur_obs, commands_so_far, current_g, current_gp, symbolic_state, action_to_feasibility, depth, next_action))
+            rollout.append((commands_so_far, current_g, current_gp, symbolic_state, action_to_feasibility, depth, next_action))
 
             if not candidate_next_nodes:
                 break
 
+        rollouts.append(rollout)
+
+    if debug:
+        for ri, rollout in enumerate(rollouts):
+            print("\n\n" + "=" * 100)
+            print(f"rollout no.{ri}")
+            for d in rollout:
+                print("\n" + "-" * 50)
+                commands_so_far, current_g, current_gp, symbolic_state, action_to_feasibility, depth, next_action = d
+                print(f"depth: {depth}")
+                for action in action_to_feasibility:
+                    print(f"{action}: {action_to_feasibility[action]}")
+                print(f"next action: {next_action}")
+                print(f"current_g: {current_g}")
+                print(f"current_gp: {current_gp}")
+                input("next?")
+
+    return rollouts
+
+
+def replay_rollout(env, rollouts_without_obs, debug=False, simple_data=True):
+
+    rollouts = []
+    for rollout_without_obs in rollouts_without_obs:
+        env.reset()
+        rollout = []
+        for d in rollout_without_obs:
+            commands_so_far, current_g, current_gp, symbolic_state, action_to_feasibility, depth, next_action = d
+            obs, info = env.reset_to_state(commands_so_far, current_g, current_gp, symbolic_state)
+            if simple_data:
+                if current_g is not None:
+                    current_g = current_g[2]
+                rollout.append((obs, symbolic_state, current_g, current_gp, action_to_feasibility, depth, next_action))
+            else:
+                rollout.append((obs, commands_so_far, current_g, current_gp, symbolic_state, action_to_feasibility, depth, next_action))
         rollouts.append(rollout)
 
     if debug:
@@ -314,9 +346,6 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
                     print(d)
                 else:
                     cur_obs, commands_so_far, current_g, current_gp, symbolic_state, action_to_feasibility, depth, next_action = d
-                # print(cur_obs.rgbPixels)
-                # img = Image.fromarray(cur_obs.rgbPixels, 'RGBA')
-                # img.show()
                 plot_images({view_name: Image.fromarray(cur_obs[view_name][0], 'RGBA') for view_name in cur_obs})
                 print(f"depth: {depth}")
                 for action in action_to_feasibility:
@@ -325,20 +354,6 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
                 print(f"current_g: {current_g}")
                 print(f"current_gp: {current_gp}")
                 input("next?")
-
-    # if True:
-    #     for ri, rollout in enumerate(rollouts):
-    #         print("\n\n" + "=" * 100)
-    #         print(f"rollout no.{ri}")
-    #         for d in rollout:
-    #             print("\n" + "-" * 50)
-    #             if simple_data:
-    #                 cur_obs, symbolic_state, current_g, action_to_feasibility, depth, next_action = d
-    #             else:
-    #                 cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth, next_action = d
-    #             print(f"next action: {next_action}")
-    #             print(f"current_g: {current_g}")
-    #             input("next?")
 
     return rollouts
 
@@ -538,7 +553,7 @@ class CleanDishEnvV1(gym.Env):
             apply_actions(self.state, self.commands_so_far, time_step=0, verbose=False)
 
             # update symbolic state
-            self.update_symbolic_state(manip_name, obj_name, loc_name)
+            self.update_symbolic_state(target_obj_name=obj_name)
 
             terminated = self.check_reach_symbolic_goal()
             reward = 100 if terminated else 0  # Binary sparse rewards
@@ -604,7 +619,7 @@ class CleanDishEnvV1(gym.Env):
             apply_actions(self.state, self.commands_so_far, time_step=0, verbose=False)
 
             # update symbolic state
-            self.update_symbolic_state(manip_name, obj_name, loc_name)
+            self.update_symbolic_state(target_obj_name=obj_name)
 
             terminated = self.check_reach_symbolic_goal()
             reward = 100 if terminated else 0  # Binary sparse rewards
@@ -913,7 +928,7 @@ class CleanDishEnvV1(gym.Env):
             self.symbolic_state[obj.name] = {"location": None, "cleanliness": None}
         self.symbolic_state["grasped"] = None
 
-    def update_symbolic_state(self, target_manip_name=None, target_obj_name=None, target_loc_name=None):
+    def update_symbolic_state(self, target_obj_name=None):
 
         ## first get some facts from world state
         facts = self.state.get_facts(init_facts=[], objects=None)
@@ -937,7 +952,6 @@ class CleanDishEnvV1(gym.Env):
         # Debug: there is a bug that the object is still supported even though it is contained. therefore, the order
         #        of preds matter
         preds = ["supported", "contained"]
-
         for pred in preds:
             if pred not in pred_to_list:
                 continue
@@ -948,20 +962,6 @@ class CleanDishEnvV1(gym.Env):
                     loc_name = loc_name.split("::")[1]
 
                 self.symbolic_state[obj_name]["location"] = loc_name
-
-        # Debug: the preds does not reflect the correct object location after placement actions
-        print("+---------+")
-        print("predicates")
-        for pred in preds:
-            if pred in pred_to_list:
-                print(pred_to_list[pred])
-        print("+---------+")
-        if target_manip_name is not None:
-            assert target_obj_name is not None and target_loc_name is not None
-            if target_manip_name == "place":
-                self.symbolic_state[target_obj_name]["location"] = target_loc_name
-        else:
-            print("WARNING: no correction is applied. This is okay if we are only initializing a new environment.")
 
         if "cleaned" in pred_to_list:
             for fact in pred_to_list["cleaned"]:
@@ -976,7 +976,6 @@ class CleanDishEnvV1(gym.Env):
             self.symbolic_state["grasped"] = None
 
         print(f"\nCurrent symbolic state:\n{self.symbolic_state}\n")
-
 
     def parse_symbolic_goal(self):
         for fact in self.goal:
@@ -1043,32 +1042,24 @@ def get_facts(world, state):
     summarize_facts(facts, world, name='Facts', print_fn=print)
 
 
-def collect_for_fastamp():
+def collect_for_fastamp(config):
 
-    if config.env_seed is not None and config.semantic_spec is not None:
-        inputs = [{"semantic_spec": config.semantic_spec, "env_seed": config.env_seed}]
-    else:
-        semantic_specs = get_semantic_specs(config.semantic_specs_dir)
-        inputs = []
-        for spec in semantic_specs:
-            for env_seed in range(10):
-                inputs.append({"semantic_spec": spec, "env_seed": env_seed})
+    inputs = []
+    for spec_seed in range(10):
+        for env_seed in range(10):
+            new_config = copy.deepcopy(config)
+            new_config.semantic_spec_seed = spec_seed
+            new_config.seed = env_seed
+            inputs.append(new_config)
 
     parallel_processing(process, inputs, parallel=config.parallel)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="collect rollouts")
-    parser.add_argument("--seed", default=0, type=int)
-    parser.add_argument("--semantic_spec_seed", default=1, type=int)
-    parser.add_argument("--config_file", default='../configs/clean_dish_feg_collect_rollouts.yaml', type=str)
+    parser.add_argument("--config_file", default='../configs/clean_dish_feg_collect_rollouts_parallel_replay.yaml', type=str)
     args = parser.parse_args()
 
     config = parse_yaml(args.config_file)
-    if config.seed is None:
-       config.seed = args.seed
-    if config.semantic_spec_seed is None:
-        config.semantic_spec_seed = args.semantic_spec_seed
-
-    process(config)
+    collect_for_fastamp(config)
 

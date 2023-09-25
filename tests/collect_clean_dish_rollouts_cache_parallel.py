@@ -59,27 +59,10 @@ from gymnasium import error, spaces, utils
 from gymnasium.utils import seeding
 import numpy as np
 
+from collect_clean_dish_rollouts import plot_images, CleanDishEnvV1
+
 from nsplan.data.dataset_sequence_multiview_v2 import load_cache_data_builder
 
-
-def plot_images(image_dict):
-    # Determine the number of images
-    num_images = len(image_dict)
-
-    fig, axes = plt.subplots(1, num_images, figsize=(15,15))
-
-    # If there is only one image, axes won't be an array, so we need to convert it
-    if num_images == 1:
-        axes = [axes]
-
-    # Plot each image on the grid
-    for (image_name, image), ax in zip(image_dict.items(), axes):
-        ax.imshow(image)
-        ax.set_title(image_name)
-        ax.axis('off')
-
-    plt.tight_layout()
-    plt.show()
 
 
 def process(config):
@@ -147,8 +130,10 @@ def process(config):
     pcs_cache_data_builder = load_cache_data_builder(cache_save_dir, config.cache_data["pcs_config_file"])
     pc_cache_data_builder = load_cache_data_builder(cache_save_dir, config.cache_data["pc_config_file"])
 
-    # option 2
-    rollouts = random_rollouts(env, max_depth=new_config.max_rollout_depth, max_rollouts=new_config.max_rollouts, debug=False, simple_data=True)
+    if new_config.bias_sink_actions:
+        rollouts = random_rollouts_for_sink(env, max_depth=new_config.max_rollout_depth, max_rollouts=new_config.max_rollouts, debug=False, simple_data=True, pick_from_sink_prob=new_config.pick_from_sink_prob)
+    else:
+        rollouts = random_rollouts(env, max_depth=new_config.max_rollout_depth, max_rollouts=new_config.max_rollouts, debug=False, simple_data=True)
 
     # convert the world entity obj to a simple str so we don't have problem unpickle it
     obj_dict = copy.deepcopy(world.obj_dict)
@@ -159,49 +144,9 @@ def process(config):
     pcs_cache_data_builder.cache_datum(data_dict, save_filename=f"semantic_spec_{semantic_spec_seed}_seed_{seed}.pkl")
     pc_cache_data_builder.cache_datum(data_dict, save_filename=f"semantic_spec_{semantic_spec_seed}_seed_{seed}.pkl")
 
-
-def adjust_grasp(grasp, robot, obj_body):
-    grasp_type = 'hand'
-    tool_from_hand = (Point(), quat_from_euler(Euler(math.pi / 2, 0, -math.pi / 2)))
-    g = multiply(invert(tool_from_hand), grasp.value)
-    approach = multiply(invert(tool_from_hand), grasp.approach)
-    adjusted_grasp = Grasp(grasp_type, obj_body, g, approach,
-                           robot.get_carry_conf(robot.arms[0], grasp_type, g))
-    adjusted_grasp.grasp_width = grasp.grasp_width
-    return adjusted_grasp
-
-
-def check_collisions_against_movable_objects(obj_body, p, moveable_bodies):
-    p0 = Pose(obj_body, get_pose(obj_body))
-    p.assign()
-    label = pairwise_collisions(obj_body, moveable_bodies)
-    # restore
-    p0.assign()
-    return label
-
-
-def play(env):
-    try:
-        done = False
-        obs = env.reset()
-        num_moves = 0
-        while not done:
-            print("-"*10)
-            print(f"move {num_moves}")
-            env.print_admissible_actions()
-            manip_name = input("manipulation name > ")
-            obj_name = input("object name > ")
-            loc_name = input("location name > ")
-            action = env.convert_text_to_action(manip_name, obj_name, loc_name)
-            obs, score, done, _, info = env.step(action)
-            print(f"\nscore {score}, done {done}")
-            num_moves += 1
-    except KeyboardInterrupt:
-        pass # Press the stop button in the toolbar to quit the game.
-
-    print("\n" + "*" * 100)
-    print("Played {} steps, scoring {} points.".format(num_moves, score))
-    print("*" * 100 + "\n")
+    reset_simulation()
+    disconnect()
+    return
 
 
 def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=True):
@@ -225,17 +170,21 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
         action_to_feasibility = {}
         depth = 0
         next_node = (obs, commands_so_far, current_g, current_gp, symbolic_state, action_to_feasibility, depth)
+        next_action = None
 
         while True:
 
             (cur_obs, commands_so_far, current_g, current_gp, symbolic_state, action_to_feasibility, depth) = next_node
             if debug:
                 print("\n\n" + "=" * 100)
+                print(f"action leading to this state {next_action}")
+                print("symbolic state: ", symbolic_state)
+                print("action_to_feasibility: ", action_to_feasibility)
+                print("depth: ", depth)
                 # plt.imshow(cur_obs.rgbPixels)
                 # plt.show()
                 plot_images({view_name: Image.fromarray(cur_obs[view_name][0], 'RGBA') for view_name in cur_obs})
                 # print((cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth))
-                print((symbolic_state, action_to_feasibility, depth))
 
             if depth >= max_depth:
                 break
@@ -288,6 +237,7 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
                     print(f"current_gp: {current_gp}")
                     print(f"new_current_g: {env.current_g}")
                     print(f"new_current_gp: {env.current_gp}")
+                    print(f"new_symbolic_state: {env.symbolic_state}")
                     input("next?")
 
             if debug:
@@ -352,695 +302,201 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
     return rollouts
 
 
-def debug_play(env):
-    try:
-        done = False
-        obs = env.reset()
-        num_moves = 0
-
-        for mi in range(4):
-            print("-"*10)
-            print(f"move {num_moves}")
-            input("execute move?")
-            if mi == 0:
-                action = env.convert_text_to_action("pick", "bowl#1", "sink_counter_left")
-            if mi == 1:
-                action = env.convert_text_to_action("place", "bowl#1", "cabinettop_storage")
-            if mi == 2:
-                action = env.convert_text_to_action("pick", "bowl#1", "shelf_lower")
-            if mi == 3:
-                action = env.convert_text_to_action("place", "bowl#1", "cabinettop_storage")
-            obs, score, done, _, info = env.step(action)
-            print(f"score {score}, done {done}")
-            num_moves += 1
-    except KeyboardInterrupt:
-        pass # Press the stop button in the toolbar to quit the game.
-
-    print("\n" + "*"*100)
-    print("Played {} steps, scoring {} points.".format(num_moves, score))
-    print("*" * 100 + "\n")
-
-
-class CleanDishEnvV1(gym.Env):
-    """
-    This environment supports multiple objects and locations
-    """
-
-    # TODO: do we need to differentiate observation and render?
-    #       observation may be low-level object and robot state
-
-    metadata = {'render_modes': ['human', 'bot']}
-
-    def __init__(self, world, goal, config, render_mode):
-        print("Initializing env ...")
-        self.world = world
-        self.goal = goal
-        self.config = config
-
-        self.saver = WorldSaver()
-
-        state = State(world)
-        self.state = state
-        self.robot = state.robot
-        self.problem = state
-
-        domain_path = abspath(self.config.planner.domain_pddl)
-        self.stream_map = self.robot.get_stream_map(self.problem, collisions=not self.config.cfree,
-                                                    custom_limits=self.world.robot.custom_limits,
-                                                    teleport=self.config.teleport, domain_pddl=domain_path,
-                                                    num_grasp_samples=30)
-
-        ## get movable objects
-        moveable_bodies = world.cat_to_bodies('moveable')
-        object_names = [world.body_to_name(b) for b in moveable_bodies]
-        print("moveable objects", object_names)
-        self.moveable_bodies = moveable_bodies
-
-        ## get locations
-        locations = ["sink_counter_left", "sink_counter_right", "shelf_lower", "sink_bottom", "cabinettop_storage"]
-        print("locations", locations)
-
-        # use text action: https://github.com/microsoft/TextWorld/blob/main/notebooks/Playing%20TextWorld%20generated%20games%20with%20OpenAI%20Gym.ipynb
-        # pick obj, place obj
-        self.manipulation_name_to_id = {}
-        self.object_name_to_id = {}
-        self.location_name_to_id = {}
-        self.set_up_text_actions(object_names, locations)
-        self.id_to_manipulation_name = self.reverse_vocab(self.manipulation_name_to_id)
-        self.id_to_object_name = self.reverse_vocab(self.object_name_to_id)
-        self.id_to_location_name = self.reverse_vocab(self.location_name_to_id)
-
-        self.action_space = spaces.MultiDiscrete([len(self.manipulation_name_to_id),
-                                                  len(self.object_name_to_id),
-                                                  len(self.location_name_to_id)])
-
-        # Here's an observation space for 200 wide x 100 high RGB image inputs:
-        self.observation_space = spaces.Box(low=0, high=255, shape=(1280, 960, 3), dtype=np.uint8)
-        # use a list of cameras: https://stackoverflow.com/questions/68113725/openai-gym-observation-space-representation
-
-        assert render_mode is None or render_mode in self.metadata["render_modes"]
-        self.render_mode = render_mode
-
-        # record some state information
-        # TODO: maybe this information is redundant and we can get it from elsewhere, like world, saver, ..
-        # current grasp
-        self.current_g = None
-        self.current_gp = None
-
-        self.commands_so_far = []
-        # map from each object to its information
-        self.symbolic_state = {}
-        self.initialize_symbolic_state()
-        self.update_symbolic_state()
-
-        print(f"\ngoal {goal}\n")
-        self.symbolic_goal = {}
-        self.parse_symbolic_goal()
-
-    def print_admissible_actions(self):
-        print("Manipulation actions:", sorted(list(self.manipulation_name_to_id.keys())))
-        print("Objects:", sorted(list(self.object_name_to_id.keys())))
-        print("Locations:", sorted(list(self.location_name_to_id.keys())))
-
-    def get_admissible_text_actions(self):
-        manipulation_names = sorted(list(self.manipulation_name_to_id.keys()))
-        object_names = sorted(list(self.object_name_to_id.keys()))
-        location_names = sorted(list(self.location_name_to_id.keys()))
-
-        actions = list(itertools.product(manipulation_names, object_names, location_names))
-        return actions
-
-    def set_up_text_actions(self, object_names, locations):
-        self.manipulation_name_to_id = {"pick": 0, "place": 1}
-
-        self.object_name_to_id = {}
-        for object_name in sorted(object_names):
-            self.object_name_to_id[object_name] = len(self.object_name_to_id)
-
-        self.location_name_to_id = {}
-        for location_name in sorted(locations):
-            self.location_name_to_id[location_name] = len(self.location_name_to_id)
-
-    def reverse_vocab(self, vocab):
-        return {vocab[v]: v for v in vocab}
-
-    def convert_text_to_action(self, manipulation, object, location):
-        return [self.manipulation_name_to_id[manipulation],
-                self.object_name_to_id[object],
-                self.location_name_to_id[location]]
-
-    def convert_action_to_text(self, action):
-        return self.id_to_manipulation_name[action[0]], self.id_to_object_name[action[1]], self.id_to_location_name[action[2]]
-
-    def step(self, action):
-        # return observation, reward, terminated, False, info
-
-        ## compute env commands
-        commands = None
-
-        # TODO: it seems like these stream functions will also change the world state, we need to be able to save state
-        #       before planning and revert after planning
-        manip_name, obj_name, loc_name = self.convert_action_to_text(action)
-
-        symbolically_feasible = self.check_symbolic_action_feasibility(manip_name, obj_name, loc_name)
-        print(f"Action {action} is symbolically feasible: {symbolically_feasible}")
-
-        if symbolically_feasible:
-
-            bodies_before = get_bodies()
-            # saver = WorldSaver()
-            # with LockRenderer(lock=True):
-            if manip_name == "pick":
-                # execute pick
-                commands = self._get_pick_action(obj_name)
-            elif manip_name == "place":
-                # execute place
-                commands = self._get_place_action(obj_name, loc_name)
-            # TODO: we want to be able to restore to the state before planning, but right not grasp attachements are not
-            #       correctly restored.
-            # saver.restore()
-            # self.state.assign()
-
-            # important: cleanup
-            bodies_after = get_bodies()
-            aux_bodies = set(bodies_after) - set(bodies_before)
-            print("new bodies created in finding motion", aux_bodies)
-            for body in aux_bodies:
-                remove_body(body)
-            if "hand" in self.robot.grippers:
-                self.robot.remove_gripper("hand")
-
-        ## step env and compute reward
-        if symbolically_feasible is False or commands is None:
-            terminated = False
-            reward = -1
-        else:
-            # set_renderer(True)
-            # apply_actions(self.state, commands, time_step=config.time_step, verbose=False)
-
-            # debug: right now we are restoring the world to the initial state and execute all actions planned so far.
-            #        once we have way to restore to any particular time of the execution, we don't need to do this anymore.
-            self.commands_so_far += commands
-            self.state.remove_gripper()
-            self.saver.restore()
-            set_renderer(True)
-            apply_actions(self.state, self.commands_so_far, time_step=0, verbose=False)
-
-            # update symbolic state
-            self.update_symbolic_state(target_obj_name=obj_name)
-
-            terminated = self.check_reach_symbolic_goal()
-            reward = 100 if terminated else 0  # Binary sparse rewards
-
-        ## update observation
-        observation = self._get_obs()
-        info = self._get_info()
-
-        return observation, reward, terminated, False, info
-
-    def step_with_target_tforms(self, action, target_tforms):
-        # return observation, reward, terminated, False, info
-
-        ## compute env commands
-        commands = None
-
-        # TODO: it seems like these stream functions will also change the world state, we need to be able to save state
-        #       before planning and revert after planning
-        manip_name, obj_name, loc_name = self.convert_action_to_text(action)
-
-        symbolically_feasible = self.check_symbolic_action_feasibility(manip_name, obj_name, loc_name)
-        print(f"Action {action} is symbolically feasible: {symbolically_feasible}")
-
-        if symbolically_feasible:
-
-            bodies_before = get_bodies()
-            # saver = WorldSaver()
-            # with LockRenderer(lock=True):
-            if manip_name == "pick":
-                # execute pick
-                commands = self._get_pick_action(obj_name)
-            elif manip_name == "place":
-                # execute place
-                commands = self._get_place_action_with_target_tforms(obj_name, loc_name, target_tforms)
-            # TODO: we want to be able to restore to the state before planning, but right not grasp attachements are not
-            #       correctly restored.
-            # saver.restore()
-            # self.state.assign()
-
-            # important: cleanup
-            bodies_after = get_bodies()
-            aux_bodies = set(bodies_after) - set(bodies_before)
-            print("new bodies created in finding motion", aux_bodies)
-            for body in aux_bodies:
-                remove_body(body)
-            if "hand" in self.robot.grippers:
-                self.robot.remove_gripper("hand")
-
-        ## step env and compute reward
-        if symbolically_feasible is False or commands is None:
-            terminated = False
-            reward = -1
-        else:
-            # set_renderer(True)
-            # apply_actions(self.state, commands, time_step=config.time_step, verbose=False)
-
-            # debug: right now we are restoring the world to the initial state and execute all actions planned so far.
-            #        once we have way to restore to any particular time of the execution, we don't need to do this anymore.
-            self.commands_so_far += commands
-            self.state.remove_gripper()
-            self.saver.restore()
-            set_renderer(True)
-            apply_actions(self.state, self.commands_so_far, time_step=0, verbose=False)
-
-            # update symbolic state
-            self.update_symbolic_state(target_obj_name=obj_name)
-
-            terminated = self.check_reach_symbolic_goal()
-            reward = 100 if terminated else 0  # Binary sparse rewards
-
-        ## update observation
-        observation = self._get_obs()
-        info = self._get_info()
-
-        return observation, reward, terminated, False, info
-
-    def reset(self):
-
-        print(self.robot.grippers)
-
-        self.state.remove_gripper()
-        self.saver.restore()
-
-        self.current_g = None
-        self.current_gp = None
-        self.commands_so_far = []
-        # map from each object to its information
-        self.symbolic_state = {}
-        self.initialize_symbolic_state()
-        self.update_symbolic_state()
-
-        observation = self._get_obs()
-        info = self._get_info()
-        return observation, info
-
-    def reset_to_state(self, commands_so_far=[], current_g=None, current_gp=None, symbolic_state=None):
-        self.state.remove_gripper()
-        self.saver.restore()
-
-        # step through commands to recreate the state
-        if commands_so_far:
-            set_renderer(True)
-            apply_actions(self.state, commands_so_far, time_step=0, verbose=False)
-
-        self.commands_so_far = copy.deepcopy(commands_so_far)
-        self.current_g = copy.deepcopy(current_g)
-        self.current_gp = copy.deepcopy(current_gp)
-        if symbolic_state is None:
-            self.symbolic_state = {}
-            self.initialize_symbolic_state()
-            self.update_symbolic_state()
-        else:
-            self.symbolic_state = copy.deepcopy(symbolic_state)
-            print(f"\nCurrent symbolic state:\n{self.symbolic_state}\n")
-
-        observation = self._get_obs()
-        info = self._get_info()
-        return observation, info
-
-    def render(self, mode='human'):
-        camera_image = self._get_obs()
-
-        if mode == 'human':
-            plt.imshow(camera_image.rgbPixels)
-            plt.show()
-
-        return camera_image
-
-    def close(self):
-        reset_simulation()
-        disconnect()
-
-    def _get_obs(self):
-        # return {"agent": self._agent_location, "target": self._target_location}
-
-        width = 512
-        height = 512
-        fx = 800
-
-        # we can set tiny to true when not using gui
-        # https://github.com/bulletphysics/bullet3/issues/1157
-        # set tiny to True when we are not using GUI
-        tiny = not self.config.viewer
-
-        camera_configs = {"scene": {"target_object": "sink#1", "dx": 5, "dy": 0, "dz": 3},
-                          "sink": {"target_object": "sink#1", "dx": 1, "dy": 0, "dz": 1.5},
-                          "cabinet": {"target_object": "cabinettop", "dx": 1, "dy": 0, "dz": 1.5},
-                          "shelf": {"target_object": "shelf_lower", "dx": 1, "dy": 0, "dz": 1.5},
-                          "counter_left": {"target_object": "sink_counter_left", "dx": 1.5, "dy": 0, "dz": 1.5},
-                          "counter_right": {"target_object": "sink_counter_right", "dx": 1.5, "dy": 0, "dz": 1.5}
-                          }
-
-        view_to_camera_image = {}
-        for view_name in camera_configs:
-            # print(view_name)
-            camera_matrix = get_camera_matrix(width=width, height=height, fx=fx)
-            camera = StaticCamera(unit_pose(), camera_matrix=camera_matrix)
-            obj = self.world.name_to_body(camera_configs[view_name]["target_object"])
-            # print(obj)
-            camera_point, target_point = set_camera_target_body(obj,
-                                                                dx=camera_configs[view_name]["dx"],
-                                                                dy=camera_configs[view_name]["dy"],
-                                                                dz=camera_configs[view_name]["dz"])
-            camera_image = camera.get_image(camera_point=camera_point, target_point=target_point, tiny=tiny)
-            # CameraImage = namedtuple('CameraImage', ['rgbPixels', 'depthPixels', 'segmentationMaskBuffer', 'camera_pose', 'camera_matrix'])
-            camera_image = (camera_image.rgbPixels, camera_image.depthPixels, camera_image.segmentationMaskBuffer, camera_image.camera_pose, camera_image.camera_matrix)
-
-            if self.render_mode == "human":
-                plt.imshow(camera_image[0])
-                plt.show()
-
-            view_to_camera_image[view_name] = camera_image
-
-        return view_to_camera_image
-
-    def _get_info(self):
-        # return {
-        #     "distance": np.linalg.norm(
-        #         self._agent_location - self._target_location, ord=1
-        #     )
-        # }
-
-        return {}
-
-    def _get_pick_action(self, object_name):
-
-        ## before we do anything
-        if self.current_g is not None:
-            # there is already object in hand
-            return None
-
-        # get current robot configuration
-        current_q = Conf(self.robot, get_se3_joints(self.robot))
-
-        obj_body = self.world.name_to_body(object_name)
-        world_obj = self.world.name_to_object(object_name)
-
-        # get current pose and instantiate Pose()
-        obj_pose = world_obj.get_link_pose(link=-1)
-        obj_Pose = Pose(obj_body, get_pose(obj_body))
-
-        # return a list of tuple [(grasp, )]
-        grasp_list = next(self.stream_map["sample-grasp"](body=obj_body))
-        print("sample {} grasps for {}: {}".format(len(grasp_list), world_obj, grasp_list))
-
-        for grasp in grasp_list:
-            print("find ik for grasp", grasp)
-
-            grasp = grasp[0]
-            grasp_world = multiply(obj_pose, grasp.value)
-            grasp_tform_world = tform_from_pose(grasp_world)
-
-            # important:
-            adjusted_grasp = adjust_grasp(grasp, self.robot, obj_pose)
-
-            ## find ik
-            for ik in self.stream_map["inverse-kinematics-hand"](a=None, o=obj_body, p=obj_Pose, g=adjusted_grasp):
-                if len(ik) == 0:
-                    continue
-
-                ## now we want to sample a trajectory from current position to next
-                q2 = ik[0][0]
-                for move_cmd in self.stream_map["plan-free-motion-hand"](q1=current_q, q2=q2):
-                    print(move_cmd)
-                    if len(move_cmd) == 0:
-                        continue
-
-                    ## computes actions to step the world
-                    pick_action = ('pick_hand', ('hand', obj_body, obj_Pose, adjusted_grasp, None, ik[0][1]))
-                    move_action = ('move_cartesian', (current_q, ik[0][0], move_cmd[0][0]))
-                    commands = []
-                    for action in [move_action, pick_action]:
-                        commands += get_primitive_actions(action, self.world)
-
-                    ## update world state
-                    self.current_g = (adjusted_grasp, grasp, grasp_tform_world)
-                    self.current_gp = None
-
-                    return commands
-
-        return None
-
-    def _get_place_action(self, object_name, surface_name):
-
-        ## before we do anything
-        if self.current_g is None:
-            # there is nothing in hand to be placed
-            return None
-
-        # get current robot configuration
-        current_q = Conf(self.robot, get_se3_joints(self.robot))
-
-        surface = self.world.name_to_body(surface_name)
-
-        obj_body = self.world.name_to_body(object_name)
-
-        if surface_name == "cabinettop_storage":
-            placement_stream = self.stream_map["sample-pose-in"]
-        else:
-            placement_stream = self.stream_map["sample-pose-on"]
-
-        for placement_pose in placement_stream(obj_body, surface):
-
-            if check_collisions_against_movable_objects(obj_body, placement_pose[0][0], self.moveable_bodies):
-                print("found collisions between moveable objects")
-                continue
-
-            print("find ik for placement pose", placement_pose)
-            for ik in self.stream_map["inverse-kinematics-hand"](a=None, o=obj_body, p=placement_pose[0][0],
-                                                                 g=self.current_g[0]):
-                print(ik)
-                if len(ik) == 0:
-                    continue
-
-                ## motion plan to place
-                q = ik[0][0]
-                for move_cmd in self.stream_map["plan-free-motion-hand"](q1=current_q, q2=q):
-                    print(move_cmd)
-                    if len(move_cmd) == 0:
-                        continue
-
-                    ## computes actions to step the world
-                    move_action = ('move_cartesian', (current_q, q, move_cmd[0][0]))
-                    place_action = ('place_hand', ('hand', obj_body, placement_pose, self.current_g[0], None, ik[0][1]))
-                    commands = []
-                    for action in [move_action, place_action]:
-                        commands += get_primitive_actions(action, self.world)
-
-                    ## update world state
-                    self.current_gp = tform_from_pose(multiply(placement_pose[0][0].value, self.current_g[1].value))
-                    # after computing grasp pose for placement (gp), reset current_g
-                    self.current_g = None
-
-                    return commands
-
-        return None
-
-    def _get_place_action_with_target_tforms(self, object_name, surface_name, target_tforms):
-
-        ## before we do anything
-        if self.current_g is None:
-            # there is nothing in hand to be placed
-            return None
-
-        # get current robot configuration
-        current_q = Conf(self.robot, get_se3_joints(self.robot))
-
-        surface = self.world.name_to_body(surface_name)
-
-        obj_body = self.world.name_to_body(object_name)
-
-        placement_poses = []
-        for target_tform in target_tforms:
-            placement_pose = multiply(pose_from_tform(target_tform), invert(self.current_g[1].value))
-            # placement_pose = Pose(obj_body, value=placement_pose, support=surface)
-            placement_pose = Pose(obj_body, value=placement_pose)
-            # follow the same format as placement_stream
-            placement_poses.append([(placement_pose,)])
-            print("self.current_g[1].value", self.current_g[1].value)
-            print("target_tform", target_tform)
-            print("placement_pose", placement_pose)
-
-        if surface_name == "cabinettop_storage":
-            placement_stream = self.stream_map["sample-pose-in"]
-        else:
-            placement_stream = self.stream_map["sample-pose-on"]
-        for placement_pose in placement_stream(obj_body, surface):
-            print("gt placement_pose", placement_pose)
-            print("gt current_gp", tform_from_pose(multiply(placement_pose[0][0].value, self.current_g[1].value)))
-
-        for pi, placement_pose in enumerate(placement_poses):
-
-            print(f"find ik for No.{pi} placement pose: {placement_pose}")
-
-            if check_collisions_against_movable_objects(obj_body, placement_pose[0][0], self.moveable_bodies):
-                print("found collisions between moveable objects")
-                continue
-
-            print("find ik for placement pose", placement_pose)
-            for ik in self.stream_map["inverse-kinematics-hand"](a=None, o=obj_body, p=placement_pose[0][0],
-                                                                 g=self.current_g[0]):
-                print(ik)
-                if len(ik) == 0:
-                    continue
-
-                ## motion plan to place
-                q = ik[0][0]
-                for move_cmd in self.stream_map["plan-free-motion-hand"](q1=current_q, q2=q):
-                    print(move_cmd)
-                    if len(move_cmd) == 0:
-                        continue
-
-                    ## computes actions to step the world
-                    move_action = ('move_cartesian', (current_q, q, move_cmd[0][0]))
-                    place_action = ('place_hand', ('hand', obj_body, placement_pose, self.current_g[0], None, ik[0][1]))
-                    commands = []
-                    for action in [move_action, place_action]:
-                        commands += get_primitive_actions(action, self.world)
-
-                    ## update world state
-                    self.current_gp = tform_from_pose(multiply(placement_pose[0][0].value, self.current_g[1].value))
-                    # after computing grasp pose for placement (gp), reset current_g
-                    self.current_g = None
-
-                    return commands
-
-        return None
-
-    #-------------------------------------------------------------------------------------------------------------------
-    def initialize_symbolic_state(self):
-        for obj in self.world.OBJECTS_BY_CATEGORY["moveable"]:
-            self.symbolic_state[obj.name] = {"location": None, "cleanliness": None}
-        self.symbolic_state["grasped"] = None
-
-    def update_symbolic_state(self, target_obj_name=None):
-
-        ## first get some facts from world state
-        facts = self.state.get_facts(init_facts=[], objects=None)
-        relevant_predicates = ["supported", "contained", "cleaned"]
-        predicates = {}
-        for fact in facts:
-            pred = fact[0].lower()
-            if pred not in relevant_predicates:
-                continue
-            if pred not in predicates:
-                predicates[pred] = []
-            predicates[pred].append(fact)
-        predicates = {k: v for k, v in sorted(predicates.items())}
-
-        pred_to_list = {}
-        for pred in predicates:
-            list = [get_readable_list(fa, self.world) for fa in predicates[pred]]
-            pred_to_list[pred] = list
-
-        # parse these world facts to update the symbolic state
-        # Debug: there is a bug that the object is still supported even though it is contained. therefore, the order
-        #        of preds matter
-        preds = ["supported", "contained"]
-        for pred in preds:
-            if pred not in pred_to_list:
-                continue
-            for fact in pred_to_list[pred]:
-                obj_name = fact[1].split("|")[1]
-                loc_name = fact[3].split("|")[1]
-                if "::" in loc_name:
-                    loc_name = loc_name.split("::")[1]
-
-                self.symbolic_state[obj_name]["location"] = loc_name
-
-        if "cleaned" in pred_to_list:
-            for fact in pred_to_list["cleaned"]:
-                obj_name = fact[1].split("|")[1]
-                self.symbolic_state[obj_name]["cleanliness"] = True
-
-        ## update gripper state
-        if self.current_g is not None:
-            assert target_obj_name is not None
-            self.symbolic_state["grasped"] = target_obj_name
-        else:
-            self.symbolic_state["grasped"] = None
-
-        print(f"\nCurrent symbolic state:\n{self.symbolic_state}\n")
-
-    def parse_symbolic_goal(self):
-        for fact in self.goal:
-            if fact[0] == "In":
-                # print(fact[0], fact[1].name, self.world.BODY_TO_OBJECT[fact[2]].name)
-                obj_name = fact[1].name
-                loc_name = self.world.BODY_TO_OBJECT[fact[2]].name
-                if "::" in loc_name:
-                    loc_name = loc_name.split("::")[1]
-                self.symbolic_goal[obj_name] = loc_name
-            if fact[0] == "On":
-                # print(fact[0], fact[1].name, self.world.BODY_TO_OBJECT[fact[2]].name)
-                obj_name = fact[1].name
-                loc_name = self.world.BODY_TO_OBJECT[fact[2]].name
-                if "::" in loc_name:
-                    loc_name = loc_name.split("::")[1]
-                self.symbolic_goal[obj_name] = loc_name
-
-        print(f"\nGoal symbolic state:\n{self.symbolic_goal}\n")
-
-    def check_symbolic_action_feasibility(self, manip_name, obj_name, loc_name):
-        if manip_name == "pick":
-            if self.symbolic_state["grasped"] != None:
-                return False
-            if loc_name != self.symbolic_state[obj_name]["location"]:
-                return False
-
-        if manip_name == "place":
-            if self.symbolic_state["grasped"] == None:
-                return False
-            if obj_name != self.symbolic_state["grasped"]:
-                return False
-            if loc_name == "cabinettop_storage" and not self.symbolic_state[obj_name]["cleanliness"]:
-                return False
-
-        return True
-
-    def check_reach_symbolic_goal(self):
-        at_goal = True
-        for obj_name in self.symbolic_goal:
-            if self.symbolic_goal[obj_name] != self.symbolic_state[obj_name]["location"]:
-                at_goal = False
+def random_rollouts_for_sink(env, max_depth=6, max_rollouts=10, debug=False, simple_data=True, pick_from_sink_prob=0.5):
+
+    assert 0 <= pick_from_sink_prob <= 1, f"pick_from_sink_prob {pick_from_sink_prob} must be between 0 and 1"
+
+    text_actions = sorted(env.get_admissible_text_actions())
+    if debug:
+        print(f"{len(text_actions)} available actions: {text_actions}")
+
+    rollouts = []
+    for ri in range(max_rollouts):
+
+        rollout = []
+
+        obs, info = env.reset()
+
+        # the format of each node in the search tree
+        # TODO: also add action_so_far so we can trace
+        commands_so_far = []
+        current_g = None
+        current_gp = None
+        symbolic_state = None
+        action_to_feasibility = {}
+        depth = 0
+        next_node = (obs, commands_so_far, current_g, current_gp, symbolic_state, action_to_feasibility, depth)
+        next_action = None
+        prev_action = None
+
+        while True:
+
+            (cur_obs, commands_so_far, current_g, current_gp, symbolic_state, action_to_feasibility, depth) = next_node
+            if debug:
+                print("\n\n" + "=" * 100)
+                print(f"action leading to this state {next_action}")
+                print("symbolic state: ", symbolic_state)
+                print("action_to_feasibility: ", action_to_feasibility)
+                print("depth: ", depth)
+                # plt.imshow(cur_obs.rgbPixels)
+                # plt.show()
+                plot_images({view_name: Image.fromarray(cur_obs[view_name][0], 'RGBA') for view_name in cur_obs})
+                # print((cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth))
+
+            if depth >= max_depth:
                 break
 
-        return at_goal
+            # important: even for checking symbolic feasibility, we need to reset the env
+            env.reset_to_state(commands_so_far, current_g, current_gp, symbolic_state)
+
+            symbolic_feasible_text_actions = []
+            for text_action in text_actions:
+                symbolic_feasible = env.check_symbolic_action_feasibility(text_action[0], text_action[1], text_action[2])
+                if not symbolic_feasible:
+                    action_to_feasibility[text_action] = -1
+                else:
+                    symbolic_feasible_text_actions.append(text_action)
+            if debug:
+                print(f"{len(symbolic_feasible_text_actions)} symbolic feasible actions: {symbolic_feasible_text_actions}")
+
+            candidate_next_nodes = []
+            motion_feasible_text_actions = []  # bookkeeping
+            for text_action in symbolic_feasible_text_actions:
+                if debug:
+                    print("\n" + "-"*25)
+                    input(f"check motion feasibility for {text_action}")
+                reset_obs, _ = env.reset_to_state(commands_so_far, current_g, current_gp, symbolic_state)
+                # debug: make sure cur_obs is the same as reset_obs
+                action = env.convert_text_to_action(text_action[0], text_action[1], text_action[2])
+                new_obs, new_score, new_done, _, _ = env.step(action)
+                if new_score == -1:
+                    # not feasible
+                    action_to_feasibility[text_action] = -1
+                else:
+                    if new_done:
+                        action_to_feasibility[text_action] = 100
+                    else:
+                        action_to_feasibility[text_action] = 1
+                    # add new node to frontier
+                    new_commands_so_far = env.commands_so_far
+                    new_current_g = env.current_g
+                    new_current_gp = env.current_gp
+                    new_symbolic_state = env.symbolic_state
+                    new_action_to_feasibility = {}
+                    new_depth = depth + 1
+                    new_node = (new_obs, new_commands_so_far, new_current_g, new_current_gp, new_symbolic_state, new_action_to_feasibility, new_depth)
+                    motion_feasible_text_actions.append(text_action)
+                    candidate_next_nodes.append(new_node)
+
+                if debug:
+                    print(f"action_to_feasibility: {action_to_feasibility[text_action]}")
+                    print(f"current_g: {current_g}")
+                    print(f"current_gp: {current_gp}")
+                    print(f"new_current_g: {env.current_g}")
+                    print(f"new_current_gp: {env.current_gp}")
+                    print(f"new_symbolic_state: {env.symbolic_state}")
+                    input("next?")
+
+            if debug:
+                print(f"{len(motion_feasible_text_actions)} motion feasible actions: {motion_feasible_text_actions}")
+                input("next node?")
+
+            prev_action = next_action
+            next_action = None
+            if candidate_next_nodes:
+
+                # motion_feasible_text_actions stores the text actions that are motion feasible
+                # manip, obj, loc = text_action
+
+                sink_action_idxs = []
+                other_action_idxs = []
+                for ai, text_action in enumerate(motion_feasible_text_actions):
+                    if text_action[2] == "sink_bottom":
+                        sink_action_idxs.append(ai)
+                    else:
+                        other_action_idxs.append(ai)
+
+                act_idx = None
+                if motion_feasible_text_actions[0][0] == "pick":
+                    # if there is a sink action, pick that with 50% chance (if there are other actions, pick one of them with 50% chance)
+                    # if there is no sink action, pick one of the other actions
+                    if sink_action_idxs:
+                        if np.random.random() < pick_from_sink_prob or not other_action_idxs:
+                            act_idx = np.random.choice(sink_action_idxs)
+                    if act_idx is None:
+                        act_idx = np.random.choice(other_action_idxs)
+                else:
+                    # if the object is picked from sink, move it out of sink
+                    # if the object is not picked from sink, move it into sink if possible
+                    assert prev_action is not None, "prev_action is None but the current action is not pick"
+                    if prev_action[2] == "sink_bottom" and other_action_idxs:
+                        act_idx = np.random.choice(other_action_idxs)
+                    if act_idx is None:
+                        if sink_action_idxs:
+                            act_idx = np.random.choice(sink_action_idxs)
+                        else:
+                            act_idx = np.random.choice(other_action_idxs)
+
+                next_node = candidate_next_nodes[act_idx]
+                next_action = motion_feasible_text_actions[act_idx]
+
+            if simple_data:
+                if current_g is not None:
+                    current_g = current_g[2]
+                rollout.append((cur_obs, symbolic_state, current_g, current_gp, action_to_feasibility, depth, next_action))
+            else:
+                rollout.append((cur_obs, commands_so_far, current_g, current_gp, symbolic_state, action_to_feasibility, depth, next_action))
+
+            if not candidate_next_nodes:
+                break
+
+        rollouts.append(rollout)
+
+    if debug:
+        for ri, rollout in enumerate(rollouts):
+            print("\n\n" + "=" * 100)
+            print(f"rollout no.{ri}")
+            for d in rollout:
+                print("\n" + "-" * 50)
+                if simple_data:
+                    cur_obs, symbolic_state, current_g, current_gp, action_to_feasibility, depth, next_action = d
+                    print(d)
+                else:
+                    cur_obs, commands_so_far, current_g, current_gp, symbolic_state, action_to_feasibility, depth, next_action = d
+                # print(cur_obs.rgbPixels)
+                # img = Image.fromarray(cur_obs.rgbPixels, 'RGBA')
+                # img.show()
+                plot_images({view_name: Image.fromarray(cur_obs[view_name][0], 'RGBA') for view_name in cur_obs})
+                print(f"depth: {depth}")
+                for action in action_to_feasibility:
+                    print(f"{action}: {action_to_feasibility[action]}")
+                print(f"next action: {next_action}")
+                print(f"current_g: {current_g}")
+                print(f"current_gp: {current_gp}")
+                input("next?")
+
+    # if True:
+    #     for ri, rollout in enumerate(rollouts):
+    #         print("\n\n" + "=" * 100)
+    #         print(f"rollout no.{ri}")
+    #         for d in rollout:
+    #             print("\n" + "-" * 50)
+    #             if simple_data:
+    #                 cur_obs, symbolic_state, current_g, action_to_feasibility, depth, next_action = d
+    #             else:
+    #                 cur_obs, commands_so_far, current_g, symbolic_state, action_to_feasibility, depth, next_action = d
+    #             print(f"next action: {next_action}")
+    #             print(f"current_g: {current_g}")
+    #             input("next?")
+
+    return rollouts
 
 
-def get_facts(world, state):
-    facts = state.get_facts(init_facts=[], objects=None)
-    # print_fn = parallel_print ## if args.parallel else myprint
-    # print_fn(config)
-    predicates = {}
-    for fact in facts:
-        pred = fact[0].lower()
-        if pred not in predicates:
-            predicates[pred] = []
-        predicates[pred].append(fact)
-    predicates = {k: v for k, v in sorted(predicates.items())}
-    for pred in predicates:
-        print(pred)
-        list = [get_readable_list(fa, world) for fa in predicates[pred]]
-        print(list)
-
-    summarize_facts(facts, world, name='Facts', print_fn=print)
-
-
-def collect_for_fastamp(config):
+def collect_for_fastamp(config, args):
 
     inputs = []
-    for spec_seed in range(10):
-        for env_seed in range(10):
+    for spec_seed in range(args.semantic_spec_seed_start, args.semantic_spec_seed_end + 1):
+        for env_seed in range(args.seed_start, args.seed_end + 1):
             new_config = copy.deepcopy(config)
             new_config.semantic_spec_seed = spec_seed
             new_config.seed = env_seed
@@ -1051,9 +507,13 @@ def collect_for_fastamp(config):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="collect rollouts")
-    parser.add_argument("--config_file", default='../configs/clean_dish_feg_collect_rollouts_parallel.yaml', type=str)
+    parser.add_argument("--seed_start", default=0, type=int)
+    parser.add_argument("--seed_end", default=9, type=int)
+    parser.add_argument("--semantic_spec_seed_start", default=0, type=int)
+    parser.add_argument("--semantic_spec_seed_end", default=99, type=int)
+    parser.add_argument("--config_file", default='../configs/clean_dish_feg_collect_rollouts_parallel_sink.yaml', type=str)
     args = parser.parse_args()
 
     config = parse_yaml(args.config_file)
-    collect_for_fastamp(config)
+    collect_for_fastamp(config, args)
 

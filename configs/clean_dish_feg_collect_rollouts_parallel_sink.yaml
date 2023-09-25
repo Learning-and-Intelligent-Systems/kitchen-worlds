@@ -1,0 +1,86 @@
+## debug related
+# seed: 594585
+# seed: 1
+#verbose: true
+#env_seed: 0
+#semantic_spec: 0.json
+verbose: true
+seed:
+semantic_spec_seed:
+max_rollout_depth: 6
+max_rollouts: 3
+bias_sink_actions: True
+pick_from_sink_prob: 1.0
+
+## semantic spec related
+# semantic_specs_dir: ../pybullet_planning/nsplan_tools/debug_specs
+semantic_specs_dir: /home/weiyu/data_drive/nsplan/0923_constrained_placing_parallel/semantic_specs
+
+## pybullet related
+viewer: false  # default: true
+lock: true
+simulate: false
+teleport: false
+drive: true
+cfree: false
+time_step: 0.05
+camera: true
+segment: false
+monitoring: false
+
+## data collection mode
+parallel: true
+
+robot:
+  robot_name: feg
+  builder_name: build_robot_from_args
+  builder_kwargs:
+    ## x, y, z joint limits for base motion planning
+    custom_limits: [[0, -4, -0.5], [3, 8, 3]]
+    initial_q: [2, 3, 0.7, 0, -1.57, 0]
+
+
+world:
+  ## method 1: use pre-specified builder inside world_builder/builders,
+  ##         followed by builder specific arguments
+  builder_name: test_clean_dish_feg
+  builder_kwargs:
+    ## sample assets in category from assets library, by default the 1st asset
+    sampling: true
+    movable_category: ['food']
+    goal_predicates: ['holding', 'on', 'in']
+    use_doors: false
+
+
+data:
+  out_dir: /home/weiyu/data_drive/nsplan/0923_constrained_placing_parallel/data
+  save_failed_plans: true
+  save_log: true
+  save_commands: true
+  images:
+    save_rgb: true
+    save_depth: false
+  resolution: [1280, 720]
+  fx: 800
+  ## {name: pose} pairs
+  cameras:
+    ## pose format 1: (point, quaternion)
+    front: [[6.84, 2.9, 1.3], [0.5, 0.5, -0.5, -0.5]]
+    ## pose format 2: (camera_point, target_point)
+    top: [[2, 4, 3], [0, 4, 1]]
+    ## pose format 3: (object_name, delta_to_target)
+    zoomin1: ['minifridge', [2, 0, 2]]
+
+cache_data:
+  pcs_config_file: /home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_XL_lr_v2.yaml
+  pc_config_file: /home/weiyu/Research/nsplan/nsplan/configs/PCTFiLM1DDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_large_lr_v2.yaml
+
+
+## configuration for PDDLStream
+planner:
+  timeout: 300
+  domain_pddl: ../assets/pddl/feg_kitchen_clean.pddl
+  stream_pddl: ../assets/pddl/feg_stream_kitchen_clean.pddl
+  diverse: true
+  downward_time: 0.02
+  dataset: false
