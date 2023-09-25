@@ -177,8 +177,8 @@ def load_model_and_cfg():
     # args.checkpoint_id = "w6lzkv52"
 
     # trained on 0919 data
-    args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_XL_lr.yaml"
-    args.checkpoint_id = "k6sxfz7r"
+    # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_XL_lr.yaml"
+    # args.checkpoint_id = "k6sxfz7r"
 
     # # trained on 0828 data witheld red bowl
     # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_XL_lr.yaml"
@@ -187,6 +187,10 @@ def load_model_and_cfg():
     # trained on 0828 data witheld red bowl
     # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTFiLM1DDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_large_lr.yaml"
     # args.checkpoint_id = "ztgus1dc"
+
+    # trained on 0924 constrained placing parallel data
+    args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_XL_lr_v2.yaml"
+    args.checkpoint_id = "9mc72ohx"
 
     base_cfg = OmegaConf.load(args.base_config_file)
     cfg = OmegaConf.load(args.config_file)
@@ -820,9 +824,9 @@ def plan_multi_step(model,
             action_sequence = [query_actions[ai] for ai in action_idx_sequence]
             if goal_action_sequence is None:
                 goal_action_sequence = action_sequence
-            print(f"{all_action_accumulated_scores[bi]}: {action_sequence}")
+            # print(f"{all_action_accumulated_scores[bi]}: {action_sequence}")
+            print(f"{all_action_score_sequences[bi]} ({all_action_accumulated_scores[bi]}): {action_sequence}")
     input("here")
-
 
     if goal_action_sequence:
         print(f"Planning complete. Goal action sequence found: {len(goal_action_sequence) != 0}")
@@ -1000,7 +1004,7 @@ def run_high_level_policy(env: CleanDishEnvV1, exp_dir, max_depth=5, debug=True,
                         num_obj_pts, num_scene_pts, device,
                         observation_mask=observation_mask,
                         admissible_concept_actions=admissible_concept_actions, debug=True,
-                        action_score_threshold=0.0, planning_horizon=4, max_beam_size=100)
+                        action_score_threshold=0.0, planning_horizon=4, max_beam_size=200)
 
         # --------------------------------
         # step the environment
@@ -1042,8 +1046,8 @@ def run_high_level_policy(env: CleanDishEnvV1, exp_dir, max_depth=5, debug=True,
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="collect rollouts")
-    parser.add_argument("--seed", default=0, type=int)
-    parser.add_argument("--semantic_spec_seed", default=2, type=int)
+    parser.add_argument("--seed", default=12, type=int)
+    parser.add_argument("--semantic_spec_seed", default=853, type=int)
     parser.add_argument("--config_file", default='../configs/evaluate_clean_dish_feg_collect_rollouts_0922.yaml', type=str)
     args = parser.parse_args()
 

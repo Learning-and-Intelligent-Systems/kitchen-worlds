@@ -495,8 +495,9 @@ def random_rollouts_for_sink(env, max_depth=6, max_rollouts=10, debug=False, sim
 def collect_for_fastamp(config, args):
 
     inputs = []
-    for spec_seed in range(args.semantic_spec_seed_start, args.semantic_spec_seed_end + 1):
-        for env_seed in range(args.seed_start, args.seed_end + 1):
+    for spec_seed in range(args.semantic_spec_seed_start, args.semantic_spec_seed_start + args.num_semantic_spec_seed):
+        env_seeds = np.random.choice(range(args.random_seed_start, args.random_seed_end), args.num_seed, replace=False)
+        for env_seed in env_seeds:
             new_config = copy.deepcopy(config)
             new_config.semantic_spec_seed = spec_seed
             new_config.seed = env_seed
@@ -507,10 +508,11 @@ def collect_for_fastamp(config, args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="collect rollouts")
-    parser.add_argument("--seed_start", default=0, type=int)
-    parser.add_argument("--seed_end", default=9, type=int)
+    parser.add_argument("--random_seed_start", default=0, type=int)
+    parser.add_argument("--random_seed_end", default=10000, type=int)
+    parser.add_argument("--num_seed", default=9, type=int)
     parser.add_argument("--semantic_spec_seed_start", default=0, type=int)
-    parser.add_argument("--semantic_spec_seed_end", default=99, type=int)
+    parser.add_argument("--num_semantic_spec_seed", default=10, type=int)
     parser.add_argument("--config_file", default='../configs/clean_dish_feg_collect_rollouts_parallel_sink.yaml', type=str)
     args = parser.parse_args()
 

@@ -9,12 +9,10 @@ seed:
 semantic_spec_seed:
 max_rollout_depth: 6
 max_rollouts: 3
-bias_sink_actions: True
-pick_from_sink_prob: 1.0
 
 ## semantic spec related
 # semantic_specs_dir: ../pybullet_planning/nsplan_tools/debug_specs
-semantic_specs_dir: /home/weiyu/data_drive/nsplan/0925_constrained_placing_parallel/semantic_specs
+semantic_specs_dir: /home/weiyu/data_drive/nsplan/0923_constrained_placing/semantic_specs
 
 ## pybullet related
 viewer: false  # default: true
@@ -29,7 +27,7 @@ segment: false
 monitoring: false
 
 ## data collection mode
-parallel: true
+parallel: false
 
 robot:
   robot_name: feg
@@ -53,7 +51,7 @@ world:
 
 
 data:
-  out_dir: /home/weiyu/data_drive/nsplan/0925_constrained_placing_parallel/data
+  out_dir: /home/weiyu/data_drive/nsplan/0923_constrained_placing/data
   save_failed_plans: true
   save_log: true
   save_commands: true
@@ -70,10 +68,6 @@ data:
     top: [[2, 4, 3], [0, 4, 1]]
     ## pose format 3: (object_name, delta_to_target)
     zoomin1: ['minifridge', [2, 0, 2]]
-
-cache_data:
-  pcs_config_file: /home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_XL_lr_v2.yaml
-  pc_config_file: /home/weiyu/Research/nsplan/nsplan/configs/PCTFiLM1DDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_large_lr_v2.yaml
 
 
 ## configuration for PDDLStream
