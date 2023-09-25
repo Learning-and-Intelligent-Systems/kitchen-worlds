@@ -11,17 +11,18 @@ config_filename=$4
 cd /svl/u/weiyul/Research/nsplan/kitchen-worlds/tests
 
 # Calculate N
-N=$(echo "($2 - $1) / 10" | bc)
+let "N = ($2 - $1) / 10"
 
-# Check if N is an integer
-if ! [[ "$N" =~ ^[0-9]+$ ]]; then
+# Check if N is an integer by multiplying by 10 and comparing
+let "CHECK = $N * 10"
+if [ "$CHECK" -ne $(($2 - $1)) ]; then
     echo "Error: N is not an integer."
     exit 1
 fi
 
 # Loop to call the python script
 for ((i=0; i<N; i++)); do
-    arg1=$(echo "$1 + 10 * $i" | bc)
+    let "arg1 = $1 + 10 * $i"
     arg2=10
     echo "Calling script with semantic_spec_seed_start=$arg1 and num_semantic_spec_seed=$arg2 and num_seed=$3 and config_file=$base_dir/configs/$config_filename"
     python collect_clean_dish_rollouts_cache_parallel.py \
