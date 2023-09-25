@@ -177,8 +177,8 @@ def load_model_and_cfg():
     # args.checkpoint_id = "w6lzkv52"
 
     # trained on 0919 data
-    args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_XL_lr.yaml"
-    args.checkpoint_id = "k6sxfz7r"
+    # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_XL_lr.yaml"
+    # args.checkpoint_id = "k6sxfz7r"
 
     # # trained on 0828 data witheld red bowl
     # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_XL_lr.yaml"
@@ -187,6 +187,10 @@ def load_model_and_cfg():
     # trained on 0828 data witheld red bowl
     # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTFiLM1DDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_large_lr.yaml"
     # args.checkpoint_id = "ztgus1dc"
+
+    # trained on 0924 constrained placing parallel data
+    args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_XL_lr_v2.yaml"
+    args.checkpoint_id = "9mc72ohx"
 
     base_cfg = OmegaConf.load(args.base_config_file)
     cfg = OmegaConf.load(args.config_file)
@@ -1042,8 +1046,8 @@ def run_high_level_policy(env: CleanDishEnvV1, exp_dir, max_depth=5, debug=True,
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="collect rollouts")
-    parser.add_argument("--seed", default=0, type=int)
-    parser.add_argument("--semantic_spec_seed", default=4, type=int)
+    parser.add_argument("--seed", default=12, type=int)
+    parser.add_argument("--semantic_spec_seed", default=853, type=int)
     parser.add_argument("--config_file", default='../configs/evaluate_clean_dish_feg_collect_rollouts_0922.yaml', type=str)
     args = parser.parse_args()
 

@@ -173,9 +173,13 @@ def load_model_and_cfg():
     # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerGoalBCModel_lr.yaml"
     # args.checkpoint_id = "uitl8lyo"
 
-    # trained on 0828 data withheld red mug early stopping
-    args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerGoalBCModel_lr.yaml"
-    args.checkpoint_id = "840nk4xq"
+    # # trained on 0828 data withheld red mug early stopping
+    # args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerGoalBCModel_lr.yaml"
+    # args.checkpoint_id = "840nk4xq"
+
+    # trained on 0924 constrained placing parallel sink data
+    args.config_file = "/home/weiyu/Research/nsplan/nsplan/configs/PCTTransformerGoalBCModel_lr_v2.yaml"
+    args.checkpoint_id = "owij63dp"
 
     base_cfg = OmegaConf.load(args.base_config_file)
     cfg = OmegaConf.load(args.config_file)
@@ -1101,7 +1105,8 @@ def plan_multi_step_with_sequence_model(model,
                 print(f"{a} {c} {o} {l}: {p}")
                 texts.append(f"{a} {c} {o} {l}: {p}")
 
-    # visualize_xyzrgbs(observation, show_instance_seg=False).show()
+    if debug:
+        visualize_xyzrgbs(observation, show_instance_seg=False).show()
 
     if observation_mode == "pc":
         scene = trimesh.PointCloud(observation[:, :3], observation[:, 3:]).scene()
@@ -1248,7 +1253,7 @@ def run_high_level_policy(env: CleanDishEnvV1, exp_dir, max_depth=5, debug=True,
                         query_actions, goal_concept_action,
                         num_obj_pts, num_scene_pts, device,
                         observation_mask=observation_mask, admissible_concept_actions=admissible_concept_actions,
-                                                                             debug=False, max_beam_size=100, failed_next_actions=failed_next_actions)
+                                                                             debug=True, max_beam_size=100, failed_next_actions=failed_next_actions)
 
         # --------------------------------
         # step the environment
@@ -1299,7 +1304,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="collect rollouts")
     parser.add_argument("--seed", default=0, type=int)
     parser.add_argument("--semantic_spec_seed", default=0, type=int)
-    parser.add_argument("--config_file", default='../configs/evaluate_clean_dish_feg_collect_rollouts_0922_red_bowl.yaml', type=str)
+    parser.add_argument("--config_file", default='../configs/evaluate_clean_dish_feg_collect_rollouts_0922.yaml', type=str)
     args = parser.parse_args()
 
     run_evaluation(args)
