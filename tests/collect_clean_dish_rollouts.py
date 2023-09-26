@@ -848,7 +848,7 @@ class CleanDishEnvV1(gym.Env):
 
         for placement_pose in placement_stream(obj_body, surface):
 
-            if len(placement_pose[0]) == 0:
+            if len(placement_pose) == 0 or len(placement_pose[0]) == 0:
                 print("placement pose is empty")
                 continue
 
