@@ -12,6 +12,9 @@
 #SBATCH --output=/svl/u/weiyul/test_output/%j.out
 #SBATCH --error=/svl/u/weiyul/test_output/%j.err
 
+# time limit 4 hours
+#SBATCH --time=4:00:00
+
 
 # list out some useful information (optional)
 echo "SLURM_JOBID="$SLURM_JOBID

@@ -1,7 +1,42 @@
 #!/bin/bash
 
+# 0926 constrained placing
+sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 0 10 10 clean_dish_feg_collect_rollouts_cluster_0926_constrained_placing.yaml'
+sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 100 110 10 clean_dish_feg_collect_rollouts_cluster_0926_constrained_placing.yaml'
+sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 200 210 10 clean_dish_feg_collect_rollouts_cluster_0926_constrained_placing.yaml'
+sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 300 310 10 clean_dish_feg_collect_rollouts_cluster_0926_constrained_placing.yaml'
+sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 400 410 10 clean_dish_feg_collect_rollouts_cluster_0926_constrained_placing.yaml'
+sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 500 510 10 clean_dish_feg_collect_rollouts_cluster_0926_constrained_placing.yaml'
+sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 600 610 10 clean_dish_feg_collect_rollouts_cluster_0926_constrained_placing.yaml'
+sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 700 710 10 clean_dish_feg_collect_rollouts_cluster_0926_constrained_placing.yaml'
+sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 800 810 10 clean_dish_feg_collect_rollouts_cluster_0926_constrained_placing.yaml'
+sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 900 910 10 clean_dish_feg_collect_rollouts_cluster_0926_constrained_placing.yaml'
+
+sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 10 20 10 clean_dish_feg_collect_rollouts_cluster_0926_constrained_placing.yaml'
+sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 110 120 10 clean_dish_feg_collect_rollouts_cluster_0926_constrained_placing.yaml'
+sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 210 220 10 clean_dish_feg_collect_rollouts_cluster_0926_constrained_placing.yaml'
+sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 310 320 10 clean_dish_feg_collect_rollouts_cluster_0926_constrained_placing.yaml'
+sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 410 420 10 clean_dish_feg_collect_rollouts_cluster_0926_constrained_placing.yaml'
+sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 510 520 10 clean_dish_feg_collect_rollouts_cluster_0926_constrained_placing.yaml'
+sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 610 620 10 clean_dish_feg_collect_rollouts_cluster_0926_constrained_placing.yaml'
+sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 710 720 10 clean_dish_feg_collect_rollouts_cluster_0926_constrained_placing.yaml'
+sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 810 820 10 clean_dish_feg_collect_rollouts_cluster_0926_constrained_placing.yaml'
+sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 910 920 10 clean_dish_feg_collect_rollouts_cluster_0926_constrained_placing.yaml'
+
+sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 20 30 10 clean_dish_feg_collect_rollouts_cluster_0926_constrained_placing.yaml'
+sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 120 130 10 clean_dish_feg_collect_rollouts_cluster_0926_constrained_placing.yaml'
+sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 220 230 10 clean_dish_feg_collect_rollouts_cluster_0926_constrained_placing.yaml'
+sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 320 330 10 clean_dish_feg_collect_rollouts_cluster_0926_constrained_placing.yaml'
+sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 420 430 10 clean_dish_feg_collect_rollouts_cluster_0926_constrained_placing.yaml'
+sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 520 530 10 clean_dish_feg_collect_rollouts_cluster_0926_constrained_placing.yaml'
+sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 620 630 10 clean_dish_feg_collect_rollouts_cluster_0926_constrained_placing.yaml'
+sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 720 730 10 clean_dish_feg_collect_rollouts_cluster_0926_constrained_placing.yaml'
+sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 820 830 10 clean_dish_feg_collect_rollouts_cluster_0926_constrained_placing.yaml'
+sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 920 930 10 clean_dish_feg_collect_rollouts_cluster_0926_constrained_placing.yaml'
+
+
 # 0925_constrained_placing_parallel
-sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 0 100 10 clean_dish_feg_collect_rollouts_cluster_parallel_sink.yaml'
+# sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 0 100 10 clean_dish_feg_collect_rollouts_cluster_parallel_sink.yaml'
 #sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 100 200 10 clean_dish_feg_collect_rollouts_cluster_parallel_sink.yaml'
 #sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 200 300 10 clean_dish_feg_collect_rollouts_cluster_parallel_sink.yaml'
 #sbatch start_sbatch_job.sh 'bash bash_scripts/cluster/collect_rollouts_parallel.sh 300 400 10 clean_dish_feg_collect_rollouts_cluster_parallel_sink.yaml'

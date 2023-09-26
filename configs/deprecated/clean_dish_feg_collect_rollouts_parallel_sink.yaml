@@ -10,7 +10,7 @@ semantic_spec_seed:
 max_rollout_depth: 6
 max_rollouts: 3
 bias_sink_actions: True
-pick_from_sink_prob: 1.0
+pick_from_sink_prob: 0.5
 
 ## semantic spec related
 # semantic_specs_dir: ../pybullet_planning/nsplan_tools/debug_specs

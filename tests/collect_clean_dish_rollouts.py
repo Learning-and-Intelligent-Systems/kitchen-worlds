@@ -24,7 +24,7 @@ from PIL import Image
 from pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, wait_if_gui, \
     SEPARATOR, get_aabb, wait_for_duration, has_gui, reset_simulation, set_random_seed, \
     set_numpy_seed, set_renderer
-from pybullet_tools.bullet_utils import summarize_facts, print_goal, nice, get_datetime
+from pybullet_tools.bullet_utils import summarize_facts, print_goal, nice, get_datetime, get_hand_grasps
 from pybullet_tools.pr2_agent import solve_multiple, post_process, pddlstream_from_state_goal, \
     create_cwd_saver, solve_one
 from pybullet_tools.pr2_primitives import control_commands, apply_commands
@@ -723,6 +723,52 @@ class CleanDishEnvV1(gym.Env):
 
         return {}
 
+    def get_object_name_to_grasps(self):
+
+        bodies_before = get_bodies()
+
+        # ---------------------------------
+        object_name_to_grasps = {}
+        for object_name in self.object_name_to_id.keys():
+
+            object_grasps = []
+
+            obj_body = self.world.name_to_body(object_name)
+
+            # world_obj = self.world.name_to_object(object_name)
+            # get current pose and instantiate Pose()
+            # obj_pose = world_obj.get_link_pose(link=-1)
+
+            grasps_O = get_hand_grasps(self.problem.world, obj_body, verbose=True, collisions=False)
+            grasps = self.robot.make_grasps("hand", self.robot.arms[0], obj_body, grasps_O, collisions=False)
+
+            for grasp in grasps:
+                # grasp_world = multiply(obj_pose, grasp.value)
+                # grasp_tform_world = tform_from_pose(grasp_world)
+                # object_grasps.append(grasp_tform_world)
+                object_grasps.append(tform_from_pose(grasp.value))
+            object_name_to_grasps[object_name] = object_grasps
+        # ---------------------------------
+
+        # important: cleanup
+        bodies_after = get_bodies()
+        aux_bodies = set(bodies_after) - set(bodies_before)
+        print("new bodies created in finding motion", aux_bodies)
+        for body in aux_bodies:
+            remove_body(body)
+        if "hand" in self.robot.grippers:
+            self.robot.remove_gripper("hand")
+
+        return object_name_to_grasps
+
+    def get_object_name_to_pose(self):
+        object_name_to_pose = {}
+        for object_name in self.object_name_to_id.keys():
+            world_obj = self.world.name_to_object(object_name)
+            obj_pose = world_obj.get_link_pose(link=-1)
+            object_name_to_pose[object_name] = tform_from_pose(obj_pose)
+        return object_name_to_pose
+
     def _get_pick_action(self, object_name):
 
         ## before we do anything
@@ -801,6 +847,10 @@ class CleanDishEnvV1(gym.Env):
             placement_stream = self.stream_map["sample-pose-on"]
 
         for placement_pose in placement_stream(obj_body, surface):
+
+            if len(placement_pose[0]) == 0:
+                print("placement pose is empty")
+                continue
 
             if check_collisions_against_movable_objects(obj_body, placement_pose[0][0], self.moveable_bodies):
                 print("found collisions between moveable objects")

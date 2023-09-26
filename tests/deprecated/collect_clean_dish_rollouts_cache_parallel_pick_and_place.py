@@ -61,10 +61,14 @@ import numpy as np
 
 from collect_clean_dish_rollouts import plot_images, CleanDishEnvV1
 
-from nsplan.data.dataset_sequence_multiview_v2 import load_cache_data_builder
+from nsplan.data.dataset_sequence_multiview_v2 import load_cache_data_builder, MultiviewSequenceSimulatorDataBuilder
 from nsplan.data.dataset_grasp_v2 import load_cache_grasp_data_builder
 from nsplan.data.dataset_placement_v2 import load_cache_placement_data_builder
-
+from nsplan.utils.point_cloud import to_pc, extract_scene_xyzrgb, extract_multiview_img
+from nsplan.utils.pointnet import pc_normalize
+from nsplan.utils.acronym import create_gripper_marker
+import nsplan.utils.transformations as tra
+import trimesh
 
 
 def process(input):
@@ -150,21 +154,75 @@ def process(input):
     for obj in obj_dict:
         obj_dict[obj]["name"] = str(obj_dict[obj]["name"])
 
-    data_dict = {"rollouts": rollouts, "obj_dict": obj_dict,
-                 "pybullet_idx_to_name": {b: world.BODY_TO_OBJECT[b].name for b in world.BODY_TO_OBJECT},
-                 "object_name_to_grasps": object_name_to_grasps}
+    data_dict = {"rollouts": rollouts, "obj_dict": obj_dict, "pybullet_idx_to_name": {b: world.BODY_TO_OBJECT[b].name for b in world.BODY_TO_OBJECT}, "object_name_to_grasps": object_name_to_grasps}
 
     pcs_cache_data_builder.cache_datum(data_dict, save_filename=f"semantic_spec_{semantic_spec_seed}_seed_{seed}.pkl")
     pc_cache_data_builder.cache_datum(data_dict, save_filename=f"semantic_spec_{semantic_spec_seed}_seed_{seed}.pkl")
     grasp_cache_data_builder.cache_datum(data_dict, save_filename=f"semantic_spec_{semantic_spec_seed}_seed_{seed}.pkl")
     placement_cache_data_builder.cache_datum(data_dict, save_filename=f"semantic_spec_{semantic_spec_seed}_seed_{seed}.pkl")
 
+    # --------------------------------
+
+    # # --------------------------------
+    # # debug
+    #
+    # obs, info = env.reset()
+    # object_name_to_grasps = env.get_object_name_to_grasps()
+    # object_name_to_poses = env.get_object_name_to_poses()
+    #
+    # # ----------------------------------
+    # # hyperparams:
+    # num_obj_pts = 512
+    # num_scene_pts = 1024
+    #
+    # # ----------------------------------
+    # # meta data
+    # obj_dict = env.world.obj_dict
+    # for obj in obj_dict:
+    #     obj_dict[obj]["name"] = str(obj_dict[obj]["name"])
+    # # for mapping from text_action to concept actions
+    # obj_name_to_info = MultiviewSequenceSimulatorDataBuilder.get_obj_name_to_info(obj_dict)
+    #
+    # # {1: floor1, 2: sinkbase, 3: sink#1, 4: faucet, 7: sink_counter_front, 8: sink_counter_back, 9: dishwasherbox, 10: cabinetlower, 11: wall, 6: sink_counter_right, 5: sink_counter_left, 12: counter_back#1, 13: cabinettop, 14: cabinettop_filler, 15: shelf_lower, (3, None, 2): sink#1::sink_bottom, (13, 2): cabinettop::dagger_door_left_joint, (13, 6): cabinettop::dagger_door_right_joint, (13, None, 0): cabinettop::cabinettop_storage, 16: mug#1, 17: bowl#1}
+    # pybullet_idx_to_name = {b: env.world.BODY_TO_OBJECT[b].name for b in env.world.BODY_TO_OBJECT}
+    # obj_name_to_pybullet_idx = {pybullet_idx_to_name[pbid]: pbid for pbid in pybullet_idx_to_name}
+    # obj_name_to_pybullet_idx["robot"] = 0
+    #
+    # furniture_names = ["sink#1", "sink_counter_left", "sink_counter_right", "cabinettop", "shelf_lower"]
+    # obj_names = ["scene"] + ["robot"] + furniture_names + sorted(obj_name_to_info.keys())
+    # scene_xyzrgb = extract_scene_xyzrgb(obs, obj_names, obj_name_to_pybullet_idx,
+    #                                     num_pts_object=num_obj_pts,
+    #                                     num_pts_scene=num_scene_pts, visualize=False)
+    # scene_xyzrgb = scene_xyzrgb[:, :6]  # ignore alpha
+    #
+    # gripper_viss = []
+    #
+    # for object_name in object_name_to_grasps:
+    #     grasps = object_name_to_grasps[object_name]
+    #     for grasp_tform in grasps:
+    #
+    #         object_pose = object_name_to_poses[object_name]
+    #         grasp_tform = object_pose @ grasp_tform
+    #
+    #         grasp_tform = grasp_tform @ tra.euler_matrix(0, 0, -np.pi / 2)
+    #         gripper_vis = create_gripper_marker(color=[0, 255, 0], tube_radius=0.005)
+    #         gripper_vis = gripper_vis.apply_transform(grasp_tform)
+    #         gripper_viss.append(gripper_vis)
+    #
+    # trimesh.Scene([trimesh.PointCloud(scene_xyzrgb[:, :3], scene_xyzrgb[:, 3:]),
+    #                # gripper_vis,
+    #                ] + gripper_viss).show()
+    #
+    # # --------------------------------
     reset_simulation()
     disconnect()
     return
 
 
 def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=True):
+
+    # add object_name_to_pose
+
     text_actions = sorted(env.get_admissible_text_actions())
     if debug:
         print(f"{len(text_actions)} available actions: {text_actions}")
@@ -523,7 +581,6 @@ def collect_for_fastamp(config, args):
             # new_config.semantic_spec_seed = spec_seed
             # new_config.seed = env_seed
             inputs.append((new_config, spec_seed, env_seed))
-    print([(i[1], i[2]) for i in inputs])
 
     parallel_processing(process, inputs, parallel=config.parallel)
 
@@ -532,10 +589,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="collect rollouts")
     parser.add_argument("--random_seed_start", default=0, type=int)
     parser.add_argument("--random_seed_end", default=10000, type=int)
-    parser.add_argument("--num_seed", default=3, type=int)
+    parser.add_argument("--num_seed", default=10, type=int)
     parser.add_argument("--semantic_spec_seed_start", default=0, type=int)
     parser.add_argument("--num_semantic_spec_seed", default=10, type=int)
-    parser.add_argument("--config_file", default='../configs/clean_dish_feg_collect_rollouts_debug.yaml', type=str)
+    parser.add_argument("--config_file", default='../configs/clean_dish_feg_collect_rollouts_parallel_sink_debug_pnp.yaml', type=str)
     args = parser.parse_args()
 
     config = parse_yaml(args.config_file)
