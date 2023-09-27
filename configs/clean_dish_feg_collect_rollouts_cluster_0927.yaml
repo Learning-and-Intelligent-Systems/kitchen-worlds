@@ -9,10 +9,11 @@ seed:
 semantic_spec_seed:
 max_rollout_depth: 6
 max_rollouts: 3
+bias_sink_actions: False
 
 ## semantic spec related
 # semantic_specs_dir: ../pybullet_planning/nsplan_tools/debug_specs
-semantic_specs_dir: /home/weiyu/data_drive/nsplan/0919_eval/semantic_specs
+semantic_specs_dir: /svl/u/weiyul/data_drive/nsplan/0927/semantic_specs
 
 ## pybullet related
 viewer: false  # default: true
@@ -27,7 +28,7 @@ segment: false
 monitoring: false
 
 ## data collection mode
-parallel: false
+parallel: true
 
 robot:
   robot_name: feg
@@ -51,7 +52,7 @@ world:
 
 
 data:
-  out_dir: /home/weiyu/data_drive/nsplan/0919_eval/data
+  out_dir: /svl/u/weiyul/data_drive/nsplan/0927/data
   save_failed_plans: true
   save_log: true
   save_commands: true
@@ -69,6 +70,11 @@ data:
     ## pose format 3: (object_name, delta_to_target)
     zoomin1: ['minifridge', [2, 0, 2]]
 
+cache_data:
+  pcs_config_file: /svl/u/weiyul/Research/nsplan/nsplan/configs/PCTTransformerDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_XL_lr_v2.yaml
+  pc_config_file: /svl/u/weiyul/Research/nsplan/nsplan/configs/PCTFiLM1DDynamicsFeasibilityModel_subsample_trajectory_irrelevant_actions_large_lr_v2.yaml
+  grasp_config_file: /svl/u/weiyul/Research/nsplan/nsplan/configs/GraspBuilder_v2.yaml
+  placement_config_file: /svl/u/weiyul/Research/nsplan/nsplan/configs/PlacementBuilder_v2.yaml
 
 ## configuration for PDDLStream
 planner:
