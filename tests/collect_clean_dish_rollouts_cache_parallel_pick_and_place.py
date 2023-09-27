@@ -297,10 +297,10 @@ def random_rollouts(env, max_depth=6, max_rollouts=10, debug=False, simple_data=
                     else:
                         action_to_feasibility[text_action] = 1
                     # add new node to frontier
-                    new_commands_so_far = env.commands_so_far
-                    new_current_g = env.current_g
-                    new_current_gp = env.current_gp
-                    new_symbolic_state = env.symbolic_state
+                    new_commands_so_far = copy.deepcopy(env.commands_so_far)
+                    new_current_g = copy.deepcopy(env.current_g)
+                    new_current_gp = copy.deepcopy(env.current_gp)
+                    new_symbolic_state = copy.deepcopy(env.symbolic_state)
                     new_action_to_feasibility = {}
                     new_depth = depth + 1
                     new_node = (new_obs, new_commands_so_far, new_current_g, new_current_gp, new_symbolic_state, new_action_to_feasibility, new_object_name_to_pose, new_depth)
@@ -457,10 +457,10 @@ def random_rollouts_for_sink(env, max_depth=6, max_rollouts=10, debug=False, sim
                     else:
                         action_to_feasibility[text_action] = 1
                     # add new node to frontier
-                    new_commands_so_far = env.commands_so_far
-                    new_current_g = env.current_g
-                    new_current_gp = env.current_gp
-                    new_symbolic_state = env.symbolic_state
+                    new_commands_so_far = copy.deepcopy(env.commands_so_far)
+                    new_current_g = copy.deepcopy(env.current_g)
+                    new_current_gp = copy.deepcopy(env.current_gp)
+                    new_symbolic_state = copy.deepcopy(env.symbolic_state)
                     new_action_to_feasibility = {}
                     new_depth = depth + 1
                     new_node = (new_obs, new_commands_so_far, new_current_g, new_current_gp, new_symbolic_state, new_action_to_feasibility, new_object_name_to_pose, new_depth)
@@ -592,7 +592,7 @@ if __name__ == '__main__':
     parser.add_argument("--num_seed", default=10, type=int)
     parser.add_argument("--semantic_spec_seed_start", default=0, type=int)
     parser.add_argument("--num_semantic_spec_seed", default=10, type=int)
-    parser.add_argument("--config_file", default='../configs/clean_dish_feg_collect_rollouts_parallel_sink_debug_pnp.yaml', type=str)
+    parser.add_argument("--config_file", default='../configs/clean_dish_feg_collect_rollouts_debug.yaml', type=str)
     args = parser.parse_args()
 
     config = parse_yaml(args.config_file)

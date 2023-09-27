@@ -442,7 +442,7 @@ class CleanDishEnvV1(gym.Env):
         # map from each object to its information
         self.symbolic_state = {}
         self.initialize_symbolic_state()
-        self.update_symbolic_state()
+        self.update_symbolic_state(start=True)
 
         print(f"\ngoal {goal}\n")
         self.symbolic_goal = {}
@@ -628,7 +628,7 @@ class CleanDishEnvV1(gym.Env):
         # map from each object to its information
         self.symbolic_state = {}
         self.initialize_symbolic_state()
-        self.update_symbolic_state()
+        self.update_symbolic_state(start=True)
 
         observation = self._get_obs()
         info = self._get_info()
@@ -649,7 +649,7 @@ class CleanDishEnvV1(gym.Env):
         if symbolic_state is None:
             self.symbolic_state = {}
             self.initialize_symbolic_state()
-            self.update_symbolic_state()
+            self.update_symbolic_state(start=True)
         else:
             self.symbolic_state = copy.deepcopy(symbolic_state)
             print(f"\nCurrent symbolic state:\n{self.symbolic_state}\n")
@@ -963,60 +963,65 @@ class CleanDishEnvV1(gym.Env):
             self.symbolic_state[obj.name] = {"location": None, "cleanliness": None}
         self.symbolic_state["grasped"] = None
 
-    def update_symbolic_state(self, target_manip_name=None, target_obj_name=None, target_loc_name=None):
+    def update_symbolic_state(self, target_manip_name=None, target_obj_name=None, target_loc_name=None, start=False):
 
-        ## first get some facts from world state
-        facts = self.state.get_facts(init_facts=[], objects=None)
-        relevant_predicates = ["supported", "contained", "cleaned"]
-        predicates = {}
-        for fact in facts:
-            pred = fact[0].lower()
-            if pred not in relevant_predicates:
-                continue
-            if pred not in predicates:
-                predicates[pred] = []
-            predicates[pred].append(fact)
-        predicates = {k: v for k, v in sorted(predicates.items())}
+        if start:
+            ## first get some facts from world state
+            facts = self.state.get_facts(init_facts=[], objects=None)
+            relevant_predicates = ["supported", "contained", "cleaned"]
+            predicates = {}
+            for fact in facts:
+                pred = fact[0].lower()
+                if pred not in relevant_predicates:
+                    continue
+                if pred not in predicates:
+                    predicates[pred] = []
+                predicates[pred].append(fact)
+            predicates = {k: v for k, v in sorted(predicates.items())}
 
-        pred_to_list = {}
-        for pred in predicates:
-            list = [get_readable_list(fa, self.world) for fa in predicates[pred]]
-            pred_to_list[pred] = list
+            pred_to_list = {}
+            for pred in predicates:
+                list = [get_readable_list(fa, self.world) for fa in predicates[pred]]
+                pred_to_list[pred] = list
 
-        # parse these world facts to update the symbolic state
-        # Debug: there is a bug that the object is still supported even though it is contained. therefore, the order
-        #        of preds matter
-        preds = ["supported", "contained"]
+            # parse these world facts to update the symbolic state
+            # Debug: there is a bug that the object is still supported even though it is contained. therefore, the order
+            #        of preds matter
+            preds = ["supported", "contained"]
 
-        for pred in preds:
-            if pred not in pred_to_list:
-                continue
-            for fact in pred_to_list[pred]:
-                obj_name = fact[1].split("|")[1]
-                loc_name = fact[3].split("|")[1]
-                if "::" in loc_name:
-                    loc_name = loc_name.split("::")[1]
+            for pred in preds:
+                if pred not in pred_to_list:
+                    continue
+                for fact in pred_to_list[pred]:
+                    obj_name = fact[1].split("|")[1]
+                    loc_name = fact[3].split("|")[1]
+                    if "::" in loc_name:
+                        loc_name = loc_name.split("::")[1]
 
-                self.symbolic_state[obj_name]["location"] = loc_name
+                    self.symbolic_state[obj_name]["location"] = loc_name
 
-        # Debug: the preds does not reflect the correct object location after placement actions
-        print("+---------+")
-        print("predicates")
-        for pred in preds:
-            if pred in pred_to_list:
-                print(pred_to_list[pred])
-        print("+---------+")
+            # Debug: the preds does not reflect the correct object location after placement actions
+            print("+---------+")
+            print("predicates")
+            for pred in preds:
+                if pred in pred_to_list:
+                    print(pred_to_list[pred])
+            print("+---------+")
+
         if target_manip_name is not None:
             assert target_obj_name is not None and target_loc_name is not None
             if target_manip_name == "place":
                 self.symbolic_state[target_obj_name]["location"] = target_loc_name
+            elif target_manip_name == "pick":
+                # important: because we assume that the action has been successfully executed.
+                self.symbolic_state[target_obj_name]["location"] = target_loc_name
         else:
             print("WARNING: no correction is applied. This is okay if we are only initializing a new environment.")
 
-        if "cleaned" in pred_to_list:
-            for fact in pred_to_list["cleaned"]:
-                obj_name = fact[1].split("|")[1]
-                self.symbolic_state[obj_name]["cleanliness"] = True
+        # if "cleaned" in pred_to_list:
+        #     for fact in pred_to_list["cleaned"]:
+        #         obj_name = fact[1].split("|")[1]
+        #         self.symbolic_state[obj_name]["cleanliness"] = True
 
         ## update gripper state
         if self.current_g is not None:
