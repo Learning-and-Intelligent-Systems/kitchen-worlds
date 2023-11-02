@@ -33,7 +33,7 @@ from test_utils import parallel_processing, get_config
 from test_world_builder import create_pybullet_world
 
 
-DEFAULT_YAML = 'clean_dish_feg.yaml'
+DEFAULT_YAML = 'kitchen_full_feg.yaml'
 config = get_config(DEFAULT_YAML)
 
 
@@ -97,7 +97,7 @@ def process(index):
         ))
     start = time.time()
     solution, tmp_dir = solve_multiple(pddlstream_problem, stream_info, lock=config.lock,
-                                       cwd_saver=cwd_saver, **kwargs)
+                                       cwd_saver=cwd_saver, world=world, **kwargs)
 
     print_solution(solution)
     plan, cost, evaluations = solution
