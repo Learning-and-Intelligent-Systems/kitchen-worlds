@@ -47,7 +47,7 @@ git submodule update --init --recursive
 ```shell
 conda env create -f environment.yml
 conda activate kitchen
-sudo apt-get install graphviz graphviz-dev  ## on Ubuntu
+## sudo apt-get install graphviz graphviz-dev  ## if you want to visualize planning constraint graph on Ubuntu
 ```
 
 3. Build FastDownward, used by PDDLStream planner
@@ -57,16 +57,16 @@ sudo apt-get install graphviz graphviz-dev  ## on Ubuntu
 (cd pddlstream; ./downward/build.py)
 ```
 
-4. Build IK solvers (If using PR2)
+4. Build IK solvers (If using PR2; skip this if you're only using floating gripper)
 
-IKFast solver for PR2 arm planning:
+IKFast solver for PR2 arm planning (the default IK):
 
 ```shell
 ## sudo apt-get install python-dev
 (cd pybullet_planning/pybullet_tools/ikfast/pr2; python setup.py)
 ```
 
-TracIK for PR2 base, torso, and arm planning:
+TracIK for PR2 base, torso, and arm planning (this is better, but requires Ubuntu):
 
 ```shell
 cd ..
@@ -74,7 +74,6 @@ sudo apt-get install libeigen3-dev liborocos-kdl-dev libkdl-parser-dev liburdfdo
 git clone https://github.com/mjd3/tracikpy.git
 pip install tracikpy/
 ```
-
 
 [graphviz](https://pygraphviz.github.io/documentation/latest/install.html)
 
@@ -94,7 +93,7 @@ python test_replay.py --path /home/yang/Documents/kitchen-worlds/outputs/test_fe
 
 ----------
 
-The test scripts below this line haven't been tested as of Feb 2023. Will be updated soon.
+The test scripts below this line haven't been tested as of Nov 2023. Will be updated soon.
 
 ----------
 
