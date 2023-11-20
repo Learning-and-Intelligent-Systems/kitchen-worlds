@@ -135,6 +135,7 @@ def process(input):
 
     pcs_cache_data_builder = load_cache_data_builder(cache_save_dir, config.cache_data["pcs_config_file"])
     pc_cache_data_builder = load_cache_data_builder(cache_save_dir, config.cache_data["pc_config_file"])
+    rgb_cache_data_builder = load_cache_data_builder(cache_save_dir, config.cache_data["rgb_config_file"])
     grasp_cache_data_builder = load_cache_grasp_data_builder(cache_save_dir, config.cache_data["grasp_config_file"])
     placement_cache_data_builder = load_cache_placement_data_builder(cache_save_dir, config.cache_data["placement_config_file"])
 
@@ -156,6 +157,7 @@ def process(input):
 
     pcs_cache_data_builder.cache_datum(data_dict, save_filename=f"semantic_spec_{semantic_spec_seed}_seed_{seed}.pkl")
     pc_cache_data_builder.cache_datum(data_dict, save_filename=f"semantic_spec_{semantic_spec_seed}_seed_{seed}.pkl")
+    rgb_cache_data_builder.cache_datum(data_dict, save_filename=f"semantic_spec_{semantic_spec_seed}_seed_{seed}.pkl")
     grasp_cache_data_builder.cache_datum(data_dict, save_filename=f"semantic_spec_{semantic_spec_seed}_seed_{seed}.pkl")
     placement_cache_data_builder.cache_datum(data_dict, save_filename=f"semantic_spec_{semantic_spec_seed}_seed_{seed}.pkl")
 
