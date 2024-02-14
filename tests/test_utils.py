@@ -13,7 +13,7 @@ import pickle
 import shutil
 import argparse
 
-from world_builder.utils import parse_yaml
+from world_builder.world_utils import parse_yaml
 
 
 def get_config(config_name):
@@ -31,151 +31,6 @@ def get_base_parser(task_name=None, parallel=False, use_viewer=False):
     parser.add_argument('-v', '--viewer', action='store_true', default=use_viewer,
                         help='When enabled, enables the PyBullet viewer.')
     return parser
-
-
-def clear_pddlstream_cache():
-    if isdir('visualizations'):
-        shutil.rmtree('visualizations')
-    if isdir('statistics'):
-        shutil.rmtree('statistics')
-    if isdir('temp'):
-        shutil.rmtree('temp')
-
-
-def clear_constraint_networks(viz_dir):
-    constraint_dir = join(viz_dir, 'constraint_networks')
-    stream_dir = join(viz_dir, 'stream_plans')
-    if isdir(constraint_dir) and len(listdir(constraint_dir)) == 0:
-        shutil.rmtree(constraint_dir)
-    if isdir(stream_dir) and len(listdir(stream_dir)) == 0:
-        shutil.rmtree(stream_dir)
-
-
-def copy_dir_for_process(viz_dir, tag=None, verbose=True, print_fn=None):
-    if not verbose:
-        print_fn = print
-    elif print_fn is None:
-        from pybullet_tools.logging import myprint as print_fn
-
-    clear_constraint_networks(viz_dir)
-
-    subdir = basename(viz_dir)
-    task_name = basename(viz_dir.replace(f"/{subdir}", ''))
-
-    ## temporarily move the dir to the test_cases folder for asset paths to be found
-    test_dir = join(EXP_PATH, f"temp_{task_name}_{subdir}")
-    if isdir(test_dir):
-        if verbose:
-            print_fn('copy_dir_for_process | removing', test_dir)
-        shutil.rmtree(test_dir)
-    if not isdir(test_dir):
-        shutil.copytree(viz_dir, test_dir)
-
-    if not verbose:
-        print_fn(viz_dir)
-    else:
-        if tag is None:
-            print_fn(viz_dir, end='\r')
-        elif verbose:
-            print_fn(f'\n\n\n--------------------------\n    {tag} {viz_dir} \n------------------------\n\n\n')
-
-    return test_dir
-
-
-def get_task_names(task_name):
-    # if task_name == 'mm':
-    #     task_names = ['mm_one_fridge_pick',
-    #                   'mm_one_fridge_table_pick', 'mm_one_fridge_table_in', 'mm_one_fridge_table_on',
-    #                   'mm_two_fridge_in', 'mm_two_fridge_pick'] ## , 'mm_two_fridge_goals'
-    # elif task_name == 'tt':
-    #     task_names = ['tt_one_fridge_table_pick', 'tt_one_fridge_table_in',
-    #                   'tt_two_fridge_pick', 'tt_two_fridge_in', 'tt_two_fridge_goals']  ##
-    # elif task_name == 'ff':
-    #     task_names = ['ff_one_fridge_table_pick', 'ff_one_fridge_table_in',
-    #                   'ff_two_fridge_in', 'ff_two_fridge_pick']
-    # elif task_name == 'ww':
-    #     task_names = ['ww_one_fridge_table_pick', 'ww_one_fridge_table_in',
-    #                   'ww_two_fridge_in', 'ww_two_fridge_pick']
-    # elif task_name == 'bb':
-    #     task_names = ['bb_one_fridge_pick',
-    #                   'bb_one_fridge_table_pick', 'bb_one_fridge_table_in', 'bb_one_fridge_table_on',
-    #                   'bb_two_fridge_in', 'bb_two_fridge_pick']
-    # elif task_name == 'zz':
-    #     task_names = ['zz_three_fridge', 'ss_two_fridge_pick', 'ss_two_fridge_in']
-
-    mm_task_names = ['mm_storage', 'mm_sink', 'mm_braiser',
-                     'mm_sink_to_storage', 'mm_braiser_to_storage']
-    if task_name == 'mm':
-        task_names = mm_task_names
-    elif task_name == 'tt':
-        task_names = [t.replace('mm_', 'tt_') for t in mm_task_names]
-    else:
-        task_names = [task_name]
-    return task_names
-
-
-def get_run_dirs(task_name):
-    task_names = get_task_names(task_name)
-    all_subdirs = []
-    for task_name in task_names:
-        dataset_dir = join('/home/yang/Documents/fastamp-data-rss/', task_name)
-        # organize_dataset(task_name)
-        if not isdir(dataset_dir):
-            print('get_run_dirs | no directory', dataset_dir)
-            continue
-        subdirs = listdir(dataset_dir)
-        subdirs.sort()
-        subdirs = [join(dataset_dir, s) for s in subdirs if isdir(join(dataset_dir, s))]
-        all_subdirs += subdirs
-    return all_subdirs
-
-
-def parallel_processing(process, inputs, parallel):
-    start_time = time.time()
-    num_cases = len(inputs)
-
-    if parallel:
-        import multiprocessing
-        from multiprocessing import Pool
-
-        max_cpus = 11
-        num_cpus = min(multiprocessing.cpu_count(), max_cpus)
-        print(f'using {num_cpus} cpus')
-        with Pool(processes=num_cpus) as pool:
-            pool.map(process, inputs)
-
-    else:
-        for i in range(num_cases):
-            process(inputs[i])
-
-    print(f'went through {num_cases} run_dirs (parallel={parallel}) in {round(time.time() - start_time, 3)} sec')
-
-
-def process_all_tasks(process, task_name, parallel=False, cases=None, path=None,
-                      dir=None, case_filter=None, return_dirs=False):
-    clear_pddlstream_cache()
-
-    if path is not None:
-        cases = [path]
-    elif dir is not None:
-        cases = [join(dir, c) for c in listdir(dir)]
-        cases = [c for c in cases if isdir(c) and not isfile(join(c, 'gym_replay.gif'))]
-        # cases = cases[:1]
-    elif cases is not None and len(cases) > 0:
-        cases = [join(MAMAO_DATA_PATH, task_name, case) for case in cases]
-    else:
-        cases = get_run_dirs(task_name)
-
-    if len(cases) > 1:
-        cases = sorted(cases, key=lambda x: eval(x.split('/')[-1]))
-
-    if case_filter is not None:
-        cases = [c for c in cases if case_filter(c)]
-
-    if return_dirs:
-        return cases
-
-    parallel_processing(process, cases, parallel)
 
 
 def find_duplicate_worlds(d1, d2):
@@ -243,115 +98,6 @@ def mp4_to_gif(mp4_file, frame_folder='output'):
     print('converted mp4 to', output_file)
 
 
-
-##########################################################################
-
-
-def get_dirs_camera(num_rows=5, num_cols=5, world_size=(6, 6), data_dir=None, camera_motion=None):
-    ## load all dirs
-    ori_dirs = []
-    if world_size == (4, 8):
-        ori_dirs = get_sample_envs_full_kitchen(num_rows * num_cols, data_dir=data_dir)
-
-    camera_target = None
-    target_point_begin = None
-    target_point_final = None
-    if num_rows == 1 and num_cols == 1:
-
-        if world_size == (4, 8):
-            camera_point = (6, 4, 6)
-            camera_target = (0, 4, 0)
-            camera_point_begin = (6, 4, 6)
-            camera_point_final = (12, 4, 12)
-
-    elif num_rows == 2 and num_cols == 1:
-
-        if world_size == (4, 8):
-            camera_point = (24, 4, 10)
-            camera_target = (0, 4, 0)
-            camera_point_begin = (16, 4, 6)
-            camera_point_final = (24, 4, 10)
-
-    elif num_rows == 4 and num_cols == 4:
-
-        if world_size == (4, 8):
-            camera_point = (32, 8, 10)
-            camera_target = (0, 24, 0)
-            camera_point_begin = (16, 16, 2)
-            camera_point_final = (32, 16, 10)
-
-    elif num_rows == 5 and num_cols == 5:
-        ori_dirs = get_sample_envs_for_corl()
-
-        if world_size == (6, 6):
-            mid = num_rows * 6 // 2
-            camera_point = (45, 15, 10)
-            camera_target = (0, 15, 0)
-            camera_point_final = (mid + 35, 15, 14)
-            camera_point_begin = (mid + 9, 15, 4)
-            camera_target = (mid, 15, 0)
-
-    elif num_rows == 8 and num_cols == 3:
-
-        if world_size == (4, 8):
-            if camera_motion == 'zoom':
-                camera_target = (4*6, 8*2, 0)
-                camera_point_begin = (4*8-1.5, 8*3-4, 2)
-                camera_point_final = (4*8+3, 8*3, 4)
-            elif camera_motion == 'spotlight':
-                camera_target = (4*4, 8*1.5, 1)
-                camera_point_begin = (4*4, 8*1.5, 2.5)
-                camera_point_final = 3.5
-
-    elif num_rows == 10 and num_cols == 10:
-
-        if world_size == (4, 8):
-            ## bad
-            camera_target = (0, 48, 0)
-            camera_point_begin = (16, 40, 6)
-            camera_point_final = (40, 32, 16)
-
-    elif num_rows == 14 and num_cols == 14:
-        ori_dirs = get_sample_envs_200()
-
-        if world_size == (6, 6):
-            y = 42 + 3
-            camera_point_begin = (67, y, 3)
-            camera_point_final = (102, y, 24)
-            camera_target = (62, y, 0)
-
-    elif num_rows == 16 and num_cols == 16:
-
-        if world_size == (4, 8):
-            camera_target = (5*11, 8*4-4, 0)
-            camera_point_begin = (5*13-1, 8*4-6, 2)
-            camera_point_final = (5*16, 8*2, 12)
-
-    elif num_rows == 32 and num_cols == 8:
-
-        if world_size == (4, 8):
-            if camera_motion == 'zoom':
-                camera_target = (5*(11+16), 8*4-4, 0)
-                camera_point_begin = (5*(12+16), 8*4-6, 2)
-                camera_point_final = (5*(16+16), 8*2, 12)
-            elif camera_motion == 'pan':
-                target_point_begin = (5*(32-4), 8*3-4, 0)
-                target_point_final = (5*(16-4), 8*3-4, 0)
-                camera_point_begin = (5*32, 8*1, 12)
-                camera_point_final = (5*16, 8*1, 12)
-
-    if target_point_begin is None and target_point_final is None:
-        target_point_begin = target_point_final = camera_target
-    if camera_target is None:
-        camera_target = target_point_begin
-
-    kwargs = dict(camera_point_begin=camera_point_begin,
-                  camera_point_final=camera_point_final,
-                  target_point_begin=target_point_begin,
-                  target_point_final=target_point_final)
-    return ori_dirs, camera_point_begin, camera_target, kwargs
-
-
 ##################################################################################
 
 
@@ -409,7 +155,7 @@ def get_sample_envs_for_rss(task_name=None, count=None):
 
 
 def get_sample_envs_full_kitchen(count=4, data_dir='test_full_kitchen_100'):
-    from mamao_tools.data_utils import load_planning_config
+    from pigi_tools.data_utils import load_planning_config
     # data_dir = join('/home/yang/Documents/kitchen-worlds/outputs', data_dir)
     # dirs = [join(data_dir, f) for f in listdir(data_dir) if isdir(join(data_dir, f))]
     task_names = ['mm_storage', 'mm_sink', 'mm_braiser',

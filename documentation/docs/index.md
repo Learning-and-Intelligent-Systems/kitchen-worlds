@@ -36,14 +36,13 @@ A library of long-horizon Task-and-Motion-Planning (TAMP) problems in kitchen an
 
 ## Setup
 
-1. Grab the submodules, may take a while
+1. Clone the repo along with the submodules. It may take a while.
 
 ```shell
-cd kitchen-worlds
-git submodule update --init --recursive
+git clone git@github.com:Learning-and-Intelligent-Systems/kitchen-worlds.git --recursive
 ```
 
-2. Install dependencies
+2. Install dependencies.
 ```shell
 conda env create -f environment.yml
 conda activate kitchen
@@ -69,10 +68,8 @@ IKFast solver for PR2 arm planning (the default IK):
 TracIK for PR2 base, torso, and arm planning (this is better, but requires Ubuntu):
 
 ```shell
-cd ..
 sudo apt-get install libeigen3-dev liborocos-kdl-dev libkdl-parser-dev liburdfdom-dev libnlopt-dev libnlopt-cxx-dev swig
-git clone https://github.com/mjd3/tracikpy.git
-pip install tracikpy/
+pip install git+https://github.com/mjd3/tracikpy.git
 ```
 
 [graphviz](https://pygraphviz.github.io/documentation/latest/install.html)
@@ -81,14 +78,14 @@ pip install tracikpy/
 
 collects data (including scene layout `scene.lisdf`, `problem.pddl`, plan, and trajectory) according to the configuration file in [pybullet_planning/pipelines](https://github.com/zt-yang/pybullet_planning/blob/master/pipelines/kitchen_full_feg.yaml) directory, and outputs to a subdirectory in `kitchen-worlds/outputs/test_feg_kitchen_mini/` named by datetime. 
 
-```commandline
+```shell
 python test_data_generation.py -c kitchen_full_feg.yaml
 ```
 
 replays the generated trajectory and generates a `replay.gif` in a given path to the data directory (containing `scene.lisdf`, `problem.pddl`, `commands.pkl`), for example:
 
-```commandline
-python test_replay.py --path /home/yang/Documents/kitchen-worlds/outputs/test_feg_kitchen_mini/230214_205947
+```shell
+python test_replay_pigi_data.py --path /home/yang/Documents/kitchen-worlds/outputs/test_feg_kitchen_mini/230214_205947
 ```
 
 ----------

@@ -22,7 +22,7 @@ from lisdf_tools.lisdf_loader import load_lisdf_pybullet, get_depth_images, crea
 from lisdf_tools.image_utils import draw_bb, crop_image, get_mask_bb, save_seg_image_given_obj_keys
 
 # from utils import load_lisdf_synthesizer
-from mamao_tools.data_utils import get_indices, exist_instance, get_init_tuples, \
+from pigi_tools.data_utils import get_indices, exist_instance, get_init_tuples, \
     get_body_map, get_world_center, add_to_planning_config, get_worlds_aabb
 from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
 

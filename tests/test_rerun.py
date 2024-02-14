@@ -31,7 +31,7 @@ from lisdf_tools.lisdf_planning import pddl_to_init_goal, Problem
 
 from world_builder.actions import apply_actions
 
-from mamao_tools.data_utils import get_instance_info, exist_instance, get_indices, \
+from pigi_tools.data_utils import get_instance_info, exist_instance, get_indices, \
     get_plan_skeleton, get_successful_plan, get_feasibility_checker, get_plan, get_body_map, \
     modify_plan_with_body_map, add_to_planning_config, load_planning_config, \
     add_objects_and_facts, delete_wrongly_supported
@@ -371,7 +371,7 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
         return
 
     if GENERATE_MULTIPLE_SOLUTIONS:
-        from mamao_tools.data_utils import save_multiple_solutions
+        from pigi_tools.data_utils import save_multiple_solutions
         solution, plan_dataset = solution
         file_path = join(run_dir, 'multiple_solutions.json')
         solution = save_multiple_solutions(plan_dataset, run_dir=run_dir, file_path=file_path)
