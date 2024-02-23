@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns="http://www.w3.org/2000/svg" xmlns:xl="http://www.w3.org/1999/xlink" version="1.1" viewBox="-389 -406 724 553" width="724" height="553">
+  <defs/>
+  <g id="Canvas_1" fill="none" fill-opacity="1" stroke="none" stroke-dasharray="none" stroke-opacity="1">
+    <title>Canvas 1</title>
+    <rect fill="white" x="-389" y="-406" width="724" height="553"/>
+    <g id="Canvas_1_Layer_1">
+      <title>Layer 1</title>
+      <g id="Graphic_51">
+        <rect x="-388" y="-405" width="722" height="551" fill="white"/>
+        <rect x="-388" y="-405" width="722" height="551" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(-383 -400)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="675.568" y="15">Floor</tspan>
+        </text>
+      </g>
+      <g id="Graphic_28">
+        <rect x="-388" y="-405" width="578" height="434" fill="white"/>
+        <rect x="-388" y="-405" width="578" height="434" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(-383 -197.224)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="247.08" y="15">office_227</tspan>
+        </text>
+      </g>
+      <g id="Graphic_30">
+        <rect x="78" y="-1" width="90" height="30" fill="white"/>
+        <rect x="78" y="-1" width="90" height="30" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(83 4.776001)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="24.432" y="15">.227</tspan>
+        </text>
+      </g>
+      <g id="Graphic_36">
+        <rect x="100" y="-307" width="73" height="166" fill="white"/>
+        <rect x="100" y="-307" width="73" height="166" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(105 -242.448)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="10.756" y="15">Desk/</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="18.156" y="33.448">270</tspan>
+        </text>
+      </g>
+      <g id="Graphic_37">
+        <rect x="-302" y="-385" width="177" height="64" fill="white"/>
+        <rect x="-302" y="-385" width="177" height="64" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(-297 -362.224)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="58.308" y="15">Desk/0</tspan>
+        </text>
+      </g>
+      <g id="Graphic_38">
+        <rect x="-68" y="-83" width="57" height="112" fill="white"/>
+        <rect x="-68" y="-83" width="57" height="112" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(-63 -45.448)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="2.756" y="15">Desk/</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="14.604" y="33.448">90</tspan>
+        </text>
+      </g>
+      <g id="Graphic_39">
+        <rect x="-376" y="-267.5" width="73" height="151.5" fill="white"/>
+        <rect x="-376" y="-267.5" width="73" height="151.5" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(-371 -200.974)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="1.86" y="15">Desk/90</tspan>
+        </text>
+      </g>
+      <g id="Graphic_40">
+        <rect x="-89" y="-385" width="177" height="64" fill="white"/>
+        <rect x="-89" y="-385" width="177" height="64" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(-84 -362.224)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="31.628" y="15">Cupboard/180</tspan>
+        </text>
+      </g>
+      <g id="Graphic_41">
+        <rect x="-282" y="-36" width="57" height="51" fill="white"/>
+        <rect x="-282" y="-36" width="57" height="51" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(-277 -19.724)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="4.684" y="15">Bin/0</tspan>
+        </text>
+      </g>
+      <g id="Graphic_42">
+        <rect x="19" y="-262" width="57" height="51" fill="white"/>
+        <rect x="19" y="-262" width="57" height="51" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(24 -254.948)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="1.876" y="15">Chair/</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="14.604" y="33.448">90</tspan>
+        </text>
+      </g>
+      <g id="Graphic_43">
+        <rect x="67" y="-123" width="57" height="51" fill="white"/>
+        <rect x="67" y="-123" width="57" height="51" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(72 -115.948)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="1.876" y="15">Chair/</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="14.604" y="33.448">90</tspan>
+        </text>
+      </g>
+      <g id="Graphic_71">
+        <rect x="-157" y="-148.5" width="43" height="97.5" fill="white"/>
+        <rect x="-157" y="-148.5" width="43" height="97.5" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(-152 -118.198)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x=".644" y="15">spot</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="4.94" y="33.448">/90</tspan>
+        </text>
+      </g>
+    </g>
+  </g>
+</svg>

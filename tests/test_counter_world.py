@@ -14,15 +14,13 @@ from pybullet_tools.utils import set_random_seed, set_numpy_seed, connect, enabl
     set_camera_pose, add_line, get_point, BLACK, get_name, CLIENTS, get_client, link_from_name, \
     get_link_subtree, clone_body, set_all_color, GREEN, BROWN, invert, multiply, set_pose, VideoSaver, reset_simulation, \
     stable_z, Euler
-
-from world_builder.world import World, State
-from world_builder.builders import test_pick, test_exist_omelette, test_kitchen_oven, test_feg_pick, test_one_fridge
-
-from pybullet_planning.world_builder.entities import Object, Floor, Moveable, Surface, Supporter
 from pybullet_tools.utils import create_box, TAN, WHITE, BLACK, GREY, Pose, Point, PI, load_model, \
 get_aabb, get_aabb_extent
 
-from pybullet_planning.world_builder.utils import read_xml, load_asset, get_model_scale
+from world_builder.world import World, State
+from world_builder.builders import test_pick, test_exist_omelette, test_kitchen_oven, test_feg_pick, test_one_fridge
+from world_builder.entities import Object, Floor, Moveable, Surface, Supporter
+from world_builder.world_utils import read_xml, load_asset, get_model_scale
 
 
 def test_feg_kitchen(world, **kwargs):

@@ -83,7 +83,7 @@ def test_load_objects(save_obj_shots=False, width=1980, height=1238):
     from pybullet_tools.utils import pose_from_tform
     from trimesh import transformations
     from world_builder.partnet_scales import MODEL_SCALES, MODEL_HEIGHTS
-    from world_builder.utils import get_instances, get_scale_by_category
+    from world_builder.world_utils import get_instances, get_scale_by_category
 
     connect(use_gui=False, shadows=False, width=width, height=height)
     gym_world = create_single_world(args=default_arguments(use_gpu=True), spacing=5.)

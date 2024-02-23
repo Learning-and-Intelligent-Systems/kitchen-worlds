@@ -13,7 +13,7 @@ import argparse
 from pybullet_tools.utils import set_random_seed, disconnect
 from pybullet_tools.bullet_utils import get_datetime
 from world_builder.builders import create_pybullet_world, test_feg_kitchen_mini
-from world_builder.utils import parse_yaml
+from world_builder.world_utils import parse_yaml
 from test_utils import get_config
 
 

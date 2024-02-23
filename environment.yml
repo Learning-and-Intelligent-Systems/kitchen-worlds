@@ -242,7 +242,7 @@ dependencies:
     - typeguard==2.13.3
     - types-termcolor==1.1.3
     - typing-extensions==4.3.0
-    - untangle==1.2.1
+    - untangle==1.1.1
     - urdf-parser-py==0.0.4
     - urdfpy==0.0.22
     - usd-core==21.11
