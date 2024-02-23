@@ -113,10 +113,10 @@ def sample_kitchen_counter_scene(world, **kwargs):
             fixture = {}
             if idx in [1, 2]: # control height for center furniture
                 fixture['id'] = world.add_object(Object(load_asset(cat, x=center_x, y=center_y, yaw=yaw, \
-                                floor=floor, w=w, l=l, h=center_z, RANDOM_INSTANCE=True)))
+                                                                   floor=floor, w=w, l=l, h=center_z, random_instance=True)))
             else:
                 fixture['id'] = world.add_object(Object(load_asset(cat, x=center_x, y=center_y, yaw=yaw, \
-                                floor=floor, w=w, l=l, h=2.5*MIN_COUNTER_Z, RANDOM_INSTANCE=True)))
+                                                                   floor=floor, w=w, l=l, h=2.5*MIN_COUNTER_Z, random_instance=True)))
             center_z = stable_z(fixture['id'].body, floor)
             # center_x = 1-get_aabb_extent(get_aabb(fixture['id'].body))[0]/2
             center_x += 1 - get_aabb(fixture['id'].body)[1][0]
