@@ -23,13 +23,12 @@ from pybullet_tools.pr2_agent import solve_multiple, post_process, pddlstream_fr
 from pybullet_tools.pr2_primitives import control_commands, apply_commands
 from pybullet_tools.logging import parallel_print, myprint
 
-from lisdf_tools.lisdf_loader import pddl_files_from_dir
-
 from world_builder.world import State
 from world_builder.actions import apply_actions
 from world_builder.world_generator import save_to_outputs_folder
 
-from test_utils import parallel_processing, get_config
+from test_utils import get_config, clear_failed_out_dirs
+from pigi_tools.run_utils import parallel_processing
 from test_world_builder import create_pybullet_world
 
 
@@ -65,8 +64,9 @@ def process(index):
     set_numpy_seed(seed)
     print('Seed:', seed)
 
-    exp_dir = abspath(join(config.data.out_dir, get_datetime(TO_LISDF=True)))
+    exp_dir = abspath(join(config.data.out_dir, get_datetime(seconds=True)))
     os.makedirs(exp_dir, exist_ok=True)
+    clear_failed_out_dirs(config.data.out_dir)
     new_config.data.out_dir = exp_dir
 
     """ STEP 1 -- GENERATE SCENES """

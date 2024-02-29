@@ -21,6 +21,8 @@ def get_config(config_name):
     parser.add_argument('-c', '--config', type=str, default=config_name)
     args = parser.parse_args()
     config = parse_yaml(join(SCENE_CONFIG_PATH, args.config))
+    if isinstance(config.seed, str) and config.seed.lower() == 'none':
+        config.seed = None
     return config
 
 
@@ -32,6 +34,17 @@ def get_base_parser(task_name=None, parallel=False, use_viewer=False):
                         help='When enabled, enables the PyBullet viewer.')
     return parser
 
+
+def clear_failed_out_dirs(out_dir):
+    exp_dirs = [join(out_dir, f) for f in listdir(out_dir) if isdir(join(out_dir, f))]
+    for exp_dir in exp_dirs:
+        solution_file = join(exp_dir, 'plan.json')
+        if not isfile(solution_file):
+            shutil.rmtree(exp_dir)
+        else:
+            solution = json.load(open(solution_file, 'r'))[0]['plan']
+            if solution == 'FAILED':
+                shutil.rmtree(exp_dir)
 
 def find_duplicate_worlds(d1, d2):
     from config import MAMAO_DATA_PATH
