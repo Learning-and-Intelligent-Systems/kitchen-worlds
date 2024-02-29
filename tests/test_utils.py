@@ -43,7 +43,7 @@ def clear_failed_out_dirs(out_dir):
             shutil.rmtree(exp_dir)
         else:
             solution = json.load(open(solution_file, 'r'))[0]['plan']
-            if solution == 'FAILED':
+            if solution is None:
                 shutil.rmtree(exp_dir)
 
 def find_duplicate_worlds(d1, d2):
