@@ -1,0 +1,261 @@
+{
+    "base_limits": {
+        "0": [
+            -0.5,
+            3
+        ],
+        "1": [
+            -2,
+            10
+        ],
+        "17": [
+            0,
+            3
+        ]
+    },
+    "system": "Linux",
+    "host": "223da4c-lcedt",
+    "camera_zoomins": [
+        {
+            "name": "minifridge",
+            "d": [
+                1.2,
+                0.0,
+                2
+            ]
+        }
+    ],
+    "supporting_surfaces": {
+        "sink#1::sink_bottom": [],
+        "sink_counter_left": [
+            "microwave#1",
+            "veggiepotato",
+            "veggietomato"
+        ],
+        "sink_counter_right": [
+            "bottle#1"
+        ],
+        "wall": [],
+        "counter#1": [
+            "bottle#2"
+        ],
+        "shelf_lower": [
+            "medicine#2"
+        ],
+        "braiserbody#1::braiser_bottom": []
+    },
+    "supported_movables": {
+        "veggiepotato": "sink_counter_left"
+    },
+    "attachments": {
+        "22": [
+            5,
+            -1,
+            [
+                [
+                    0.07742199301719666,
+                    -0.4409768581390381,
+                    0.20289456844329834
+                ],
+                [
+                    0.0,
+                    0.0,
+                    1.0,
+                    6.123234262925839e-17
+                ]
+            ]
+        ],
+        "23": [
+            9,
+            -1,
+            [
+                [
+                    -0.266152024269104,
+                    0.06532859802246094,
+                    0.568212628364563
+                ],
+                [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            ]
+        ],
+        "24": [
+            23,
+            -1,
+            [
+                [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    0.0,
+                    0.3826834559440613,
+                    0.9238795638084412
+                ]
+            ]
+        ],
+        "25": [
+            5,
+            -1,
+            [
+                [
+                    0.15790903568267822,
+                    0.4152405261993408,
+                    0.10614705085754395
+                ],
+                [
+                    0.0,
+                    0.0,
+                    0.7321683168411255,
+                    0.6811237335205078
+                ]
+            ]
+        ],
+        "26": [
+            5,
+            -1,
+            [
+                [
+                    0.09499001502990723,
+                    0.03011322021484375,
+                    0.0869520902633667
+                ],
+                [
+                    0.0,
+                    0.0,
+                    0.2964753806591034,
+                    0.9550405144691467
+                ]
+            ]
+        ],
+        "27": [
+            6,
+            -1,
+            [
+                [
+                    0.10547173023223877,
+                    -0.02702808380126953,
+                    0.16321706771850586
+                ],
+                [
+                    0.0,
+                    0.0,
+                    0.8113747835159302,
+                    0.5845264196395874
+                ]
+            ]
+        ],
+        "28": [
+            16,
+            -1,
+            [
+                [
+                    0.06669303774833679,
+                    -0.06886720657348633,
+                    0.17604506015777588
+                ],
+                [
+                    0.0,
+                    0.0,
+                    0.4173252284526825,
+                    0.908757209777832
+                ]
+            ]
+        ],
+        "29": [
+            22,
+            -1,
+            [
+                [
+                    -0.08929169178009033,
+                    -0.11774539947509766,
+                    0.2456914186477661
+                ],
+                [
+                    0.0,
+                    0.0,
+                    -0.4747885465621948,
+                    0.880099892616272
+                ]
+            ]
+        ],
+        "30": [
+            21,
+            -1,
+            [
+                [
+                    0.2019105851650238,
+                    0.0,
+                    0.10440897941589355
+                ],
+                [
+                    0.0,
+                    0.0,
+                    0.9999927878379822,
+                    0.003796317847445607
+                ]
+            ]
+        ]
+    },
+    "body_to_name": {
+        "(13, 1)": "minifridge::joint_1",
+        "(13, None, 0)": "minifridge::link_0",
+        "(19, 10)": "cabinettop::chewie_door_left_joint",
+        "(19, 2)": "cabinettop::baker_joint",
+        "(19, 6)": "cabinettop::chewie_door_right_joint",
+        "(19, None, 0)": "cabinettop::sektion",
+        "(23, None, 1)": "braiserbody#1::braiser_bottom",
+        "(3, None, 1)": "sink#1::sink_bottom",
+        "0": "pr2robot",
+        "1": "floor1",
+        "10": "cabinetlower",
+        "11": "dishwasherbox",
+        "12": "cabinetlower#1",
+        "13": "minifridge",
+        "14": "minifridgebase",
+        "15": "wall",
+        "16": "counter#1",
+        "17": "counter_back#1",
+        "18": "counter_back#2",
+        "19": "cabinettop",
+        "2": "sinkbase",
+        "20": "cabinettop_filler",
+        "21": "shelf_lower",
+        "22": "microwave#1",
+        "23": "braiserbody#1",
+        "24": "braiserlid",
+        "25": "veggiepotato",
+        "26": "veggietomato",
+        "27": "bottle#1",
+        "28": "bottle#2",
+        "29": "medicine#1",
+        "3": "sink#1",
+        "30": "medicine#2",
+        "4": "faucet",
+        "5": "sink_counter_left",
+        "6": "sink_counter_right",
+        "7": "sink_counter_front",
+        "8": "sink_counter_back",
+        "9": "ovencounter"
+    },
+    "pddlstream_kwargs": {
+        "skeleton": "[]",
+        "subgoals": "None",
+        "soft_subgoals": "False",
+        "fc": "None",
+        "collect_dataset": "True",
+        "lock": "True",
+        "preview": "False",
+        "max_solutions": "1",
+        "visualization": "False",
+        "log_failures": "False",
+        "evaluation_time": "30",
+        "downward_time": "3",
+        "max_plans": "10"
+    }
+}

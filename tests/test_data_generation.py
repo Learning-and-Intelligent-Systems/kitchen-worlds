@@ -8,8 +8,9 @@ import time
 import random
 import copy
 import json
+import argparse
 from os.path import join, abspath, dirname, isdir, isfile, basename
-from config import EXP_PATH, OUTPUT_PATH
+from config import EXP_PATH, OUTPUT_PATH, SCENE_CONFIG_PATH
 
 from pddlstream.language.constants import Equal, AND, print_solution, PDDLProblem
 from pddlstream.algorithms.meta import solve, create_parser
@@ -32,9 +33,23 @@ from pigi_tools.run_utils import parallel_processing
 from test_world_builder import create_pybullet_world
 
 
-DEFAULT_YAML = 'kitchen_full_feg.yaml'
-config = get_config(DEFAULT_YAML)
 
+#####################################
+
+DEFAULT_YAML = 'kitchen_full_feg.yaml'
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-n', '--config_name', type=str, default=DEFAULT_YAML,
+                    help='name of config file inside pybullet_planning/pipelines directory.')
+parser.add_argument('-p', '--config_path', type=str, default=None,
+                    help='absolute path to config file.')
+args = parser.parse_args()
+
+if args.config_path is not None:
+    config_file = args.config_path
+else:
+    config_file = join(SCENE_CONFIG_PATH, args.config_name)
+config = get_config(config_file)
 
 #####################################
 
@@ -135,6 +150,12 @@ def process(index):
     with open(join(exp_dir, f"commands.pkl"), 'wb') as f:
         pickle.dump(commands, f)
 
+    """ =============== save visuals =============== """
+    # if save_rgb:
+    #     world.visualize_image(img_dir=output_dir, rgb=True)
+    # if save_depth:
+    #     world.visualize_image(img_dir=output_dir)
+
     """ =============== visualize the plan =============== """
     if (plan is None) or not has_gui():
         reset_simulation()
@@ -155,9 +176,5 @@ def process(index):
     disconnect()
 
 
-def collect_for_fastamp():
-    parallel_processing(process, range(config.n_data), parallel=config.parallel)
-
-
 if __name__ == '__main__':
-    collect_for_fastamp()
+    parallel_processing(process, range(config.n_data), parallel=config.parallel)
