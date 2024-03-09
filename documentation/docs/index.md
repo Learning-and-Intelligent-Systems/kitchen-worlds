@@ -2,9 +2,10 @@
 
 A library of long-horizon Task-and-Motion-Planning (TAMP) problems in kitchen and household scenes, as well as planners to solve them
 
-- visualize a scene in LISDF format (an extension to SDF that includes URDF)
-- solve a TAMP problem using PDDLStream defined with a scene.lisdf, problem.pddl, domain.pddl, stream.pddl
 - procedurally generate scenes with rigid and articulated objects
+- visualize a scene in LISDF format (an extension to SDF that includes URDF)
+- solve using PDDLStream a TAMP problem defined by a `scene.lisdf` and `problem.pddl` using existing `domain.pddl` and `stream.pddl`
+- visualize the robot trajectory in pybullet
 
 <img src="gifs/demo-cabbage.gif"></img>
 
@@ -34,55 +35,55 @@ A library of long-horizon Task-and-Motion-Planning (TAMP) problems in kitchen an
 </table>
 -->
 
-## Setup
+## Setting Up
 
-1. Clone the repo along with the submodules. It may take a while.
+Clone the repo along with the submodules. It may take a while.
 
 ```shell
 git clone git@github.com:Learning-and-Intelligent-Systems/kitchen-worlds.git --recursive
 ```
 
-2. Install dependencies.
+Install dependencies. Install [graphviz](https://pygraphviz.github.io/documentation/latest/install.html).
+
 ```shell
 conda env create -f environment.yml
 conda activate kitchen
-## sudo apt-get install graphviz graphviz-dev  ## if you want to visualize planning constraint graph on Ubuntu
+## sudo apt-get install graphviz graphviz-dev  ## on Ubuntu
 ```
 
-3. Build FastDownward, used by PDDLStream planner
+Build FastDownward, used by PDDLStream planner
 
 ```shell
 ## sudo apt install cmake g++ git make python3
 (cd pddlstream; ./downward/build.py)
 ```
 
-4. Build IK solvers (If using PR2; skip this if you're only using floating gripper)
+Build IK solvers (If using PR2; skip this if you're only using floating gripper).
 
-IKFast solver for PR2 arm planning (the default IK):
+1) IKFast solver for PR2 arm planning (the default IK):
 
 ```shell
 ## sudo apt-get install python-dev
 (cd pybullet_planning/pybullet_tools/ikfast/pr2; python setup.py)
 ```
 
-TracIK for PR2 base, torso, and arm planning (this is better, but requires Ubuntu):
+2) TracIK for PR2 whole-body IK that solves for base, torso, and arm together (this is better, but requires Ubuntu):
 
 ```shell
 sudo apt-get install libeigen3-dev liborocos-kdl-dev libkdl-parser-dev liburdfdom-dev libnlopt-dev libnlopt-cxx-dev swig
 pip install git+https://github.com/mjd3/tracikpy.git
 ```
 
-[graphviz](https://pygraphviz.github.io/documentation/latest/install.html)
 
 ## Examples
 
-collects data (including scene layout `scene.lisdf`, `problem.pddl`, plan, and trajectory) according to the configuration file in [pybullet_planning/pipelines](https://github.com/zt-yang/pybullet_planning/blob/master/pipelines/kitchen_full_feg.yaml) directory, and outputs to a subdirectory in `kitchen-worlds/outputs/test_feg_kitchen_mini/` named by datetime. 
+Collect data (including scene layout `scene.lisdf`, `problem.pddl`, plan, and trajectory) according to the configuration file in [pybullet_planning/pipelines](https://github.com/zt-yang/pybullet_planning/blob/master/pipelines/kitchen_full_feg.yaml) directory, and outputs to a subdirectory in `kitchen-worlds/outputs/test_feg_kitchen_mini/` named by datetime.
 
 ```shell
 python test_data_generation.py -c kitchen_full_feg.yaml
 ```
 
-replays the generated trajectory and generates a `replay.gif` in a given path to the data directory (containing `scene.lisdf`, `problem.pddl`, `commands.pkl`), for example:
+Replay the generated trajectory and generates a `replay.gif` in a given path to the data directory (containing `scene.lisdf`, `problem.pddl`, `commands.pkl`), for example:
 
 ```shell
 python test_replay_pigi_data.py --path /home/yang/Documents/kitchen-worlds/outputs/test_feg_kitchen_mini/230214_205947
