@@ -13,6 +13,9 @@ documentation/
 !documentation/docs/css/extra.css
 
 test_cases/
+temp/
+outputs/
+experiments/
 
 */visualizations/
 */statistics/
@@ -23,7 +26,5 @@ test_cases/
 */vhacd/
 */gym_images/
 
-temp/
-outputs/
 !outputs/data_demo.html
 !outputs/style.css
