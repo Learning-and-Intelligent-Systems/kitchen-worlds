@@ -5,6 +5,7 @@ assets/tmp/*
 *.lisdf~
 *.pyc
 *.gif
+*.mp4
 
 documentation/
 !documentation/docs/index.md
@@ -12,20 +13,18 @@ documentation/
 !documentation/docs/css/extra.css
 
 test_cases/
+temp/
+outputs/
+experiments/
 
+*/visualizations/
 */statistics/
 */temp/
-tests/.ipynb_checkpoints/
-tests/txt_file.txt
-tests/collisions.pkl
-tests/visualizations/
-tests/statistics/
-tests/vhacd/
-tests/gym_images/
+*/.ipynb_checkpoints/
+*/txt_file.txt
+*/collisions.pkl
+*/vhacd/
+*/gym_images/
 
-outputs/
 !outputs/data_demo.html
 !outputs/style.css
-
-collisions.json
-*.mp4

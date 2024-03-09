@@ -24,13 +24,18 @@ from lisdf_tools.image_utils import draw_bb, crop_image, get_mask_bb, save_seg_i
 # from utils import load_lisdf_synthesizer
 from pigi_tools.data_utils import get_indices, exist_instance, get_init_tuples, \
     get_body_map, get_world_center, add_to_planning_config, get_worlds_aabb
-from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
+from data_generator.run_utils import copy_dir_for_process, get_data_processing_parser
+
+from test_utils import process_all_tasks
+
+DATASET_ROOT = join(dirname(__file__), '..', '..', 'fastamp-data-rss')
+DATASET_ROOT = join(dirname(__file__), '..', 'outputs')
 
 N_PX = 224
 NEW_KEY = 'channel7'
 ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb', 'meraki']
 
-DEFAULT_TASK = 'mm_sink'
+DEFAULT_TASK = 'test_feg_kitchen_full'
 LARGER_WORLD = 'mm_' in DEFAULT_TASK or 'tt_' in DEFAULT_TASK
 GIVEN_PATH = None
 MODIFIED_TIME = 1675535195
@@ -39,7 +44,7 @@ USE_VIEWER = True
 REDO = False
 
 
-parser = get_base_parser(task_name=DEFAULT_TASK, parallel=PARALLEL, use_viewer=USE_VIEWER)
+parser = get_data_processing_parser(task_name=DEFAULT_TASK, parallel=PARALLEL, use_viewer=USE_VIEWER)
 args = parser.parse_args()
 
 
@@ -453,17 +458,17 @@ def generate_images(viz_dir, redo=REDO):
         shutil.rmtree(test_dir)
         add_key(viz_dir)
     else:
-        print('skipping', viz_dir, f'{name}')
+        print('skipping', viz_dir, name)
 
 
 def process_worlds_aabb():
     """ ((-0.879, -2.56, -0.002), (1.15, 9.477, 2.841)) """
-    run_dirs = process_all_tasks(None, args.t, parallel=False, return_dirs=True)
+    run_dirs = process_all_tasks(None, args.t, DATASET_ROOT, parallel=False, return_dirs=True)
     aabb = get_worlds_aabb(run_dirs)
 
 
 if __name__ == "__main__":
     process = generate_images
-    process_all_tasks(process, args.t, parallel=args.p, path=GIVEN_PATH)
+    process_all_tasks(process, args.t, DATASET_ROOT, parallel=args.p, path=GIVEN_PATH)
 
     # process_worlds_aabb()
