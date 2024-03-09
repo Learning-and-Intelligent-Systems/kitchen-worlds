@@ -2,10 +2,10 @@
 
 from __future__ import print_function
 from os.path import join
-from world_builder.paths import pbp_path
+from world_builder.paths import PBP_PATH
 from pigi_tools.replay_utils import run_replay
 
-CONFIG_YAML_PATH = join(pbp_path, 'pigi_tools', 'config', 'replay_rss.yaml')
+CONFIG_YAML_PATH = join(PBP_PATH, 'pigi_tools', 'config', 'replay_rss.yaml')
 
 
 if __name__ == '__main__':

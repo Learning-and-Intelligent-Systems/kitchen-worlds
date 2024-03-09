@@ -36,7 +36,7 @@ from pigi_tools.data_utils import get_instance_info, exist_instance, get_indices
     modify_plan_with_body_map, add_to_planning_config, load_planning_config, \
     add_objects_and_facts, delete_wrongly_supported
 
-from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
+from test_utils import process_all_tasks, copy_dir_for_process, get_data_processing_parser
 
 ## special modes
 GENERATE_MULTIPLE_SOLUTIONS = False
@@ -100,7 +100,7 @@ if CLEAN_LARGE_WORLD:
 
 ## =========================================
 
-parser = get_base_parser(task_name=TASK_NAME, parallel=PARALLEL, use_viewer=USE_VIEWER)
+parser = get_data_processing_parser(task_name=TASK_NAME, parallel=PARALLEL, use_viewer=USE_VIEWER)
 parser.add_argument('-d', type=str, default=DIVERSE)
 parser.add_argument('-f', type=str, default=FEASIBILITY_CHECKER)
 parser.add_argument('-l', '--lock', action='store_true',
@@ -362,7 +362,8 @@ def run_one(run_dir, parallel=False, SKIP_IF_SOLVED=SKIP_IF_SOLVED):
     with timeout(duration=max_time):
         if parallel:
             solution = solve_multiple(pddlstream_problem, stream_info, **kwargs)
-            solution, cwd = solution
+            solution, cwd_saver = solution
+            cwd = cwd_saver.tmp_cwd
         else:
             solution = solve_one(pddlstream_problem, stream_info, **kwargs)
     if solution == 'failed':

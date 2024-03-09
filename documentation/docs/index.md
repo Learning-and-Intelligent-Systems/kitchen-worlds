@@ -76,7 +76,7 @@ pip install git+https://github.com/mjd3/tracikpy.git
 
 ## Examples
 
-collects data (including scene layout `scene.lisdf`, `problem.pddl`, plan, and trajectory) according to the configuration file in [pybullet_planning/pipelines](https://github.com/zt-yang/pybullet_planning/blob/master/pipelines/kitchen_full_feg.yaml) directory, and outputs to a subdirectory in `kitchen-worlds/outputs/test_feg_kitchen_mini/` named by datetime. 
+collects data (including scene layout `scene.lisdf`, `problem.pddl`, plan, and trajectory) according to the configuration file in [pybullet_planning/data_generation/configs](https://github.com/zt-yang/pybullet_planning/blob/master/data_generation/configs/kitchen_full_feg.yaml) directory, and outputs to a subdirectory in `kitchen-worlds/outputs/test_feg_kitchen_mini/` named by datetime. 
 
 ```shell
 python test_data_generation.py -c kitchen_full_feg.yaml

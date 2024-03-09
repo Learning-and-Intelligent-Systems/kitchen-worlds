@@ -23,9 +23,11 @@ tests/statistics/
 tests/vhacd/
 tests/gym_images/
 
+temp/
 outputs/
 !outputs/data_demo.html
 !outputs/style.css
 
+txt_file.txt
 collisions.json
 *.mp4

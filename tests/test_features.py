@@ -31,7 +31,9 @@ import pybullet as p
 from tqdm import tqdm
 
 # from utils import load_lisdf_synthesizer
-from test_utils import process_all_tasks, copy_dir_for_process, get_base_parser
+from data_generator.run_utils import copy_dir_for_process
+from pigi_tools.run_utils import process_all_tasks
+from test_utils import get_data_processing_parser
 
 # DEFAULT_TASK = 'mm'
 DEFAULT_TASK = 'tt'
@@ -43,7 +45,7 @@ CASES = None  ## ['0'] | None
 PARALLEL = True
 USE_VIEWER = False
 
-parser = get_base_parser(task_name=DEFAULT_TASK, parallel=PARALLEL, use_viewer=USE_VIEWER)
+parser = get_data_processing_parser(task_name=DEFAULT_TASK, parallel=PARALLEL, use_viewer=USE_VIEWER)
 args = parser.parse_args()
 
 USE_VIEWER = args.viewer
