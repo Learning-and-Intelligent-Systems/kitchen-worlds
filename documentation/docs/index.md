@@ -76,17 +76,38 @@ pip install git+https://github.com/mjd3/tracikpy.git
 
 ## Examples
 
-collects data (including scene layout `scene.lisdf`, `problem.pddl`, plan, and trajectory) according to the configuration file in [pybullet_planning/data_generation/configs](https://github.com/zt-yang/pybullet_planning/blob/master/data_generation/configs/kitchen_full_feg.yaml) directory, and outputs to a subdirectory in `kitchen-worlds/outputs/test_feg_kitchen_mini/` named by datetime. 
+### Generate Worlds, Problems, and Plans
+
+Collecting data involves generating scene layout `scene.lisdf`, `problem.pddl`, `plan.json`, and trajectory `commands.pkl`. It can be run without gui (faster) and can be run in parallel. Note that planning is not guaranteed to be return a solution within timeout, depending on the domain.
+
+There are two scripts for collecting data, one is simpler, cleaner, and more adaptable for your tasks. Example configuration files are provided in [kitchen-worlds/pybullet_planning/data_generation/configs](https://github.com/zt-yang/pybullet_planning/blob/master/data_generation/configs/kitchen_full_feg.yaml):
 
 ```shell
-python test_data_generation.py -c kitchen_full_feg.yaml
+python examples/test_data_generation.py -n kitchen_full_pr2.yaml  ## PR2 with extended torso range
+python examples/test_data_generation.py -n kitchen_full_feg.yaml  ## floating franka gripper
+```
+
+The other uses a more general set of classes and processes. It supports replaning and continuously interacting with the environment. It was used to generate data for PIGINet [Sequence-Based Plan Feasibility Prediction for Efficient Task and Motion Planning](https://piginet.github.io/). Example configuration files are provided in [kitchen-worlds/pybullet_planning/cogarch_tools/configs](https://github.com/zt-yang/pybullet_planning/blob/master/cogarch_tools/configs/config_pigi.yaml):
+
+```shell
+python examples/test_data_generation_pigi.py  ## PR2 with extended torso range
+```
+
+### Generate Images and Videos
+
+Generate layout only:
+
+```shell
+python examples/test_world_builder.py -c kitchen_full_feg.yaml
 ```
 
 replays the generated trajectory and generates a `replay.gif` in a given path to the data directory (containing `scene.lisdf`, `problem.pddl`, `commands.pkl`), for example:
 
 ```shell
-python test_replay_pigi_data.py --path /home/yang/Documents/kitchen-worlds/outputs/test_feg_kitchen_mini/230214_205947
+python examples/test_replay_pigi_data.py --path /home/yang/Documents/kitchen-worlds/outputs/test_feg_kitchen_mini/230214_205947
 ```
+
+### Solve a Problem Again
 
 ----------
 

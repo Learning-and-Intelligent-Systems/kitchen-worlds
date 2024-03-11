@@ -4,7 +4,7 @@ from os import listdir
 import numpy as np
 import shutil
 import random
-from config import MAMAO_DATA_PATH, ASSET_PATH
+from examples.config import MAMAO_DATA_PATH, ASSET_PATH
 from pybullet_tools.utils import connect
 from isaac_tools.gym_utils import images_to_gif, load_obj_shots_bg, take_obj_shot
 

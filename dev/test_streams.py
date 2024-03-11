@@ -4,7 +4,7 @@ from __future__ import print_function
 import os
 import json
 from os.path import join, abspath, dirname, isdir, isfile
-from config import EXP_PATH
+from examples.config import EXP_PATH
 
 from pybullet_planning.pybullet_tools.pr2_utils import get_group_conf
 from pybullet_planning.pybullet_tools.pr2_primitives import get_base_custom_limits, control_commands, apply_commands, State

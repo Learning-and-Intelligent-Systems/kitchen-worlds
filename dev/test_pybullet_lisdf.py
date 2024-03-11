@@ -1,6 +1,6 @@
 import shutil
 
-from config import ASSET_PATH, EXP_PATH, OUTPUT_PATH, MAMAO_DATA_PATH
+from examples.config import ASSET_PATH, EXP_PATH, OUTPUT_PATH, MAMAO_DATA_PATH
 from os.path import join, abspath, isdir
 from os import listdir
 from pybullet_planning.lisdf_tools.lisdf_loader import load_lisdf_pybullet

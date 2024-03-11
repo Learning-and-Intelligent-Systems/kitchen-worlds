@@ -6,7 +6,7 @@ import numpy as np
 import argparse
 import sys
 
-from config import EXP_PATH
+from examples.config import EXP_PATH
 from pybullet_tools.utils import quat_from_euler, reset_simulation, remove_body, AABB, \
     get_aabb_extent, get_aabb_center, get_joint_name, get_link_name, euler_from_quat, \
     set_color, apply_alpha, YELLOW, WHITE, get_aabb, get_point, wait_unlocked, \

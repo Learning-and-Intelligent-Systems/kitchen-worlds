@@ -8,7 +8,7 @@ sys.path.extend([
 ])
 sys.path.extend([
     '/home/yang/Documents/jupyter-worlds',
-    '/home/yang/Documents/jupyter-worlds/tests',
+    '/home/yang/Documents/jupyter-worlds/dev',
     '/home/yang/Documents/playground/srl_stream/src',
     '/home/yang/Documents/playground/scene_synthesizer/src',
     # '/home/yang/playground/srl/src',

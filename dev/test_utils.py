@@ -1,11 +1,7 @@
 from os import listdir
-from os.path import join, abspath, dirname, basename, isdir, isfile
-from tabnanny import verbose
-import os
+from os.path import join, isdir, isfile
 import math
-import json
-from config import EXP_PATH, MAMAO_DATA_PATH, DATA_CONFIG_PATH, PBP_PATH
-import numpy as np
+from examples.config import MAMAO_DATA_PATH
 import random
 
 
@@ -89,7 +85,7 @@ def get_run_dirs(task_name, dataset_root='/home/yang/Documents/fastamp-data-rss/
 
 
 def find_duplicate_worlds(d1, d2):
-    from config import MAMAO_DATA_PATH
+    from examples.config import MAMAO_DATA_PATH
 
     def find_duplicate(found):
         dup1 = len(set(found)) != len(found)

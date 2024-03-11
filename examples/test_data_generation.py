@@ -2,13 +2,14 @@
 
 from __future__ import print_function
 
+import config
 from data_generator.data_generation_run import data_generation_process
 from data_generator.run_utils import get_config_from_argparse, parallel_processing
 
 #####################################
 
 default_config_name, default_config_path = 'kitchen_full_feg.yaml', None
-# default_config_name, default_config_path = 'kitchen_full_pr2.yaml', None
+default_config_name, default_config_path = 'kitchen_full_pr2.yaml', None
 # default_config_name, default_config_path = None, join(root, 'config_pigi.yaml')
 
 config = get_config_from_argparse(default_config_name, default_config_path)

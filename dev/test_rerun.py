@@ -8,30 +8,25 @@ import shutil
 import copy
 import sys
 from os import listdir
-from os.path import join, abspath, dirname, isdir, isfile
-from tabnanny import verbose
-from config import EXP_PATH, MAMAO_DATA_PATH
+from os.path import join, dirname, isdir, isfile
 import numpy as np
 import random
 import time
 import argparse
 
-from pybullet_tools.pr2_utils import get_group_conf
-from pybullet_tools.utils import disconnect, LockRenderer, has_gui, WorldSaver, wait_if_gui, \
-    SEPARATOR, get_aabb, wait_for_duration, safe_remove, ensure_dir, reset_simulation, timeout, wait_unlocked
-from pybullet_tools.bullet_utils import summarize_facts, print_goal, nice, get_datetime, \
+from pybullet_tools.utils import LockRenderer, has_gui, WorldSaver, SEPARATOR, get_aabb, ensure_dir, reset_simulation, timeout, wait_unlocked
+from pybullet_tools.bullet_utils import print_goal, get_datetime, \
     initialize_logs
-from pybullet_tools.pr2_agent import get_stream_info, post_process, move_cost_fn, \
-    get_stream_map, solve_multiple, solve_one
+from pybullet_tools.pr2_agent import get_stream_info, post_process, get_stream_map, solve_multiple, solve_one
 
-from pddlstream.language.constants import Equal, AND, print_solution
+from pddlstream.language.constants import AND, print_solution
 
 from lisdf_tools.lisdf_loader import load_lisdf_pybullet, pddlstream_from_dir
 from lisdf_tools.lisdf_planning import pddl_to_init_goal, Problem
 
 from world_builder.actions import apply_actions
 
-from pigi_tools.data_utils import get_instance_info, exist_instance, get_indices, \
+from pigi_tools.data_utils import exist_instance, get_indices, \
     get_plan_skeleton, get_successful_plan, get_feasibility_checker, get_plan, get_body_map, \
     modify_plan_with_body_map, add_to_planning_config, load_planning_config, \
     add_objects_and_facts, delete_wrongly_supported
