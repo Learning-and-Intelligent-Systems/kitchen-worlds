@@ -25,6 +25,7 @@ experiments/
 */collisions.pkl
 */vhacd/
 */gym_images/
+txt_file.txt
 
 !outputs/data_demo.html
 !outputs/style.css
