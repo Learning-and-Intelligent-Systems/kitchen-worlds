@@ -1,14 +1,12 @@
-from os.path import join, isdir, getsize, abspath
+from os.path import join, getsize, abspath
 import sys
-from os import listdir
 import numpy as np
 import shutil
-import random
 from config import MAMAO_DATA_PATH, ASSET_PATH
 from pybullet_tools.utils import connect
 from isaac_tools.gym_utils import images_to_gif, load_obj_shots_bg, take_obj_shot
 
-from test_utils import copy_dir_for_process, get_sample_envs_200
+from examples.test_utils import copy_dir_for_process, get_sample_envs_200
 
 
 ###########################################################################

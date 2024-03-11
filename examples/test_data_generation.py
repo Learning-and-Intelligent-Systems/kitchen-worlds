@@ -2,6 +2,7 @@
 
 from __future__ import print_function
 
+import config
 from data_generator.data_generation_run import data_generation_process
 from data_generator.run_utils import get_config_from_argparse, parallel_processing
 
