@@ -12,17 +12,17 @@ from os.path import join, dirname, isdir, isfile
 import numpy as np
 import random
 import time
-import argparse
 
-from pybullet_tools.utils import LockRenderer, has_gui, WorldSaver, SEPARATOR, get_aabb, ensure_dir, reset_simulation, timeout, wait_unlocked
+
+from pybullet_tools.utils import LockRenderer, has_gui, WorldSaver, SEPARATOR, reset_simulation, timeout
 from pybullet_tools.bullet_utils import print_goal, get_datetime, \
     initialize_logs
-from pybullet_tools.pr2_agent import get_stream_info, post_process, get_stream_map, solve_multiple, solve_one
+from pybullet_tools.pr2_agent import post_process, get_stream_map, solve_multiple, solve_one
 
-from pddlstream.language.constants import AND, print_solution
+from pddlstream.language.constants import Equal, print_solution
 
 from lisdf_tools.lisdf_loader import load_lisdf_pybullet, pddlstream_from_dir
-from lisdf_tools.lisdf_planning import pddl_to_init_goal, Problem
+from lisdf_tools.lisdf_planning import Problem
 
 from world_builder.actions import apply_actions
 
@@ -31,7 +31,7 @@ from pigi_tools.data_utils import exist_instance, get_indices, \
     modify_plan_with_body_map, add_to_planning_config, load_planning_config, \
     add_objects_and_facts, delete_wrongly_supported
 
-from test_utils import process_all_tasks, copy_dir_for_process, get_data_processing_parser
+from examples.test_utils import process_all_tasks, copy_dir_for_process, get_data_processing_parser
 
 ## special modes
 GENERATE_MULTIPLE_SOLUTIONS = False

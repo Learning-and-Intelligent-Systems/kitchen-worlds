@@ -1,39 +1,19 @@
-import copy
 import os
 
-import PIL.Image
-import numpy as np
-import argparse
-import sys
-
-from examples.config import EXP_PATH
-from pybullet_tools.utils import quat_from_euler, reset_simulation, remove_body, AABB, \
-    get_aabb_extent, get_aabb_center, get_joint_name, get_link_name, euler_from_quat, \
-    set_color, apply_alpha, YELLOW, WHITE, get_aabb, get_point, wait_unlocked, \
-    get_joint_positions, GREEN, get_pose
-from pybullet_tools.bullet_utils import get_segmask, get_door_links, nice, \
-    get_partnet_doors, collided
-from pybullet_tools.general_streams import get_contain_list_gen
-from pybullet_planning.pybullet_tools.general_streams import get_grasp_list_gen
-from pybullet_tools.flying_gripper_utils import get_cloned_se3_conf, plan_se3_motion, \
-    set_cloned_se3_conf
+from pybullet_tools.utils import reset_simulation, AABB, \
+    get_aabb_extent, get_aabb_center, get_aabb, get_point, get_joint_positions
+from pybullet_tools.bullet_utils import get_door_links
 
 from world_builder.world import State
-from pigi_tools.data_utils import organize_dataset, get_indices, exist_instance, get_init_tuples
-from lisdf_tools.lisdf_loader import load_lisdf_pybullet, get_depth_images, create_gripper_robot
-import json
+from pigi_tools.data_utils import get_indices, get_init_tuples
+from lisdf_tools.lisdf_loader import load_lisdf_pybullet, create_gripper_robot
 import shutil
 from os import listdir
-from os.path import join, isdir, isfile, dirname, getmtime, basename
-import time
-import math
-import pybullet as p
-from tqdm import tqdm
+from os.path import join, isdir, isfile
 
 # from utils import load_lisdf_synthesizer
-from data_generator.run_utils import copy_dir_for_process
-from pigi_tools.run_utils import process_all_tasks
-from test_utils import get_data_processing_parser
+from data_generator.run_utils import copy_dir_for_process, get_data_processing_parser
+from test_utils import process_all_tasks
 
 # DEFAULT_TASK = 'mm'
 DEFAULT_TASK = 'tt'

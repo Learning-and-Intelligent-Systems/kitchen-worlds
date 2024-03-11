@@ -1,141 +1,250 @@
-from __future__ import print_function
-import os
-import json
-import csv
-from collections import defaultdict
-import argparse
-from os.path import join, abspath, basename, isdir, isfile
 from os import listdir
-import shutil
-
-from pybullet_tools.utils import connect, draw_pose, unit_pose, link_from_name, load_pybullet, load_model, \
-    sample_aabb, AABB, set_pose, get_aabb, get_aabb_center, quat_from_euler, Euler, HideOutput, get_aabb_extent, \
-    set_camera_pose, wait_unlocked, disconnect, wait_if_gui, create_box, wait_for_duration, \
-    SEPARATOR, get_aabb, get_pose, approximate_as_prism, draw_aabb, multiply, unit_quat, remove_body, invert, \
-    Pose, get_link_pose, get_joint_limits, WHITE, RGBA, set_all_color, RED, GREEN, set_renderer, clone_body, \
-    add_text, joint_from_name, set_caching, Point, set_random_seed, set_numpy_seed, reset_simulation, \
-    get_joint_name, get_link_name, dump_joint, set_joint_position, ConfSaver, pairwise_link_collision
-from pybullet_tools.bullet_utils import nice
-from pybullet_tools.pr2_problems import create_floor
-
-from world_builder.robot_builders import build_skill_domain_robot
-
-from tutorials.config import EXP_PATH, modify_file_by_project
-
-from pddlstream.algorithms.meta import solve, create_parser
+from os.path import join, abspath, dirname, basename, isdir, isfile
+import os
+import math
+import json
+from config import EXP_PATH, MAMAO_DATA_PATH, DATA_CONFIG_PATH, PBP_PATH
+import numpy as np
+import random
 
 
-def init_experiment(exp_dir):
-    from pybullet_tools.logging import TXT_FILE
-    if isfile(TXT_FILE):
-        os.remove(TXT_FILE)
+from cogarch_tools.cogarch_utils import clear_planning_dir
+from data_generator.run_utils import parallel_processing
 
 
-def get_test_world(robot='feg', semantic_world=False, draw_origin=False,
-                   width=1980, height=1238, **kwargs):
-    connect(use_gui=True, shadows=False, width=width, height=height)  ##  , width=360, height=270
-    if draw_origin:
-        draw_pose(unit_pose(), length=.5)
-        create_floor()
-    set_caching(cache=False)
-    if semantic_world:
-        from world_builder.world import World
-        world = World()
+def process_all_tasks(process, task_name=None, dataset_root=None, parallel=False, cases=None, path=None,
+                      dir=None, case_filter=None, return_dirs=False, input_args=None):
+    clear_planning_dir()
+
+    if path is not None:
+        cases = [path]
+    elif dir is not None:
+        cases = [join(dir, c) for c in listdir(dir)]
+        cases = [c for c in cases if isdir(c) and not isfile(join(c, 'gym_replay.gif'))]
+        # cases = cases[:1]
+    elif cases is not None and len(cases) > 0:
+        cases = [join(dataset_root, task_name, case) for case in cases]
     else:
-        from lisdf_tools.lisdf_loader import World
-        world = World()
-    build_skill_domain_robot(world, robot, **kwargs)
-    return world
+        cases = get_run_dirs(task_name, dataset_root)
+
+    if len(cases) > 1:
+        cases = sorted(cases, key=lambda x: eval(x.split('/')[-1]))
+
+    if case_filter is not None:
+        cases = [c for c in cases if case_filter(c)]
+
+    if return_dirs:
+        return cases
+
+    if input_args is not None:
+        cases = [(case, input_args) for case in cases]
+
+    parallel_processing(process, cases, parallel)
 
 
-def get_test_base_parser(task_name=None, parallel=False, use_viewer=False):
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-t', type=str, default=task_name)
-    parser.add_argument('-p', action='store_true', default=parallel)
-    parser.add_argument('-v', '--viewer', action='store_true', default=use_viewer,
-                        help='When enabled, enables the PyBullet viewer.')
-    return parser
+def get_task_names(task_name):
+    # if task_name == 'mm':
+    #     task_names = ['mm_one_fridge_pick',
+    #                   'mm_one_fridge_table_pick', 'mm_one_fridge_table_in', 'mm_one_fridge_table_on',
+    #                   'mm_two_fridge_in', 'mm_two_fridge_pick'] ## , 'mm_two_fridge_goals'
+    # elif task_name == 'tt':
+    #     task_names = ['tt_one_fridge_table_pick', 'tt_one_fridge_table_in',
+    #                   'tt_two_fridge_pick', 'tt_two_fridge_in', 'tt_two_fridge_goals']  ##
+    # elif task_name == 'ff':
+    #     task_names = ['ff_one_fridge_table_pick', 'ff_one_fridge_table_in',
+    #                   'ff_two_fridge_in', 'ff_two_fridge_pick']
+    # elif task_name == 'ww':
+    #     task_names = ['ww_one_fridge_table_pick', 'ww_one_fridge_table_in',
+    #                   'ww_two_fridge_in', 'ww_two_fridge_pick']
+    # elif task_name == 'bb':
+    #     task_names = ['bb_one_fridge_pick',
+    #                   'bb_one_fridge_table_pick', 'bb_one_fridge_table_in', 'bb_one_fridge_table_on',
+    #                   'bb_two_fridge_in', 'bb_two_fridge_pick']
+    # elif task_name == 'zz':
+    #     task_names = ['zz_three_fridge', 'ss_two_fridge_pick', 'ss_two_fridge_in']
+
+    mm_task_names = ['mm_storage', 'mm_sink', 'mm_braiser',
+                     'mm_sink_to_storage', 'mm_braiser_to_storage']
+    if task_name == 'mm':
+        task_names = mm_task_names
+    elif task_name == 'tt':
+        task_names = [t.replace('mm_', 'tt_') for t in mm_task_names]
+    else:
+        task_names = [task_name]
+    return task_names
 
 
-def get_parser(exp_name=None):
-    parser = create_parser()
-    parser.add_argument('-test', type=str, default=exp_name, help='Name of the test case')
-    parser.add_argument('-cfree', action='store_true', help='Disables collisions during planning')
-    parser.add_argument('-enable', action='store_true', help='Enables rendering during planning')
-    parser.add_argument('-teleport', action='store_true', help='Teleports between configurations')
-    parser.add_argument('-simulate', action='store_true', help='Simulates the system')
-    return parser
+def get_run_dirs(task_name, dataset_root='/home/yang/Documents/fastamp-data-rss/'):
+    task_names = get_task_names(task_name)
+    all_subdirs = []
+    for task_name in task_names:
+        dataset_dir = join(dataset_root, task_name)
+        # organize_dataset(task_name)
+        if not isdir(dataset_dir):
+            print('get_run_dirs | no directory', dataset_dir)
+            continue
+        subdirs = listdir(dataset_dir)
+        subdirs.sort()
+        subdirs = [join(dataset_dir, s) for s in subdirs if isdir(join(dataset_dir, s))]
+        all_subdirs += subdirs
+    return all_subdirs
 
 
-def get_args(exp_name=None):
-    parser = get_parser(exp_name=exp_name)
-    args = parser.parse_args()
-    print('Arguments:', args)
-    return args
+def find_duplicate_worlds(d1, d2):
+    from config import MAMAO_DATA_PATH
+
+    def find_duplicate(found):
+        dup1 = len(set(found)) != len(found)
+        if dup1:
+            seen = []
+            dup = []
+            for f in found:
+                if f not in seen:
+                    seen.append(f)
+                else:
+                    dup.append(f)
+            print(f'{t} has duplicate {(len(dup))}, {dup}')
+
+    t1 = get_task_names(d1)
+    t2 = get_task_names(d2)
+    n1 = []
+    for t in t1:
+        found = open(join(MAMAO_DATA_PATH, f'{t}.txt')).read().splitlines()
+        find_duplicate(found)
+        n1.extend(found)
+    n2 = []
+    for t in t2:
+        found = open(join(MAMAO_DATA_PATH, f'{t}.txt')).read().splitlines()
+        find_duplicate(found)
+        n2.extend(found)
+    dup1 = len(set(n1)) != len(n1)
+    dup2 = len(set(n2)) != len(n2)
+    inter = len(list(set(n1) & set(n2))) > 0
+    print(f'\nt1: {d1}, t2: {d2}, dup1: {dup1}, dup2: {dup2}, inter: {inter}'
+          f'\n----------------------------------------------------------\n')
 
 
-###########################################################################
+def mp4_to_gif(mp4_file, frame_folder='output'):
+    import cv2
+    def convert_mp4_to_jpgs(path):
+        video_capture = cv2.VideoCapture(path)
+        still_reading, image = video_capture.read()
+        frame_count = 0
+        while still_reading:
+            cv2.imwrite(f"{frame_folder}/frame_{frame_count:03d}.jpg", image)
+
+            # read next image
+            still_reading, image = video_capture.read()
+            frame_count += 1
+
+    import glob
+    from PIL import Image
+
+    def make_gif():
+        images = glob.glob(f"{frame_folder}/*.jpg")
+        images.sort()
+        frames = [Image.open(image) for image in images]
+        frame_one = frames[0]
+        output_file = mp4_file.replace('.mp4', '.gif')
+        frame_one.save(output_file, format="GIF", append_images=frames,
+                       save_all=True, duration=50, loop=0)
+        return output_file
+
+    convert_mp4_to_jpgs(mp4_file)
+    output_file = make_gif()
+    print('converted mp4 to', output_file)
 
 
-def save_csv(csv_file, data):
-    csv_file = modify_file_by_project(csv_file)
-    col_names = list(data.keys())
-    col_data = list(data.values())
-
-    file_exists = isfile(csv_file)
-    with open(csv_file, 'a') as csvfile:
-        writer = csv.writer(csvfile)
-        if not file_exists:
-            writer.writerow(col_names)
-        for row in zip(*col_data):
-            writer.writerow(row)
+##################################################################################
 
 
-def read_csv(csv_file, summarize=True):
-    from tabulate import tabulate
-    csv_file = modify_file_by_project(csv_file)
-    keys = None
-    data = {}
-    with open(csv_file, 'r') as csvfile:
-        reader = csv.reader(csvfile)
-        for j, row in enumerate(reader):
-            if j == 0:
-                keys = row
-                data = defaultdict(list)
-            else:
-                for i, elem in enumerate(row):
-                    data[keys[i]].append(elem if i == 0 else eval(elem))
-                    if i == 1 and elem == 0:  ## failed run
-                        break
-
-    ## summarize the average, min, max, and count of each column
-    if summarize:
-        stats = [["name", "avg", "min", "max", "count"]]
-        for key, value in data.items():
-            if key in ["date"]: continue
-            numbers = [sum(value) / len(value), min(value), max(value), len(value)]
-            stats.append([key] + [nice(n) for n in numbers])
-        print(tabulate(stats, headers="firstrow"))
-
-    return data
+def get_envs_from_task(task_dir = join(MAMAO_DATA_PATH, 'tt_two_fridge_pick')):
+    ori_dirs = [join(task_dir, f) for f in listdir(task_dir) if isdir(join(task_dir, f))]
+    ori_dirs.sort()
+    return ori_dirs
 
 
-########################################################################
+def get_sample_envs_200():
+    dirs = get_sample_envs_for_corl()
+    new_dirs = []
+    for subdir in get_task_names('mm'):
+        if subdir == 'mm_one_fridge_pick':
+            continue
+        path = join(MAMAO_DATA_PATH, subdir)
+        names = [join(path, f) for f in listdir(path) if isdir(join(path, f))]
+        new_dirs.extend(random.choices(names, k=40))
+    new_dirs = [n for n in new_dirs if n not in dirs]
+    random.shuffle(new_dirs)
+    dirs.extend(new_dirs[:200-len(dirs)])
+    return dirs
 
 
-def has_srl_stream():
-    try:
-        import srl_stream
-    except ImportError:
-        print('Unfortunately, you cant use the library unless you are part of NVIDIA Seattle Robotics lab')
-        return False
-    return True
+def get_sample_envs_for_corl():
+    task_scenes = {
+        'mm_one_fridge_pick': ['5', '226', '229', '232', '288', '295', '311'],
+        'mm_one_fridge_table_on': ['48', '69', '168', '248', '296', '325', '313'],
+        'mm_one_fridge_table_in': ['7', '88', '97', '202', '305', '394', '419', '466'],
+        'mm_two_fridge_in': ['36', '104', '186', '294', '346', '405', '473', '493', '498', '502'],
+        'mm_two_fridge_pick': ['222', '347', '472']
+    }
+    dirs = []
+    for k, v in task_scenes.items():
+        for i in v:
+            dirs.append(join(MAMAO_DATA_PATH, k, i))
+    random.shuffle(dirs)
+    return dirs
 
 
-def has_getch():
-    try:
-        import getch
-    except ImportError:
-        print('Please install has_getch in order to use `step_by_step`: ```pip install getch```\n')
-        return False
-    return True
+def get_sample_envs_for_rss(task_name=None, count=None):
+    task_scenes = {
+        'mm_storage': ['1085', '1097', '1098', '1105', '1110', '1182', '1218', '1232', '1234', '1253', '1257'],
+        'mm_sink': ['1514', '1566', '1612', '1649', '1812', '2053', '2110', '2125', '2456', '2534', '2535', '2576', '2613'],
+        'mm_braiser': ['688', '810', '813', '814', '816', '824', '825', '830', '831', '915', '917', '927', '931', '939', '948', '949', '950', '1099', '1100', '1101', '1102', '1107', '1108', '1109', '1110', '1115', '1116', '1118', '1120', '1125', '1127', '1132', '1143', '1144', '1151', '1152'],
+        'mm_storage_long': ['0', '2', '3', '9', '19', '26', '31', '40', '42', '44', '47'],
+    }
+    dirs = []
+    if task_name is not None:
+        task_scenes = {task_name: task_scenes[task_name]}
+    for k, v in task_scenes.items():
+        for i in v:
+            dirs.append(join(MAMAO_DATA_PATH, k, i))
+    return make_count(dirs, count)
+
+
+def get_sample_envs_full_kitchen(count=4, data_dir='test_full_kitchen_100'):
+    from pigi_tools.data_utils import load_planning_config
+    # data_dir = join('/home/yang/Documents/kitchen-worlds/outputs', data_dir)
+    # dirs = [join(data_dir, f) for f in listdir(data_dir) if isdir(join(data_dir, f))]
+    task_names = ['mm_storage', 'mm_sink', 'mm_braiser',
+                  'mm_sink_to_storage', 'mm_braiser_to_storage']
+    num_per_problem = math.ceil(count / len(task_names))
+    dirs = []
+    for t in task_names:
+        task_dir = join(MAMAO_DATA_PATH, t)
+        run_dirs = [join(task_dir, f) for f in listdir(task_dir) if isdir(join(task_dir, f))]
+        cleaned_dirs = []
+        for rr in run_dirs:
+            conf = load_planning_config(rr)
+            if 'cfree' in conf and isinstance(conf['cfree'], float):
+                cleaned_dirs.append(rr)
+        dirs.extend(cleaned_dirs)
+        # dirs.extend(random.sample(run_dirs, num_per_problem))
+    random.shuffle(dirs)
+    return make_count(dirs, count)
+
+
+def make_count(dirs, count=None):
+    random.shuffle(dirs)
+    if count is None:
+        return dirs
+    if count <= len(dirs):
+        dirs = dirs[:count]
+    else:
+        dirs = random.choices(dirs, k=count)
+    return dirs
+
+
+if __name__ == '__main__':
+    find_duplicate_worlds('mm', 'ww')
+    find_duplicate_worlds('mm', 'ff')
+    find_duplicate_worlds('ww', 'ff')

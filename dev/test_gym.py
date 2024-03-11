@@ -1,14 +1,12 @@
-from os.path import join, isdir, getsize, abspath
+from os.path import join, getsize, abspath
 import sys
-from os import listdir
 import numpy as np
 import shutil
-import random
-from examples.config import MAMAO_DATA_PATH, ASSET_PATH
 from pybullet_tools.utils import connect
 from isaac_tools.gym_utils import images_to_gif, load_obj_shots_bg, take_obj_shot
 
-from test_utils import copy_dir_for_process, get_sample_envs_200
+from config import MAMAO_DATA_PATH, ASSET_PATH
+from examples.test_utils import copy_dir_for_process, get_sample_envs_200
 
 
 ###########################################################################
@@ -82,7 +80,7 @@ def test_load_objects(save_obj_shots=False, width=1980, height=1238):
     from srl_stream.gym_world import create_single_world, default_arguments
     from pybullet_tools.utils import pose_from_tform
     from trimesh import transformations
-    from world_builder.partnet_scales import MODEL_SCALES, MODEL_HEIGHTS
+    from world_builder.asset_constants import MODEL_SCALES, MODEL_HEIGHTS
     from world_builder.world_utils import get_instances, get_scale_by_category
 
     connect(use_gui=False, shadows=False, width=width, height=height)
