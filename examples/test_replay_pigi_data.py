@@ -3,9 +3,26 @@
 from __future__ import print_function
 from os.path import join
 from world_builder.paths import PBP_PATH
-from pigi_tools.replay_utils import run_replay
+from pigi_tools.replay_utils import load_replay_conf, run_one, case_filter
+from test_utils import process_all_tasks
 
 CONFIG_YAML_PATH = join(PBP_PATH, 'pigi_tools', 'config', 'replay_rss.yaml')
+
+
+def run_replay(config_yaml_file, load_data_fn):
+    c = load_replay_conf(config_yaml_file)
+
+    def process(run_dir_ori):
+        return run_one(run_dir_ori, load_data_fn=load_data_fn, **c)
+
+    def _case_filter(run_dir_ori):
+        case_kwargs = dict(given_path=c['given_path'], cases=c['cases'], check_collisions=c['check_collisions'],
+                           save_jpg=c['save_jpg'], save_gif=c['save_gif'],
+                           skip_if_processed_recently=c['skip_if_processed_recently'], check_time=c['check_time'])
+        return case_filter(run_dir_ori, **case_kwargs)
+
+    process_all_tasks(process, c['task_name'], parallel=c['parallel'], cases=c['cases'],
+                      path=c['given_path'], dir=c['given_dir'], case_filter=_case_filter)
 
 
 if __name__ == '__main__':
