@@ -252,4 +252,5 @@ dependencies:
     - widgetsnbextension==3.6.1
     - yourdfpy==0.0.51
     - zipp==3.8.1
+    - tqdm
 prefix: /home/yang/miniconda3/envs/kitchen

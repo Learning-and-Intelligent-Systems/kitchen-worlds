@@ -105,7 +105,7 @@ Generate layout only:
 python examples/test_world_builder.py -c kitchen_full_feg.yaml
 ```
 
-Replay the generated trajectory and generates a `replay.gif` in a given path to the data directory (containing `scene.lisdf`, `problem.pddl`, `commands.pkl`), for example:
+Replay the generated trajectory in a given path to the data directory (containing `scene.lisdf`, `problem.pddl`, `commands.pkl`). Example configuration files are provided in [kitchen-worlds/pybullet_planning/pigi_tools/configs](https://github.com/zt-yang/pybullet_planning/blob/master/pigi_tools/configs/replay_rss.yaml). You can modify the options in config file to generate mp4, jpg, and gif.
 
 ```shell
 python examples/test_replay_pigi_data.py --path /home/yang/Documents/kitchen-worlds/outputs/test_feg_kitchen_mini/230214_205947

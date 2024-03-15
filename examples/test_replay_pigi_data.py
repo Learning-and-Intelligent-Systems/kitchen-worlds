@@ -2,11 +2,23 @@
 
 from __future__ import print_function
 from os.path import join
-from world_builder.paths import PBP_PATH
+
+from config import PBP_PATH
+from data_generator.run_utils import get_config_file_from_argparse
 from pigi_tools.replay_utils import load_replay_conf, run_one, case_filter
 from test_utils import process_all_tasks
 
-CONFIG_YAML_PATH = join(PBP_PATH, 'pigi_tools', 'config', 'replay_rss.yaml')
+REPLAY_CONFIG_PATH = join(PBP_PATH, 'pigi_tools', 'config')
+DEFAULT_CONFIG_NAME = 'replay_rss.yaml'
+DEFAULT_CONFIG_PATH = None
+
+## or replace with your path to config yaml file
+DEFAULT_CONFIG_NAME = None
+DEFAULT_CONFIG_PATH = join(REPLAY_CONFIG_PATH, DEFAULT_CONFIG_NAME)
+
+config_file = get_config_file_from_argparse(default_config_name=DEFAULT_CONFIG_NAME,
+                                            default_config_path=DEFAULT_CONFIG_PATH,
+                                            default_config_dir=REPLAY_CONFIG_PATH)
 
 
 def run_replay(config_yaml_file, load_data_fn):
@@ -28,7 +40,7 @@ def run_replay(config_yaml_file, load_data_fn):
 if __name__ == '__main__':
     from pigi_tools.replay_utils import load_pigi_data_complex
 
-    run_replay(CONFIG_YAML_PATH, load_pigi_data_complex)
+    run_replay(config_file, load_pigi_data_complex)
 
     # replay_all_in_gym(num_rows=14, num_cols=14, world_size=(6, 6), save_gif=True)
 
