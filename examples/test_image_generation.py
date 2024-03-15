@@ -14,10 +14,12 @@ DATASET_ROOT = join(dirname(__file__), '..', 'outputs')
 
 DEFAULT_TASK = 'test_feg_kitchen_full'
 GIVEN_PATH = None
-PARALLEL = False and (GIVEN_PATH is None)
+PARALLEL = False
 USE_VIEWER = True
-GENERATE_SEG = False  ## generate RGB only
 
+##########################################################################################
+
+GENERATE_SEG = False  ## generate RGB only
 N_PX = 224
 REDO = True
 MODIFIED_TIME = 1675535195
@@ -25,8 +27,7 @@ LARGER_WORLD = 'mm_' in DEFAULT_TASK or 'tt_' in DEFAULT_TASK
 NEW_KEY = 'channel7'
 ACCEPTED_KEYS = [NEW_KEY, 'crop_fix', 'rgb', 'meraki']
 
-
-parser = get_data_processing_parser(task_name=DEFAULT_TASK, parallel=PARALLEL, use_viewer=USE_VIEWER)
+parser = get_data_processing_parser(task_name=DEFAULT_TASK, given_path=GIVEN_PATH, parallel=PARALLEL, use_viewer=USE_VIEWER)
 parser.add_argument('--seg', action='store_true', default=GENERATE_SEG)
 parser.add_argument('--redo', action='store_true', default=REDO)
 parser.add_argument('--larger_world', action='store_true', default=LARGER_WORLD)

@@ -77,157 +77,54 @@ pip install git+https://github.com/mjd3/tracikpy.git
 
 ## Examples
 
+
 ### Generate Worlds, Problems, and Plans
 
-Collecting data involves generating scene layout `scene.lisdf`, `problem.pddl`, `plan.json`, and trajectory `commands.pkl`. It can be run without gui (faster) and can be run in parallel. Note that planning is not guaranteed to be return a solution within timeout, depending on the domain.
+Collecting data involves generating data folders that include scene layout `scene.lisdf`, `problem.pddl`, `plan.json`, and trajectory `commands.pkl`. It can be run without gui (faster) and can be run in parallel. Note that planning is not guaranteed to be return a solution within timeout, depending on the domain.
 
 There are two scripts for collecting data:
 
-One is simpler, cleaner, and more adaptable for your tasks. Example configuration files are provided in [kitchen-worlds/pybullet_planning/data_generation/configs](https://github.com/zt-yang/pybullet_planning/blob/master/data_generation/configs/kitchen_full_feg.yaml):
-
+1) One is simpler, cleaner, and more adaptable for your tasks. It supports parallel data collection (change to `parallel: true; n_data: 10` in config yaml file). Example configuration files are provided in [kitchen-worlds/pybullet_planning/data_generator/configs](https://github.com/zt-yang/pybullet_planning/blob/master/data_generator/configs/kitchen_full_feg.yaml):
 
 ```shell
-python examples/test_data_generation.py -n kitchen_full_pr2.yaml  ## PR2 with extended torso range
-python examples/test_data_generation.py -n kitchen_full_feg.yaml  ## floating franka gripper
+python examples/test_data_generation.py --name kitchen_full_pr2.yaml  ## PR2 with extended torso range
+python examples/test_data_generation.py --name kitchen_full_feg.yaml  ## floating franka gripper
+python examples/test_data_generation.py --path {path/to/your/custom_data_config.yaml}
 ```
 
-The other uses a more general set of classes and processes. It supports replaning and continuously interacting with the environment. It was used to generate data for PIGINet [Sequence-Based Plan Feasibility Prediction for Efficient Task and Motion Planning](https://piginet.github.io/). Example configuration files are provided in [kitchen-worlds/pybullet_planning/cogarch_tools/configs](https://github.com/zt-yang/pybullet_planning/blob/master/cogarch_tools/configs/config_pigi.yaml):
+2) The other uses a more general set of classes and processes. It supports replaning and continuously interacting with the environment. It was used to generate data for PIGINet [Sequence-Based Plan Feasibility Prediction for Efficient Task and Motion Planning](https://piginet.github.io/). Example configuration files are provided in [kitchen-worlds/pybullet_planning/cogarch_tools/configs](https://github.com/zt-yang/pybullet_planning/blob/master/cogarch_tools/configs/config_pigi.yaml):
 
 ```shell
 python examples/test_data_generation_pigi.py  ## PR2 with extended torso range
 ```
 
+The outputs from both scripts will be one or multiple data folders that you can use as input to the following post-processing scripts.
+
+For example, a path may be `/home/yang/Documents/kitchen-worlds/outputs/test_feg_kitchen_mini/230214_205947`. You may also use the parent folder name `test_feg_kitchen_mini` as input to process all data folders for that task.
+
 ### Generate Images and Videos
+
+Render images from camera poses given in `planning_config.json` of the data folders, which originates from the `camera_poses` field of data generation config files. The output images will be in their original data folders.
+
+```shell
+python examples/test_image_generation.py --task {path/to/your/task_name/data_dir}
+python examples/test_image_generation.py --path {task_name}
+```
+
+Replay the generated trajectory in a given data path. Example configuration files are provided in [kitchen-worlds/pybullet_planning/pigi_tools/configs](https://github.com/zt-yang/pybullet_planning/blob/master/pigi_tools/configs/replay_rss.yaml). You can modify the options in config file to generate mp4, jpg, and gif.
+
+```shell
+python examples/test_replay_pigi_data.py --name replay_rss.yaml
+python examples/test_replay_pigi_data.py --path {path/to/your/custom_replay_config.yaml}
+```
+
+### Customize Your Layout or Goals
 
 Generate layout only:
 
 ```shell
 python examples/test_world_builder.py -c kitchen_full_feg.yaml
 ```
-
-Replay the generated trajectory in a given path to the data directory (containing `scene.lisdf`, `problem.pddl`, `commands.pkl`). Example configuration files are provided in [kitchen-worlds/pybullet_planning/pigi_tools/configs](https://github.com/zt-yang/pybullet_planning/blob/master/pigi_tools/configs/replay_rss.yaml). You can modify the options in config file to generate mp4, jpg, and gif.
-
-```shell
-python examples/test_replay_pigi_data.py --path /home/yang/Documents/kitchen-worlds/outputs/test_feg_kitchen_mini/230214_205947
-```
-
-### Solve a Problem Again
-
-----------
-
-The test scripts below this line haven't been tested as of Nov 2023. Will be updated soon.
-
-----------
-
-## Examples (obsolete)
-
-### Test planner for MALAO project
-
-```
-(cd tests; ./rerun.sh)
-```
-
-
-### LISDF parser testing
-
-To run all tests before git push, do
-```commandline
-cd tests
-sh run_tests.sh
-```
-
-To test basic lisdf functions
-```commandline
-## Test LISDF parser
-python test_parse_lisdf.py
-
-## Test load LISDF to Pybullet
-python test_pybullet_lisdf.py
-
-##  Test parse problem.pddl
-python test_parse_pddl.py
-```
-
-### Planning
-
-To solve some test problems wih PDDLStream, `-test` takes the name of subdirectory inside `test_cases` folder.
-
-```commandline
-cd pybullet_planning/tests
-python test_pddlstream.py -test test_fridges_tables
-python test_floating_gripper.py -test test_feg_pick
-```
-
-Some test cases (verified that they can run on Ubuntu with Python 3.7/3.8):
-
-<table class="multicol">
-<tr>
-<td width="50%">
-
-<img src="gifs/220613-clean-only.gif"></img>
-
-</td>
-<td width="50%">
-
-<img src="gifs/220613-rearraneg-only.gif"></img>
-
-</td>
-</tr>
-<tr>
-<td width="50%">
-
-`test_feg_clean_only`
-
-</td>
-<td width="50%">
-
-`test_feg_cabinets_rearrange`
-
-</td>
-</tr>
-</table>
-
-Note: There may be weird bounding boxes drawn during planning and pybullet throwing errors. if that happens and planning doesn't return a solution. Stop the script and run again. It may be a pybullet problem (happens only in Ubutun with python 3.8 but not MacOS with python 3.7)
-
-Other test cases (to be uploaded soon):
-
-<table class="multicol">
-
-<tr>
-<td width="50%">
-
-<img src="gifs/220602-serve-plate.gif"></img>
-
-</td>
-<td width="50%">
-
-<img src="gifs/220531-cook-only.gif"></img>
-
-</td>
-</tr>
-<tr>
-<td width="50%">
-
-`test_feg_dishwasher` (currently unavailable)
-
-</td>
-<td width="50%">
-
-`test_feg_cook_only` (currently unavailable)
-
-</td>
-</tr>
-</table>
-
-### Scene generation
-
-To build some scenes.
-
-```commandline
-python test_world_builder.py
-```
-
-The default script creates 10 scenes with variations on the following properties of movable objects: (1) mesh model instances, (2) poses on their assigned surface or space.
 
 ## Acknowledgements
 
@@ -242,23 +139,3 @@ All the object models and urdf files are downloaded for free from the following 
 * most articulated object models are downloaded from [PartNet Mobility dataset](https://sapien.ucsd.edu/browse) (Mo, Kaichun, et al. "Partnet: A large-scale benchmark for fine-grained and hierarchical part-level 3d object understanding." *Proceedings of the IEEE/CVF conference on computer vision and pattern recognition*. 2019.)
 * most kitchen object models are downloaded from [Free3D](https://free3d.com/3d-models/food).
 
-
-## TODO
-
-- [x] add `requirements.txt`
-- [x] upload test scene files in the format of `.lisdf` -> need lisdf team to support a few more tags, including
-  ``````xml
-  <include><uri>...</uri></include>
-  <state>...</state>
-  ``````
-- [x] upload test scene files with `<world><gui><camera><pose>`
-- [x] update problem files in the format of `problem.pddl`
-- [x] upload implicit domain files in the format of `domain.pddl`
-- [x] add instructions to solve the example problems with TAMP planner [PDDLStream](https://github.com/caelan/pddlstream/tree/main)
-
-- [ ] run PDDLStream on one problem in each category, with the same domain, different scenes and goals
-- [ ] run PDDLStream with execution noise
-- [ ] run PDDLStream+HPN with execution noise
-- [ ] run TTM with execution noise
-- [ ] add instructions on sampling scenes
-- [ ] add instructions on sampling goals
