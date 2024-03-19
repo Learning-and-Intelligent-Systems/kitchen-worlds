@@ -1,7 +1,7 @@
 ## all relative paths in this file has pybullet_planning as the root dir
 
 ## debug related
-seed: 662122
+seed: null
 verbose: true
 
 ## configuration for PDDLStream
