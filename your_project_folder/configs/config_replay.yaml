@@ -1,0 +1,52 @@
+## ---- data source
+task_name: 'mm_braiser'
+given_dir: null
+cases: null
+parallel: false
+skip_if_processed_recently: false
+check_time: 1674417578
+
+## ---- path -- absolute path or relative to `pybullet_planning`
+
+#given_path: '/home/yang/Documents/fastamp-data-rss/mm_braiser_to_storage/105'
+#camera_kwargs: { camera_point: (6, 3, 3), camera_target: (0, 3, 1) }
+
+#given_path: '/home/yang/Documents/fastamp-data-rss/mm_braiser_to_storage/34'
+#camera_kwargs: { target_point_begin: [0.5, 3, 1], target_point_final:[0.5, 3, 1],
+#                 camera_point_begin: [8, 3, 3], camera_point_final: [8, 3, 3] }
+
+given_path: '/Users/z/Documents/simulators/kitchen-worlds/outputs/test_feg_kitchen_full/240314_162621'
+camera_kwargs: { target_point_begin: [0.5, 3, 1], target_point_final:[0.5, 3, 1],
+                 camera_point_begin: [8, 3, 3], camera_point_final: [8, 3, 3] }
+
+## ---- control
+preview_scene: false
+step_by_step: false
+use_gym: false
+auto_play: true
+verbose: false
+
+## ---- visual
+width: 1440
+height: 1120
+fx: 600
+camera_point: (8.5, 2.5, 3)
+target_point: (0, 2.5, 0)
+#camera_kwargs: null
+camera_movement: null
+light_conf: null
+
+## ---- purposes
+check_collisions: false
+cfree_range: 0.1
+visualize_collisions: false
+evaluate_quality: false
+
+## ---- outputs
+save_jpg: false
+save_composed_jpg: true
+save_gif: false
+save_animation_json: false
+save_mp4: false
+mp4_side_view: false
+mp4_top_view: false

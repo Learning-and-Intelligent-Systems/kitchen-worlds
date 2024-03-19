@@ -75,6 +75,33 @@ pip install git+https://github.com/mjd3/tracikpy.git
 ```
 
 
+## Quick Start
+
+We suggest putting your custom data generation code and config files inside a directory on the same level as `kitchen-worlds/pybullet_planning` in the project repo. For example, in `kitchen-worlds/your_project_folder`
+
+### To generate PIGINet data
+
+The argument is name to your custom configuration file in [kitchen-worlds/your_project_folder/configs](https://github.com/Learning-and-Intelligent-Systems/kitchen-worlds/blob/master/your_project_folder/configs/config_generation_pigi.yaml):
+
+```shell
+## generates data folders with scene, problem, plan, trajectory
+python your_project_folder/run_generation_pigi_custom.py
+
+## render images, can run in parallel
+python your_project_folder/render_images_custom.py --task custom_piginet_data --parallel
+```
+
+### To generate custom data (different world layout, goals, robots, etc.)
+
+The argument is name to your custom configuration file in [kitchen-worlds/your_project_folder/configs](https://github.com/Learning-and-Intelligent-Systems/kitchen-worlds/blob/master/your_project_folder/configs/config_generation.yaml):
+
+Data can be generated in parallel on CPU (set flag in config yaml file).
+
+```shell
+## generates data folders with scene, problem, plan, trajectory
+python your_project_folder/run_generation_custom.py --config_name config_generation.yaml
+```
+
 ## Examples
 
 
@@ -87,9 +114,9 @@ There are two scripts for collecting data:
 1) One is simpler, cleaner, and more adaptable for your tasks. It supports parallel data collection (change to `parallel: true; n_data: 10` in config yaml file). Example configuration files are provided in [kitchen-worlds/pybullet_planning/data_generator/configs](https://github.com/zt-yang/pybullet_planning/blob/master/data_generator/configs/kitchen_full_feg.yaml):
 
 ```shell
-python examples/test_data_generation.py --name kitchen_full_pr2.yaml  ## PR2 with extended torso range
-python examples/test_data_generation.py --name kitchen_full_feg.yaml  ## floating franka gripper
-python examples/test_data_generation.py --path {path/to/your/custom_data_config.yaml}
+python examples/test_data_generation.py --config_name kitchen_full_pr2.yaml  ## PR2 with extended torso range
+python examples/test_data_generation.py --config_name kitchen_full_feg.yaml  ## floating franka gripper
+python examples/test_data_generation.py --config_path {path/to/your/custom_data_config.yaml}
 ```
 
 2) The other uses a more general set of classes and processes. It supports replaning and continuously interacting with the environment. It was used to generate data for PIGINet [Sequence-Based Plan Feasibility Prediction for Efficient Task and Motion Planning](https://piginet.github.io/). Example configuration files are provided in [kitchen-worlds/pybullet_planning/cogarch_tools/configs](https://github.com/zt-yang/pybullet_planning/blob/master/cogarch_tools/configs/config_pigi.yaml):

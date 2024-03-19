@@ -1,0 +1,70 @@
+## all relative paths in this file has pybullet_planning as the root dir
+
+## debug related
+seed: None
+verbose: true
+
+## pybullet related
+viewer: true
+lock: true
+simulate: false
+teleport: false
+drive: true
+cfree: false
+time_step: 0.05
+camera: true
+segment: false
+monitoring: false
+
+## data collection mode
+parallel: true
+n_data: 3
+
+
+robot:
+  robot_name: 'pr2'
+  builder_name: 'build_robot_from_args'
+  builder_kwargs:
+    ## x, y, z joint limits for base motion planning
+    custom_limits: [[0, -4, -0.5], [3, 8, 3]]
+    initial_xy: [2, 3]
+
+
+world:
+  ## method 1: use pre-specified builder inside world_builder/builders,
+  ##         followed by builder specific arguments
+  builder_name: 'test_kitchen_full'
+  builder_kwargs:
+    movable_categories: ['edible']
+    goal_predicates: ['openedjoint', 'holding', 'on', 'in']
+
+
+data:
+  out_dir: '../outputs/custom_pr2_kitchen_full/'
+  save_failed_plans: true
+  save_log: true
+  save_commands: true
+  ## by default images are generated afterward in batch by test_image_generation.py
+  images:
+    save_rgb: true
+    save_depth: false
+  resolution: [1280, 720]
+  fx: 800
+  ## {name: pose} pairs
+  cameras:
+    ## pose format 1: (point, quaternion)
+    front: [[6.84, 2.9, 1.3], [0.5, 0.5, -0.5, -0.5]]
+    ## pose format 2: (camera_point, target_point)
+    top: [[2, 4, 3], [0, 4, 1]]
+    ## pose format 3: (object_name, delta_to_target)
+    zoomin1: ['minifridge', [2, 0, 2]]
+
+
+## configuration for PDDLStream
+planner:
+  timeout: 300
+  domain_pddl: 'pddl/pr2_domain_pigi.pddl'
+  stream_pddl: 'pddl/pr2_stream_pigi.pddl'
+  diverse: false
+  downward_time: 1
+  dataset: false

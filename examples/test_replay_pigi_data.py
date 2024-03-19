@@ -4,9 +4,8 @@ from __future__ import print_function
 from os.path import join
 
 from config import PBP_PATH
-from data_generator.run_utils import get_config_file_from_argparse
+from data_generator.run_utils import get_config_file_from_argparse, process_all_tasks
 from pigi_tools.replay_utils import load_replay_conf, run_one, case_filter
-from test_utils import process_all_tasks
 
 REPLAY_CONFIG_PATH = join(PBP_PATH, 'pigi_tools', 'config')
 DEFAULT_CONFIG_NAME = 'replay_rss.yaml'

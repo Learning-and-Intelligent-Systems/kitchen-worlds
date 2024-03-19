@@ -12,8 +12,7 @@ from os import listdir
 from os.path import join, isdir, isfile
 
 # from utils import load_lisdf_synthesizer
-from data_generator.run_utils import copy_dir_for_process, get_data_processing_parser
-from test_utils import process_all_tasks
+from data_generator.run_utils import copy_dir_for_process, get_data_processing_parser, process_all_tasks
 
 # DEFAULT_TASK = 'mm'
 DEFAULT_TASK = 'tt'
@@ -25,7 +24,7 @@ CASES = None  ## ['0'] | None
 PARALLEL = True
 USE_VIEWER = False
 
-parser = get_data_processing_parser(task_name=DEFAULT_TASK, parallel=PARALLEL, use_viewer=USE_VIEWER)
+parser = get_data_processing_parser(task_name=DEFAULT_TASK, parallel=PARALLEL, viewer=USE_VIEWER)
 args = parser.parse_args()
 
 USE_VIEWER = args.viewer
