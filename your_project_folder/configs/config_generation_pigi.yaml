@@ -1,7 +1,7 @@
 ## all relative paths in this file has pybullet_planning as the root dir
 
 ## debug related
-seed: 663064
+seed: null
 verbose: true
 
 ## configuration for PDDLStream
@@ -11,21 +11,22 @@ planner:
   use_heuristic_fc: false
   dataset_mode: true
   downward_time: 10
-  evaluation_time: 20
-  stream_planning_timeout: 30
-  total_planning_timeout: 60
-  max_plans: 40
+  evaluation_time: 30
+  stream_planning_timeout: 60
+  total_planning_timeout: 360
+  max_plans: 25
   max_solutions: 1
   log_failures: false
 
 ## specify the TAMP problem with preconfigured scene layout & robot
 problem:
   problem: 'test_full_kitchen'
-  goal_variations: [1]
+  goal_variations: [21]
   domain_pddl: 'pr2_domain_pigi.pddl'
   stream_pddl: 'pr2_stream_pigi.pddl'
   use_skeleton_constraints: false
   use_subgoal_constraints: false
+  use_all_grasps: false
   use_rel_pose: false
   preview_plan: false
   preview_scene: false

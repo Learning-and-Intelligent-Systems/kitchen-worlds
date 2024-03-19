@@ -102,8 +102,9 @@ Data can be generated in parallel on CPU (set flag in config yaml file).
 python your_project_folder/run_generation_custom.py --config_name config_generation.yaml
 ```
 
-## Examples
+---
 
+## Examples
 
 ### Generate Worlds, Problems, and Plans
 
