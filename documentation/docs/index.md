@@ -1,10 +1,10 @@
 # Kitchen Worlds
 
-A library of long-horizon Task-and-Motion-Planning (TAMP) problems in kitchen and household scenes, as well as planners to solve them
+A library of long-horizon Task-and-Motion-Planning (TAMP) problems in kitchen and household scenes, as well as planning algorithms to solve them
 
 - procedurally generate scenes with rigid and articulated objects
 - visualize a scene in LISDF format (an extension to SDF that includes URDF)
-- solve using PDDLStream a TAMP problem defined by a `scene.lisdf` and `problem.pddl` using existing `domain.pddl` and `stream.pddl`
+- solve a TAMP problem defined by a `scene.lisdf` and `problem.pddl` using existing `domain.pddl` and `stream.pddl` using PDDLStream
 - visualize the robot trajectory in pybullet
 
 <img src="gifs/demo-cabbage.gif"></img>
@@ -35,7 +35,7 @@ A library of long-horizon Task-and-Motion-Planning (TAMP) problems in kitchen an
 </table>
 -->
 
-## Setting Up
+## Installation
 
 Clone the repo along with the submodules. It may take a while.
 
@@ -43,8 +43,10 @@ Clone the repo along with the submodules. It may take a while.
 git clone git@github.com:Learning-and-Intelligent-Systems/kitchen-worlds.git --recursive
 ```
 
-Install dependencies. Install [graphviz](https://pygraphviz.github.io/documentation/latest/install.html).
-
+Install dependencies. 
+<!-- 
+Install [graphviz](https://pygraphviz.github.io/documentation/latest/install.html).
+-->
 ```shell
 conda env create -f environment.yml
 conda activate kitchen
@@ -60,22 +62,41 @@ Build FastDownward, used by PDDLStream planner
 
 Build IK solvers (If using PR2; skip this if you're only using floating gripper).
 
-1) IKFast solver for PR2 arm planning (the default IK):
+1) IKFast solver for arm planning (the default IK), which needs to be compiled for each robot type. Here's example for PR2:
 
 ```shell
 ## sudo apt-get install python-dev
 (cd pybullet_planning/pybullet_tools/ikfast/pr2; python setup.py)
 ```
 
-2) TracIK for PR2 whole-body IK that solves for base, torso, and arm together (this is better, but requires Ubuntu):
+2) (If on Ubuntu, this one is better) TracIK for whole-body IK that solves for base, torso, and arm together
 
 ```shell
 sudo apt-get install libeigen3-dev liborocos-kdl-dev libkdl-parser-dev liburdfdom-dev libnlopt-dev libnlopt-cxx-dev swig
 pip install git+https://github.com/mjd3/tracikpy.git
 ```
 
+### Test Installation
 
-## Quick Start
+```shell 
+conda activate pybullet
+python examples/test_parse_lisdf.py
+python examples/test_data_generation.py
+```
+
+---
+
+<!--
+
+## Tutorials
+
+Here are some example scripts to help you understand the scene generation and task and motion planning tools 
+
+--- 
+
+-->
+
+## Quick Start Your Scene or Trajectory Generation Pipeline
 
 We suggest putting your custom data generation code and config files inside a directory on the same level as `kitchen-worlds/pybullet_planning` in the project repo. For example, in `kitchen-worlds/your_project_folder`
 
@@ -154,7 +175,11 @@ Generate layout only:
 python examples/test_world_builder.py -c kitchen_full_feg.yaml
 ```
 
+---
+
 ## Acknowledgements
+
+The development is partially performed during internship at NVIDIA Research, Seattle Robotics Lab.
 
 This repo works thanks for the tools provided by LIS lab members and alum:
 

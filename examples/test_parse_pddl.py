@@ -1,5 +1,7 @@
-from config import ASSET_PATH
-from os.path import join
+import shutil
+
+from config import ASSET_PATH, OUTPUT_PATH, PBP_PATH, TEMP_PATH
+from os.path import join, isdir
 import lisdf.components as C
 from lisdf.parsing import load_all
 
@@ -11,14 +13,21 @@ def get_name(f):
 
 
 if __name__ == '__main__':
+    """
+    currently broken due to lisdf version problem, ignore this for now
+        lark.exceptions.UnexpectedCharacters: No terminal matches 'f' in the current parser context, at line 197 col 5
+    """
 
-    lisdf_file = join(ASSET_PATH, 'scenes/kitchen_lunch.lisdf')
-    domain_file = join(ASSET_PATH, 'pddl/test_kitchen_lunch_domain.pddl')
-    problem_file = join(ASSET_PATH, 'pddl/test_kitchen_lunch.pddl')
+    ## the scene.lisdf file assumes that the problem directory is two levels below project directory, instead of 3
+    problem_dir = join(OUTPUT_PATH, 'test_pr2_kitchen_full', '240309_123733')
+    temp_dir = join(TEMP_PATH, 'test_pr2_kitchen_full_240309_123733')
+    if isdir(temp_dir):
+        shutil.rmtree(temp_dir)
+    shutil.copytree(problem_dir, temp_dir)
 
-    lisdf_file = join(ASSET_PATH, 'scenes/scene.lisdf')
-    domain_file = join(ASSET_PATH, 'pddl/domain.pddl')
-    problem_file = join(ASSET_PATH, 'pddl/problem.pddl')
+    lisdf_file = join(temp_dir, 'scene.lisdf')
+    problem_file = join(temp_dir, 'problem.pddl')
+    domain_file = join(PBP_PATH, 'pddl_domains/mobile_v5_domain.pddl')
 
     lisdf, domain, problem = load_all(lisdf_file, domain_file, problem_file)
 
@@ -34,3 +43,4 @@ if __name__ == '__main__':
                     print(" ", arg.to_pddl(), end='\r')
 
     print(f'finished loading scene = {get_name(lisdf_file)}, domain = {get_name(domain_file)}, problem_file = {get_name(problem_file)}')
+    shutil.rmtree(temp_dir)

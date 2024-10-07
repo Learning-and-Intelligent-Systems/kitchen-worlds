@@ -12,7 +12,7 @@
 
 
     <include name="pr2">    
-      <uri>../models/drake/pr2_description/urdf/pr2_simplified.urdf</uri>
+      <uri>../../pybullet_planning/models/drake/pr2_description/urdf/pr2_simplified.urdf</uri>
       <pose>1.79 6.0 0.051 0.0 -0.0 3.142</pose>
     </include>            
 
