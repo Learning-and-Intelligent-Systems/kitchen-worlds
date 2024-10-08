@@ -86,13 +86,60 @@ python examples/test_data_generation.py
 
 ---
 
+## Tutorial
+
+Here are some example scripts to help you understand the scene generation and task and motion planning tools. Once they are all working for you, we recommend you follow the next section to set up your own data generation pipeline with custom config files.
+
+### Generate Worlds, Problems, and Plans
+
+Generating data involves creating data folders that include scene layout `scene.lisdf`, `problem.pddl`, `plan.json`, and trajectory `commands.pkl`. It can be run without gui (faster) and can be run in parallel. Note that planning is not guaranteed to be return a solution within timeout, depending on the domain.
+
+There are two scripts for collecting data. Note that both script may result in a failed output folder or early stop of simulation because the problem can't be solved, e.g. when the world generation script failed to find an initial world configuration for randomly sampled objects.
+
+1) One is simpler, cleaner, and more adaptable for your tasks. It supports parallel data collection (change to `parallel: true; n_data: 10` in config yaml file). Example configuration files are provided in [kitchen-worlds/pybullet_planning/data_generator/configs](https://github.com/zt-yang/pybullet_planning/blob/master/data_generator/configs/kitchen_full_feg.yaml):
+
+```shell
+python examples/test_data_generation.py --config_name kitchen_full_pr2.yaml  ## PR2 with extended torso range
+python examples/test_data_generation.py --config_name kitchen_full_feg.yaml  ## floating franka gripper
+python examples/test_data_generation.py --config_path {path/to/your/custom_data_config.yaml}
+```
+
+2) The other uses a more general set of classes and processes. It supports replaning and continuously interacting with the environment. It was used to generate data for PIGINet [Sequence-Based Plan Feasibility Prediction for Efficient Task and Motion Planning](https://piginet.github.io/). Example configuration files are provided in [kitchen-worlds/pybullet_planning/cogarch_tools/configs](https://github.com/zt-yang/pybullet_planning/blob/master/cogarch_tools/configs/config_pigi.yaml):
+
+```shell
+python examples/test_data_generation_pigi.py  ## PR2 with extended torso range
+```
+
+Once a plan is generated and console stopped generated more logs, press Enter to visualize execution.
+
 <!--
+The outputs from both scripts will be one or multiple data folders that you can use as input to scripts for rendering images and videos described in the next section.
 
-## Tutorials
+For example, a path may be `/home/yang/Documents/kitchen-worlds/outputs/test_feg_kitchen_mini/230214_205947`. You may also use the parent folder name `test_feg_kitchen_mini` as input to process all data folders for that task.
 
-Here are some example scripts to help you understand the scene generation and task and motion planning tools 
+### Generate Images and Videos
 
---- 
+Render images from camera poses given in `planning_config.json` of the data folders, which originates from the `camera_poses` field of data generation config files. The output images will be in their original data folders.
+
+```shell
+python examples/test_image_generation.py --task {path/to/your/task_name/data_dir}
+python examples/test_image_generation.py --path {task_name}
+```
+
+Replay the generated trajectory in a given data path. Example configuration files are provided in [kitchen-worlds/pybullet_planning/pigi_tools/configs](https://github.com/zt-yang/pybullet_planning/blob/master/pigi_tools/configs/replay_rss.yaml). You can modify the options in config file to generate mp4, jpg, and gif.
+
+```shell
+python examples/test_replay_pigi_data.py --name replay_rss.yaml
+python examples/test_replay_pigi_data.py --path {path/to/your/custom_replay_config.yaml}
+```
+
+### Customize Your Layout or Goals
+
+Generate layout only:
+
+```shell
+python examples/test_world_builder.py -c kitchen_full_feg.yaml
+```
 
 -->
 
@@ -155,61 +202,7 @@ Given path, for example, `timestamped_data_dir = 'custom_pr2_kitchen_full/241007
 python your_project_folder/run_replay_custom.py -p {timestamped_data_dir}
 ```
 
-<!--
 
----
-
-## Examples
-
-### Generate Worlds, Problems, and Plans
-
-Collecting data involves generating data folders that include scene layout `scene.lisdf`, `problem.pddl`, `plan.json`, and trajectory `commands.pkl`. It can be run without gui (faster) and can be run in parallel. Note that planning is not guaranteed to be return a solution within timeout, depending on the domain.
-
-There are two scripts for collecting data:
-
-1) One is simpler, cleaner, and more adaptable for your tasks. It supports parallel data collection (change to `parallel: true; n_data: 10` in config yaml file). Example configuration files are provided in [kitchen-worlds/pybullet_planning/data_generator/configs](https://github.com/zt-yang/pybullet_planning/blob/master/data_generator/configs/kitchen_full_feg.yaml):
-
-```shell
-python examples/test_data_generation.py --config_name kitchen_full_pr2.yaml  ## PR2 with extended torso range
-python examples/test_data_generation.py --config_name kitchen_full_feg.yaml  ## floating franka gripper
-python examples/test_data_generation.py --config_path {path/to/your/custom_data_config.yaml}
-```
-
-2) The other uses a more general set of classes and processes. It supports replaning and continuously interacting with the environment. It was used to generate data for PIGINet [Sequence-Based Plan Feasibility Prediction for Efficient Task and Motion Planning](https://piginet.github.io/). Example configuration files are provided in [kitchen-worlds/pybullet_planning/cogarch_tools/configs](https://github.com/zt-yang/pybullet_planning/blob/master/cogarch_tools/configs/config_pigi.yaml):
-
-```shell
-python examples/test_data_generation_pigi.py  ## PR2 with extended torso range
-```
-
-The outputs from both scripts will be one or multiple data folders that you can use as input to the following post-processing scripts.
-
-For example, a path may be `/home/yang/Documents/kitchen-worlds/outputs/test_feg_kitchen_mini/230214_205947`. You may also use the parent folder name `test_feg_kitchen_mini` as input to process all data folders for that task.
-
-### Generate Images and Videos
-
-Render images from camera poses given in `planning_config.json` of the data folders, which originates from the `camera_poses` field of data generation config files. The output images will be in their original data folders.
-
-```shell
-python examples/test_image_generation.py --task {path/to/your/task_name/data_dir}
-python examples/test_image_generation.py --path {task_name}
-```
-
-Replay the generated trajectory in a given data path. Example configuration files are provided in [kitchen-worlds/pybullet_planning/pigi_tools/configs](https://github.com/zt-yang/pybullet_planning/blob/master/pigi_tools/configs/replay_rss.yaml). You can modify the options in config file to generate mp4, jpg, and gif.
-
-```shell
-python examples/test_replay_pigi_data.py --name replay_rss.yaml
-python examples/test_replay_pigi_data.py --path {path/to/your/custom_replay_config.yaml}
-```
-
-### Customize Your Layout or Goals
-
-Generate layout only:
-
-```shell
-python examples/test_world_builder.py -c kitchen_full_feg.yaml
-```
-
--->
 
 ---
 
