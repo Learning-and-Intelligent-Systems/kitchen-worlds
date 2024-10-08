@@ -98,11 +98,17 @@ Here are some example scripts to help you understand the scene generation and ta
 
 ## Quick Start Your Scene or Trajectory Generation Pipeline
 
+(Last tested 7 Oct, 2024)
+
 We suggest putting your custom data generation code and config files inside a directory on the same level as `kitchen-worlds/pybullet_planning` in the project repo. For example, in `kitchen-worlds/your_project_folder`
 
-### To generate PIGINet data
+### Step 1a) To generate PIGINet data
+
+PIGINet data uses a specific procedure to generate scenes with randomized clutter. We recommend following 1b for your custom purposes.
 
 The argument is name to your custom configuration file in [kitchen-worlds/your_project_folder/configs](https://github.com/Learning-and-Intelligent-Systems/kitchen-worlds/blob/master/your_project_folder/configs/config_generation_pigi.yaml):
+
+Output will be in `outputs/{config.data.exp_subdir}/{timestamped_data_name}`.
 
 ```shell
 ## generates data folders with scene, problem, plan, trajectory
@@ -112,16 +118,44 @@ python your_project_folder/run_generation_pigi_custom.py
 python your_project_folder/render_images_custom.py --task custom_piginet_data --parallel
 ```
 
-### To generate custom data (different world layout, goals, robots, etc.)
+### Step 1b) To generate custom data (different world layout, goals, robots, etc.)
 
 The argument is name to your custom configuration file in [kitchen-worlds/your_project_folder/configs](https://github.com/Learning-and-Intelligent-Systems/kitchen-worlds/blob/master/your_project_folder/configs/config_generation.yaml):
 
 Data can be generated in parallel on CPU (set flag in config yaml file).
 
+Output will be in `outputs/{config.data.out_dir}/{timestamped_data_names}`.
+
 ```shell
 ## generates data folders with scene, problem, plan, trajectory
 python your_project_folder/run_generation_custom.py --config_name config_generation.yaml
 ```
+
+### Step 2) To render images for the generated scene
+
+To train vision language models using generated data, we generate images for all runs in one output subdirectory associated for a task / data generation batch. 
+
+For example, if data is generated using step 1b and default config is used, data will be generated in `outputs/custom_pr2_kitchen_full`, where `custom_pr2_kitchen_full` constitutes our task name here.
+
+Some camera poses are defined in code, some in `outputs/{task_name}/{timestamped_data_name}/planning_config.json`. 
+
+Output will be in each individual `outputs/{task_name}/{timestamped_data_name}/`
+
+```shell 
+python your_project_folder/render_images_custom.py --task {task_name}
+```
+
+### Step 3) To render video from successful planning runs
+
+Replay the trajectory for review or rendering
+
+Given path, for example, `timestamped_data_dir = 'custom_pr2_kitchen_full/241007_233942'`. Output will be in `{timestamped_data_dir}/`
+
+```shell
+python your_project_folder/run_replay_custom.py -p {timestamped_data_dir}
+```
+
+<!--
 
 ---
 
@@ -174,6 +208,8 @@ Generate layout only:
 ```shell
 python examples/test_world_builder.py -c kitchen_full_feg.yaml
 ```
+
+-->
 
 ---
 

@@ -26,4 +26,5 @@ def process(index):
 
 
 if __name__ == '__main__':
+    """ output will be in outputs/custom_pr2_kitchen_full/{timestamped_run_dir} """
     parallel_processing(process, range(config.n_data), parallel=config.parallel)

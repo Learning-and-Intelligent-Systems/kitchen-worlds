@@ -11,4 +11,3 @@ if __name__ == "__main__":
     kwargs = dict(task_name=args.task, dataset_root=OUTPUT_PATH, path=args.path,
                   parallel=args.parallel, input_args=args)
     process_all_tasks(generate_segmented_images, **kwargs)
-

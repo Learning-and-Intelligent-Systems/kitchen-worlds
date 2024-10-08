@@ -22,8 +22,8 @@ planner:
 problem:
   problem: 'test_full_kitchen'
   goal_variations: [21]
-  domain_pddl: 'pr2_domain_pigi.pddl'
-  stream_pddl: 'pr2_stream_pigi.pddl'
+  domain_pddl: 'pddl_domains/pr2_domain_pigi.pddl'
+  stream_pddl: 'pddl_domains/pr2_stream_pigi.pddl'
   use_skeleton_constraints: false
   use_subgoal_constraints: false
   use_all_grasps: false
@@ -38,23 +38,34 @@ data:
   exp_name: 'original'
   record_problem: true
   record_mp4: false
-  save_testcase: true
+  save_testcase: false
 
 robot:
   robot_name: 'pr2'
   draw_base_limits: true
 
+## planning stream related
+streams:
+  debug: false
+  cfree: false
+  teleport: false
+  disable_movable_collision: false
+  disable_base_collision: false
+  top_grasp_tolerance: 0.8
+  ir_max_attempts: 15
+  use_all_grasps: false
+
 ## pybullet related
 sim:
+  window_width: 720
+  window_height: 619
   viewer: true
   lock: true
   simulate: false
-  teleport: false
   drive: false
   cfree: false
-  disable_movable_collision: false
-  disable_base_collision: false
   time_step: 0.05
   camera: false
   segment: false
   monitoring: false
+  show_object_names: true
