@@ -253,4 +253,5 @@ dependencies:
     - yourdfpy==0.0.51
     - zipp==3.8.1
     - tqdm
+    - ipdb
 prefix: /home/yang/miniconda3/envs/kitchen
