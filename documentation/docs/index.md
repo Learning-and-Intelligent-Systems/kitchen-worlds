@@ -128,7 +128,7 @@ Here are some example scripts to help you understand the scene generation and ta
 
 ### 1. VLM-TAMP
 
-See [pybullet_planning/vlm_tools/README.md](pybullet_planning/vlm_tools/README.md) for more details.
+See [vlm_tools/README.md](https://github.com/zt-yang/pybullet_planning/blob/master/vlm_tools/README.md) for more details.
 
 ### 2. Generate Worlds, Problems, and Plans
 
