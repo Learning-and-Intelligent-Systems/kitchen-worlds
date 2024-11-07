@@ -1,13 +1,16 @@
 # Kitchen Worlds
 
-A library of long-horizon Task-and-Motion-Planning (TAMP) problems in kitchen and household scenes, as well as planning algorithms to solve them
+A library of long-horizon Task-and-Motion-Planning (TAMP) problems in simulated kitchen and household scenes, as well as planning algorithms to solve them
 
-- procedurally generate scenes with rigid and articulated objects
-- visualize a scene in LISDF format (an extension to SDF that includes URDF)
-- solve a TAMP problem defined by a `scene.lisdf` and `problem.pddl` using existing `domain.pddl` and `stream.pddl` using PDDLStream
-- visualize the robot trajectory in pybullet
+- Procedural scene, goal, and multi-step trajectory generation (follow sections A -> B2 -> C)
+  - procedurally generate scenes with rigid and articulated objects
+  - visualize a scene in LISDF format (an extension to SDF that includes URDF)
+  - solve a TAMP problem defined by a `scene.lisdf` and `problem.pddl` using existing `domain.pddl` and `stream.pddl` using PDDLStream
+  - visualize the robot trajectory in pybullet
+- Use a pretrained VLM (e.g. GPT-4v) to guide the planning process (follow section A -> B1)
 
-<img src="gifs/demo-cabbage.gif"></img>
+<img src="gifs/rss23kitchens.gif"></img>
+<img src="gifs/icra25vlmtamp.gif"></img>
 
 <!--
 <video autoplay loop muted playsinline width=100%>
@@ -35,7 +38,7 @@ A library of long-horizon Task-and-Motion-Planning (TAMP) problems in kitchen an
 </table>
 -->
 
-## Installation
+## A. Installation
 
 1. Clone the repo along with the submodules. It may take a few minutes. 
 
@@ -119,11 +122,15 @@ python examples/test_data_generation.py
 
 ---
 
-## Tutorial
+## B. Tutorial
 
 Here are some example scripts to help you understand the scene generation and task and motion planning tools. Once they are all working for you, we recommend you follow the next section to set up your own data generation pipeline with custom config files.
 
-### Generate Worlds, Problems, and Plans
+### 1. VLM-TAMP
+
+See [vlm_tools/README.md](vlm_tools/README.md) for more details.
+
+### 2. Generate Worlds, Problems, and Plans
 
 Generating data involves creating data folders that include scene layout `scene.lisdf`, `problem.pddl`, `plan.json`, and trajectory `commands.pkl`. It can be run without gui (faster) and can be run in parallel. Note that planning is not guaranteed to be return a solution within timeout, depending on the domain.
 
@@ -182,7 +189,9 @@ python examples/test_world_builder.py -c kitchen_full_feg.yaml
 
 -->
 
-## Quick Start Your Scene or Trajectory Generation Pipeline
+---
+
+## C. Quick Start Your Scene or Trajectory Generation Pipeline
 
 (Last tested 7 Oct, 2024)
 
@@ -241,7 +250,33 @@ Given path, for example, `timestamped_data_dir = 'custom_pr2_kitchen_full/241007
 python your_project_folder/run_replay_custom.py -p {timestamped_data_dir}
 ```
 
+---
 
+## References
+
+Please cite one of the following papers if you use this code in your research:
+
+```text 
+@misc{yang2024guidinglonghorizontaskmotion,
+      title={Guiding Long-Horizon Task and Motion Planning with Vision Language Models}, 
+      author={Zhutian Yang and Caelan Garrett and Dieter Fox and Tomás Lozano-Pérez and Leslie Pack Kaelbling},
+      year={2024},
+      eprint={2410.02193},
+      archivePrefix={arXiv},
+      primaryClass={cs.RO},
+      url={https://arxiv.org/abs/2410.02193}, 
+} 
+
+@INPROCEEDINGS{yang2023piginet, 
+    AUTHOR    = {Zhutian  Yang AND Caelan R Garrett AND Tomas Lozano-Perez AND Leslie Kaelbling AND Dieter Fox}, 
+    TITLE     = {{Sequence-Based Plan Feasibility Prediction for Efficient Task and Motion Planning}}, 
+    BOOKTITLE = {Proceedings of Robotics: Science and Systems}, 
+    YEAR      = {2023}, 
+    ADDRESS   = {Daegu, Republic of Korea}, 
+    MONTH     = {July}, 
+    DOI       = {10.15607/RSS.2023.XIX.061} 
+} 
+```
 
 ---
 
