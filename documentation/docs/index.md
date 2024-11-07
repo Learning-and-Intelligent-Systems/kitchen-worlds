@@ -134,11 +134,14 @@ See [vlm_tools/README.md](https://github.com/zt-yang/pybullet_planning/blob/mast
 
 Generating data involves creating data folders that include scene layout `scene.lisdf`, `problem.pddl`, `plan.json`, and trajectory `commands.pkl`. It can be run without gui (faster) and can be run in parallel. Note that planning is not guaranteed to be return a solution within timeout, depending on the domain.
 
-There are two scripts for collecting data. Note that both script may result in a failed output folder or early stop of simulation because the problem can't be solved, e.g. when the world generation script failed to find an initial world configuration for randomly sampled objects.
+There are two scripts for collecting data. 
+
+**Note that both script may result in a failed output folder or early stop of simulation because the problem can't be solved, e.g. when the world generation script failed to find an initial world configuration for randomly sampled objects. It's normal. Just run the script again.**
 
 1) One is simpler, cleaner, and more adaptable for your tasks.    
    * It supports parallel data collection (change to `parallel: true; n_data: 10` in config yaml file).
    * Example configuration files are provided in [kitchen-worlds/pybullet_planning/data_generator/configs](https://github.com/zt-yang/pybullet_planning/blob/master/data_generator/configs/kitchen_full_feg.yaml).
+   * **If `parallel: false; n_data: 1`, after a plan is generated, the console will prompt you to press Enter to visualize execution and prompt you to press again to exit the program.**
 
 ```shell
 python examples/test_data_generation.py --config_name kitchen_full_pr2.yaml  ## PR2 with extended torso range
