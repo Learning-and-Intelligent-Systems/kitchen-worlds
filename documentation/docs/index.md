@@ -226,8 +226,9 @@ Output will be in `outputs/{config.data.out_dir}/{timestamped_data_names}`.
 
 ```shell
 ## generates data folders with scene, problem, plan, trajectory
-python your_project_folder/run_generation_custom.py --config_name config_generation.yaml
+python your_project_folder/run_generation_custom.py --config_name config_generation.yaml 
 ```
+
 
 ### Step 2) To render images for the generated scene
 
@@ -247,11 +248,18 @@ python your_project_folder/render_images_custom.py --task {task_name}
 
 Replay the trajectory for review or rendering
 
-Given path, for example, `timestamped_data_dir = 'custom_pr2_kitchen_full/241007_233942'`. Output will be in `{timestamped_data_dir}/`
+Given path, for example, `timestamped_data_dir = 'custom_pr2_kitchen_full/241007_233942'` which contains the scene and plan files. 
+
+The output `replay.mp4` will be saved in the same directory.
 
 ```shell
 python your_project_folder/run_replay_custom.py -p {timestamped_data_dir}
 ```
+
+Useful optional flags to this script:
+* `--timestep 0.05` to set the simulation timestep, higher makes robot move slower and the video will have more frames.
+* `--width 1440` sets the width of the video frame.
+* `--height 1080` sets the height of the video frame.
 
 ---
 
