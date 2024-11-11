@@ -6,22 +6,30 @@ from os.path import join
 from config import PBP_PATH
 from data_generator.run_utils import get_config_file_from_argparse, process_all_tasks
 from pigi_tools.replay_utils import load_replay_conf, run_one, case_filter
+from world_builder.paths import OUTPUT_PATH
 
-REPLAY_CONFIG_PATH = join(PBP_PATH, 'pigi_tools', 'config')
+REPLAY_CONFIG_PATH = join(PBP_PATH, 'pigi_tools', 'configs')
 DEFAULT_CONFIG_NAME = 'replay_rss.yaml'
 DEFAULT_CONFIG_PATH = None
 
 ## or replace with your path to config yaml file
-DEFAULT_CONFIG_NAME = None
+DEFAULT_CONFIG_PATH = None
 DEFAULT_CONFIG_PATH = join(REPLAY_CONFIG_PATH, DEFAULT_CONFIG_NAME)
 
-config_file = get_config_file_from_argparse(default_config_name=DEFAULT_CONFIG_NAME,
-                                            default_config_path=DEFAULT_CONFIG_PATH,
-                                            default_config_dir=REPLAY_CONFIG_PATH)
+config_file, args = get_config_file_from_argparse(default_config_name=DEFAULT_CONFIG_NAME,
+                                                  default_config_path=DEFAULT_CONFIG_PATH,
+                                                  default_config_dir=REPLAY_CONFIG_PATH)
 
 
 def run_replay(config_yaml_file, load_data_fn):
     c = load_replay_conf(config_yaml_file)
+    for k, v in args.items():
+        if k in c:
+            if k.startswith('given_'):
+                v = join(OUTPUT_PATH, v)
+            c[k] = v
+    print(f'\n\ngiven_dir =', c['given_dir'])
+    print(f'given_path =', c['given_path'], '\n\n')
 
     def process(run_dir_ori):
         return run_one(run_dir_ori, load_data_fn=load_data_fn, **c)

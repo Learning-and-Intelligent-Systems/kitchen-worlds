@@ -29,7 +29,7 @@ def process(index):
     new_config = copy.deepcopy(config)
     new_config.seed = index
     new_config.data.out_dir = join(EXP_PATH, config.data.out_dir, str(index))
-    return sample_world_and_goal(new_config, save_testcase=True, reset_sim=True)
+    return sample_world_and_goal(new_config)
 
 
 if __name__ == '__main__':

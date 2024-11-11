@@ -1,5 +1,5 @@
 ## ---- data source
-task_name: 'mm_braiser'
+task_name: 'custom_task'
 given_dir: null
 cases: null
 parallel: false

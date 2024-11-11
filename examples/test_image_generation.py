@@ -27,6 +27,7 @@ def process_worlds_aabb():
 
 
 if __name__ == "__main__":
+    print('\n\n', args)
     kwargs = dict(task_name=args.task, dataset_root=OUTPUT_PATH, parallel=args.parallel, path=args.path, input_args=args)
     process_all_tasks(generate_segmented_images, **kwargs)
 
