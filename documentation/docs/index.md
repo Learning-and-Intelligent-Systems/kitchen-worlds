@@ -111,6 +111,8 @@ cmake --version
 
 ### Test Installation
 
+See [trouble-shooting.md](pybullet_planning/trouble-shooting.md) for common issues.
+
 ```shell 
 conda activate kitchen
 python examples/test_parse_lisdf.py
