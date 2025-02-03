@@ -19,6 +19,7 @@ sim:
   camera: true
   segment: false
   monitoring: false
+  skip_prompt: false
 
 robot:
   robot_name: 'pr2'

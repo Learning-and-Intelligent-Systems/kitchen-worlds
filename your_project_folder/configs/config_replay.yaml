@@ -1,5 +1,5 @@
 ## ---- data source
-task_name: 'mm_braiser'
+task_name: 'custom_task'
 given_dir: null
 cases: null
 parallel: false
@@ -29,9 +29,11 @@ verbose: false
 width: 1440
 height: 1120
 fx: 60
+time_step: 0.05
 #camera_kwargs: null
 camera_movement: null
 light_conf: null
+make_robot_and_links_transparent: false
 
 ## ---- purposes
 check_collisions: false
