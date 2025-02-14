@@ -44,6 +44,7 @@ git clone git@github.com:Learning-and-Intelligent-Systems/kitchen-worlds.git --r
 
 <pre>
 (cd pybullet_planning; git checkout master; git pull); \
+  (cd lisdf; git checkout main); \
   (cd pddlstream; git checkout caelan/diverse); \
   (cd assets/models; git checkout main); 
 </pre>
@@ -155,7 +156,7 @@ Please cite one of the following papers if you use this code in your research:
 } 
 
 @INPROCEEDINGS{yang2023piginet, 
-    AUTHOR    = {Zhutian  Yang AND Caelan R Garrett AND Tomas Lozano-Perez AND Leslie Kaelbling AND Dieter Fox}, 
+    AUTHOR    = {Zhutian Yang AND Caelan R Garrett AND Tomas Lozano-Perez AND Leslie Kaelbling AND Dieter Fox}, 
     TITLE     = {{Sequence-Based Plan Feasibility Prediction for Efficient Task and Motion Planning}}, 
     BOOKTITLE = {Proceedings of Robotics: Science and Systems}, 
     YEAR      = {2023}, 

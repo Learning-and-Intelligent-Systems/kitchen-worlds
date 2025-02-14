@@ -254,4 +254,4 @@ dependencies:
     - zipp==3.8.1
     - tqdm
     - ipdb
-prefix: /home/yang/miniconda3/envs/kitchen
+prefix: /home/yang/miniconda3/envs/kitchen2

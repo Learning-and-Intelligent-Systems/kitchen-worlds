@@ -3,10 +3,10 @@ import sys
 import numpy as np
 import shutil
 from pybullet_tools.utils import connect
-from isaac_tools.gym_utils import images_to_gif, load_obj_shots_bg, take_obj_shot
+from isaac_tools.gym_utils import images_to_gif, load_obj_shots_bg, take_obj_shot, create_single_world
 
 from config import MAMAO_DATA_PATH, ASSET_PATH
-from examples.test_utils import copy_dir_for_process, get_sample_envs_200
+from data_generator.run_utils import copy_dir_for_process
 
 
 ###########################################################################
@@ -77,14 +77,13 @@ def test_load_multiple(test_camera_pose=False):
 
 def test_load_objects(save_obj_shots=False, width=1980, height=1238):
     sys.path.append('/home/yang/Documents/playground/srl_stream/src')
-    from srl_stream.gym_world import create_single_world, default_arguments
     from pybullet_tools.utils import pose_from_tform
     from trimesh import transformations
     from world_builder.asset_constants import MODEL_SCALES, MODEL_HEIGHTS
     from world_builder.world_utils import get_instances, get_scale_by_category
 
     connect(use_gui=False, shadows=False, width=width, height=height)
-    gym_world = create_single_world(args=default_arguments(use_gpu=True), spacing=5.)
+    gym_world = create_single_world(use_gpu=True, spacing=5.)
     gym_world.set_viewer_target((3, 3, 3), target=(0, 0, 0))
     gym_world.create_camera(width=width, height=height, fov=60)
 
