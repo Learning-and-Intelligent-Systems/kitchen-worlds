@@ -18,6 +18,7 @@ test_cases/
 temp/
 outputs/
 experiments/
+gym_images/
 
 */visualizations/
 */statistics/
