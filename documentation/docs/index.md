@@ -145,15 +145,12 @@ python tests/1_test_data_generation.py
 Please cite one of the following papers if you use this code in your research:
 
 ```text 
-@misc{yang2024guidinglonghorizontaskmotion,
-      title={Guiding Long-Horizon Task and Motion Planning with Vision Language Models}, 
-      author={Zhutian Yang and Caelan Garrett and Dieter Fox and Tomás Lozano-Pérez and Leslie Pack Kaelbling},
-      year={2024},
-      eprint={2410.02193},
-      archivePrefix={arXiv},
-      primaryClass={cs.RO},
-      url={https://arxiv.org/abs/2410.02193}, 
-} 
+@article{yang2024guiding,
+  title={Guiding long-horizon task and motion planning with vision language models},
+  author={Yang, Zhutian and Garrett, Caelan and Fox, Dieter and Lozano-P{\'e}rez, Tom{\'a}s and Kaelbling, Leslie Pack},
+  journal={arXiv preprint arXiv:2410.02193},
+  year={2024}
+}
 
 @INPROCEEDINGS{yang2023piginet, 
     AUTHOR    = {Zhutian Yang AND Caelan R Garrett AND Tomas Lozano-Perez AND Leslie Kaelbling AND Dieter Fox}, 
