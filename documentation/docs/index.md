@@ -145,21 +145,22 @@ python tests/1_test_data_generation.py
 Please cite one of the following papers if you use this code in your research:
 
 ```text 
-@article{yang2024guiding,
-  title={Guiding long-horizon task and motion planning with vision language models},
-  author={Yang, Zhutian and Garrett, Caelan and Fox, Dieter and Lozano-P{\'e}rez, Tom{\'a}s and Kaelbling, Leslie Pack},
-  journal={arXiv preprint arXiv:2410.02193},
-  year={2024}
+@inproceedings{yang2024guiding,
+    title     = {{Guiding Long-Horizon Task and Motion Planning with Vision Language Models}},
+    author    = {Yang, Zhutian and Garrett, Caelan and Fox, Dieter and Lozano-P{\'e}rez, Tom{\'a}s and Kaelbling, Leslie Pack},
+    booktitle = {ICRA},
+    year      = {2025},
+    organization  = {IEEE}
 }
 
-@INPROCEEDINGS{yang2023piginet, 
-    AUTHOR    = {Zhutian Yang AND Caelan R Garrett AND Tomas Lozano-Perez AND Leslie Kaelbling AND Dieter Fox}, 
-    TITLE     = {{Sequence-Based Plan Feasibility Prediction for Efficient Task and Motion Planning}}, 
-    BOOKTITLE = {Proceedings of Robotics: Science and Systems}, 
-    YEAR      = {2023}, 
-    ADDRESS   = {Daegu, Republic of Korea}, 
-    MONTH     = {July}, 
-    DOI       = {10.15607/RSS.2023.XIX.061} 
+@inproceedings{yang2023piginet, 
+    author    = {Zhutian Yang AND Caelan R Garrett AND Tomas Lozano-Perez AND Leslie Kaelbling AND Dieter Fox}, 
+    title     = {{Sequence-Based Plan Feasibility Prediction for Efficient Task and Motion Planning}}, 
+    booktitle = {Proceedings of Robotics: Science and Systems}, 
+    year      = {2023}, 
+    address   = {Daegu, Republic of Korea}, 
+    month     = {July}, 
+    doi       = {10.15607/RSS.2023.XIX.061} 
 } 
 ```
 
